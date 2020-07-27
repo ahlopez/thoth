@@ -13,6 +13,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
+import com.f.thoth.backend.data.OrderState;
+import com.f.thoth.backend.data.entity.Order;
+import com.f.thoth.backend.data.entity.PickupLocation;
+import com.f.thoth.backend.data.entity.Product;
+import com.f.thoth.backend.data.entity.User;
+import com.f.thoth.backend.service.PickupLocationService;
+import com.f.thoth.backend.service.ProductService;
+import com.f.thoth.ui.crud.CrudEntityDataProvider;
+import com.f.thoth.ui.dataproviders.DataProviderUtil;
+import com.f.thoth.ui.events.CancelEvent;
+import com.f.thoth.ui.utils.FormattingUtils;
+import com.f.thoth.ui.utils.converters.LocalTimeConverter;
+import com.f.thoth.ui.views.storefront.events.ReviewEvent;
+import com.f.thoth.ui.views.storefront.events.ValueChangeEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.HasValue;
@@ -35,20 +49,6 @@ import com.vaadin.flow.data.validator.BeanValidator;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.templatemodel.TemplateModel;
-import com.f.thoth.backend.data.OrderState;
-import com.f.thoth.backend.data.entity.Order;
-import com.f.thoth.backend.data.entity.PickupLocation;
-import com.f.thoth.backend.data.entity.Product;
-import com.f.thoth.backend.data.entity.User;
-import com.f.thoth.backend.service.PickupLocationService;
-import com.f.thoth.backend.service.ProductService;
-import com.f.thoth.ui.crud.CrudEntityDataProvider;
-import com.f.thoth.ui.dataproviders.DataProviderUtil;
-import com.f.thoth.ui.events.CancelEvent;
-import com.f.thoth.ui.utils.FormattingUtils;
-import com.f.thoth.ui.utils.converters.LocalTimeConverter;
-import com.f.thoth.ui.views.storefront.events.ReviewEvent;
-import com.f.thoth.ui.views.storefront.events.ValueChangeEvent;
 
 @Tag("order-editor")
 @JsModule("./src/views/orderedit/order-editor.js")

@@ -1,13 +1,13 @@
 package com.f.thoth.app.security;
 
+import com.f.thoth.ui.components.OfflineBanner;
+import com.f.thoth.ui.exceptions.AccessDeniedException;
+import com.f.thoth.ui.views.login.LoginView;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.server.ServiceInitEvent;
 import com.vaadin.flow.server.VaadinServiceInitListener;
 import com.vaadin.flow.spring.annotation.SpringComponent;
-import com.f.thoth.ui.components.OfflineBanner;
-import com.f.thoth.ui.exceptions.AccessDeniedException;
-import com.f.thoth.ui.views.login.LoginView;
 
 /**
  * Adds before enter listener to check access to views.

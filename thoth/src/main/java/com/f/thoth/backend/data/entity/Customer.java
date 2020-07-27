@@ -6,6 +6,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 
+
 @Entity
 public class Customer extends AbstractEntity {
 

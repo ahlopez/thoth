@@ -1,7 +1,7 @@
 package com.f.thoth.testbench.elements.ui;
 
-import com.vaadin.flow.component.applayout.testbench.AppLayoutElement;
 import com.f.thoth.testbench.elements.components.AppNavigationElement;
+import com.vaadin.flow.component.applayout.testbench.AppLayoutElement;
 
 public class MainViewElement extends AppLayoutElement {
 

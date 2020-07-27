@@ -8,8 +8,6 @@ import javax.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
 
-import com.vaadin.flow.data.binder.ValidationException;
-import com.vaadin.flow.shared.Registration;
 import com.f.thoth.app.HasLogger;
 import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.entity.AbstractEntity;
@@ -19,6 +17,8 @@ import com.f.thoth.backend.service.UserFriendlyDataException;
 import com.f.thoth.ui.utils.messages.CrudErrorMessage;
 import com.f.thoth.ui.utils.messages.Message;
 import com.f.thoth.ui.views.EntityView;
+import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.shared.Registration;
 
 public class EntityPresenter<T extends AbstractEntity, V extends EntityView<T>>
    implements HasLogger {

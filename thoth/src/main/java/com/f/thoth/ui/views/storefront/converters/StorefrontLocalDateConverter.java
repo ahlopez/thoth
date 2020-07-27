@@ -1,11 +1,11 @@
 package com.f.thoth.ui.views.storefront.converters;
 
-import com.vaadin.flow.templatemodel.ModelEncoder;
-
 import static com.f.thoth.ui.utils.FormattingUtils.MONTH_AND_DAY_FORMATTER;
 import static com.f.thoth.ui.utils.FormattingUtils.WEEKDAY_FULLNAME_FORMATTER;
 
 import java.time.LocalDate;
+
+import com.vaadin.flow.templatemodel.ModelEncoder;
 
 /**
  * Date converter specific for the way date is displayed in storefront.

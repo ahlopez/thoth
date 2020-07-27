@@ -2,6 +2,8 @@ package com.f.thoth.ui.views.errors;
 
 import javax.servlet.http.HttpServletResponse;
 
+import com.f.thoth.ui.MainView;
+import com.f.thoth.ui.utils.BakeryConst;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.dependency.JsModule;
@@ -13,8 +15,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.ParentLayout;
 import com.vaadin.flow.router.RouteNotFoundError;
 import com.vaadin.flow.router.RouterLink;
-import com.f.thoth.ui.MainView;
-import com.f.thoth.ui.utils.BakeryConst;
 
 @ParentLayout(MainView.class)
 @PageTitle(BakeryConst.TITLE_NOT_FOUND)

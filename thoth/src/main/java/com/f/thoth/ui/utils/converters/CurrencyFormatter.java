@@ -1,8 +1,8 @@
 package com.f.thoth.ui.utils.converters;
 
-import com.vaadin.flow.templatemodel.ModelEncoder;
 import com.f.thoth.ui.dataproviders.DataProviderUtil;
 import com.f.thoth.ui.utils.FormattingUtils;
+import com.vaadin.flow.templatemodel.ModelEncoder;
 
 public class CurrencyFormatter implements ModelEncoder<Integer, String> {
 

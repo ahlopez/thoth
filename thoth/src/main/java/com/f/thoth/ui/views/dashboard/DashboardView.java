@@ -11,6 +11,18 @@ import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.f.thoth.backend.data.DashboardData;
+import com.f.thoth.backend.data.DeliveryStats;
+import com.f.thoth.backend.data.entity.Order;
+import com.f.thoth.backend.data.entity.OrderSummary;
+import com.f.thoth.backend.data.entity.Product;
+import com.f.thoth.backend.service.OrderService;
+import com.f.thoth.ui.MainView;
+import com.f.thoth.ui.dataproviders.OrdersGridDataProvider;
+import com.f.thoth.ui.utils.BakeryConst;
+import com.f.thoth.ui.utils.FormattingUtils;
+import com.f.thoth.ui.views.storefront.OrderCard;
+import com.f.thoth.ui.views.storefront.beans.OrdersCountDataWithChart;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.UI;
@@ -33,18 +45,6 @@ import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.templatemodel.TemplateModel;
-import com.f.thoth.backend.data.DashboardData;
-import com.f.thoth.backend.data.DeliveryStats;
-import com.f.thoth.backend.data.entity.Order;
-import com.f.thoth.backend.data.entity.OrderSummary;
-import com.f.thoth.backend.data.entity.Product;
-import com.f.thoth.backend.service.OrderService;
-import com.f.thoth.ui.MainView;
-import com.f.thoth.ui.dataproviders.OrdersGridDataProvider;
-import com.f.thoth.ui.utils.BakeryConst;
-import com.f.thoth.ui.utils.FormattingUtils;
-import com.f.thoth.ui.views.storefront.OrderCard;
-import com.f.thoth.ui.views.storefront.beans.OrdersCountDataWithChart;
 
 @Tag("dashboard-view")
 @JsModule("./src/views/dashboard/dashboard-view.js")

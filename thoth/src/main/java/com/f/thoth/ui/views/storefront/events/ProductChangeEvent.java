@@ -1,8 +1,8 @@
 package com.f.thoth.ui.views.storefront.events;
 
-import com.vaadin.flow.component.ComponentEvent;
 import com.f.thoth.backend.data.entity.Product;
 import com.f.thoth.ui.views.orderedit.OrderItemEditor;
+import com.vaadin.flow.component.ComponentEvent;
 
 public class ProductChangeEvent extends ComponentEvent<OrderItemEditor> {
 

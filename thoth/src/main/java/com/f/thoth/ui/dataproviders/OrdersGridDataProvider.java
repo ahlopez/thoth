@@ -12,14 +12,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.vaadin.artur.spring.dataprovider.FilterablePageableDataProvider;
 
+import com.f.thoth.backend.data.entity.Order;
+import com.f.thoth.backend.service.OrderService;
+import com.f.thoth.ui.utils.BakeryConst;
 import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.provider.QuerySortOrder;
 import com.vaadin.flow.data.provider.QuerySortOrderBuilder;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.vaadin.flow.spring.annotation.UIScope;
-import com.f.thoth.backend.data.entity.Order;
-import com.f.thoth.backend.service.OrderService;
-import com.f.thoth.ui.utils.BakeryConst;
 
 /**
  * A pageable order data provider.

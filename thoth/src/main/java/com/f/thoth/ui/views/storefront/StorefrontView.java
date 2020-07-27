@@ -2,15 +2,23 @@ package com.f.thoth.ui.views.storefront;
 
 import java.util.stream.Stream;
 
-import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
-import com.vaadin.flow.component.dependency.JsModule;
-import com.vaadin.flow.component.dialog.Dialog;
-import com.f.thoth.backend.data.entity.util.EntityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.f.thoth.app.HasLogger;
+import com.f.thoth.backend.data.entity.Order;
+import com.f.thoth.backend.data.entity.util.EntityUtil;
+import com.f.thoth.ui.MainView;
+import com.f.thoth.ui.components.SearchBar;
+import com.f.thoth.ui.utils.BakeryConst;
+import com.f.thoth.ui.views.EntityView;
+import com.f.thoth.ui.views.orderedit.OrderDetails;
+import com.f.thoth.ui.views.orderedit.OrderEditor;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.UI;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
+import com.vaadin.flow.component.dependency.JsModule;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.polymertemplate.Id;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
@@ -22,14 +30,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.templatemodel.TemplateModel;
-import com.f.thoth.app.HasLogger;
-import com.f.thoth.backend.data.entity.Order;
-import com.f.thoth.ui.MainView;
-import com.f.thoth.ui.components.SearchBar;
-import com.f.thoth.ui.utils.BakeryConst;
-import com.f.thoth.ui.views.EntityView;
-import com.f.thoth.ui.views.orderedit.OrderDetails;
-import com.f.thoth.ui.views.orderedit.OrderEditor;
 
 @Tag("storefront-view")
 @JsModule("./src/views/storefront/storefront-view.js")

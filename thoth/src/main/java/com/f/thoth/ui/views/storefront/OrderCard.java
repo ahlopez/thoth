@@ -9,11 +9,11 @@ import static com.f.thoth.ui.utils.FormattingUtils.WEEK_OF_YEAR_FIELD;
 import java.time.LocalDate;
 import java.util.List;
 
-import com.vaadin.flow.data.renderer.TemplateRenderer;
 import com.f.thoth.backend.data.entity.Order;
 import com.f.thoth.backend.data.entity.OrderItem;
 import com.f.thoth.backend.data.entity.OrderSummary;
 import com.f.thoth.ui.utils.converters.OrderStateConverter;
+import com.vaadin.flow.data.renderer.TemplateRenderer;
 
 /**
  * Help class to get ready to use TemplateRenderer for displaying order card list on the Storefront and Dashboard grids.

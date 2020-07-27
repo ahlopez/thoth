@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import com.vaadin.flow.templatemodel.ModelEncoder;
 import com.f.thoth.backend.data.OrderState;
+import com.vaadin.flow.templatemodel.ModelEncoder;
 
 public class OrderStateConverter implements ModelEncoder<OrderState, String> {
 

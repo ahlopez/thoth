@@ -9,15 +9,15 @@ import java.util.stream.IntStream;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.vaadin.flow.component.button.testbench.ButtonElement;
-import com.vaadin.flow.component.notification.testbench.NotificationElement;
-import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 import com.f.thoth.testbench.elements.components.OrderCardElement;
 import com.f.thoth.testbench.elements.ui.OrderItemEditorElement;
 import com.f.thoth.testbench.elements.ui.StorefrontViewElement;
 import com.f.thoth.testbench.elements.ui.StorefrontViewElement.OrderEditorElement;
 import com.f.thoth.testbench.elements.ui.UsersViewElement;
 import com.f.thoth.ui.utils.BakeryConst;
+import com.vaadin.flow.component.button.testbench.ButtonElement;
+import com.vaadin.flow.component.notification.testbench.NotificationElement;
+import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
 
 public class StorefrontViewIT extends AbstractIT<StorefrontViewElement> {
 

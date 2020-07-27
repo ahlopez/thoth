@@ -1,9 +1,11 @@
 package com.f.thoth.ui;
 
+import static com.f.thoth.ui.utils.BakeryConst.TITLE_ADMINISTRATION;
 import static com.f.thoth.ui.utils.BakeryConst.TITLE_DASHBOARD;
 import static com.f.thoth.ui.utils.BakeryConst.TITLE_LOGOUT;
 import static com.f.thoth.ui.utils.BakeryConst.TITLE_PRODUCTS;
 import static com.f.thoth.ui.utils.BakeryConst.TITLE_STOREFRONT;
+import static com.f.thoth.ui.utils.BakeryConst.TITLE_TENANTS;
 import static com.f.thoth.ui.utils.BakeryConst.TITLE_USERS;
 import static com.f.thoth.ui.utils.BakeryConst.VIEWPORT;
 
@@ -14,6 +16,7 @@ import java.util.Optional;
 import com.f.thoth.app.security.SecurityUtils;
 import com.f.thoth.ui.views.HasConfirmation;
 import com.f.thoth.ui.views.admin.products.ProductsView;
+import com.f.thoth.ui.views.admin.tenants.TenantsView;
 import com.f.thoth.ui.views.admin.users.UsersView;
 import com.f.thoth.ui.views.dashboard.DashboardView;
 import com.f.thoth.ui.views.storefront.StorefrontView;
@@ -98,15 +101,17 @@ public class MainView extends AppLayout {
 
    private static Tab[] getAvailableTabs() {
       final List<Tab> tabs = new ArrayList<>(4);
-      tabs.add(createTab(VaadinIcon.EDIT, TITLE_STOREFRONT,
-                  StorefrontView.class));
+      tabs.add(createTab(VaadinIcon.EDIT, TITLE_STOREFRONT, StorefrontView.class));
       tabs.add(createTab(VaadinIcon.CLOCK,TITLE_DASHBOARD, DashboardView.class));
-      if (SecurityUtils.isAccessGranted(UsersView.class)) {
-         tabs.add(createTab(VaadinIcon.USER,TITLE_USERS, UsersView.class));
+      if (SecurityUtils.isAccessGranted(UsersView.class)){
+         tabs.add(createTab(VaadinIcon.KEY,TITLE_ADMINISTRATION, UsersView.class));
       }
       if (SecurityUtils.isAccessGranted(ProductsView.class)) {
          tabs.add(createTab(VaadinIcon.CALENDAR, TITLE_PRODUCTS, ProductsView.class));
       }
+      if (SecurityUtils.isAccessGranted(TenantsView.class)) {
+          tabs.add(createTab(VaadinIcon.HOSPITAL, TITLE_TENANTS, ProductsView.class));
+       }
       final String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
       final Tab logoutTab = createTab(createLogoutLink(contextPath));
       tabs.add(logoutTab);
@@ -132,7 +137,10 @@ public class MainView extends AppLayout {
 
    private static <T extends HasComponents> T populateLink(T a, VaadinIcon icon, String title) {
       a.add(icon.create());
-      a.add(title);
+      if (title.equals(TITLE_ADMINISTRATION) )
+    	  a.add(TITLE_USERS);
+      else
+          a.add(title);
       return a;
    }
 }

@@ -1,5 +1,8 @@
 package com.f.thoth.ui.views.login;
 
+import com.f.thoth.app.security.SecurityUtils;
+import com.f.thoth.ui.utils.BakeryConst;
+import com.f.thoth.ui.views.storefront.StorefrontView;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.login.LoginI18n;
 import com.vaadin.flow.component.login.LoginOverlay;
@@ -10,9 +13,6 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.f.thoth.app.security.SecurityUtils;
-import com.f.thoth.ui.utils.BakeryConst;
-import com.f.thoth.ui.views.storefront.StorefrontView;
 
 @Route
 @PageTitle("Evidentia")

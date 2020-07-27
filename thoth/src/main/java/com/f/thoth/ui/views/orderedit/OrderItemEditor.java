@@ -3,6 +3,13 @@ package com.f.thoth.ui.views.orderedit;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import com.f.thoth.backend.data.entity.OrderItem;
+import com.f.thoth.backend.data.entity.Product;
+import com.f.thoth.ui.utils.FormattingUtils;
+import com.f.thoth.ui.views.storefront.events.CommentChangeEvent;
+import com.f.thoth.ui.views.storefront.events.DeleteEvent;
+import com.f.thoth.ui.views.storefront.events.PriceChangeEvent;
+import com.f.thoth.ui.views.storefront.events.ProductChangeEvent;
 import com.vaadin.flow.component.AbstractField.ComponentValueChangeEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.HasValue;
@@ -22,13 +29,6 @@ import com.vaadin.flow.data.binder.BindingValidationStatus;
 import com.vaadin.flow.data.provider.DataProvider;
 import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.templatemodel.TemplateModel;
-import com.f.thoth.backend.data.entity.OrderItem;
-import com.f.thoth.backend.data.entity.Product;
-import com.f.thoth.ui.utils.FormattingUtils;
-import com.f.thoth.ui.views.storefront.events.CommentChangeEvent;
-import com.f.thoth.ui.views.storefront.events.DeleteEvent;
-import com.f.thoth.ui.views.storefront.events.PriceChangeEvent;
-import com.f.thoth.ui.views.storefront.events.ProductChangeEvent;
 
 @Tag("order-item-editor")
 @JsModule("./src/views/orderedit/order-item-editor.js")

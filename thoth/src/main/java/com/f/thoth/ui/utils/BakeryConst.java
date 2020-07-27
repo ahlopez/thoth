@@ -14,14 +14,18 @@ public class BakeryConst {
    public static final String PAGE_DASHBOARD = "dashboard";
    public static final String PAGE_USERS = "users";
    public static final String PAGE_PRODUCTS = "products";
+   public static final String PAGE_TENANTS = "tenants";
 
    public static final String TITLE_STOREFRONT = "Storefront";
    public static final String TITLE_DASHBOARD = "Dashboard";
+   
+   public static final String TITLE_ADMINISTRATION = "Administración";
    public static final String TITLE_USERS = "Users";
    public static final String TITLE_PRODUCTS = "Products";
    public static final String TITLE_LOGOUT = "Logout";
    public static final String TITLE_NOT_FOUND = "Page was not found";
    public static final String TITLE_ACCESS_DENIED = "Access denied";
+   public static final String TITLE_TENANTS = "Tenants";
 
    public static final String[] ORDER_SORT_FIELDS = {"dueDate", "dueTime", "id"};
    public static final Sort.Direction DEFAULT_SORT_DIRECTION = Sort.Direction.ASC;

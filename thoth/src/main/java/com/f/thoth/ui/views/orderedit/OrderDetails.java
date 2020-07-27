@@ -3,6 +3,17 @@
  */
 package com.f.thoth.ui.views.orderedit;
 
+import com.f.thoth.backend.data.entity.Order;
+import com.f.thoth.ui.events.CancelEvent;
+import com.f.thoth.ui.events.SaveEvent;
+import com.f.thoth.ui.utils.converters.CurrencyFormatter;
+import com.f.thoth.ui.utils.converters.LocalDateTimeConverter;
+import com.f.thoth.ui.utils.converters.LocalTimeConverter;
+import com.f.thoth.ui.utils.converters.LongToStringConverter;
+import com.f.thoth.ui.utils.converters.OrderStateConverter;
+import com.f.thoth.ui.views.storefront.converters.StorefrontLocalDateConverter;
+import com.f.thoth.ui.views.storefront.events.CommentEvent;
+import com.f.thoth.ui.views.storefront.events.EditEvent;
 import com.vaadin.flow.component.ClickEvent;
 import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Tag;
@@ -16,17 +27,6 @@ import com.vaadin.flow.shared.Registration;
 import com.vaadin.flow.templatemodel.Encode;
 import com.vaadin.flow.templatemodel.Include;
 import com.vaadin.flow.templatemodel.TemplateModel;
-import com.f.thoth.backend.data.entity.Order;
-import com.f.thoth.ui.events.CancelEvent;
-import com.f.thoth.ui.events.SaveEvent;
-import com.f.thoth.ui.utils.converters.CurrencyFormatter;
-import com.f.thoth.ui.utils.converters.LocalDateTimeConverter;
-import com.f.thoth.ui.utils.converters.LocalTimeConverter;
-import com.f.thoth.ui.utils.converters.LongToStringConverter;
-import com.f.thoth.ui.utils.converters.OrderStateConverter;
-import com.f.thoth.ui.views.storefront.converters.StorefrontLocalDateConverter;
-import com.f.thoth.ui.views.storefront.events.CommentEvent;
-import com.f.thoth.ui.views.storefront.events.EditEvent;
 
 /**
  * The component displaying a full (read-only) summary of an order, and a comment

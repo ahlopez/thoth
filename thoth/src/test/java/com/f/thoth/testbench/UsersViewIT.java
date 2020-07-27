@@ -5,11 +5,11 @@ import java.util.Random;
 import org.junit.Assert;
 import org.junit.Test;
 
+import com.f.thoth.testbench.elements.ui.StorefrontViewElement;
+import com.f.thoth.testbench.elements.ui.UsersViewElement;
 import com.vaadin.flow.component.tabs.testbench.TabElement;
 import com.vaadin.flow.component.textfield.testbench.EmailFieldElement;
 import com.vaadin.flow.component.textfield.testbench.PasswordFieldElement;
-import com.f.thoth.testbench.elements.ui.StorefrontViewElement;
-import com.f.thoth.testbench.elements.ui.UsersViewElement;
 import com.vaadin.testbench.TestBenchElement;
 
 public class UsersViewIT extends AbstractIT<UsersViewElement> {

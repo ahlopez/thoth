@@ -6,11 +6,11 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.support.ui.ExpectedCondition;
 
+import com.f.thoth.testbench.elements.ui.ProductsViewElement;
+import com.f.thoth.testbench.elements.ui.StorefrontViewElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.grid.testbench.GridTHTDElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
-import com.f.thoth.testbench.elements.ui.ProductsViewElement;
-import com.f.thoth.testbench.elements.ui.StorefrontViewElement;
 
 public class ProductsViewIT extends AbstractIT<ProductsViewElement> {
 

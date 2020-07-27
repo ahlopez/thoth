@@ -6,12 +6,12 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 
+import com.f.thoth.ui.utils.FormattingUtils;
 import com.vaadin.flow.data.binder.Result;
 import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.data.converter.Converter;
-import com.f.thoth.ui.utils.FormattingUtils;
 
-class PriceConverter implements Converter<String, Integer> {
+public class PriceConverter implements Converter<String, Integer> {
 
    private final DecimalFormat df = FormattingUtils.getUiPriceFormatter();
 

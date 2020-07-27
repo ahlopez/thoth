@@ -1,7 +1,7 @@
 package com.f.thoth.ui.views.storefront.events;
 
-import com.vaadin.flow.component.ComponentEvent;
 import com.f.thoth.ui.views.orderedit.OrderDetails;
+import com.vaadin.flow.component.ComponentEvent;
 
 public class CommentEvent extends ComponentEvent<OrderDetails> {
 

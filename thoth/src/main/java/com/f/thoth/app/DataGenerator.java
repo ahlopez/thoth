@@ -15,7 +15,6 @@ import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.f.thoth.backend.data.OrderState;
 import com.f.thoth.backend.data.Role;
 import com.f.thoth.backend.data.entity.Customer;
@@ -29,6 +28,7 @@ import com.f.thoth.backend.repositories.OrderRepository;
 import com.f.thoth.backend.repositories.PickupLocationRepository;
 import com.f.thoth.backend.repositories.ProductRepository;
 import com.f.thoth.backend.repositories.UserRepository;
+import com.vaadin.flow.spring.annotation.SpringComponent;
 
 @SpringComponent
 public class DataGenerator implements HasLogger {

@@ -2,13 +2,13 @@ package com.f.thoth.testbench.elements.ui;
 
 import java.util.Optional;
 
+import com.f.thoth.testbench.elements.components.OrderCardElement;
+import com.f.thoth.testbench.elements.components.OrderDetailsElement;
+import com.f.thoth.testbench.elements.components.SearchBarElement;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.dialog.testbench.DialogElement;
 import com.vaadin.flow.component.grid.testbench.GridElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
-import com.f.thoth.testbench.elements.components.OrderCardElement;
-import com.f.thoth.testbench.elements.components.OrderDetailsElement;
-import com.f.thoth.testbench.elements.components.SearchBarElement;
 import com.vaadin.testbench.TestBenchElement;
 import com.vaadin.testbench.elementsbase.Element;
 

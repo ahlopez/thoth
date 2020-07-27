@@ -1,11 +1,11 @@
 package com.f.thoth.ui.views;
 
+import com.f.thoth.ui.utils.BakeryConst;
 import com.vaadin.flow.component.HasElement;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.Notification.Position;
-import com.f.thoth.ui.utils.BakeryConst;
 
 /**
  * Interface for views showing notifications to users

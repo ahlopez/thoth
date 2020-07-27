@@ -7,10 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
-import com.vaadin.flow.component.Focusable;
-import com.vaadin.flow.component.HasValue;
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.spring.annotation.SpringComponent;
 import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.entity.Order;
 import com.f.thoth.backend.service.OrderService;
@@ -19,6 +15,10 @@ import com.f.thoth.ui.dataproviders.OrdersGridDataProvider;
 import com.f.thoth.ui.dataproviders.OrdersGridDataProvider.OrderFilter;
 import com.f.thoth.ui.utils.BakeryConst;
 import com.f.thoth.ui.views.storefront.beans.OrderCardHeader;
+import com.vaadin.flow.component.Focusable;
+import com.vaadin.flow.component.HasValue;
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.spring.annotation.SpringComponent;
 
 @SpringComponent
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)

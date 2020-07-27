@@ -1,5 +1,13 @@
 package com.f.thoth.ui.crud;
 
+import java.util.function.Consumer;
+
+import javax.persistence.EntityNotFoundException;
+import javax.validation.ConstraintViolationException;
+
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
+
 import com.f.thoth.app.HasLogger;
 import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.entity.AbstractEntity;
@@ -7,12 +15,6 @@ import com.f.thoth.backend.service.CrudService;
 import com.f.thoth.backend.service.UserFriendlyDataException;
 import com.f.thoth.ui.utils.messages.CrudErrorMessage;
 import com.f.thoth.ui.views.HasNotifications;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.OptimisticLockingFailureException;
-
-import javax.persistence.EntityNotFoundException;
-import javax.validation.ConstraintViolationException;
-import java.util.function.Consumer;
 
 public class CrudEntityPresenter<E extends AbstractEntity>  implements HasLogger {
 
