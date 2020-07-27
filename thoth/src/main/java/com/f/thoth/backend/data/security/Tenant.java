@@ -7,15 +7,20 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
+import javax.persistence.Version;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.BatchSize;
@@ -33,6 +38,19 @@ import com.f.thoth.backend.data.gdoc.metadata.DocType;
 @Table(name = "TENANT", indexes = { @Index(columnList = "name") })
 public class Tenant extends AbstractEntity implements Comparable<Tenant>
 {
+	 @Id
+	  @GeneratedValue(strategy = GenerationType.IDENTITY)
+	  protected Long id;
+
+	  @Version
+	  protected int version;
+
+	  @NotNull (message = "{evidentia.code.required}")
+	  @NotEmpty(message = "{evidentia.code.required}")
+	  @Size(max = 255, message="{evidentia.code.maxlength}")
+	  @Column(unique = true)
+	  protected String code;
+
    @NotBlank(message = "{evidentia.name.required}")
    @NotEmpty(message = "{evidentia.name.required}")
    @Size(min = 2, max = 255, message="{evidentia.name.minmaxlength}")
@@ -96,6 +114,14 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 
    // -------------- Getters & Setters ----------------
 
+   public boolean isPersisted() { return id != null; }
+
+   public int     getVersion() { return version; }
+
+   public String  getCode() { return code; }
+   public void    setCode(String code) { this.code = code; }
+
+
    public String       getName()  { return name;}
    public void         setName( String name)
    {
@@ -103,8 +129,8 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
       buildCode();
    }
    
-   public String       getAdministrator() { return administrator;}
-   public void         setAdministrator( String administrator) { this.administrator = administrator;}
+   public String              getAdministrator() { return administrator;}
+   public void                setAdministrator( String administrator) { this.administrator = administrator;}
 
    public Map<String,Role>    getRoles() { return roles;}
    public void                setRoles( Map<String,Role> roles) { this.roles = roles;}
@@ -136,7 +162,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
    public int hashCode() { return name.hashCode(); }
 
    @Override
-   public String toString() { return "Tenant{"+ super.toString()+ " name["+ name+ "] roles["+  roles.size()+ "] users["+ users.size()+ "] docTypes["+ docTypes.size()+ "]}";}
+   public String toString() { return "Tenant{ id["+ id+ "] version["+ version+ "] name["+ name+ "] code["+  code+ "] roles["+  roles.size()+ "] users["+ users.size()+ "] docTypes["+ docTypes.size()+ "]}";}
 
    @Override
    public int compareTo(Tenant that) { return this.equals(that)?  0:  that == null? 1: this.name.compareTo(that.name); }

@@ -10,13 +10,13 @@ import javax.persistence.PreUpdate;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-import com.f.thoth.backend.data.entity.AbstractEntity;
+import com.f.thoth.backend.data.entity.BasicEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 
 /**
  * Representa un esquema de metadatos
  */
-public class Schema extends AbstractEntity implements Comparable<Schema>
+public class Schema extends BasicEntity implements Comparable<Schema>
 {
    @NotBlank(message = "{evidentia.name.required}")
    @NotNull (message = "{evidentia.name.required}")

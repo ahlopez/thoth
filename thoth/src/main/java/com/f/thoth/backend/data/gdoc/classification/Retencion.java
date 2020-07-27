@@ -6,7 +6,7 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
-import com.f.thoth.backend.data.entity.AbstractEntity;
+import com.f.thoth.backend.data.entity.BasicEntity;
 
 /**
  * Enumeraci�n con las duraciones de retenci�n
@@ -15,7 +15,7 @@ import com.f.thoth.backend.data.entity.AbstractEntity;
  */
 @Entity
 @Table(name = "RETENCION", indexes = { @Index(columnList = "code") })
-public class Retencion extends AbstractEntity implements Comparable<Retencion>
+public class Retencion extends BasicEntity implements Comparable<Retencion>
 {
    public static int GESTION    = 0;
    public static int CENTRAL    = 1;

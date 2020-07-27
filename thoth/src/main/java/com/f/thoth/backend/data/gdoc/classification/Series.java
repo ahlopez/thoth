@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.f.thoth.backend.data.entity.AbstractEntity;
+import com.f.thoth.backend.data.entity.BasicEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.security.NeedsProtection;
@@ -20,7 +20,7 @@ import com.f.thoth.ui.utils.FormattingUtils;
 /**
  * Representa una serie documental
  */
-public class Series extends AbstractEntity implements NeedsProtection, Comparable<Series>
+public class Series extends BasicEntity implements NeedsProtection, Comparable<Series>
 {
    @NotBlank(message = "{evidentia.name.required}")
    @NotNull (message = "{evidentia.name.required}")

@@ -12,7 +12,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.f.thoth.backend.data.entity.AbstractEntity;
+import com.f.thoth.backend.data.entity.BasicEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 
 /**
@@ -21,7 +21,7 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
  *  Calendario de conservaci�n)
  */
 @Table(name = "RETENTION_SCHEDULE", indexes = { @Index(columnList = "code") })
-public class RetentionSchedule extends AbstractEntity implements Comparable<RetentionSchedule>
+public class RetentionSchedule extends BasicEntity implements Comparable<RetentionSchedule>
 {
    @NotBlank(message = "{evidentia.name.required}")
    @NotNull (message = "{evidentia.name.required}")

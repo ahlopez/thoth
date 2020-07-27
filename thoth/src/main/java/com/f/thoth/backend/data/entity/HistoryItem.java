@@ -31,8 +31,9 @@ public class HistoryItem extends AbstractEntity {
 
    public HistoryItem(User createdBy, String message) {
       this.createdBy = createdBy;
-      this.message = message;
-      timestamp = LocalDateTime.now();
+      this.message   = message;
+      this.timestamp = LocalDateTime.now();
+      this.code      = timestamp.toString();
    }
 
    public OrderState getNewState() {
@@ -57,6 +58,7 @@ public class HistoryItem extends AbstractEntity {
 
    public void setTimestamp(LocalDateTime timestamp) {
       this.timestamp = timestamp;
+      this.code      = timestamp.toString();
    }
 
    public User getCreatedBy() {

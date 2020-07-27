@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Entity
-public class Tenant extends AbstractEntity
+public class Tenant extends BasicEntity
 {
 
    @NotBlank(message = "{bakery.name.required}")

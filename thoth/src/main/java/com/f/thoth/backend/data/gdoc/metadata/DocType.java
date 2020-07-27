@@ -17,7 +17,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.f.thoth.backend.data.entity.AbstractEntity;
+import com.f.thoth.backend.data.entity.BasicEntity;
 import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
@@ -39,7 +39,7 @@ import com.f.thoth.backend.data.security.SingleUser;
         }) })
 @Entity
 @Table(name = "DOC_TYPE", indexes = { @Index(columnList = "code") })
-public class DocType extends AbstractEntity implements NeedsProtection, Comparable<DocType>
+public class DocType extends BasicEntity implements NeedsProtection, Comparable<DocType>
 {
    public static final String BRIEF = "DocType.brief";
    public static final String FULL  = "DocType.full";

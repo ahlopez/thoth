@@ -22,14 +22,14 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.BatchSize;
 
-import com.f.thoth.backend.data.entity.AbstractEntity;
+import com.f.thoth.backend.data.entity.BasicEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 
 /**
  *  Representa un usuario sencillo o compuesto del sistema
  */
 @MappedSuperclass
-public abstract class Usuario extends AbstractEntity
+public abstract class Usuario extends BasicEntity
 {
    @NotNull(message = "{evidentia.tenant.required}")
    protected Tenant  tenant;

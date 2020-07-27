@@ -1,5 +1,7 @@
 package com.f.thoth.backend.data.entity;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Min;
@@ -26,6 +28,7 @@ public class OrderItem extends AbstractEntity {
 
    public void setProduct(Product product) {
       this.product = product;
+      this.code    = product.getName()+ LocalDateTime.now().toString();
    }
 
    public Integer getQuantity() {

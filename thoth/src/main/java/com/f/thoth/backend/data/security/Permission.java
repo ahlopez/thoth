@@ -10,14 +10,14 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import com.f.thoth.backend.data.entity.AbstractEntity;
+import com.f.thoth.backend.data.entity.BasicEntity;
 
 /**
  * Representa un permiso de acceso a un objeto que requiere protección
  */
 @Entity
 @Table(name = "PERMISSION", indexes = { @Index(columnList = "code") })
-public class Permission extends AbstractEntity implements Comparable<Permission>
+public class Permission extends BasicEntity implements Comparable<Permission>
 {
 
    @NotNull(message = "{evidentia.role.required}")

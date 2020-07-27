@@ -27,4 +27,5 @@ public class ThothSession
       String       userId   = (String)session.getAttribute("user");
       return       tenant.getUserById( userId);
    }//getCurrentUser
+   
 }//ThothSession

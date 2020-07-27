@@ -99,6 +99,7 @@ public class DataGenerator implements HasLogger {
       String first = getRandom(FIRST_NAME);
       String last = getRandom(LAST_NAME);
       customer.setFullName(first + " " + last);
+      customer.setCode( customer.getFullName());
       customer.setPhoneNumber(getRandomPhone());
       if (random.nextInt(10) == 0) {
          customer.setDetails("Very important customer");
@@ -143,6 +144,7 @@ public class DataGenerator implements HasLogger {
       fillCustomer(order.getCustomer());
       order.setPickupLocation(pickupLocationSupplier.get());
       order.setDueDate(dueDate);
+      order.setCode( order.getCustomer().getFullName()+ order.getDueDate().toString());
       order.setDueTime(getRandomDueTime());
       order.changeState(barista, getRandomState(order.getDueDate()));
 
@@ -155,6 +157,7 @@ public class DataGenerator implements HasLogger {
             product = productSupplier.get();
          } while (containsProduct(items, product));
          item.setProduct(product);
+         item.setCode( product.getName());
          item.setQuantity(random.nextInt(10) + 1);
          if (random.nextInt(5) == 0) {
             if (random.nextBoolean()) {
@@ -176,9 +179,9 @@ public class DataGenerator implements HasLogger {
       ArrayList<HistoryItem> history = new ArrayList<>();
       HistoryItem item = new HistoryItem(barista, "Order placed");
       item.setNewState(OrderState.NEW);
-      LocalDateTime orderPlaced = order.getDueDate().minusDays(random.nextInt(5) + 2L).atTime(random.nextInt(10) + 7,
-            00);
+      LocalDateTime orderPlaced = order.getDueDate().minusDays(random.nextInt(5) + 2L).atTime(random.nextInt(10) + 7, 00);
       item.setTimestamp(orderPlaced);
+      item.setCode( item.getTimestamp().toString());
       history.add(item);
       if (order.getState() == OrderState.CANCELLED) {
          item = new HistoryItem(barista, "Order cancelled");
@@ -284,6 +287,7 @@ public class DataGenerator implements HasLogger {
    private PickupLocation createPickupLocation(String name) {
       PickupLocation store = new PickupLocation();
       store.setName(name);
+      store.setCode( name);
       return store;
    }
 
@@ -292,6 +296,7 @@ public class DataGenerator implements HasLogger {
       for (int i = 0; i < numberOfItems; i++) {
          Product product = new Product();
          product.setName(getRandomProductName());
+         product.setCode(product.getName());
          double doublePrice = 2.0 + random.nextDouble() * 100.0;
          product.setPrice((int) (doublePrice * 100.0));
          products.add(productsRepo.save(product));
@@ -351,6 +356,7 @@ public class DataGenerator implements HasLogger {
          boolean locked) {
       User user = new User();
       user.setEmail(email);
+      user.setCode(email);
       user.setFirstName(firstName);
       user.setLastName(lastName);
       user.setPasswordHash(passwordHash);
