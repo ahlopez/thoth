@@ -12,7 +12,8 @@ import com.f.thoth.backend.data.OrderState;
 
 @Entity
 public class HistoryItem extends AbstractEntity {
-
+   
+   private static int itemSequence = 0;
    private OrderState newState;
 
    @NotBlank
@@ -27,13 +28,14 @@ public class HistoryItem extends AbstractEntity {
 
    HistoryItem() {
       // Empty constructor is needed by Spring Data / JPA
+	  this.code      = ""+ (++itemSequence);
    }
 
    public HistoryItem(User createdBy, String message) {
       this.createdBy = createdBy;
       this.message   = message;
       this.timestamp = LocalDateTime.now();
-      this.code      = timestamp.toString();
+      this.code      = ""+ (++itemSequence);
    }
 
    public OrderState getNewState() {
@@ -58,7 +60,6 @@ public class HistoryItem extends AbstractEntity {
 
    public void setTimestamp(LocalDateTime timestamp) {
       this.timestamp = timestamp;
-      this.code      = timestamp.toString();
    }
 
    public User getCreatedBy() {
