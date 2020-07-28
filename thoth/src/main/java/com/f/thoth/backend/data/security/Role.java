@@ -21,7 +21,7 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.BatchSize;
 
-import com.f.thoth.backend.data.entity.BasicEntity;
+import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 
 /**
@@ -29,7 +29,7 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
  */
 @Entity
 @Table(name = "ROLE", indexes = { @Index(columnList = "tenant,name") })
-public class Role extends BasicEntity implements Comparable<Role>
+public class Role extends BaseEntity implements Comparable<Role>
 {
    @NotBlank(message = "{evidentia.name.required}")
    @NotEmpty(message = "{evidentia.name.required}")
@@ -69,7 +69,7 @@ public class Role extends BasicEntity implements Comparable<Role>
       buildCode();
    }//prepareData
 
-   private void buildCode(){ this.code = this.name; }
+   @Override protected void buildCode(){ this.code = this.name; }
 
    private void allocate() { this.permissions = new TreeMap<>(); }
 

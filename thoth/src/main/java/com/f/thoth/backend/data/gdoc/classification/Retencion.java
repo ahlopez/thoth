@@ -6,17 +6,19 @@ import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.Table;
 
-import com.f.thoth.backend.data.entity.BasicEntity;
+import com.f.thoth.backend.data.entity.BaseEntity;
 
 /**
- * Enumeraci�n con las duraciones de retenci�n
- * en unidades de a�os, para las tres fases
+ * Enumeracion con las duraciones de retencion
+ * en unidades de annos, para las tres fases
  * de archivo
  */
 @Entity
 @Table(name = "RETENCION", indexes = { @Index(columnList = "code") })
-public class Retencion extends BasicEntity implements Comparable<Retencion>
+public class Retencion extends BaseEntity implements Comparable<Retencion>
 {
+   private static int retSequence = 0;
+   
    public static int GESTION    = 0;
    public static int CENTRAL    = 1;
    public static int INTERMEDIO = 2;
@@ -29,18 +31,22 @@ public class Retencion extends BasicEntity implements Comparable<Retencion>
    {
       super();
       periodo[0] = periodo[1] = periodo[2] = 5;
+      buildCode();
    }
 
    public Retencion( int gestion, int central, int intermedio)
    {
       super();
       if (gestion <= 0 || central <= 0 || intermedio <= 0)
-         throw new IllegalArgumentException("Per�odos de retenci�n deben ser mayores que 0");
+         throw new IllegalArgumentException("Periodos de retencion deben ser mayores que 0");
 
       periodo[0] = gestion;
       periodo[1] = central;
       periodo[2] = intermedio;
+      buildCode();
    }//Retencion
+   
+   @Override protected void buildCode() { this.code = tenant.getCode()+ ":"+ (++retSequence);}
 
    // -------------- Getters & Setters ----------------
 

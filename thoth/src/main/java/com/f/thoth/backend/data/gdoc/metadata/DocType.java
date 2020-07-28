@@ -17,7 +17,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.f.thoth.backend.data.entity.BasicEntity;
+import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
@@ -39,7 +39,7 @@ import com.f.thoth.backend.data.security.SingleUser;
         }) })
 @Entity
 @Table(name = "DOC_TYPE", indexes = { @Index(columnList = "code") })
-public class DocType extends BasicEntity implements NeedsProtection, Comparable<DocType>
+public class DocType extends BaseEntity implements NeedsProtection, Comparable<DocType>
 {
    public static final String BRIEF = "DocType.brief";
    public static final String FULL  = "DocType.full";
@@ -76,7 +76,7 @@ public class DocType extends BasicEntity implements NeedsProtection, Comparable<
    public DocType( String name, Schema schema, DocType parent, boolean requiresContent)
    {
       if( name == null || name.trim().length() == 0 || name.trim().equals(" "))
-         throw new IllegalArgumentException( "Nombre["+ name+ "] del tipo documental es inv�lido");
+         throw new IllegalArgumentException( "Nombre["+ name+ "] del tipo documental es invalido");
 
       if(schema == null)
          throw new IllegalArgumentException( "El esquema de metadatos del tipo documental no puede ser nulo");
@@ -106,7 +106,7 @@ public class DocType extends BasicEntity implements NeedsProtection, Comparable<
       buildCode();
    }
 
-   private void buildCode() { this.code =  parent == null? tenant.toString()+ ":"+ name : parent.code + "-"+ name; }
+   @Override protected void buildCode() { this.code =  parent == null? tenant.toString()+ ":"+ name : parent.code + "-"+ name; }
 
    // -------------- Getters & Setters ----------------
 

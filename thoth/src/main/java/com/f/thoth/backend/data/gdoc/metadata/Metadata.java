@@ -10,7 +10,8 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.f.thoth.backend.data.entity.AbstractEntity;
+import com.f.thoth.backend.data.entity.BaseEntity;
+import com.f.thoth.backend.data.entity.util.TextUtil;
 
 /**
  * Representa la definici�n de un metadato
@@ -29,7 +30,7 @@ import com.f.thoth.backend.data.entity.AbstractEntity;
         }) })
 @Entity
 @Table(name = "METADATA", indexes = { @Index(columnList = "code") })
-public class Metadata extends AbstractEntity implements Comparable<Metadata>
+public class Metadata extends BaseEntity implements Comparable<Metadata>
 {
    public static final String BRIEF = "Metadata.brief";
    public static final String FULL  = "Metadata.full";
@@ -53,12 +54,36 @@ public class Metadata extends AbstractEntity implements Comparable<Metadata>
    // ------------- Constructors ------------------
    public Metadata()
    {
+	   super();
    }
+   
+   public Metadata( String name, Type type, boolean required, boolean editable)
+   {
+	   super();
+	   if ( TextUtil.isEmpty(name))
+		   throw new IllegalArgumentException("Nombre del metadato no puede ser nulo ni vacío");
+	   
+	   if ( type == null)
+		   throw new IllegalArgumentException("Tipo del metadato no puede ser nulo");
+	   
+	   this.name     = name;
+	   this.type     = type;
+	   this.required = required;
+	   this.editable = editable;
+	   buildCode();
+	   
+   }//Metadata
+   
+   @Override protected void buildCode() { this.code = tenant.getCode()+ ":M:"+ this.name;}
 
    // -------------- Getters & Setters ----------------
 
    public String  getName(){ return name;}
-   public void    setName( String name){ this.name = name;}
+   public void    setName( String name)
+   { 
+	   this.name = name;
+	   buildCode();
+   }
 
    public Type    getType(){ return type;}
    public void    setType( Type type){ this.type = type;}

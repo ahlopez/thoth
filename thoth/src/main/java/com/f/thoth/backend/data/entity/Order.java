@@ -42,6 +42,8 @@ public class Order extends AbstractEntity implements OrderSummary {
 
    public static final String ENTITY_GRAPTH_BRIEF = "Order.brief";
    public static final String ENTITY_GRAPTH_FULL = "Order.full";
+   
+   private static int orderSequence = 0;
 
    @NotNull(message = "{bakery.due.date.required}")
    private LocalDate dueDate;
@@ -78,11 +80,15 @@ public class Order extends AbstractEntity implements OrderSummary {
       setCustomer(new Customer());
       addHistoryItem(createdBy, "Order placed");
       this.items = new ArrayList<>();
+      buildCode();
    }
 
-   Order() {
+   public Order() {
       // Empty constructor is needed by Spring Data / JPA
+	   buildCode();
    }
+   
+   @Override protected void buildCode() { this.code = ""+ (++orderSequence);}
 
    public void addHistoryItem(User createdBy, String comment) {
       HistoryItem item = new HistoryItem(createdBy, comment);

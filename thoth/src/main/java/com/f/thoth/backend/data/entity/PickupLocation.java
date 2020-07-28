@@ -8,6 +8,8 @@ import javax.validation.constraints.Size;
 @Entity
 public class PickupLocation extends AbstractEntity {
 
+   private static int pickSequence = 0;
+   
    @Size(max = 255)
    @NotBlank
    @Column(unique = true)
@@ -20,4 +22,11 @@ public class PickupLocation extends AbstractEntity {
    public void setName(String name) {
       this.name = name;
    }
+   
+   public PickupLocation()
+   {
+	   buildCode();
+   }
+   
+   @Override protected void buildCode() { this.code = ""+ (++pickSequence);}
 }

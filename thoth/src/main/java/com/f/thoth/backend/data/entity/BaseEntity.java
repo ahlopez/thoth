@@ -5,14 +5,14 @@ import javax.validation.constraints.NotNull;
 
 import com.f.thoth.backend.data.security.Tenant;
 
-public class BasicEntity extends AbstractEntity
+public abstract class BaseEntity extends AbstractEntity
 {
 	  @ManyToOne
 	  @NotNull (message = "{evidentia.tenant.required}")
 	  protected Tenant tenant;
 
 	  public Tenant  getTenant() { return tenant;}
-	  public void    setTenant( Tenant tenant) { this.tenant = tenant;}
+	  public void    setTenant( Tenant tenant) { this.tenant = tenant;}  
 	  
 	  @Override public boolean equals( Object other)
 	  {

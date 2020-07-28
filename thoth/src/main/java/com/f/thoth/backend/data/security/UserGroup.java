@@ -47,13 +47,20 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>
    @JoinColumn
    @BatchSize(size = 50)
    @Valid
-   private Set<Usuario> members;
+   private Set<SingleUser> singleMembers;
 
+   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+   @OrderColumn
+   @JoinColumn
+   @BatchSize(size = 50)
+   @Valid
+   private Set<UserGroup> groupMembers;
    // ----------------- Constructor -----------------
    public UserGroup()
    {
       super();
-      members = new TreeSet<>();
+      singleMembers = new TreeSet<>();
+      groupMembers  = new TreeSet<>();
    }
 
    @PrePersist
@@ -61,8 +68,10 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>
    public void prepareData()
    {
       super.prepareData();
-      this.code     = tenant.toString()+ ":G:"+ firstName;
+      buildCode();
    }//prepareData
+   
+   @Override protected void buildCode() { this.code     = tenant.toString()+ ":G:"+ firstName;}
 
    // --------------- Getters & Setters -----------------
    @Override
@@ -72,8 +81,11 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>
       this.setCode( tenant.toString()+ ":G:"+ firstName);
    }//setFirstName
 
-   public Set<Usuario> getMembers() { return members;}
-   public void         setMembers( Set<Usuario> members) { this.members = members;}
+   public Set<SingleUser> getSingleMembers() { return singleMembers;}
+   public void         setSingleMembers( Set<SingleUser> singleMembers) { this.singleMembers = singleMembers;}
+
+   public Set<UserGroup> getGroupMembers() { return groupMembers;}
+   public void         setGroupMembers( Set<UserGroup> groupMembers) { this.groupMembers = groupMembers;}
 
     @Override
    public int compareTo(UserGroup that)

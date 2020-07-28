@@ -20,12 +20,12 @@ public class ThothSession
       return   tenants.get( tenantId);
    }//getTenant
 
-   public static Usuario getCurrentUser()
+   public static SingleUser getCurrentUser()
    {
       Tenant       tenant   = getCurrentTenant();
       VaadinSession session = VaadinSession.getCurrent();
       String       userId   = (String)session.getAttribute("user");
-      return       tenant.getUserById( userId);
+      return       tenant.getSingleUserById( userId);
    }//getCurrentUser
    
 }//ThothSession

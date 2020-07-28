@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import com.f.thoth.backend.data.entity.BasicEntity;
+import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.security.NeedsProtection;
@@ -20,7 +20,7 @@ import com.f.thoth.ui.utils.FormattingUtils;
 /**
  * Representa una serie documental
  */
-public class Series extends BasicEntity implements NeedsProtection, Comparable<Series>
+public class Series extends BaseEntity implements NeedsProtection, Comparable<Series>
 {
    @NotBlank(message = "{evidentia.name.required}")
    @NotNull (message = "{evidentia.name.required}")
@@ -88,7 +88,7 @@ public class Series extends BasicEntity implements NeedsProtection, Comparable<S
       buildCode();
    }//prepareData
 
-   private void buildCode() { this.code = parent == null? tenant.toString()+ ":"+ name : parent.code + "-"+ name; }
+   @Override protected void buildCode() { this.code = parent == null? tenant.toString()+ ":"+ name : parent.code + "-"+ name; }
 
    // -------------- Getters & Setters ----------------
 

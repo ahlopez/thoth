@@ -28,15 +28,17 @@ public class HistoryItem extends AbstractEntity {
 
    HistoryItem() {
       // Empty constructor is needed by Spring Data / JPA
-	  this.code      = ""+ (++itemSequence);
+	  buildCode();
    }
 
    public HistoryItem(User createdBy, String message) {
       this.createdBy = createdBy;
       this.message   = message;
       this.timestamp = LocalDateTime.now();
-      this.code      = ""+ (++itemSequence);
+      buildCode();
    }
+   
+   @Override protected void buildCode() { this.code      = ""+ (++itemSequence);}
 
    public OrderState getNewState() {
       return newState;

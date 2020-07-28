@@ -1,5 +1,6 @@
 package com.f.thoth.backend.data.entity;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -12,6 +13,7 @@ public class Customer extends AbstractEntity {
 
    @NotBlank
    @Size(max = 255)
+   @Column(unique = true)
    private String fullName;
 
    @NotBlank
@@ -31,7 +33,10 @@ public class Customer extends AbstractEntity {
 
    public void setFullName(String fullName) {
       this.fullName = fullName;
+      buildCode();
    }
+   
+   @Override protected void buildCode() { this.code = fullName;}
 
    public String getPhoneNumber() {
       return phoneNumber;

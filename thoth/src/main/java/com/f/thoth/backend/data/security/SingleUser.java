@@ -94,7 +94,7 @@ public class SingleUser extends Usuario implements Comparable<SingleUser>
 
    }//prepareData
 
-   private void buildCode() { this.code = email;}
+   @Override protected void buildCode() { this.code = email;}
 
    // --------------- Getters & Setters -----------------
    public String getPasswordHash() { return passwordHash;}

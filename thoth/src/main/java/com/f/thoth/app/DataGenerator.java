@@ -154,6 +154,7 @@ public class DataGenerator implements HasLogger {
       List<OrderItem> items = new ArrayList<>();
       for (int i = 0; i <= itemCount; i++) {
          OrderItem item = new OrderItem();
+         item.setCode(""+ (++itemSequence));
          Product product;
          do {
             product = productSupplier.get();

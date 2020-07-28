@@ -12,6 +12,8 @@ import javax.validation.constraints.Size;
 @Entity
 public class Product extends AbstractEntity {
 
+   private static int prodSequence = 0;
+   
    @NotBlank(message = "{bakery.name.required}")
    @Size(max = 255)
    @Column(unique = true)
@@ -63,4 +65,11 @@ public class Product extends AbstractEntity {
    public int hashCode() {
       return Objects.hash(super.hashCode(), name, price);
    }
+   
+   public Product()
+   {
+	   buildCode();
+   }
+   
+   @Override protected void buildCode() { this.code = ""+ (++prodSequence);}
 }

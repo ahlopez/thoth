@@ -22,18 +22,15 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.BatchSize;
 
-import com.f.thoth.backend.data.entity.BasicEntity;
+import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 
 /**
  *  Representa un usuario sencillo o compuesto del sistema
  */
 @MappedSuperclass
-public abstract class Usuario extends BasicEntity
+public abstract class Usuario extends BaseEntity
 {
-   @NotNull(message = "{evidentia.tenant.required}")
-   protected Tenant  tenant;
-
    @NotNull (message = "{evidentia.category.required}")
    @Min(value=0, message= "{evidentia.category.minvalue}")
    @Max(value=5, message= "{evidentia.category.maxvalue}")
@@ -87,9 +84,6 @@ public abstract class Usuario extends BasicEntity
 
 
    // --------------- Getters & Setters -----------------
-
-   public Tenant     getTenant() { return tenant;}
-   public void       setTenant( Tenant tenant) { this.tenant = tenant;}
 
    public Integer    getCategory() { return category;}
    public void       setCategory(Integer category) { this.category = (category == null? 0: category);}

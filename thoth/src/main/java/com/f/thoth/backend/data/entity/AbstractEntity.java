@@ -42,6 +42,8 @@ public abstract class AbstractEntity
 
 	  public String  getCode() { return code; }
 	  public void    setCode(String code) { this.code = code; }
+	  
+	  protected abstract void buildCode();
 
 	  // ---------- Object methods ------------------
 
@@ -54,7 +56,7 @@ public abstract class AbstractEntity
 	    if (o == null || getClass() != o.getClass())
 	      return false;
 
-	    BasicEntity that = (BasicEntity) o;
+	    BaseEntity that = (BaseEntity) o;
 	    if (this.getId() == null || that.getId() == null)
 	      return false;
 

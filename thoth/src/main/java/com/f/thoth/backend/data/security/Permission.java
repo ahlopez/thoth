@@ -10,14 +10,14 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import com.f.thoth.backend.data.entity.BasicEntity;
+import com.f.thoth.backend.data.entity.BaseEntity;
 
 /**
  * Representa un permiso de acceso a un objeto que requiere protección
  */
 @Entity
 @Table(name = "PERMISSION", indexes = { @Index(columnList = "code") })
-public class Permission extends BasicEntity implements Comparable<Permission>
+public class Permission extends BaseEntity implements Comparable<Permission>
 {
 
    @NotNull(message = "{evidentia.role.required}")
@@ -65,7 +65,7 @@ public class Permission extends BasicEntity implements Comparable<Permission>
       buildCode();
    }//prepareData
 
-   private void buildCode(){ this.code = tenant.toString()+ ":"+ role.getCode()+ ">"+ object.getKey(); }
+   @Override protected void buildCode(){ this.code = tenant.toString()+ ":"+ role.getCode()+ ">"+ object.getKey(); }
 
    // -------------- Getters & Setters ----------------
 

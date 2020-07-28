@@ -15,6 +15,7 @@ import javax.validation.constraints.Size;
 @Entity(name="UserInfo")
 public class User extends AbstractEntity 
 {
+   private static int userSequence = 0;
 
    @NotEmpty
    @Email
@@ -44,11 +45,15 @@ public class User extends AbstractEntity
    @PreUpdate
    private void prepareData(){
       this.email = email == null ? null : email.toLowerCase();
+      buildCode();
    }
 
    public User() {
       // An empty constructor is needed for all beans
+	   buildCode();
    }
+   
+   @Override protected void buildCode() { this.code = ""+ (++userSequence);}
 
    public String getPasswordHash() {
       return passwordHash;
