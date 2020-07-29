@@ -1,5 +1,6 @@
 package com.f.thoth.backend.data.security;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.TreeSet;
@@ -78,7 +79,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 
 	@NotNull(message = "{evidentia.date.required}")
 	@PastOrPresent(message="{evidentia.date.pastorpresent}")
-	protected LocalDateTime fromDate;
+	protected LocalDateTime  fromDate;
 
 	@NotNull(message = "{evidentia.date.required}")
 	protected LocalDateTime toDate;
@@ -164,7 +165,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 	public boolean    isLocked()
 	{
 		LocalDateTime now = LocalDateTime.now();
-		locked = (locked || now.compareTo(fromDate) < 0 || now.compareTo(toDate) > 0);
+		locked = (locked || (fromDate != null && now.compareTo(fromDate) < 0) || (toDate != null && now.compareTo(toDate) > 0));
 		return locked;
 	}
 	public void       setLocked(boolean locked) { this.locked = locked;}
@@ -175,9 +176,11 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 
 	public LocalDateTime  getFromDate() {	return fromDate;}
 	public void           setFromDate(LocalDateTime fromDate) { this.fromDate = fromDate;}
+	public void           setFromDate(LocalDate     fromDate) { this.fromDate = fromDate.atStartOfDay();}
 
 	public LocalDateTime  getToDate() { return toDate; }
 	public void           setToDate(LocalDateTime toDate) { this.toDate = toDate; }
+	public void           setToDate(LocalDate     toDate) { this.toDate = toDate.plusDays(1).atStartOfDay(); }
 
 	public Set<Role>      getRoles() { return roles;}
 	public void           setRoles( Set<Role> roles) { this.roles = roles;}

@@ -110,7 +110,7 @@ public class MainView extends AppLayout {
          tabs.add(createTab(VaadinIcon.CALENDAR, TITLE_PRODUCTS, ProductsView.class));
       }
       if (SecurityUtils.isAccessGranted(TenantsView.class)) {
-          tabs.add(createTab(VaadinIcon.HOSPITAL, TITLE_TENANTS, ProductsView.class));
+          tabs.add(createTab(VaadinIcon.HOSPITAL, TITLE_TENANTS, TenantsView.class));
        }
       final String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
       final Tab logoutTab = createTab(createLogoutLink(contextPath));

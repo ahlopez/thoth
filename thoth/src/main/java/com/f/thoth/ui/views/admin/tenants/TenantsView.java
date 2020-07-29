@@ -12,7 +12,9 @@ import com.f.thoth.backend.service.TenantService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.crud.AbstractBakeryCrudView;
 import com.f.thoth.ui.utils.BakeryConst;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.crud.BinderCrudEditor;
+import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.textfield.TextField;
@@ -33,9 +35,13 @@ public class TenantsView extends AbstractBakeryCrudView<Tenant>
 
    @Override
    protected void setupGrid(Grid<Tenant> grid) {
-      grid.addColumn(Tenant::getName).setHeader("Cliente").setFlexGrow(10);
-      grid.addColumn(Tenant::getAdministrator).setHeader("Administrador").setFlexGrow(10);
-   }
+      grid.addColumn(Tenant::getName).setHeader("Cliente").setFlexGrow(20);
+      grid.addColumn(Tenant::getAdministrator).setHeader("Administrador").setFlexGrow(20);
+      grid.addColumn(Tenant::getFromDate).setHeader("Fecha Desde").setFlexGrow(10);
+      grid.addColumn(Tenant::getToDate).setHeader("Fecha Hasta").setFlexGrow(10);
+      grid.addColumn(Tenant::isLocked).setHeader("Bloqueado").setFlexGrow(5);
+
+   }//setupGrid
 
    @Override
    protected String getBasePage() {
@@ -44,16 +50,25 @@ public class TenantsView extends AbstractBakeryCrudView<Tenant>
 
    private static BinderCrudEditor<Tenant> createForm() {
       TextField name = new TextField("Nombre cliente");
-      name.getElement().setAttribute("colspan", "2");
+      name.getElement().setAttribute("colspan", "4");
       TextField administrator = new TextField("Administrador");
-      name.getElement().setAttribute("colspan", "2");
+      administrator.getElement().setAttribute("colspan", "4");
+      DateTimePicker fromDate = new DateTimePicker();
+      fromDate.getElement().setAttribute("colspan", "2");
+      DateTimePicker toDate   = new DateTimePicker();
+      toDate.getElement().setAttribute("colspan", "2");
+      Checkbox   blocked    = new Checkbox();
+      blocked.getElement().setAttribute("colspan", "1");
 
-      FormLayout form = new FormLayout(name, administrator);
+      FormLayout form = new FormLayout(name, administrator, fromDate, toDate, blocked);
 
       BeanValidationBinder<Tenant> binder = new BeanValidationBinder<>(Tenant.class);
 
       binder.bind(name, "name");
       binder.bind(administrator, "administrator");
+      binder.bind(fromDate, "fromDate");
+      binder.bind(toDate, "toDate");
+      binder.bind(blocked, "locked");
 
 
       return new BinderCrudEditor<Tenant>(binder, form);
