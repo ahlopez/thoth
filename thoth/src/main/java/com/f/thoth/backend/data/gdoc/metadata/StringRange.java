@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * Representa un rango de valores de Strings
  */
-public class StringRange implements Range
+public class StringRange implements Range<String>
 {
    public static int   MAX_LENGTH = 500000;
 
@@ -32,6 +32,12 @@ public class StringRange implements Range
       this.canBeEmpty  = canBeEmpty;
 
    }//StringRange
+
+	public StringRange( String range)
+	{
+		//TODO: StringRange( String range) constructor
+	}
+
 
    // -------------- Getters & Setters ----------------
 
@@ -78,19 +84,18 @@ public class StringRange implements Range
 
    // --------------- Logic ------------------------------
 
-   public boolean in(Object value)
+   public boolean in(String value)
    {
-      if (value == null || !(value instanceof String))
+      if (value == null)
          return false;
 
-      String val = ((String)value).trim();
+      value = value.trim();
       if (!canBeEmpty)
       {
-         val = ((String)value).trim();
-         if (val.equals(""))
+         if (value.equals(""))
              return false;
       }
-      return val.length() >= minLength && val.length() <= maxLength;
+      return value.length() >= minLength && value.length() <= maxLength;
 
    }//in
 

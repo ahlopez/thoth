@@ -23,4 +23,4 @@ public abstract class BaseEntity extends AbstractEntity
 	  
 	  @Override public String toString() { return super.toString()+ " tenant["+ tenant.getName()+ "]";}
 
-}//BasicEntity
+}//BaseEntity

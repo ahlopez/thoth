@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import com.f.thoth.app.security.SecurityConfiguration;
 import com.f.thoth.backend.data.entity.User;
+import com.f.thoth.backend.data.gdoc.metadata.DocType;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.repositories.TenantRepository;
 import com.f.thoth.backend.repositories.UserRepository;
@@ -23,7 +24,7 @@ import com.f.thoth.ui.MainView;
 		scanBasePackageClasses = { SecurityConfiguration.class, MainView.class, Application.class, UserService.class }, 
         exclude = ErrorMvcAutoConfiguration.class)
 @EnableJpaRepositories(basePackageClasses = { UserRepository.class, TenantRepository.class })
-@EntityScan(basePackageClasses = { User.class, Tenant.class })
+@EntityScan(basePackageClasses = { User.class, Tenant.class, DocType.class })
 public class Application extends SpringBootServletInitializer {
 
    public static void main(String[] args) {

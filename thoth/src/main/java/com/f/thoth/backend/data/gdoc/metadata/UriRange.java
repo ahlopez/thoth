@@ -6,29 +6,35 @@ import java.net.URISyntaxException;
 /**
  * Representa un rango de valores tipo URI
  */
-public class UriRange implements Range
+public class UriRange implements Range<String>
 {
-   // ------------- Constructors ------------------
-   public UriRange()
-   {
-   }
+	// ------------- Constructors ------------------
+	public UriRange()
+	{
+	}
 
-   // --------------- Logic ------------------------------
+	public UriRange( String range)
+	{
+		//TODO: UriRange( String range) constructor
+	}
 
-   public boolean in(Object value)
-   {
-      if (value == null ||  ! (value instanceof String))
-         return false;
 
-      try
-      {
-         URI uri = new URI( (String)value);
-         return uri != null;
-      } catch (URISyntaxException e)
-      {
-         return false;
-      }
+	// --------------- Logic ------------------------------
 
-   }//in
+	public boolean in(String value)
+	{
+		if (value == null ||  ! (value instanceof String))
+			return false;
+
+		try
+		{
+			URI uri = new URI( (String)value);
+			return uri != null;
+		} catch (URISyntaxException e)
+		{
+			return false;
+		}
+
+	}//in
 
 }//UriRange

@@ -6,7 +6,7 @@ import java.util.Objects;
 /**
  * Representa un rango de valores enteros
  */
-public class IntegerRange implements Range
+public class IntegerRange implements Range<BigInteger>
 {
    private BigInteger minValue;
    private BigInteger maxValue;
@@ -27,6 +27,12 @@ public class IntegerRange implements Range
       this.minValue   = minValue;
       this.maxValue   = maxValue;
    }//IntegerRange
+
+	public IntegerRange( String range)
+	{
+		//TODO: IntegerRange( String range) constructor
+	}
+
 
    // -------------- Getters & Setters ----------------
 
@@ -72,13 +78,11 @@ public class IntegerRange implements Range
 
    // --------------- Logic ------------------------------
 
-   public boolean in(Object value)
+   public boolean in(BigInteger value)
    {
-      if (value == null ||  !(value instanceof BigInteger))
-         return false;
-
-      BigInteger that = (BigInteger) value;
-      return that.compareTo( minValue) >= 0  && that.compareTo( maxValue) <= 0;
+       return value != null &&
+              value.compareTo( minValue) >= 0  && 
+              value.compareTo( maxValue) <= 0;
 
    }//in
 

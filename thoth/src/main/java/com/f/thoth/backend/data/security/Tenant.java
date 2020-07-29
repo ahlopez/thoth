@@ -79,6 +79,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 	{
 		super();
 		allocate();
+		buildCode();
 	}
 
 	public Tenant( String name)
@@ -93,7 +94,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 		buildCode();
 	}//Tenant
 
-	@Override protected void buildCode(){ this.code = name;}
+	@Override protected void buildCode(){ this.code = (name == null? "[name]":name);}
 
 	private void allocate()
 	{

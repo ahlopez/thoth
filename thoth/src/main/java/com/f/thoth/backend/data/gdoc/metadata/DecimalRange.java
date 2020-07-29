@@ -6,7 +6,7 @@ import java.util.Objects;
 /**
  * Representa un rango de valores decimales
  */
-public class DecimalRange implements Range
+public class DecimalRange implements Range<BigDecimal>
 {
    private BigDecimal minValue;
    private BigDecimal maxValue;
@@ -27,6 +27,13 @@ public class DecimalRange implements Range
       this.minValue   = minValue;
       this.maxValue   = maxValue;
    }//DecimalRange
+   
+   
+   public DecimalRange( String range)
+   {
+	   //TODO: DecimalRange( String range) constructor
+   }
+
 
    // -------------- Getters & Setters ----------------
 
@@ -72,13 +79,11 @@ public class DecimalRange implements Range
 
    // --------------- Logic ------------------------------
 
-   public boolean in(Object value)
+   public boolean in(BigDecimal value)
    {
-      if (value == null ||  !(value instanceof BigDecimal))
-         return false;
-
-      BigDecimal that = (BigDecimal) value;
-      return that.compareTo( minValue) >= 0  && that.compareTo( maxValue) <= 0;
+       return value != null &&
+              value.compareTo( minValue) >= 0  && 
+              value.compareTo( maxValue) <= 0;
 
    }//in
 }//DecimalRange

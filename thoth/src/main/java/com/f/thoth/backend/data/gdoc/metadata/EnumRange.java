@@ -6,7 +6,7 @@ import java.util.Set;
 /**
  * Representa un rango de valores de enumeraci�n
  */
-public class EnumRange implements Range
+public class EnumRange implements Range<String>
 {
    private Set<String> values;
 
@@ -22,6 +22,12 @@ public class EnumRange implements Range
 
       this.values = values;
    }
+   
+   public EnumRange( String range)
+   {
+	   //TODO: EnumRange( String range) constructor
+   }
+
 
    // -------------- Getters & Setters ----------------
 
@@ -79,9 +85,9 @@ public class EnumRange implements Range
 
    // --------------- Logic ------------------------------
 
-   public boolean in(Object value)
+   public boolean in(String value)
    {
-      return value != null && value instanceof String && values.contains( value);
+      return value != null && values.contains( value);
    }
 
 }//EnumRange

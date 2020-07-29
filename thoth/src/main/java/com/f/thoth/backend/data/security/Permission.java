@@ -5,12 +5,16 @@ import java.util.Objects;
 
 import javax.persistence.Entity;
 import javax.persistence.Index;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
+import com.f.thoth.backend.data.entity.util.TextUtil;
 
 /**
  * Representa un permiso de acceso a un objeto que requiere protección
@@ -19,12 +23,14 @@ import com.f.thoth.backend.data.entity.BaseEntity;
 @Table(name = "PERMISSION", indexes = { @Index(columnList = "code") })
 public class Permission extends BaseEntity implements Comparable<Permission>
 {
-
    @NotNull(message = "{evidentia.role.required}")
+   @ManyToOne
    private Role          role;
 
-   @NotNull(message = "{evidentia.protected.required}")
-   public NeedsProtection object;
+   @NotNull (message = "{evidentia.object.required}")
+   @NotBlank(message = "{evidentia.object.required}")
+   @NotEmpty(message = "{evidentia.object.required}")
+   public String         objectToProtect;
 
    @NotNull(message = "{evidentia.date.required}")
    private LocalDateTime fromDate;
@@ -32,29 +38,32 @@ public class Permission extends BaseEntity implements Comparable<Permission>
    @NotNull(message = "{evidentia.date.required}")
    private LocalDateTime toDate;
 
-   @NotNull(message = "{evidentia.usuer.required}")
+   @NotNull(message = "{evidentia.user.required}")
+   @ManyToOne
    private SingleUser  grantedBy;
 
    // ------------- Constructors ------------------
    public Permission()
    {
       super();
+      buildCode();
    }
 
-   public Permission( Integer category, Role role, NeedsProtection object, LocalDateTime fromDate, LocalDateTime toDate, SingleUser grantedBy)
+   public Permission( Integer category, Role role, String objectToProtect, 
+		   LocalDateTime fromDate, LocalDateTime toDate, SingleUser grantedBy)
    {
       super();
       if (category < 0 || category > 5)
          throw new IllegalArgumentException("Categoría["+ category+ "] inválida");
 
-      if (object == null)
+      if (TextUtil.isEmpty(objectToProtect))
          throw new IllegalArgumentException("Objeto del permiso no puede ser nulo");
 
       this.role     = role;
-      this.object   = object;
       this.fromDate = fromDate;
       this.toDate   = toDate;
       this.grantedBy= grantedBy;
+      this.objectToProtect   = objectToProtect;
       buildCode();
    }//Permission
 
@@ -65,7 +74,11 @@ public class Permission extends BaseEntity implements Comparable<Permission>
       buildCode();
    }//prepareData
 
-   @Override protected void buildCode(){ this.code = tenant.toString()+ ":"+ role.getCode()+ ">"+ object.getKey(); }
+   @Override protected void buildCode()
+   { 
+	   this.code = (tenant == null? "[Tenant]" : tenant.getCode())+ ":"+ 
+                   (role ==  null? "[role]": role.getCode())+ ">"+ objectToProtect; 
+   }//buildCode
 
    // -------------- Getters & Setters ----------------
 
@@ -81,8 +94,8 @@ public class Permission extends BaseEntity implements Comparable<Permission>
    public SingleUser      getGrantedBy() { return grantedBy;}
    public void            setGrantedBy( SingleUser grantedBy){ this.grantedBy = grantedBy;}
 
-   public NeedsProtection getObject() { return object;}
-   public void            setObject( NeedsProtection object) { this.object = object;}
+   public String          getObjectToProtect() { return objectToProtect;}
+   public void            setObjectToProtect( String objectToProtect) { this.objectToProtect = objectToProtect;}
 
    // --------------- Object methods ---------------------
 
@@ -97,15 +110,18 @@ public class Permission extends BaseEntity implements Comparable<Permission>
 
       Permission that = (Permission) o;
 
-      return this.role.equals(that.role) && this.object.equals(that.object) && this.fromDate.equals(that.fromDate) && this.toDate.equals(that.toDate);
+      return this.role.equals(that.role) && 
+    		  this.objectToProtect.equals(that.objectToProtect) && 
+    		  this.fromDate.equals(that.fromDate) && 
+    		  this.toDate.equals(that.toDate);
 
    }// equals
 
    @Override
-   public int hashCode() { return Objects.hash(role.hashCode(), object.hashCode(), fromDate, toDate); }
+   public int hashCode() { return Objects.hash(role.hashCode(), objectToProtect.hashCode(), fromDate, toDate); }
 
    @Override
-   public String toString() { return "Permission{ role["+ role.getName()+ "] object["+ object.toString()+ "] from["+  fromDate+ "] to["+ toDate+ "] grantedBy["+ grantedBy.getEmail()+ "]}";}
+   public String toString() { return "Permission{ role["+ role.getName()+ "] object["+ objectToProtect.toString()+ "] from["+  fromDate+ "] to["+ toDate+ "] grantedBy["+ grantedBy.getEmail()+ "]}";}
 
    @Override
    public int compareTo(Permission that)
@@ -116,8 +132,8 @@ public class Permission extends BaseEntity implements Comparable<Permission>
      if (this.equals(that))
         return 0;
 
-     String key1 = this.role.getName()+ ":"+ this.object.getKey()+ this.fromDate+ ":"+ this.toDate;
-     String key2 = this.role.getName()+ ":"+ that.object.getKey()+ that.fromDate+ ":"+ that.toDate;
+     String key1 = this.role.getName()+ ":"+ this.objectToProtect+ this.fromDate+ ":"+ this.toDate;
+     String key2 = this.role.getName()+ ":"+ that.objectToProtect+ that.fromDate+ ":"+ that.toDate;
      return key1.compareTo(key2);
 
    }// compareTo

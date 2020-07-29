@@ -62,6 +62,7 @@ public class SingleUser extends Usuario implements Comparable<SingleUser>
    public SingleUser()
    {
       super();
+      buildCode();
    }
 
    public SingleUser( String email, String passwordHash, String lastName)
@@ -94,7 +95,7 @@ public class SingleUser extends Usuario implements Comparable<SingleUser>
 
    }//prepareData
 
-   @Override protected void buildCode() { this.code = email;}
+   @Override protected void buildCode(){this.code = (tenant == null? "[Tenant]": tenant.getCode())+ ">"+ (email==null? "[email]": email);}
 
    // --------------- Getters & Setters -----------------
    public String getPasswordHash() { return passwordHash;}

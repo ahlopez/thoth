@@ -61,6 +61,7 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>
       super();
       singleMembers = new TreeSet<>();
       groupMembers  = new TreeSet<>();
+      buildCode();
    }
 
    @PrePersist
@@ -71,7 +72,11 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>
       buildCode();
    }//prepareData
    
-   @Override protected void buildCode() { this.code     = tenant.toString()+ ":G:"+ firstName;}
+   @Override protected void buildCode() 
+   { 
+	   this.code = (tenant == null? "[Tenant]": tenant.getCode())+ ":G:"+ 
+                   (firstName == null? "[firstName]": firstName);
+   }//buildCode
 
    // --------------- Getters & Setters -----------------
    @Override

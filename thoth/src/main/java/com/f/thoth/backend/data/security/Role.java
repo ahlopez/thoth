@@ -1,8 +1,8 @@
 package com.f.thoth.backend.data.security;
 
-import java.util.Map;
 import java.util.Objects;
-import java.util.TreeMap;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -28,7 +28,7 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
  * Representa un rol que tiene permisos sobre los objetos que requieren protección
  */
 @Entity
-@Table(name = "ROLE", indexes = { @Index(columnList = "tenant,name") })
+@Table(name = "ROLE", indexes = { @Index(columnList = "code") })
 public class Role extends BaseEntity implements Comparable<Role>
 {
    @NotBlank(message = "{evidentia.name.required}")
@@ -41,12 +41,13 @@ public class Role extends BaseEntity implements Comparable<Role>
    @JoinColumn
    @BatchSize(size = 50)
    @Valid
-   private Map<NeedsProtection,Permission> permissions;
+   private Set<Permission> permissions;
 
    public Role()
    {
       super();
       allocate();
+      buildCode();
    }
 
    public Role( String name)
@@ -69,9 +70,9 @@ public class Role extends BaseEntity implements Comparable<Role>
       buildCode();
    }//prepareData
 
-   @Override protected void buildCode(){ this.code = this.name; }
+   @Override protected void buildCode(){ this.code = (tenant == null? "[Tenant]": tenant.getCode())+ ">"+ this.name; }
 
-   private void allocate() { this.permissions = new TreeMap<>(); }
+   private void allocate() { this.permissions = new TreeSet<>(); }
 
    // -------------- Getters & Setters ----------------
 
@@ -82,8 +83,8 @@ public class Role extends BaseEntity implements Comparable<Role>
       buildCode();
    }//setName
 
-   public Map<NeedsProtection,Permission> getPermissions() { return permissions;}
-   public void setPermissions( Map<NeedsProtection,Permission> permissions) { this.permissions = permissions;}
+   public Set<Permission> getPermissions() { return permissions;}
+   public void setPermissions( Set<Permission> permissions) { this.permissions = permissions;}
 
    // --------------- Object methods ---------------------
 
@@ -126,12 +127,20 @@ public class Role extends BaseEntity implements Comparable<Role>
     */
    public boolean canAccess(NeedsProtection object)
    {
+      if (object == null)
+         return false;
+
       if( object.isOwnedBy(this))
          return true;
 
-      Permission permission = permissions.get(object);
-      return  permission != null && permission.isCurrent();
-   }//hasPermission
+      for(Permission p: permissions)
+      {
+         if ( p.getObjectToProtect().equals(object.getKey()) && p.isCurrent())
+        	 return true;
+      }
+      
+      return  false;
+   }//canAccess
 
 }//Role
 

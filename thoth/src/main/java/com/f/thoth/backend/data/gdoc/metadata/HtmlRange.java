@@ -10,7 +10,7 @@ import javax.swing.text.html.HTMLEditorKit.ParserCallback;
 /**
  * Representa un rango de valores html
  */
-public class HtmlRange implements Range
+public class HtmlRange implements Range<String>
 {
    private static HTMLEditorKit.Parser parser;
    private static HTMLEditorKit.ParserCallback callback;
@@ -23,14 +23,15 @@ public class HtmlRange implements Range
       callback         = new ParserCallback();
    }//HtmlRange
 
+
    // --------------- Logic ------------------------------
 
-   public boolean in(Object value)
+   public boolean in(String value)
    {
-      if (value == null ||  !(value instanceof String))
+      if (value == null)
          return false;
 
-      StringReader reader = new StringReader( (String)value);
+      StringReader reader = new StringReader( value);
       try
       {
          parser.parse( reader, callback, true);

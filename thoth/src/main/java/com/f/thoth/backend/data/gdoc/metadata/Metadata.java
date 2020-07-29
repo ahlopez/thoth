@@ -1,5 +1,9 @@
 package com.f.thoth.backend.data.gdoc.metadata;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.time.LocalDateTime;
+
 import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.NamedAttributeNode;
@@ -7,6 +11,7 @@ import javax.persistence.NamedEntityGraph;
 import javax.persistence.NamedEntityGraphs;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -14,7 +19,7 @@ import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 
 /**
- * Representa la definici�n de un metadato
+ * Representa la definicion de un metadato
  */
 @NamedEntityGraphs({
     @NamedEntityGraph(
@@ -47,42 +52,43 @@ public class Metadata extends BaseEntity implements Comparable<Metadata>
 
    private boolean   editable = false;
 
-   @NotNull (message = "{evidentia.type.required}")
-   private Range     range;
+   @NotNull (message = "{evidentia.range.required}")
+   @NotEmpty(message = "{evidentia.range.required}")
+   private String    range;
 
 
    // ------------- Constructors ------------------
    public Metadata()
    {
-	   super();
+      super();
    }
-   
+
    public Metadata( String name, Type type, boolean required, boolean editable)
    {
-	   super();
-	   if ( TextUtil.isEmpty(name))
-		   throw new IllegalArgumentException("Nombre del metadato no puede ser nulo ni vacío");
-	   
-	   if ( type == null)
-		   throw new IllegalArgumentException("Tipo del metadato no puede ser nulo");
-	   
-	   this.name     = name;
-	   this.type     = type;
-	   this.required = required;
-	   this.editable = editable;
-	   buildCode();
-	   
+      super();
+      if ( TextUtil.isEmpty(name))
+         throw new IllegalArgumentException("Nombre del metadato no puede ser nulo ni vacío");
+
+      if ( type == null)
+         throw new IllegalArgumentException("Tipo del metadato no puede ser nulo");
+
+      this.name     = name;
+      this.type     = type;
+      this.required = required;
+      this.editable = editable;
+      buildCode();
+
    }//Metadata
-   
+
    @Override protected void buildCode() { this.code = tenant.getCode()+ ":M:"+ this.name;}
 
    // -------------- Getters & Setters ----------------
 
    public String  getName(){ return name;}
    public void    setName( String name)
-   { 
-	   this.name = name;
-	   buildCode();
+   {
+      this.name = name;
+      buildCode();
    }
 
    public Type    getType(){ return type;}
@@ -94,8 +100,8 @@ public class Metadata extends BaseEntity implements Comparable<Metadata>
    public boolean isEditable() { return editable;}
    public void    setEditable( boolean editable){ this.editable = editable;}
 
-   public Range   getRange(){ return range;}
-   public void    setRange( Range range) { this.range = range;}
+   public String  getRange(){ return range;}
+   public void    setRange(String range) { this.range = range;}
 
    // --------------- Object methods ---------------------
 
@@ -147,7 +153,70 @@ public class Metadata extends BaseEntity implements Comparable<Metadata>
 
    public boolean in(Object value)
    {
-      return range.in(value);
-   }
+     switch ( type)
+     {
+      case STRING   :
+      {
+         StringRange rng =new StringRange( range);
+         return rng.in( (String)value);
+      }
+      case ENUM     :
+      {
+         EnumRange rng =new EnumRange( range);
+         return rng.in( (String)value);
+      }
+      case BINARY   :
+      {
+         return value != null;
+      }
+      case BOOLEAN  :
+      {
+         BooleanRange rng =new BooleanRange( );
+         return rng.in( (Boolean)value);
+      }
+      case DECIMAL  :
+      {
+         DecimalRange rng =new DecimalRange( range);
+         return rng.in( (BigDecimal)value);
+      }
+      case INTEGER  :
+      {
+         IntegerRange rng =new IntegerRange( range);
+         return rng.in( (BigInteger)value);
+      }
+      case DATETIME :
+      {
+         DateTimeRange rng =new DateTimeRange( range);
+         return rng.in( (LocalDateTime)value);
+      }
+      case REFERENCE:
+      {
+         IdRange rng =new IdRange( range);
+         return rng.in( (String)value);
+      }
+      case URI      :
+      {
+         UriRange rng =new UriRange( );
+         return rng.in( (String)value);
+      }
+      case ID       :
+      {
+         IdRange rng =new IdRange(range);
+         return rng.in( (String)value);
+      }
+      case PATH     :
+      {
+         StringRange rng =new StringRange( range);
+         return rng.in( (String)value);
+      }
+      case HTML     :
+      {
+         HtmlRange rng =new HtmlRange( );
+         return rng.in( (String)value);
+      }
+     }//switch
+      return false;
+   }//in
+
 
 }//Metadata

@@ -6,7 +6,7 @@ import java.util.Objects;
 /**
  * Representa un rango de valores de Fecha-Hora
  */
-public class DateTimeRange implements Range
+public class DateTimeRange implements Range<LocalDateTime>
 {
    private LocalDateTime minTime;
    private LocalDateTime maxTime;
@@ -28,6 +28,11 @@ public class DateTimeRange implements Range
       this.maxTime   = maxTime;
 
    }//DateTimeRange
+   
+   public DateTimeRange( String range)
+   {
+	   //TODO: DateTimeRange( String range) constructor
+   }
 
    // -------------- Getters & Setters ----------------
 
@@ -68,14 +73,11 @@ public class DateTimeRange implements Range
 
    // --------------- Logic ------------------------------
 
-   public boolean in(Object value)
+   public boolean in(LocalDateTime value)
    {
-      if (value == null ||  !(value instanceof LocalDateTime))
-         return false;
-
-      LocalDateTime that = (LocalDateTime) value;
-      return (that.isEqual(minTime) || that.isAfter(minTime))  &&
-             (that.isEqual(maxTime) || that.isBefore(maxTime));
+      return   value != null && 
+    		  (value.isEqual(minTime) || value.isAfter(minTime))  &&
+              (value.isEqual(maxTime) || value.isBefore(maxTime));
 
    }//in
 

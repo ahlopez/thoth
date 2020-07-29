@@ -3,78 +3,83 @@ package com.f.thoth.backend.data.gdoc.metadata;
 /**
  * Representa un rango de valores de Identificadores
  */
-public class IdRange implements Range
+public class IdRange implements Range<String>
 {
-   public static int   MAX_LENGTH = 255;
+	public static int   MAX_LENGTH = 255;
 
-   private int     minLength  = 0;
-   private int     maxLength  = 255;
+	private int     minLength  = 0;
+	private int     maxLength  = 255;
 
 
-   // ------------- Constructors ------------------
-   public IdRange()
-   {
-   }
+	// ------------- Constructors ------------------
+	public IdRange()
+	{
+	}
 
-   public IdRange( int minLength, int maxLength)
-   {
-      if ( minLength > maxLength)
-         throw new IllegalArgumentException("Longitud m�nimma no puede ser mayor que longitud m�xima");
+	public IdRange( int minLength, int maxLength)
+	{
+		if ( minLength > maxLength)
+			throw new IllegalArgumentException("Longitud m�nimma no puede ser mayor que longitud maxima");
 
-      if (minLength < 0 || maxLength > MAX_LENGTH)
-         throw new IllegalArgumentException("Longitud m�nima o m�xima inv�lidas");
+		if (minLength < 0 || maxLength > MAX_LENGTH)
+			throw new IllegalArgumentException("Longitud m�nima o m�xima inv�lidas");
 
-      this.minLength   = minLength;
-      this.maxLength   = maxLength;
+		this.minLength   = minLength;
+		this.maxLength   = maxLength;
 
-   }//IdRange
+	}//IdRange
 
-   // -------------- Getters & Setters ----------------
+	public IdRange( String range)
+	{
+		//TODO: IdRange( String range) constructor
+	}
 
-   public int     getMinLength(){ return minLength;}
-   public void    setMinLength( int minLength){ this.minLength = minLength;}
 
-   public int     getMaxLength(){ return maxLength;}
-   public void    setMaxLength( int maxLength){ this.maxLength = maxLength;}
+	// -------------- Getters & Setters ----------------
 
-   // --------------- Object methods ---------------------
+	public int     getMinLength(){ return minLength;}
+	public void    setMinLength( int minLength){ this.minLength = minLength;}
 
-   @Override
-   public boolean equals(Object o)
-   {
-      if (this == o)
-         return true;
+	public int     getMaxLength(){ return maxLength;}
+	public void    setMaxLength( int maxLength){ this.maxLength = maxLength;}
 
-      if (o == null || getClass() != o.getClass())
-         return false;
+	// --------------- Object methods ---------------------
 
-      if (!super.equals(o))
-         return false;
+	@Override
+	public boolean equals(Object o)
+	{
+		if (this == o)
+			return true;
 
-      IdRange that = (IdRange) o;
+		if (o == null || getClass() != o.getClass())
+			return false;
 
-      return  this.minLength == that.minLength && this.maxLength == that.maxLength;
+		if (!super.equals(o))
+			return false;
 
-   }// equals
+		IdRange that = (IdRange) o;
 
-   @Override
-   public int hashCode() { return minLength * 1023 + maxLength; }
+		return  this.minLength == that.minLength && this.maxLength == that.maxLength;
 
-   @Override
-   public String toString()
-   {
-      return "IdRange{ minLength["+ minLength+ "] maxLength["+ maxLength+ "]}";
-   }//toString
+	}// equals
 
-   // --------------- Logic ------------------------------
+	@Override
+	public int hashCode() { return minLength * 1023 + maxLength; }
 
-   public boolean in(Object value)
-   {
-      if (value == null || !(value instanceof String))
-         return false;
+	@Override
+	public String toString()
+	{
+		return "IdRange{ minLength["+ minLength+ "] maxLength["+ maxLength+ "]}";
+	}//toString
 
-      String val = ((String)value);
-      return val.length() >= minLength && val.length() <= maxLength;
-   }//val
+	// --------------- Logic ------------------------------
+
+	public boolean in(String value)
+	{
+		return value != null  &&
+				value.length() >= minLength &&
+				value.length() <= maxLength;
+	}//val
+
 
 }//IdRange

@@ -3,7 +3,7 @@ package com.f.thoth.backend.data.gdoc.metadata;
 /**
  * Representa un rango de valores booleano
  */
-public class BooleanRange implements Range
+public class BooleanRange implements Range<Boolean>
 {
    // ------------- Constructors ------------------
    public BooleanRange()
@@ -12,13 +12,9 @@ public class BooleanRange implements Range
 
    // --------------- Logic ------------------------------
 
-   public boolean in(Object value)
+   public boolean in(Boolean value)
    {
-      if (value == null ||  !(value instanceof Boolean))
-         return false;
-
-      Boolean that = (Boolean) value;
-      return that.equals(Boolean.TRUE) || that.equals(Boolean.FALSE);
+      return  value != null && (value.equals(Boolean.TRUE) || value.equals(Boolean.FALSE));
 
    }//in
 
