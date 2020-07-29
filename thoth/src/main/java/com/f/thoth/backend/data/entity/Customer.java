@@ -13,7 +13,7 @@ public class Customer extends AbstractEntity {
 
    @NotBlank
    @Size(max = 255)
-   @Column(unique = true)
+   @Column/*(unique = true)*/
    private String fullName;
 
    @NotBlank

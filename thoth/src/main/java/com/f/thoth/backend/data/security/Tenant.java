@@ -1,5 +1,6 @@
 package com.f.thoth.backend.data.security;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -9,6 +10,9 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedEntityGraphs;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
@@ -16,6 +20,8 @@ import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.BatchSize;
@@ -29,21 +35,55 @@ import com.f.thoth.backend.data.gdoc.metadata.DocType;
  *  Representa una instancia del sistema,
  *  dueña de sus propias definiciones y datos
  */
+@NamedEntityGraphs({
+	@NamedEntityGraph(
+			name = SingleUser.BRIEF,
+			attributeNodes = {
+					@NamedAttributeNode("name"),
+					@NamedAttributeNode("administrator"),
+					@NamedAttributeNode("fromDate"),
+					@NamedAttributeNode("toDate"),
+					@NamedAttributeNode("locked")
+			}),
+	@NamedEntityGraph(
+			name = SingleUser.FULL,
+			attributeNodes = {
+					@NamedAttributeNode("name"),
+					@NamedAttributeNode("administrator"),
+					@NamedAttributeNode("fromDate"),
+					@NamedAttributeNode("toDate"),
+					@NamedAttributeNode("locked"),
+					@NamedAttributeNode("roles"),
+					@NamedAttributeNode("singleUsers"),
+					@NamedAttributeNode("userGroups"),
+					@NamedAttributeNode("docTypes")
+			}) })
 @Entity
 @Table(name = "TENANT", indexes = { @Index(columnList = "name") })
 public class Tenant extends AbstractEntity implements Comparable<Tenant>
 {
+	public static final String BRIEF = "Tenant.brief";
+	public static final String FULL  = "Tenant.full";
 
 	@NotBlank(message = "{evidentia.name.required}")
 	@NotEmpty(message = "{evidentia.name.required}")
 	@Size(min = 2, max = 255, message="{evidentia.name.minmaxlength}")
 	@Column(unique = true)
-	private String         name;
+	private String       name;
 
 	@NotEmpty(message = "{evidentia.email.required}")
 	@Email
 	@Size(min=3, max = 255, message="{evidentia.email.length}")
-	private String         administrator;
+	private String       administrator;
+
+	@NotNull(message = "{evidentia.date.required}")
+	@PastOrPresent(message="{evidentia.date.pastorpresent}")
+	protected LocalDateTime fromDate;
+
+	@NotNull(message = "{evidentia.date.required}")
+	protected LocalDateTime toDate;
+
+	protected boolean locked = false;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
 	@OrderColumn
@@ -62,14 +102,14 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
 	@OrderColumn
 	@JoinColumn
-	@BatchSize(size = 100)
+	@BatchSize(size = 50)
 	@Valid
 	private Set<UserGroup>  userGroups;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
 	@OrderColumn
 	@JoinColumn
-	@BatchSize(size = 100)
+	@BatchSize(size = 50)
 	@Valid
 	private Set<DocType>  docTypes;
 
@@ -94,7 +134,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 		buildCode();
 	}//Tenant
 
-	@Override protected void buildCode(){ this.code = (name == null? "[name]":name);}
+	@Override protected void buildCode(){ this.code = (name == null? "[name]" : name);}
 
 	private void allocate()
 	{
@@ -121,8 +161,23 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 		buildCode();
 	}
 
+	public boolean    isLocked()
+	{
+		LocalDateTime now = LocalDateTime.now();
+		locked = (locked || now.compareTo(fromDate) < 0 || now.compareTo(toDate) > 0);
+		return locked;
+	}
+	public void       setLocked(boolean locked) { this.locked = locked;}
+
+
 	public String         getAdministrator() { return administrator;}
 	public void           setAdministrator( String administrator) { this.administrator = administrator;}
+
+	public LocalDateTime  getFromDate() {	return fromDate;}
+	public void           setFromDate(LocalDateTime fromDate) { this.fromDate = fromDate;}
+
+	public LocalDateTime  getToDate() { return toDate; }
+	public void           setToDate(LocalDateTime toDate) { this.toDate = toDate; }
 
 	public Set<Role>      getRoles() { return roles;}
 	public void           setRoles( Set<Role> roles) { this.roles = roles;}
@@ -157,10 +212,10 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 	public int hashCode() { return name.hashCode(); }
 
 	@Override
-	public String toString() 
-	{ 
-		return "Tenant{ id["+ id+ "] version["+ version+ "] name["+ name+ "] code["+  code+ "] roles["+  roles.size()+ 
-			   "] singleUsers["+ singleUsers.size()+ "userGroups["+ userGroups.size()+ "] docTypes["+ docTypes.size()+ "]}";
+	public String toString()
+	{
+		return "Tenant{ id["+ id+ "] version["+ version+ "] name["+ name+ "] code["+  code+ "] roles["+  roles.size()+
+				"] singleUsers["+ singleUsers.size()+ "userGroups["+ userGroups.size()+ "] docTypes["+ docTypes.size()+ "]}";
 	}
 
 	@Override
@@ -172,8 +227,8 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 
 	public void addType( DocType type) { docTypes.add(type);}
 
-	public SingleUser getSingleUserById( String userCode) 
-	{   
+	public SingleUser getSingleUserById( String userCode)
+	{
 		for ( SingleUser s: singleUsers )
 		{
 			if ( s.getCode().equals(userCode))
@@ -182,8 +237,8 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 		return null;
 	}//getSingleUserById
 
-	public UserGroup getUserGroupById( String groupCode) 
-	{   
+	public UserGroup getUserGroupById( String groupCode)
+	{
 		for ( UserGroup ug: userGroups )
 		{
 			if ( ug.getCode().equals(groupCode))
@@ -193,7 +248,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 	}//getUserGroupById
 
 	public DocType getTypeById( String code)
-	{ 
+	{
 		for (DocType dt: docTypes)
 		{
 			if( dt.getCode().equals(code))

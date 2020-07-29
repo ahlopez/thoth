@@ -10,9 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
-import javax.persistence.NamedAttributeNode;
-import javax.persistence.NamedEntityGraph;
-import javax.persistence.NamedEntityGraphs;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
@@ -25,18 +22,6 @@ import com.f.thoth.backend.data.security.Role;
 /**
  * Representa una rama del �rbol de clasificaci�n
  */
-@NamedEntityGraphs({
-    @NamedEntityGraph(
-        name = BranchClass.BRIEF,
-        attributeNodes = {
-            @NamedAttributeNode("parms")
-        }),
-    @NamedEntityGraph(
-        name = BranchClass.FULL,
-        attributeNodes = {
-            @NamedAttributeNode("parms"),
-            @NamedAttributeNode("history")
-        }) })
 @Entity
 @Table(name = "BRANCH_CLASS", indexes = { @Index(columnList = "code") })
 public class BranchClass extends Clazz

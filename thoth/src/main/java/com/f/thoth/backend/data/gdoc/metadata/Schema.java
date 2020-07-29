@@ -27,118 +27,118 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 @Entity
 public class Schema extends BaseEntity implements Comparable<Schema>
 {
-	@NotBlank(message = "{evidentia.name.required}")
-	@NotNull (message = "{evidentia.name.required}")
-	private String         name;
+   @NotBlank(message = "{evidentia.name.required}")
+   @NotNull (message = "{evidentia.name.required}")
+   private String         name;
 
-	@NotNull (message = "{evidentia.fields.required}")
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-	@OrderColumn
-	@JoinColumn
-	@BatchSize(size = 30)
-	private Set<Metadata>  fields;
-
-
-	// ------------- Constructors ------------------
-	public Schema()
-	{
-		fields = new TreeSet<>();
-	}
-
-	public Schema( String name, Set<Metadata> fields)
-	{
-		if( !TextUtil.isValidName(name))
-			throw new IllegalArgumentException("Nombre inválido");
-
-		if(fields == null || fields.size() == 0)
-			throw new IllegalArgumentException("Conjunto de metadatos del esquema no puede ser nulo ni vacío");
-
-		this.name   = name;
-		this.fields = fields;
-		buildCode();
-	}//Schema
-
-	@PrePersist
-	@PreUpdate
-	public void prepareData()
-	{
-		this.name =  name != null ? name.trim() : "Generico";
-		buildCode();
-	}//prepareData
-
-	@Override protected void buildCode() { this.code =  tenant.toString()+ ":"+ name; }
-
-	// -------------- Getters & Setters ----------------
-
-	public String    getName(){ return name;}
-	public void      setName( String name)
-	{
-		this.name = name;
-		buildCode();
-	}//setName
-
-	public Set<Metadata>  getFields() { return fields;}
-	public void           setFields( Set<Metadata> fields){ this.fields = fields;}
+   @NotNull (message = "{evidentia.fields.required}")
+   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+   @OrderColumn
+   @JoinColumn
+   @BatchSize(size = 30)
+   private Set<Metadata>  fields;
 
 
-	// --------------- Object methods ---------------------
+   // ------------- Constructors ------------------
+   public Schema()
+   {
+      fields = new TreeSet<>();
+   }
 
-	@Override
-	public boolean equals(Object o)
-	{
-		if (this == o)
-			return true;
+   public Schema( String name, Set<Metadata> fields)
+   {
+      if( !TextUtil.isValidName(name))
+         throw new IllegalArgumentException("Nombre inválido");
 
-		if (o == null || getClass() != o.getClass())
-			return false;
+      if(fields == null || fields.size() == 0)
+         throw new IllegalArgumentException("Conjunto de metadatos del esquema no puede ser nulo ni vacío");
 
-		if (!super.equals(o))
-			return false;
+      this.name   = name;
+      this.fields = fields;
+      buildCode();
+   }//Schema
 
-		Schema that = (Schema) o;
+   @PrePersist
+   @PreUpdate
+   public void prepareData()
+   {
+      this.name =  name != null ? name.trim() : "Generico";
+      buildCode();
+   }//prepareData
 
-		return  this.tenant.equals(that.tenant) && this.code.equals(that.code);
+   @Override protected void buildCode() { this.code =  tenant.toString()+ ">"+ name; }
 
-	}// equals
+   // -------------- Getters & Setters ----------------
 
-	@Override
-	public int hashCode()
-	{
-		return Objects.hash( tenant, code);
-	}
+   public String    getName(){ return name;}
+   public void      setName( String name)
+   {
+      this.name = name;
+      buildCode();
+   }//setName
 
-	@Override
-	public String toString()
-	{
-		StringBuilder s = new StringBuilder();
-		s.append( "Schema{").
-		append( super.toString()).
-		append( " name["+ name+ "]").append("\n\t\t").
-		append( " fields["+ fieldNames()).
-		append( "]}");
+   public Set<Metadata>  getFields() { return fields;}
+   public void           setFields( Set<Metadata> fields){ this.fields = fields;}
 
-		return s.toString();
 
-	}//toString
+   // --------------- Object methods ---------------------
 
-	private String fieldNames()
-	{
-		StringBuilder s = new StringBuilder();
-		for(Metadata m: fields)
-			s.append( m.getName()).append(" ");
+   @Override
+   public boolean equals(Object o)
+   {
+      if (this == o)
+         return true;
 
-		return s.toString();
-	}//fieldNames
+      if (o == null || getClass() != o.getClass())
+         return false;
 
-	@Override
-	public int compareTo(Schema other)
-	{
-		return other == null?  1 :  this.equals(other)? 0:  this.code.compareTo( other.code);
-	}
+      if (!super.equals(o))
+         return false;
 
-	public Iterator<Metadata> iterator()
-	{
-		return fields.iterator();
-	}
+      Schema that = (Schema) o;
+
+      return  this.tenant.equals(that.tenant) && this.code.equals(that.code);
+
+   }// equals
+
+   @Override
+   public int hashCode()
+   {
+      return Objects.hash( tenant, code);
+   }
+
+   @Override
+   public String toString()
+   {
+      StringBuilder s = new StringBuilder();
+      s.append( "Schema{").
+      append( super.toString()).
+      append( " name["+ name+ "]").append("\n\t\t").
+      append( " fields["+ fieldNames()).
+      append( "]}");
+
+      return s.toString();
+
+   }//toString
+
+   private String fieldNames()
+   {
+      StringBuilder s = new StringBuilder();
+      for(Metadata m: fields)
+         s.append( m.getName()).append(" ");
+
+      return s.toString();
+   }//fieldNames
+
+   @Override
+   public int compareTo(Schema other)
+   {
+      return other == null?  1 :  this.equals(other)? 0:  this.code.compareTo( other.code);
+   }
+
+   public Iterator<Metadata> iterator()
+   {
+      return fields.iterator();
+   }
 
 }//Schema

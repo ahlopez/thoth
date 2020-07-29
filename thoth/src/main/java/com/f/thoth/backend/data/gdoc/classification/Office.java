@@ -49,6 +49,7 @@ public class Office extends BaseEntity implements NeedsProtection, Comparable<Of
    public Office()
    {
       super();
+      buildCode();
    }
 
    public Office( String name, Schema schema, Integer category, Role roleOwner, Office parent,
@@ -87,7 +88,11 @@ public class Office extends BaseEntity implements NeedsProtection, Comparable<Of
       buildCode();
    }
 
-   @Override protected void buildCode() { this.code =  parent == null? tenant.toString()+ ":"+ name : parent.code + "-"+ name; }
+   @Override protected void buildCode()
+   {
+      this.code =   parent != null? parent.code + "-"+ name :
+                   (tenant == null? "[Tenant]" : tenant.getCode())+ ">"+ (name == null? "[name]" : name);
+   }//buildCode
 
    // -------------- Getters & Setters ----------------
 

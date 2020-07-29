@@ -31,129 +31,135 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 @MappedSuperclass
 public abstract class Usuario extends BaseEntity
 {
-   @NotNull (message = "{evidentia.category.required}")
-   @Min(value=0, message= "{evidentia.category.minvalue}")
-   @Max(value=5, message= "{evidentia.category.maxvalue}")
-   protected Integer       category;
+	@NotNull (message = "{evidentia.category.required}")
+	@Min(value=0, message= "{evidentia.category.minvalue}")
+	@Max(value=5, message= "{evidentia.category.maxvalue}")
+	protected Integer       category;
 
-   @NotNull(message = "{evidentia.date.required}")
-   @PastOrPresent(message="{evidentia.date.pastorpresent}")
-   protected LocalDateTime fromDate;
+	@NotNull(message = "{evidentia.date.required}")
+	@PastOrPresent(message="{evidentia.date.pastorpresent}")
+	protected LocalDateTime fromDate;
 
-   @NotNull(message = "{evidentia.date.required}")
-   protected LocalDateTime toDate;
+	@NotNull(message = "{evidentia.date.required}")
+	protected LocalDateTime toDate;
 
-   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-   @OrderColumn
-   @JoinColumn
-   @BatchSize(size = 10)
-   @Valid
-   protected Set<Role>       roles;
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@OrderColumn
+	@JoinColumn
+	@BatchSize(size = 10)
+	@Valid
+	protected Set<Role>       roles;
 
-   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-   @OrderColumn
-   @JoinColumn
-   @BatchSize(size = 10)
-   @Valid
-   protected Set<UserGroup>  groups;
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+	@OrderColumn
+	@JoinColumn
+	@BatchSize(size = 10)
+	@Valid
+	protected Set<UserGroup>  groups;
 
-   @NotBlank(message = "{evidentia.name.required}")
-   @NotEmpty(message = "{evidentia.name.required}")
-   @Size(min = 2, max = 255, message="{evidentia.name.min.max.length}")
-   protected String firstName;
+	@NotBlank(message = "{evidentia.name.required}")
+	@NotEmpty(message = "{evidentia.name.required}")
+	@Size(min = 2, max = 255, message="{evidentia.name.min.max.length}")
+	protected String firstName;
 
-   protected boolean locked = false;
+	protected boolean locked = false;
 
-   // ----------------- Constructor -----------------
-   public Usuario()
-   {
-      super();
-      groups = new TreeSet<>();
-      roles  = new TreeSet<>();
-   }
+	// ----------------- Constructor -----------------
+	public Usuario()
+	{
+		super();
+		groups = new TreeSet<>();
+		roles  = new TreeSet<>();
+	}
 
-   public void prepareData()
-   {
-      this.fromDate  =  fromDate  != null ? fromDate : LocalDateTime.MIN;
-      this.toDate    =  toDate    != null ? toDate   : LocalDateTime.now().plusDays(1L);
-      this.category  =  category  != null ? category : 0;
-      this.firstName =  TextUtil.nameTidy( firstName);
-      this.locked    =  isLocked();
+	public void prepareData()
+	{
+		this.fromDate  =  fromDate  != null ? fromDate : LocalDateTime.MIN;
+		this.toDate    =  toDate    != null ? toDate   : LocalDateTime.now().plusDays(1L);
+		this.category  =  category  != null ? category : 0;
+		this.firstName =  TextUtil.nameTidy( firstName);
+		this.locked    =  isLocked();
 
-   }//prepareData
+	}//prepareData
 
 
-   // --------------- Getters & Setters -----------------
+	// --------------- Getters & Setters -----------------
 
-   public Integer    getCategory() { return category;}
-   public void       setCategory(Integer category) { this.category = (category == null? 0: category);}
+	public Integer    getCategory() { return category;}
+	public void       setCategory(Integer category) { this.category = (category == null? 0: category);}
 
-   public String     getFirstName() { return firstName;}
-   public void       setFirstName(String firstName) { this.firstName = firstName;}
+	public String     getFirstName() { return firstName;}
+	public void       setFirstName(String firstName) { this.firstName = firstName;}
 
-   public Set<UserGroup> getGroups() { return groups;}
-   public void           setGroups( Set<UserGroup> groups) { this.groups = groups;}
+	public LocalDateTime getFromDate() {	return fromDate;}
+	public void setFromDate(LocalDateTime fromDate) { this.fromDate = fromDate;}
 
-   public Set<Role> getRoles() { return roles;}
-   public void       setRoles(Set<Role> roles) { this.roles = roles;}
+	public LocalDateTime getToDate() { return toDate; }
+	public void setToDate(LocalDateTime toDate) { this.toDate = toDate; }
 
-   public boolean    isLocked()
-   {
-      LocalDateTime now = LocalDateTime.now();
-      locked = (locked || now.compareTo(fromDate) < 0 || now.compareTo(toDate) > 0);
-      return locked;
-   }
-   public void       setLocked(boolean locked) { this.locked = locked;}
+	public Set<UserGroup> getGroups() { return groups;}
+	public void           setGroups( Set<UserGroup> groups) { this.groups = groups;}
 
-   // --------------- Object ------------------
+	public Set<Role> getRoles() { return roles;}
+	public void       setRoles(Set<Role> roles) { this.roles = roles;}
 
-   @Override
-   public boolean equals(Object o)
-   {
-      if (this == o)
-         return true;
+	public boolean    isLocked()
+	{
+		LocalDateTime now = LocalDateTime.now();
+		locked = (locked || now.compareTo(fromDate) < 0 || now.compareTo(toDate) > 0);
+		return locked;
+	}
+	public void       setLocked(boolean locked) { this.locked = locked;}
 
-      if (o == null || getClass() != o.getClass())
-         return false;
+	// --------------- Object ------------------
 
-      if (!super.equals(o))
-         return false;
+	@Override
+	public boolean equals(Object o)
+	{
+		if (this == o)
+			return true;
 
-      Usuario that = (Usuario) o;
+		if (o == null || getClass() != o.getClass())
+			return false;
 
-      return isLocked() == that.isLocked() &&
-             Objects.equals(tenant,    that.tenant)   &&
-             Objects.equals(category,  that.category) &&
-             Objects.equals(firstName, that.firstName);
+		if (!super.equals(o))
+			return false;
 
-   }// equals
+		Usuario that = (Usuario) o;
 
-   @Override
-   public int hashCode()
-   {
-      return Objects.hash(super.hashCode(), tenant, category, firstName, isLocked());
-   }
+		return isLocked() == that.isLocked() &&
+				Objects.equals(tenant,    that.tenant)   &&
+				Objects.equals(category,  that.category) &&
+				Objects.equals(firstName, that.firstName);
 
-   @Override
-   public String toString() { return " Usuario{" + super.toString()+ " tenant["+ tenant.getName()+ "] category["+ category+ "] locked["+ isLocked()+ "]"+ "] name[" + firstName+ "]}" ; }
+	}// equals
 
-   // --------------- function ----------------
+	@Override
+	public int hashCode()
+	{
+		return Objects.hash(super.hashCode(), tenant, category, firstName, isLocked());
+	}
 
-   public void addToGroup( UserGroup group)
-   {
-      if (group != null )
-      {
-          groups.add( group);
-          group.addMember(this);
-      }
-   }//addToGroup
+	@Override
+	public String toString() { return " Usuario{" + super.toString()+ " tenant["+ tenant.getName()+ "] category["+ category+ "] locked["+ isLocked()+ "]"+ "] name[" + firstName+ "]}" ; }
 
-   public void addToRole( Role role)
-   {
-      if ( role != null)
-         roles.add(role);
-   }//addToRole
+	// --------------- function ----------------
 
-   public abstract boolean canAccess( NeedsProtection object);
+	public void addToGroup( UserGroup group)
+	{
+		if (group != null )
+		{
+			groups.add( group);
+			group.addMember(this);
+		}
+	}//addToGroup
+
+	public void addToRole( Role role)
+	{
+		if ( role != null)
+			roles.add(role);
+	}//addToRole
+
+	public abstract boolean canAccess( NeedsProtection object);
 
 }//Usuario

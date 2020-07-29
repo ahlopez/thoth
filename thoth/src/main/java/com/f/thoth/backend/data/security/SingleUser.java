@@ -22,18 +22,33 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 /**
  * Representa un usuario autenticado del sistema
  */
+/*
 @NamedEntityGraphs({
-    @NamedEntityGraph(
-        name = SingleUser.BRIEF,
-        attributeNodes = {
-            @NamedAttributeNode("parms")
-        }),
-    @NamedEntityGraph(
-        name = SingleUser.FULL,
-        attributeNodes = {
-            @NamedAttributeNode("parms"),
-            @NamedAttributeNode("history")
-        }) })
+   @NamedEntityGraph(
+         name = SingleUser.BRIEF,
+         attributeNodes = {
+               @NamedAttributeNode("tenant"),
+               @NamedAttributeNode("firstName"),
+               @NamedAttributeNode("lastName"),
+               @NamedAttributeNode("email"),
+               @NamedAttributeNode("fromDate"),
+               @NamedAttributeNode("toDate"),
+               @NamedAttributeNode("locked")
+         }),
+   @NamedEntityGraph(
+         name = SingleUser.FULL,
+         attributeNodes = {
+               @NamedAttributeNode("tenant"),
+               @NamedAttributeNode("firstName"),
+               @NamedAttributeNode("lastName"),
+               @NamedAttributeNode("email"),
+               @NamedAttributeNode("fromDate"),
+               @NamedAttributeNode("toDate"),
+               @NamedAttributeNode("locked"),
+               @NamedAttributeNode("roles"),
+               @NamedAttributeNode("groups")
+         }) })
+*/
 @Entity
 @Table(name = "SINGLE_USER", indexes = { @Index(columnList = "email"), @Index(columnList = "lastName,firstName") })
 public class SingleUser extends Usuario implements Comparable<SingleUser>
@@ -140,8 +155,8 @@ public class SingleUser extends Usuario implements Comparable<SingleUser>
    public int compareTo(SingleUser that)
    {
       return this.equals(that)? 0 :
-             that == null ?     1 :
-             (this.lastName + ":" + this.firstName).compareTo(that.lastName + ":" + that.firstName);
+         that == null ?     1 :
+            (this.lastName + ":" + this.firstName).compareTo(that.lastName + ":" + that.firstName);
 
    }// compareTo
 

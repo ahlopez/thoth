@@ -18,7 +18,7 @@ import com.f.thoth.backend.data.security.SingleUser;
 import com.f.thoth.ui.utils.FormattingUtils;
 
 /**
- * Representa una clase del esquema de clasificaci�n
+ * Representa una clase del esquema de clasificacion
  */
 public class Clazz extends BaseEntity implements NeedsProtection, Comparable<Clazz>
 {
@@ -49,6 +49,7 @@ public class Clazz extends BaseEntity implements NeedsProtection, Comparable<Cla
    public Clazz()
    {
       super();
+      buildCode();
    }
 
    public Clazz( String name, Schema schema, Integer category, Role roleOwner, Clazz parent,
@@ -87,7 +88,12 @@ public class Clazz extends BaseEntity implements NeedsProtection, Comparable<Cla
       buildCode();
    }
 
-   @Override protected void buildCode() { this.code =  parent == null? tenant.toString()+ ":"+ name : parent.code + "-"+ name; }
+
+   @Override protected void buildCode()
+   {
+      this.code =   parent != null? parent.code + "-"+ name :
+                   (tenant == null? "[Tenant]" : tenant.getCode())+ ">"+ (name == null? "[name]" : name);
+   }//buildCode
 
    // -------------- Getters & Setters ----------------
 

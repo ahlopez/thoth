@@ -49,6 +49,7 @@ public class Series extends BaseEntity implements NeedsProtection, Comparable<Se
    public Series()
    {
       super();
+      buildCode();
    }
 
 
@@ -88,7 +89,12 @@ public class Series extends BaseEntity implements NeedsProtection, Comparable<Se
       buildCode();
    }//prepareData
 
-   @Override protected void buildCode() { this.code = parent == null? tenant.toString()+ ":"+ name : parent.code + "-"+ name; }
+
+   @Override protected void buildCode()
+   {
+      this.code =   parent != null? parent.code + "-"+ name :
+                   (tenant == null? "[Tenant]" : tenant.getCode())+ ">"+ (name == null? "[name]" : name);
+   }//buildCode
 
    // -------------- Getters & Setters ----------------
 

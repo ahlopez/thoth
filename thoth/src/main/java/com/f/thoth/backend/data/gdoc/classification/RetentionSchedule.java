@@ -17,8 +17,8 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 
 /**
  * Representa una entrada de la  TRD
- * (Tabla de retenci�n documental, o tambi�n
- *  Calendario de conservaci�n)
+ * (Tabla de retencion documental, o tambien
+ *  Calendario de conservacion)
  */
 @Table(name = "RETENTION_SCHEDULE", indexes = { @Index(columnList = "code") })
 public class RetentionSchedule extends BaseEntity implements Comparable<RetentionSchedule>
@@ -43,6 +43,7 @@ public class RetentionSchedule extends BaseEntity implements Comparable<Retentio
    public RetentionSchedule()
    {
       super();
+      buildCode();
    }
 
    public RetentionSchedule( String name, Retencion retention, Disposicion disposition, TradicionDocumental tradicionDocumental)
@@ -78,7 +79,11 @@ public class RetentionSchedule extends BaseEntity implements Comparable<Retentio
    }//prepareData
 
 
-   @Override protected void buildCode() { this.code =  tenant.toString()+ ":"+ name; }
+   @Override protected void buildCode()
+   {
+      this.code =  (tenant == null? "[Tenant]" : tenant.getCode())+ ">"+
+                   (name == null? "[name]": name);
+   }//buildCode
 
    // -------------- Getters & Setters ----------------
 

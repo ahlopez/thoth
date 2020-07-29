@@ -23,18 +23,29 @@ import org.hibernate.annotations.BatchSize;
 /**
  * Representa un Grupo de Usuarios
  */
+/*
 @NamedEntityGraphs({
-    @NamedEntityGraph(
-        name = UserGroup.BRIEF,
-        attributeNodes = {
-            @NamedAttributeNode("parms")
-        }),
-    @NamedEntityGraph(
-        name = UserGroup.FULL,
-        attributeNodes = {
-            @NamedAttributeNode("parms"),
-            @NamedAttributeNode("history")
-        }) })
+   @NamedEntityGraph(
+         name = UserGroup.BRIEF,
+         attributeNodes = {
+               @NamedAttributeNode("tenant"),
+               @NamedAttributeNode("firstName"),
+               @NamedAttributeNode("fromDate"),
+               @NamedAttributeNode("toDate")
+         }),
+   @NamedEntityGraph(
+         name = UserGroup.FULL,
+         attributeNodes = {
+               @NamedAttributeNode("tenant"),
+               @NamedAttributeNode("firstName"),
+               @NamedAttributeNode("fromDate"),
+               @NamedAttributeNode("toDate"),
+               @NamedAttributeNode("roles"),
+               @NamedAttributeNode("groups"),
+               @NamedAttributeNode("singleMembers"),
+               @NamedAttributeNode("groupMembers")
+         }) })
+*/
 @Entity
 @Table(name = "USER_GROUP", indexes = { @Index(columnList = "code")})
 public class UserGroup extends Usuario implements Comparable<UserGroup>
@@ -71,11 +82,11 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>
       super.prepareData();
       buildCode();
    }//prepareData
-   
-   @Override protected void buildCode() 
-   { 
-	   this.code = (tenant == null? "[Tenant]": tenant.getCode())+ ":G:"+ 
-                   (firstName == null? "[firstName]": firstName);
+
+   @Override protected void buildCode()
+   {
+      this.code = (tenant == null? "[Tenant]": tenant.getCode())+ ":G:"+
+            (firstName == null? "[firstName]": firstName);
    }//buildCode
 
    // --------------- Getters & Setters -----------------
@@ -92,12 +103,12 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>
    public Set<UserGroup> getGroupMembers() { return groupMembers;}
    public void         setGroupMembers( Set<UserGroup> groupMembers) { this.groupMembers = groupMembers;}
 
-    @Override
+   @Override
    public int compareTo(UserGroup that)
    {
       return this.equals(that)? 0 :
-             that == null ?     1 :
-             (this.code).compareTo(that.code);
+         that == null ?     1 :
+            (this.code).compareTo(that.code);
 
    }// compareTo
 

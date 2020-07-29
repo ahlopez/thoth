@@ -10,9 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
-import javax.persistence.NamedAttributeNode;
-import javax.persistence.NamedEntityGraph;
-import javax.persistence.NamedEntityGraphs;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
@@ -25,18 +22,6 @@ import com.f.thoth.backend.data.security.Role;
 /**
  * Representa una rama de la estructura jer�rquica de oficinas productoras
  */
-@NamedEntityGraphs({
-    @NamedEntityGraph(
-        name = BranchOffice.BRIEF,
-        attributeNodes = {
-            @NamedAttributeNode("parms")
-        }),
-    @NamedEntityGraph(
-        name = BranchOffice.FULL,
-        attributeNodes = {
-            @NamedAttributeNode("parms"),
-            @NamedAttributeNode("history")
-        }) })
 @Entity
 @Table(name = "BRANCH_OFFICE", indexes = { @Index(columnList = "code") })
 public class BranchOffice extends Office

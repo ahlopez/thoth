@@ -4,9 +4,6 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.Index;
-import javax.persistence.NamedAttributeNode;
-import javax.persistence.NamedEntityGraph;
-import javax.persistence.NamedEntityGraphs;
 import javax.persistence.Table;
 
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
@@ -15,18 +12,6 @@ import com.f.thoth.backend.data.security.Role;
 /**
  * Representa una hoja de la estructura jer�rquica de series documentales
  */
-@NamedEntityGraphs({
-    @NamedEntityGraph(
-        name = LeafSeries.BRIEF,
-        attributeNodes = {
-            @NamedAttributeNode("parms")
-        }),
-    @NamedEntityGraph(
-        name = LeafSeries.FULL,
-        attributeNodes = {
-            @NamedAttributeNode("parms"),
-            @NamedAttributeNode("history")
-        }) })
 @Entity
 @Table(name = "LEAF_SERIES", indexes = { @Index(columnList = "code") })
 public class LeafSeries extends Series

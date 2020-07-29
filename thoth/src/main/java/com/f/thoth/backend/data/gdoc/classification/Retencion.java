@@ -18,11 +18,13 @@ import com.f.thoth.backend.data.entity.BaseEntity;
 public class Retencion extends BaseEntity implements Comparable<Retencion>
 {
    private static int retSequence = 0;
-   
+
    public static int GESTION    = 0;
    public static int CENTRAL    = 1;
    public static int INTERMEDIO = 2;
 
+
+   private int retId;
    private int periodo[] = new int[3];
 
    // ------------- Constructors ------------------
@@ -30,6 +32,7 @@ public class Retencion extends BaseEntity implements Comparable<Retencion>
    public Retencion()
    {
       super();
+      retId = ++retSequence;
       periodo[0] = periodo[1] = periodo[2] = 5;
       buildCode();
    }
@@ -40,13 +43,14 @@ public class Retencion extends BaseEntity implements Comparable<Retencion>
       if (gestion <= 0 || central <= 0 || intermedio <= 0)
          throw new IllegalArgumentException("Periodos de retencion deben ser mayores que 0");
 
+      retId = ++retSequence;
       periodo[0] = gestion;
       periodo[1] = central;
       periodo[2] = intermedio;
       buildCode();
    }//Retencion
-   
-   @Override protected void buildCode() { this.code = tenant.getCode()+ ":"+ (++retSequence);}
+
+   @Override protected void buildCode() { this.code = (tenant == null? "[Tenant]": tenant.getCode())+ ">"+ retId;}
 
    // -------------- Getters & Setters ----------------
 

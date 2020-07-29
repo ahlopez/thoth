@@ -6,9 +6,6 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
 import javax.persistence.Index;
-import javax.persistence.NamedAttributeNode;
-import javax.persistence.NamedEntityGraph;
-import javax.persistence.NamedEntityGraphs;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -21,25 +18,10 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 /**
  * Representa la definicion de un metadato
  */
-@NamedEntityGraphs({
-    @NamedEntityGraph(
-        name = Metadata.BRIEF,
-        attributeNodes = {
-            @NamedAttributeNode("parms")
-        }),
-    @NamedEntityGraph(
-        name = Metadata.FULL,
-        attributeNodes = {
-            @NamedAttributeNode("parms"),
-            @NamedAttributeNode("history")
-        }) })
 @Entity
 @Table(name = "METADATA", indexes = { @Index(columnList = "code") })
 public class Metadata extends BaseEntity implements Comparable<Metadata>
 {
-   public static final String BRIEF = "Metadata.brief";
-   public static final String FULL  = "Metadata.full";
-
    @NotBlank(message = "{evidentia.name.required}")
    @NotNull (message = "{evidentia.name.required}")
    @Size(min= 2, max = 50, message= "{evidentia.name.length}")
