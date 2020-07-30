@@ -20,8 +20,8 @@ import com.vaadin.flow.router.OptionalParameter;
 public abstract class AbstractBakeryCrudView<E extends AbstractEntity> extends Crud<E>
         implements HasUrlParameter<Long>, HasNotifications {
 
-    private static final String DISCARD_MESSAGE = "There are unsaved modifications to the %s. Discard changes?";
-    private static final String DELETE_MESSAGE = "Are you sure you want to delete the selected %s? This action cannot be undone.";
+    private static final String DISCARD_MESSAGE = "Hay modificaciones sin guardar a %s. Descartar los cambios?";
+    private static final String DELETE_MESSAGE = "Esta seguro de eliminar el %s seleccionado? Esta accion no puede deshacerse.";
 
     private final Grid<E> grid;
 
@@ -39,12 +39,12 @@ public abstract class AbstractBakeryCrudView<E extends AbstractEntity> extends C
 
         CrudI18n crudI18n = CrudI18n.createDefault();
         String entityName = EntityUtil.getName(beanType);
-        crudI18n.setNewItem("New " + entityName);
-        crudI18n.setEditItem("Edit " + entityName);
-        crudI18n.setEditLabel("Edit " + entityName);
+        crudI18n.setNewItem("Nuevo " + entityName);
+        crudI18n.setEditItem("Edite " + entityName);
+        crudI18n.setEditLabel("Edite " + entityName);
         crudI18n.getConfirm().getCancel().setContent(String.format(DISCARD_MESSAGE, entityName));
         crudI18n.getConfirm().getDelete().setContent(String.format(DELETE_MESSAGE, entityName));
-        crudI18n.setDeleteItem("Delete");
+        crudI18n.setDeleteItem("Eliminar");
         setI18n(crudI18n);
 
         CrudEntityDataProvider<E> dataProvider = new CrudEntityDataProvider<>(service);
@@ -55,8 +55,8 @@ public abstract class AbstractBakeryCrudView<E extends AbstractEntity> extends C
         entityPresenter = new CrudEntityPresenter<>(service, currentUser, this);
 
         SearchBar searchBar = new SearchBar();
-        searchBar.setActionText("New " + entityName);
-        searchBar.setPlaceHolder("Search");
+        searchBar.setActionText("Nuevo " + entityName);
+        searchBar.setPlaceHolder("Buscar");
         searchBar.addFilterChangeListener(e -> dataProvider.setFilter(searchBar.getFilter()));
         searchBar.getActionButton().getElement().setAttribute("new-button", true);
 
@@ -67,7 +67,7 @@ public abstract class AbstractBakeryCrudView<E extends AbstractEntity> extends C
     private void setupCrudEventListeners(CrudEntityPresenter<E> entityPresenter) {
         Consumer<E> onSuccess = entity -> navigateToEntity(null);
         Consumer<E> onFail = entity -> {
-            throw new RuntimeException("The operation could not be performed.");
+            throw new RuntimeException("La operacion no pudo ser ejecutada.");
         };
 
         addEditListener(e ->
@@ -99,6 +99,6 @@ public abstract class AbstractBakeryCrudView<E extends AbstractEntity> extends C
             setOpened(false);
         }
     }
-    
+
 
 }

@@ -94,13 +94,13 @@ public class Role extends BaseEntity implements Comparable<Role>
       if (this == o)
          return true;
 
-      if (o == null || getClass() != o.getClass())
+      if ( !(o instanceof Role))
          return false;
 
       Role that = (Role) o;
 
-      return Objects.equals(tenant, that.tenant) &&
-             Objects.equals(name,   that.name);
+      return Objects.equals(this.tenant, that.tenant) &&
+             Objects.equals(this.name,   that.name);
 
    }// equals
 
@@ -135,10 +135,10 @@ public class Role extends BaseEntity implements Comparable<Role>
 
       for(Permission p: permissions)
       {
-         if ( p.getObjectToProtect().equals(object.getKey()) && p.isCurrent())
-        	 return true;
+         if ( p.getObjectToProtect().getCode().equals(object.getKey()) && p.isCurrent())
+          return true;
       }
-      
+
       return  false;
    }//canAccess
 

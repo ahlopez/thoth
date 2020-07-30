@@ -13,7 +13,8 @@ import com.vaadin.flow.data.binder.ValidationException;
  *
  * @param <T> the entity type
  */
-public interface EntityView<T> extends HasConfirmation, HasNotifications {
+public interface EntityView<T> extends HasConfirmation, HasNotifications 
+{
 
    /**
     * Shows an error notification with a given text.
@@ -55,14 +56,15 @@ public interface EntityView<T> extends HasConfirmation, HasNotifications {
    String getEntityName();
 
    default void showCreatedNotification() {
-      showNotification(getEntityName() + " was created");
+      showNotification(getEntityName() + " creado");
    }
 
    default void showUpdatedNotification() {
-      showNotification(getEntityName() + " was updated");
+      showNotification(getEntityName() + " actualizado");
    }
 
    default void showDeletedNotification() {
-      showNotification(getEntityName() + " was deleted");
+      showNotification(getEntityName() + " eliminado");
    }
-}
+   
+}//EntityView

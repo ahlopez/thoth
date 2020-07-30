@@ -1,4 +1,4 @@
-cd C:\ahl\des\wk1\thoth
+cd C:\ahl\des\gitrepo\thoth
 cls
 call deploy
 

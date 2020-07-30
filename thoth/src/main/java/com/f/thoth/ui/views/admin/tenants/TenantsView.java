@@ -2,6 +2,8 @@ package com.f.thoth.ui.views.admin.tenants;
 
 import static com.f.thoth.ui.utils.BakeryConst.PAGE_TENANTS;
 
+import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
@@ -27,14 +29,14 @@ import com.vaadin.flow.router.Route;
 @Secured(Role.ADMIN)
 public class TenantsView extends AbstractBakeryCrudView<Tenant>
 {
-
    @Autowired
    public TenantsView(TenantService service, CurrentUser currentUser) {
       super(Tenant.class, service, new Grid<>(), createForm(), currentUser);
    }
 
    @Override
-   protected void setupGrid(Grid<Tenant> grid) {
+   protected void setupGrid(Grid<Tenant> grid) 
+   {
       grid.addColumn(Tenant::getName).setHeader("Cliente").setFlexGrow(20);
       grid.addColumn(Tenant::getAdministrator).setHeader("Administrador").setFlexGrow(20);
       grid.addColumn(Tenant::getFromDate).setHeader("Fecha Desde").setFlexGrow(10);
@@ -53,11 +55,13 @@ public class TenantsView extends AbstractBakeryCrudView<Tenant>
       name.getElement().setAttribute("colspan", "4");
       TextField administrator = new TextField("Administrador");
       administrator.getElement().setAttribute("colspan", "4");
-      DateTimePicker fromDate = new DateTimePicker();
+      LocalDate now = LocalDate.now();
+      LocalDate yearStart =now.minusDays(now.getDayOfYear());
+      DateTimePicker fromDate = new DateTimePicker("Fecha desde", yearStart.atStartOfDay());
       fromDate.getElement().setAttribute("colspan", "2");
-      DateTimePicker toDate   = new DateTimePicker();
+      DateTimePicker toDate   = new DateTimePicker("Fecha hasta",yearStart.plusYears(1).atStartOfDay());
       toDate.getElement().setAttribute("colspan", "2");
-      Checkbox   blocked    = new Checkbox();
+      Checkbox   blocked    = new Checkbox("Bloqueado?");
       blocked.getElement().setAttribute("colspan", "1");
 
       FormLayout form = new FormLayout(name, administrator, fromDate, toDate, blocked);

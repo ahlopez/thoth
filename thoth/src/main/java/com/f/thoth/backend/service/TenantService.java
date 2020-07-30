@@ -63,7 +63,7 @@ public class TenantService implements FilterableCrudService<Tenant>
       try {
          return FilterableCrudService.super.save(currentUser, entity);
       } catch (DataIntegrityViolationException e) {
-         throw new UserFriendlyDataException("Ya hay un cliene con ese nombre. Por favor escoja un nombre �nico para el cliente");
+         throw new UserFriendlyDataException("Ya hay un cliente con ese nombre. Por favor escoja un nombre único para el cliente");
       }
 
    }

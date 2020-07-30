@@ -108,10 +108,7 @@ public class User extends AbstractEntity
       if (this == o) {
          return true;
       }
-      if (o == null || getClass() != o.getClass()) {
-         return false;
-      }
-      if (!super.equals(o)) {
+      if (o == null || !(o instanceof User)) {
          return false;
       }
       User that = (User) o;

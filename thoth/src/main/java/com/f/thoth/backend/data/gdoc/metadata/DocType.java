@@ -33,7 +33,7 @@ import com.f.thoth.backend.data.security.SingleUser;
 /**
  * Representa un tipo documental
  */
-/*
+
 @NamedEntityGraphs({
    @NamedEntityGraph(
          name = DocType.BRIEF,
@@ -59,7 +59,6 @@ import com.f.thoth.backend.data.security.SingleUser;
                @NamedAttributeNode("children")
 
          }) })
-*/
 @Entity
 @Table(name = "DOC_TYPE", indexes = { @Index(columnList = "code") })
 public class DocType extends BaseEntity implements NeedsProtection, Comparable<DocType>

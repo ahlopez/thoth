@@ -1,10 +1,12 @@
 package com.f.thoth.backend.data.entity;
 
 import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotNull;
 
 import com.f.thoth.backend.data.security.Tenant;
 
+@MappedSuperclass
 public abstract class BaseEntity extends AbstractEntity
 {
 	@ManyToOne

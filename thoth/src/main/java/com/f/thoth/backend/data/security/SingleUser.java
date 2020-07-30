@@ -22,7 +22,6 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 /**
  * Representa un usuario autenticado del sistema
  */
-/*
 @NamedEntityGraphs({
    @NamedEntityGraph(
          name = SingleUser.BRIEF,
@@ -48,7 +47,6 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
                @NamedAttributeNode("roles"),
                @NamedAttributeNode("groups")
          }) })
-*/
 @Entity
 @Table(name = "SINGLE_USER", indexes = { @Index(columnList = "email"), @Index(columnList = "lastName,firstName") })
 public class SingleUser extends Usuario implements Comparable<SingleUser>

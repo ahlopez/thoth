@@ -20,6 +20,6 @@ public class LocalDateTimeConverter implements ModelEncoder<LocalDateTime, Strin
 
    @Override
    public LocalDateTime decode(String presentationValue) {
-      throw new UnsupportedOperationException();
+      throw new UnsupportedOperationException("Fecha-hora inválida");
    }
 }

@@ -9,12 +9,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
-import com.f.thoth.backend.data.entity.util.TextUtil;
 
 /**
  * Representa un permiso de acceso a un objeto que requiere protección
@@ -28,9 +25,8 @@ public class Permission extends BaseEntity implements Comparable<Permission>
    private Role          role;
 
    @NotNull (message = "{evidentia.object.required}")
-   @NotBlank(message = "{evidentia.object.required}")
-   @NotEmpty(message = "{evidentia.object.required}")
-   public String         objectToProtect;
+   @ManyToOne
+   public ObjectToProtect objectToProtect;
 
    @NotNull(message = "{evidentia.date.required}")
    private LocalDateTime fromDate;
@@ -49,14 +45,14 @@ public class Permission extends BaseEntity implements Comparable<Permission>
       buildCode();
    }
 
-   public Permission( Integer category, Role role, String objectToProtect, 
+   public Permission( Integer category, Role role, ObjectToProtect objectToProtect, 
 		   LocalDateTime fromDate, LocalDateTime toDate, SingleUser grantedBy)
    {
       super();
       if (category < 0 || category > 5)
          throw new IllegalArgumentException("Categoría["+ category+ "] inválida");
 
-      if (TextUtil.isEmpty(objectToProtect))
+      if (objectToProtect == null)
          throw new IllegalArgumentException("Objeto del permiso no puede ser nulo");
 
       this.role     = role;
@@ -94,8 +90,8 @@ public class Permission extends BaseEntity implements Comparable<Permission>
    public SingleUser      getGrantedBy() { return grantedBy;}
    public void            setGrantedBy( SingleUser grantedBy){ this.grantedBy = grantedBy;}
 
-   public String          getObjectToProtect() { return objectToProtect;}
-   public void            setObjectToProtect( String objectToProtect) { this.objectToProtect = objectToProtect;}
+   public ObjectToProtect getObjectToProtect() { return objectToProtect;}
+   public void            setObjectToProtect( ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect;}
 
    // --------------- Object methods ---------------------
 

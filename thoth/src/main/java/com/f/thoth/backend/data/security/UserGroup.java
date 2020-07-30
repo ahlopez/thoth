@@ -23,7 +23,6 @@ import org.hibernate.annotations.BatchSize;
 /**
  * Representa un Grupo de Usuarios
  */
-/*
 @NamedEntityGraphs({
    @NamedEntityGraph(
          name = UserGroup.BRIEF,
@@ -45,7 +44,6 @@ import org.hibernate.annotations.BatchSize;
                @NamedAttributeNode("singleMembers"),
                @NamedAttributeNode("groupMembers")
          }) })
-*/
 @Entity
 @Table(name = "USER_GROUP", indexes = { @Index(columnList = "code")})
 public class UserGroup extends Usuario implements Comparable<UserGroup>
@@ -85,7 +83,7 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>
 
    @Override protected void buildCode()
    {
-      this.code = (tenant == null? "[Tenant]": tenant.getCode())+ ":G:"+
+      this.code = (tenant == null? "[Tenant]": tenant.getCode())+ ">"+
             (firstName == null? "[firstName]": firstName);
    }//buildCode
 
