@@ -1,14 +1,15 @@
 package com.f.thoth.ui.utils.messages;
 
-public class Message {
+public class Message
+{
 
-   public static final String CONFIRM_CAPTION_DELETE = "Confirm Delete";
-   public static final String CONFIRM_MESSAGE_DELETE = "Are you sure you want to delete the selected Item? This action cannot be undone.";
-   public static final String BUTTON_CAPTION_DELETE = "Delete";
-   public static final String BUTTON_CAPTION_CANCEL = "Cancel";
+   public static final String CONFIRM_CAPTION_DELETE = "Confirmar Eliminación";
+   public static final String CONFIRM_MESSAGE_DELETE = "Está seguro de eliminar el item seleccionado? Esta acción no puede deshacerse.";
+   public static final String BUTTON_CAPTION_DELETE = "Eliminar";
+   public static final String BUTTON_CAPTION_CANCEL = "Cancelar";
 
-   public static final MessageSupplier UNSAVED_CHANGES = createMessage("Unsaved Changes", "Discard", "Continue Editing",
-         "There are unsaved modifications to the %s. Discard changes?");
+   public static final MessageSupplier UNSAVED_CHANGES = createMessage("Cambios no guardados", "Descartar", "Continuar Editando",
+         "Hay modificaciones a %s sin guardar. Descarta los cambios?");
 
    public static final MessageSupplier CONFIRM_DELETE = createMessage(CONFIRM_CAPTION_DELETE, BUTTON_CAPTION_DELETE,
          BUTTON_CAPTION_CANCEL, CONFIRM_MESSAGE_DELETE);
@@ -50,4 +51,4 @@ public class Message {
       Message createMessage(Object... parameters);
    }
 
-}
+}//Message

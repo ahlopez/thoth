@@ -97,7 +97,7 @@ public class ProductsViewIT extends AbstractIT<ProductsViewElement> {
       Assert.assertTrue(productsPage.isEditorOpen());
       productsPage.getProductName().setValue("Some name");
       productsPage.getEditorCancelButton().click();
-      Assert.assertEquals(productsPage.getDiscardConfirmDialog().getHeaderText(), "Discard changes");
+      Assert.assertEquals(productsPage.getDiscardConfirmDialog().getHeaderText(), "Descarta los cambios");
    }
 
    private int createProduct(ProductsViewElement productsPage, String name, String price) {
