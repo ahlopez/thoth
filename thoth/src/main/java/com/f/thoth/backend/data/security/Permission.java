@@ -45,12 +45,15 @@ public class Permission extends BaseEntity implements Comparable<Permission>
       buildCode();
    }
 
-   public Permission( Integer category, Role role, ObjectToProtect objectToProtect, 
-		   LocalDateTime fromDate, LocalDateTime toDate, SingleUser grantedBy)
+   public Permission( Integer category, Role role, ObjectToProtect objectToProtect,
+         LocalDateTime fromDate, LocalDateTime toDate, SingleUser grantedBy)
    {
       super();
       if (category < 0 || category > 5)
          throw new IllegalArgumentException("Categoría["+ category+ "] inválida");
+
+      if (role == null)
+         throw new IllegalArgumentException("Rol a quien se concede el permiso no puede ser nulo");
 
       if (objectToProtect == null)
          throw new IllegalArgumentException("Objeto del permiso no puede ser nulo");
@@ -71,9 +74,10 @@ public class Permission extends BaseEntity implements Comparable<Permission>
    }//prepareData
 
    @Override protected void buildCode()
-   { 
-	   this.code = (tenant == null? "[Tenant]" : tenant.getCode())+ ":"+ 
-                   (role ==  null? "[role]": role.getCode())+ ">"+ objectToProtect; 
+   {
+      this.code = (tenant == null? "[Tenant]" : tenant.getCode())+ ">"+
+                  (role ==  null? "[role]": role.getCode())+ ":"+ 
+    		      (objectToProtect == null? "[object]" : objectToProtect.getCode());
    }//buildCode
 
    // -------------- Getters & Setters ----------------
@@ -106,10 +110,10 @@ public class Permission extends BaseEntity implements Comparable<Permission>
 
       Permission that = (Permission) o;
 
-      return this.role.equals(that.role) && 
-    		  this.objectToProtect.equals(that.objectToProtect) && 
-    		  this.fromDate.equals(that.fromDate) && 
-    		  this.toDate.equals(that.toDate);
+      return this.role.equals(that.role) &&
+           this.objectToProtect.equals(that.objectToProtect) &&
+           this.fromDate.equals(that.fromDate) &&
+           this.toDate.equals(that.toDate);
 
    }// equals
 

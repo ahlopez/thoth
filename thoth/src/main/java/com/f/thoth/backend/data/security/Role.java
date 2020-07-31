@@ -142,5 +142,6 @@ public class Role extends BaseEntity implements Comparable<Role>
       return  false;
    }//canAccess
 
+
 }//Role
 

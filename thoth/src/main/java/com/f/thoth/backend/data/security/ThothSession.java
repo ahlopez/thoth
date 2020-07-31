@@ -1,14 +1,11 @@
 package com.f.thoth.backend.data.security;
 
-import java.util.Map;
-import java.util.TreeMap;
+import static com.f.thoth.ui.utils.BakeryConst.TENANT;
 
 import com.vaadin.flow.server.VaadinSession;
 
 public class ThothSession
 {
-   private static Map<String,Tenant> tenants = new TreeMap<>();
-
    public ThothSession()
    {
    }
@@ -16,9 +13,8 @@ public class ThothSession
    public static Tenant getCurrentTenant()
    {
       VaadinSession session = VaadinSession.getCurrent();
-      String       tenantId = (String)session.getAttribute("tenant");
-      return   tenants.get( tenantId);
-   }//getTenant
+      return  (Tenant)session.getAttribute(TENANT);
+   }//getCurrentTenant
 
    public static SingleUser getCurrentUser()
    {

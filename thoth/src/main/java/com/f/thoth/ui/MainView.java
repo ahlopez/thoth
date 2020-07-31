@@ -5,6 +5,7 @@ import static com.f.thoth.ui.utils.BakeryConst.TITLE_DASHBOARD;
 import static com.f.thoth.ui.utils.BakeryConst.TITLE_LOGOUT;
 import static com.f.thoth.ui.utils.BakeryConst.TITLE_OBJECT_TO_PROTECT;
 import static com.f.thoth.ui.utils.BakeryConst.TITLE_PRODUCTS;
+import static com.f.thoth.ui.utils.BakeryConst.TITLE_ROLES;
 import static com.f.thoth.ui.utils.BakeryConst.TITLE_STOREFRONT;
 import static com.f.thoth.ui.utils.BakeryConst.TITLE_TENANTS;
 import static com.f.thoth.ui.utils.BakeryConst.TITLE_USERS;
@@ -18,6 +19,7 @@ import com.f.thoth.app.security.SecurityUtils;
 import com.f.thoth.ui.views.HasConfirmation;
 import com.f.thoth.ui.views.admin.objects.ObjectToProtectView;
 import com.f.thoth.ui.views.admin.products.ProductsView;
+import com.f.thoth.ui.views.admin.roles.RoleView;
 import com.f.thoth.ui.views.admin.tenants.TenantsView;
 import com.f.thoth.ui.views.admin.users.UsersView;
 import com.f.thoth.ui.views.dashboard.DashboardView;
@@ -45,7 +47,7 @@ import com.vaadin.flow.server.VaadinServlet;
       offlinePath = "offline-page.html",
       offlineResources = {"images/offline-login-banner.jpg"},
       enableInstallPrompt = false)
-public class MainView extends AppLayout 
+public class MainView extends AppLayout
 {
 
    private final ConfirmDialog confirmDialog = new ConfirmDialog();
@@ -117,6 +119,9 @@ public class MainView extends AppLayout
        }
       if (SecurityUtils.isAccessGranted(ObjectToProtectView.class)) {
           tabs.add(createTab(VaadinIcon.COG, TITLE_OBJECT_TO_PROTECT, ObjectToProtectView.class));
+       }
+      if (SecurityUtils.isAccessGranted(RoleView.class)) {
+          tabs.add(createTab(VaadinIcon.ACADEMY_CAP, TITLE_ROLES, RoleView.class));
        }
       final String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
       final Tab logoutTab = createTab(createLogoutLink(contextPath));

@@ -1,75 +1,96 @@
 package com.f.thoth.ui.views.admin.objects;
 
+import static com.f.thoth.ui.dataproviders.DataProviderUtil.createItemLabelGenerator;
 import static com.f.thoth.ui.utils.BakeryConst.PAGE_OBJECT_TO_PROTECT;
+import static com.f.thoth.ui.utils.BakeryConst.TENANT;
+
+import java.util.TreeSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
 import com.f.thoth.app.security.CurrentUser;
-import com.f.thoth.backend.data.Role;
 import com.f.thoth.backend.data.security.ObjectToProtect;
+import com.f.thoth.backend.data.security.Role;
+import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.service.ObjectToProtectService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.crud.AbstractBakeryCrudView;
 import com.f.thoth.ui.utils.BakeryConst;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.crud.BinderCrudEditor;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
 
 @Route(value = PAGE_OBJECT_TO_PROTECT, layout = MainView.class)
 @PageTitle(BakeryConst.TITLE_OBJECT_TO_PROTECT)
-@Secured(Role.ADMIN)
+@Secured(com.f.thoth.backend.data.Role.ADMIN)
 public class ObjectToProtectView extends AbstractBakeryCrudView<ObjectToProtect>
 {
-   @Autowired
-   public ObjectToProtectView(ObjectToProtectService service, CurrentUser currentUser) {
-      super(ObjectToProtect.class, service, new Grid<>(), createForm(), currentUser);
-   }
+	@Autowired
+	public ObjectToProtectView(ObjectToProtectService service, CurrentUser currentUser) {
+		super(ObjectToProtect.class, service, new Grid<>(), createForm(), currentUser);
+	}
 
-   @Override
-   protected void setupGrid(Grid<ObjectToProtect> grid)
-   {
-      grid.addColumn(ObjectToProtect::getName).setHeader("LLave").setFlexGrow(30);
-      grid.addColumn(ObjectToProtect::getCategory).setHeader("Categoría").setFlexGrow(8);
-      grid.addColumn(ObjectToProtect::getUserOwner).setHeader("Usuario dueño").setFlexGrow(15);
-      grid.addColumn(ObjectToProtect::getRoleOwner).setHeader("Rol dueño").setFlexGrow(15);
+	@Override
+	protected void setupGrid(Grid<ObjectToProtect> grid)
+	{
+		grid.addColumn(ObjectToProtect::getName).setHeader("LLave").setFlexGrow(30);
+		grid.addColumn(ObjectToProtect::getCategory).setHeader("Categoría").setFlexGrow(8);
+		grid.addColumn(ObjectToProtect::getUserOwner).setHeader("Usuario dueño").setFlexGrow(15);
+		grid.addColumn(ObjectToProtect::getRoleOwner).setHeader("Rol dueño").setFlexGrow(15);
 
-   }//setupGrid
+	}//setupGrid
 
-   @Override
-   protected String getBasePage() {
-      return PAGE_OBJECT_TO_PROTECT;
-   }
+	@Override
+	protected String getBasePage() {
+		return PAGE_OBJECT_TO_PROTECT;
+	}
 
-   private static BinderCrudEditor<ObjectToProtect> createForm() {
-      TextField name = new TextField("LLave del objeto");
-      name.getElement().setAttribute("colspan", "4");
-      IntegerField category = new IntegerField("Categoría");
-      category.setValue( new Integer(0));
-      category.getElement().setAttribute("colspan", "4");
-      
-      TextField userOwner = new TextField("Usuario dueño");
-      userOwner.getElement().setAttribute("colspan", "2");
-      TextField roleOwner = new TextField("Rol dueño");
-      roleOwner.getElement().setAttribute("colspan", "2");
-      
+	private static BinderCrudEditor<ObjectToProtect> createForm() {
+		TextField name = new TextField("LLave del objeto");
+		name.getElement().setAttribute("colspan", "4");
+		IntegerField category = new IntegerField("Categoría");
+		category.setValue( new Integer(0));
+		category.getElement().setAttribute("colspan", "4");
 
-      FormLayout form = new FormLayout(name, category, userOwner, roleOwner);
+		TextField userOwner = new TextField("Usuario dueño");
+		userOwner.getElement().setAttribute("colspan", "2");
 
-      BeanValidationBinder<ObjectToProtect> binder = new BeanValidationBinder<>(ObjectToProtect.class);
+		ComboBox<Role> roleOwner = new ComboBox<>();
+		roleOwner.getElement().setAttribute("colspan", "2");
+		roleOwner.setLabel("Rol dueño");      
+		roleOwner.setItemLabelGenerator(createItemLabelGenerator(Role::getName));
+		roleOwner.setDataProvider(getTenantRoles());
 
-      binder.bind(name, "name");
-      binder.bind(category, "category");
-      binder.bind(userOwner, "userOwner");
-      binder.bind(roleOwner, "roleOwner");
+		FormLayout form = new FormLayout(name, category, userOwner, roleOwner);
+
+		BeanValidationBinder<ObjectToProtect> binder = new BeanValidationBinder<>(ObjectToProtect.class);
+
+		//ListDataProvider<String> roleProvider = DataProvider.ofCollection(roles());
+		//roleOwner.setItemLabelGenerator(s -> s != null ? s : "");
+
+		binder.bind(name,      "name");
+		binder.bind(category,  "category");
+		binder.bind(userOwner, "userOwner");
+		binder.bind(roleOwner, "roleOwner");
 
 
-      return new BinderCrudEditor<ObjectToProtect>(binder, form);
-   }//BinderCrudEditor
+		return new BinderCrudEditor<ObjectToProtect>(binder, form);
+	}//BinderCrudEditor
+
+	private static ListDataProvider<Role> getTenantRoles()
+	{
+		VaadinSession currentSession = VaadinSession.getCurrent();
+		Tenant tenant = (Tenant)currentSession.getAttribute(TENANT);
+		return new ListDataProvider<Role>( (TreeSet<Role>)tenant.getRoles());
+	}//getTenantRoles
 
 }//ObjectToProtectView

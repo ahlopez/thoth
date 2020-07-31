@@ -3,8 +3,8 @@ package com.f.thoth.ui.utils.messages;
 public class Message
 {
 
-   public static final String CONFIRM_CAPTION_DELETE = "Confirmar EliminaciÛn";
-   public static final String CONFIRM_MESSAGE_DELETE = "Est· seguro de eliminar el item seleccionado? Esta acciÛn no puede deshacerse.";
+   public static final String CONFIRM_CAPTION_DELETE = "Confirmar Eliminaci√≥n";
+   public static final String CONFIRM_MESSAGE_DELETE = "Est√° seguro de eliminar el item seleccionado? Esta acci√≥n no puede deshacerse.";
    public static final String BUTTON_CAPTION_DELETE = "Eliminar";
    public static final String BUTTON_CAPTION_CANCEL = "Cancelar";
 

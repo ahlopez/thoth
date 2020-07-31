@@ -5,7 +5,8 @@ import java.util.function.Supplier;
 
 import com.vaadin.flow.component.ItemLabelGenerator;
 
-public class DataProviderUtil {
+public class DataProviderUtil
+{
 
    public static <S, T> T convertIfNotNull(S source, Function<S, T> converter) {
       return convertIfNotNull(source, converter, () -> null);
@@ -18,4 +19,4 @@ public class DataProviderUtil {
    public static <T> ItemLabelGenerator<T> createItemLabelGenerator(Function<T, String> converter) {
       return item -> convertIfNotNull(item, converter, () -> "");
    }
-}
+}//DataProviderUtil
