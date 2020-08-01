@@ -12,6 +12,7 @@ import org.springframework.security.access.annotation.Secured;
 import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Role;
+import com.f.thoth.backend.data.security.SingleUser;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.service.ObjectToProtectService;
 import com.f.thoth.ui.MainView;
@@ -54,28 +55,45 @@ public class ObjectToProtectView extends AbstractBakeryCrudView<ObjectToProtect>
 		return PAGE_OBJECT_TO_PROTECT;
 	}
 
-	private static BinderCrudEditor<ObjectToProtect> createForm() {
+	private static BinderCrudEditor<ObjectToProtect> createForm() 
+	{
 		TextField name = new TextField("LLave del objeto");
+		name.setRequired(true);
+		name.setRequiredIndicatorVisible(true);
 		name.getElement().setAttribute("colspan", "4");
+		
 		IntegerField category = new IntegerField("Categoría");
 		category.setValue( new Integer(0));
+		category.setRequiredIndicatorVisible(true);
 		category.getElement().setAttribute("colspan", "4");
 
-		TextField userOwner = new TextField("Usuario dueño");
+		//TextField userOwner = new TextField("Usuario dueño");
+		//userOwner.setItemLabelGenerator(s -> s != null ? s.getFullName() : "-NINGUNO-");
+		ComboBox<SingleUser> userOwner = new ComboBox<>();
+		userOwner.setLabel("Usuario dueño");      
 		userOwner.getElement().setAttribute("colspan", "2");
-
+		userOwner.setRequired(false);
+		userOwner.setRequiredIndicatorVisible(false);
+		userOwner.setClearButtonVisible(true);
+		userOwner.setAllowCustomValue(true);
+		userOwner.setPageSize(20);
+		
 		ComboBox<Role> roleOwner = new ComboBox<>();
 		roleOwner.getElement().setAttribute("colspan", "2");
 		roleOwner.setLabel("Rol dueño");      
 		roleOwner.setItemLabelGenerator(createItemLabelGenerator(Role::getName));
 		roleOwner.setDataProvider(getTenantRoles());
+		roleOwner.setRequired(false);
+		roleOwner.setRequiredIndicatorVisible(false);
+		roleOwner.setClearButtonVisible(true);
+		roleOwner.setPageSize(20);
 
 		FormLayout form = new FormLayout(name, category, userOwner, roleOwner);
 
 		BeanValidationBinder<ObjectToProtect> binder = new BeanValidationBinder<>(ObjectToProtect.class);
 
 		//ListDataProvider<String> roleProvider = DataProvider.ofCollection(roles());
-		//roleOwner.setItemLabelGenerator(s -> s != null ? s : "");
+		//
 
 		binder.bind(name,      "name");
 		binder.bind(category,  "category");

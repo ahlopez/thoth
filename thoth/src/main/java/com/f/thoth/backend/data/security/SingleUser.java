@@ -116,6 +116,7 @@ public class SingleUser extends Usuario implements Comparable<SingleUser>
 
    public String getLastName() { return lastName;}
    public void   setLastName(String lastName) { this.lastName = lastName;}
+   public String getFullName() { return lastName+ " "+ firstName;}
 
    public String getEmail() { return email;}
    public void   setEmail(String email)
