@@ -1,10 +1,12 @@
 package com.f.thoth.ui.views.login;
 
-import java.time.LocalDateTime;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import static com.f.thoth.ui.utils.BakeryConst.TENANT;
 
 import com.f.thoth.app.security.SecurityUtils;
-import com.f.thoth.backend.data.security.Role;
-import com.f.thoth.backend.data.security.Tenant;
+import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.repositories.TenantRepository;
 import com.f.thoth.ui.utils.BakeryConst;
 import com.f.thoth.ui.views.storefront.StorefrontView;
 import com.vaadin.flow.component.dependency.JsModule;
@@ -26,6 +28,7 @@ import com.vaadin.flow.server.VaadinSession;
 public class LoginView extends LoginOverlay
    implements AfterNavigationObserver, BeforeEnterObserver 
 {
+	@Autowired TenantRepository tenantRepository;
 
    public LoginView() 
    {
@@ -58,42 +61,10 @@ public class LoginView extends LoginOverlay
    @Override
    public void afterNavigation(AfterNavigationEvent event) 
    {
-	  loadTenant();
+	  VaadinSession session = VaadinSession.getCurrent();
+	  session.setAttribute(TENANT, ThothSession.getTenant());
       setError(event.getLocation().getQueryParameters().getParameters().containsKey("error"));
    }
-   
-   private void loadTenant()
-   {
-	    //TODO: Cuando esté el mantenimiento de usuarios, borrar este y createRole
-	    //       y cambiarlos por la carga del Tenant y sus roles definidos
-		Tenant tenant = new Tenant();
-		tenant.setName("Tenant1");
-		tenant.setLocked(false);
-		tenant.setAdministrator("admin@vaadin.com");
-		tenant.setFromDate(LocalDateTime.MIN);
-		tenant.setToDate(LocalDateTime.MAX);
-		VaadinSession session = VaadinSession.getCurrent();
-		session.setAttribute("TENANT", tenant);
-		Role role1 = createRole(tenant, "Gerente");
-		Role role2 = createRole(tenant, "Admin");
-		Role role3 = createRole(tenant, "Supervisor");
-		Role role4 = createRole(tenant, "Operador");
-		Role role5 = createRole(tenant, "Publico");
-		tenant.addRole(role1); 
-		tenant.addRole(role2); 
-		tenant.addRole(role3);
-		tenant.addRole(role4); 
-		tenant.addRole(role5);
-
-   }//loadTenant
-   
-	private Role createRole( Tenant tenant, String name)
-	{
-		com.f.thoth.backend.data.security.Role  role = new Role();
-		role.setTenant(tenant);
-		role.setName(name);
-		return role;
-	}
 
 
 }//LoginView

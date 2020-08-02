@@ -16,6 +16,8 @@ import javax.persistence.NamedEntityGraph;
 import javax.persistence.NamedEntityGraphs;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
@@ -135,6 +137,16 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 		buildCode();
 	}//Tenant
 
+	
+	@PrePersist
+	@PreUpdate
+	public void prepareData()
+	{
+		this.name     =  TextUtil.nameTidy(name);
+		buildCode();
+	}//prepareData
+
+
 	@Override protected void buildCode(){ this.code = (name == null? "[name]" : name);}
 
 	private void allocate()
@@ -234,9 +246,9 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 	public boolean contains( DocType type) { return docTypes.contains(type);}
 
 	public void addType( DocType type) { docTypes.add(type);}
-	
+
 	public void addRole( Role role) { roles.add(role);}
-	
+
 
 	public SingleUser getSingleUserById( String userCode)
 	{

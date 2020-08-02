@@ -25,9 +25,11 @@ import com.f.thoth.backend.data.entity.PickupLocation;
 import com.f.thoth.backend.data.entity.Product;
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.security.Tenant;
+import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.OrderRepository;
 import com.f.thoth.backend.repositories.PickupLocationRepository;
 import com.f.thoth.backend.repositories.ProductRepository;
+import com.f.thoth.backend.repositories.RoleRepository;
 import com.f.thoth.backend.repositories.TenantRepository;
 import com.f.thoth.backend.repositories.UserRepository;
 import com.vaadin.flow.spring.annotation.SpringComponent;
@@ -50,6 +52,7 @@ public class DataGenerator implements HasLogger {
 	private final Random random = new Random(1L);
 
 	private TenantRepository tenantRepository;
+	private RoleRepository   roleRepository;
 	private OrderRepository orderRepository;
 	private UserRepository userRepository;
 	private ProductRepository productRepository;
@@ -61,12 +64,13 @@ public class DataGenerator implements HasLogger {
 	@Autowired
 	public DataGenerator(OrderRepository orderRepository, UserRepository userRepository,
 			ProductRepository productRepository, PickupLocationRepository pickupLocationRepository,
-			TenantRepository tenantRepository, PasswordEncoder passwordEncoder) {
+			TenantRepository tenantRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
 		this.orderRepository = orderRepository;
 		this.userRepository = userRepository;
 		this.productRepository = productRepository;
 		this.pickupLocationRepository = pickupLocationRepository;
 		this.tenantRepository = tenantRepository;
+		this.roleRepository = roleRepository;
 		this.passwordEncoder = passwordEncoder;
 	}
 
@@ -80,7 +84,9 @@ public class DataGenerator implements HasLogger {
 		getLogger().info("Generating demo data");
 			
 		getLogger().info("... generating tenants");
-		Tenant tenant1 = createTenant(tenantRepository, "FCONSULTORES");
+		Tenant tenant1 = createTenant(tenantRepository, "FCONSULTORES");      
+		ThothSession.setTenant(tenant1);
+
 		Tenant tenant2 = createTenant(tenantRepository,"SEI");
 		
 		getLogger().info("... generating roles");
@@ -89,12 +95,26 @@ public class DataGenerator implements HasLogger {
 		com.f.thoth.backend.data.security.Role role3 = createRole(tenant1, "Supervisor");
 		com.f.thoth.backend.data.security.Role role4 = createRole(tenant1, "Operador");
 		com.f.thoth.backend.data.security.Role role5 = createRole(tenant1, "Publico");
-		tenant1.addRole(role1); tenant2.addRole(role1);
-		tenant1.addRole(role2); tenant2.addRole(role2);
-		tenant1.addRole(role3); tenant2.addRole(role3);
-		tenant1.addRole(role4); tenant2.addRole(role4);
-		tenant1.addRole(role5); tenant2.addRole(role5);
-
+		 
+		tenant1.addRole(role1); 
+		tenant1.addRole(role2); 
+		tenant1.addRole(role3); 
+		tenant1.addRole(role4); 
+		tenant1.addRole(role5); 
+ 
+		com.f.thoth.backend.data.security.Role role6 = createRole(tenant2, "CEO");
+		com.f.thoth.backend.data.security.Role role7 = createRole(tenant2, "Admin2");
+		com.f.thoth.backend.data.security.Role role8 = createRole(tenant2, "CFO");
+		com.f.thoth.backend.data.security.Role role9 = createRole(tenant2, "CIO");
+		com.f.thoth.backend.data.security.Role role10 = createRole(tenant2, "COO");
+		 
+		tenant2.addRole(role6);  
+		tenant2.addRole(role7);  
+		tenant2.addRole(role8);  
+		tenant2.addRole(role9);  
+		tenant2.addRole(role10);  
+	
+		
 		getLogger().info("... generating users");
 		User baker = createBaker(userRepository, passwordEncoder);
 		User barista = createBarista(userRepository, passwordEncoder);
@@ -135,6 +155,7 @@ public class DataGenerator implements HasLogger {
 		com.f.thoth.backend.data.security.Role  role = new com.f.thoth.backend.data.security.Role();
 		role.setTenant(tenant);
 		role.setName(name);
+		roleRepository.saveAndFlush(role);
 		return role;
 	}
 

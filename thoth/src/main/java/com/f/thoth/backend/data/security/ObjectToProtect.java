@@ -4,6 +4,8 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
@@ -19,6 +21,7 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 @Table(name = "object_to_protect", indexes = { @Index(columnList = "code") })
 public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Comparable<ObjectToProtect>
 {
+   @NotNull  (message = "{evidentia.name.required}")
    @NotBlank (message = "{evidentia.name.required}")
    @Size(max = 255)
    @Column(unique = true)
@@ -49,8 +52,23 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Com
       this.name = name;
       buildCode();
    }//ObjectToProtect
+   
 
-   @Override public void buildCode() { this.code = (tenant == null? "[Tenant]": tenant.getCode())+ ">"+ (name == null? "[name]" : name);}
+    @PrePersist
+	@PreUpdate
+	public void prepareData()
+	{
+    	this.tenant = ThothSession.getCurrentTenant();
+		this.name     =  TextUtil.nameTidy(name).toLowerCase();
+		buildCode();
+	}//prepareData
+
+   @Override public void buildCode() 
+   { 
+	   this.code = (tenant == null? "[Tenant]": tenant.getCode())+ 
+			        ">"+ 
+                   (name == null? "[name]" : name);
+   }
 
    // ----------------- Getters & Setters ----------------
 

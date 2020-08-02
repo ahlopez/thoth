@@ -6,6 +6,10 @@ import com.vaadin.flow.server.VaadinSession;
 
 public class ThothSession
 {
+   private static Tenant tenant;
+   public  static Tenant getTenant() { return tenant;}
+   public  static void   setTenant(Tenant newTenant) { tenant = newTenant;}
+   
    public ThothSession()
    {
    }

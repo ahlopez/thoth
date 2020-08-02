@@ -238,18 +238,18 @@ public class TextUtil
 
     /**
      * Asegura que el nombre tenga un formato correcto.
-     * Si nulo, lo cambia por desconocido
+     * Si nulo, lo cambia por [Desconocido]
      * @param name Nombre a revisar
-     * @return Nombre ajustado
+     * @return Nombre ajustado (Sentence case)
      */
     public static String  nameTidy( String name)
     {
        if ( name == null){
-          name = "Desconocido";
+          name = "[Desconocido]";
        }else {
           name = name.trim().toLowerCase();
           if (name.length() == 0)
-             name = "Desconocido";
+             name = "[Desconocido]";
        }
 
        return sentenceCase(name);

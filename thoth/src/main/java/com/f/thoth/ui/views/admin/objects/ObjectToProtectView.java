@@ -4,8 +4,6 @@ import static com.f.thoth.ui.dataproviders.DataProviderUtil.createItemLabelGener
 import static com.f.thoth.ui.utils.BakeryConst.PAGE_OBJECT_TO_PROTECT;
 import static com.f.thoth.ui.utils.BakeryConst.TENANT;
 
-import java.util.TreeSet;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
@@ -43,10 +41,10 @@ public class ObjectToProtectView extends AbstractBakeryCrudView<ObjectToProtect>
 	@Override
 	protected void setupGrid(Grid<ObjectToProtect> grid)
 	{
-		grid.addColumn(ObjectToProtect::getName).setHeader("LLave").setFlexGrow(30);
-		grid.addColumn(ObjectToProtect::getCategory).setHeader("Categoría").setFlexGrow(8);
-		grid.addColumn(ObjectToProtect::getUserOwner).setHeader("Usuario dueño").setFlexGrow(15);
-		grid.addColumn(ObjectToProtect::getRoleOwner).setHeader("Rol dueño").setFlexGrow(15);
+		grid.addColumn(object -> object.getName()).setHeader("LLave").setFlexGrow(30);
+		grid.addColumn(object -> object.getCategory() == null? "0" : object.getCategory().toString()).setHeader("Categoría").setFlexGrow(8);
+ 		grid.addColumn(object -> object.getUserOwner()== null? "-NINGUNO-" : object.getUserOwner().getFullName()).setHeader("Usuario dueño").setFlexGrow(15);
+  		grid.addColumn(object -> object.getRoleOwner()== null? "-NINGUNO-" : object.getRoleOwner().getName()).setHeader("Rol dueño").setFlexGrow(15);
 
 	}//setupGrid
 
@@ -60,18 +58,18 @@ public class ObjectToProtectView extends AbstractBakeryCrudView<ObjectToProtect>
 		TextField name = new TextField("LLave del objeto");
 		name.setRequired(true);
 		name.setRequiredIndicatorVisible(true);
-		name.getElement().setAttribute("colspan", "4");
+		name.getElement().setAttribute("colspan", "10");
 		
 		IntegerField category = new IntegerField("Categoría");
 		category.setValue( new Integer(0));
 		category.setRequiredIndicatorVisible(true);
-		category.getElement().setAttribute("colspan", "4");
+		category.getElement().setAttribute("colspan", "2");
 
 		//TextField userOwner = new TextField("Usuario dueño");
 		//userOwner.setItemLabelGenerator(s -> s != null ? s.getFullName() : "-NINGUNO-");
 		ComboBox<SingleUser> userOwner = new ComboBox<>();
 		userOwner.setLabel("Usuario dueño");      
-		userOwner.getElement().setAttribute("colspan", "2");
+		userOwner.getElement().setAttribute("colspan", "4");
 		userOwner.setRequired(false);
 		userOwner.setRequiredIndicatorVisible(false);
 		userOwner.setClearButtonVisible(true);
@@ -79,16 +77,16 @@ public class ObjectToProtectView extends AbstractBakeryCrudView<ObjectToProtect>
 		userOwner.setPageSize(20);
 		
 		ComboBox<Role> roleOwner = new ComboBox<>();
-		roleOwner.getElement().setAttribute("colspan", "2");
+		roleOwner.getElement().setAttribute("colspan", "4");
 		roleOwner.setLabel("Rol dueño");      
-		roleOwner.setItemLabelGenerator(createItemLabelGenerator(Role::getName));
 		roleOwner.setDataProvider(getTenantRoles());
+		roleOwner.setItemLabelGenerator(createItemLabelGenerator(Role::getName));
 		roleOwner.setRequired(false);
 		roleOwner.setRequiredIndicatorVisible(false);
 		roleOwner.setClearButtonVisible(true);
 		roleOwner.setPageSize(20);
 
-		FormLayout form = new FormLayout(name, category, userOwner, roleOwner);
+		FormLayout form = new FormLayout( name, category, userOwner, roleOwner);
 
 		BeanValidationBinder<ObjectToProtect> binder = new BeanValidationBinder<>(ObjectToProtect.class);
 
@@ -108,7 +106,7 @@ public class ObjectToProtectView extends AbstractBakeryCrudView<ObjectToProtect>
 	{
 		VaadinSession currentSession = VaadinSession.getCurrent();
 		Tenant tenant = (Tenant)currentSession.getAttribute(TENANT);
-		return new ListDataProvider<Role>( (TreeSet<Role>)tenant.getRoles());
+		return new ListDataProvider<Role>( tenant.getRoles());
 	}//getTenantRoles
 
 }//ObjectToProtectView
