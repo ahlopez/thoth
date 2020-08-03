@@ -66,7 +66,8 @@ public class Role extends BaseEntity implements Comparable<Role>
    @PreUpdate
    public void prepareData()
    {
-      this.name = name != null ? name.trim() : "Anonimo";
+      this.tenant = ThothSession.getCurrentTenant();
+      this.name   = name != null ? name.trim() : "Anonimo";
       buildCode();
    }//prepareData
 

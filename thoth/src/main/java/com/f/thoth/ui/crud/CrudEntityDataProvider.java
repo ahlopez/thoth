@@ -12,36 +12,43 @@ import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.provider.QuerySortOrder;
 import com.vaadin.flow.data.provider.QuerySortOrderBuilder;
 
-public class CrudEntityDataProvider<T extends AbstractEntity> extends FilterablePageableDataProvider<T, String> {
+public class CrudEntityDataProvider<T extends AbstractEntity> extends FilterablePageableDataProvider<T, String> 
+{
 
    private final FilterableCrudService<T> crudService;
    private List<QuerySortOrder> defaultSortOrders;
 
-   public CrudEntityDataProvider(FilterableCrudService<T> crudService) {
+   public CrudEntityDataProvider(FilterableCrudService<T> crudService) 
+   {
       this.crudService = crudService;
       setSortOrders();
    }
 
-   private void setSortOrders() {
+   private void setSortOrders() 
+   {
       QuerySortOrderBuilder builder = new QuerySortOrderBuilder();
-      builder.thenAsc("id");
+      builder.thenAsc("code");
+      //builder.thenAsc("id");
       defaultSortOrders = builder.build();
    }
 
    @Override
-   protected Page<T> fetchFromBackEnd(Query<T, String> query, Pageable pageable) {
+   protected Page<T> fetchFromBackEnd(Query<T, String> query, Pageable pageable) 
+   {
       return crudService.findAnyMatching(query.getFilter(), pageable);
    }
 
    @Override
-   protected List<QuerySortOrder> getDefaultSortOrders() {
+   protected List<QuerySortOrder> getDefaultSortOrders() 
+   {
       return defaultSortOrders;
    }
 
    @Override
-   protected int sizeInBackEnd(Query<T, String> query) {
+   protected int sizeInBackEnd(Query<T, String> query) 
+   {
       return (int) crudService.countAnyMatching(query.getFilter());
    }
 
-}
+}//CrudEntityDataProvider
 

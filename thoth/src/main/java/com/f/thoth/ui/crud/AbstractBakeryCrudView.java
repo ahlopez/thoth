@@ -18,10 +18,11 @@ import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.OptionalParameter;
 
 public abstract class AbstractBakeryCrudView<E extends AbstractEntity> extends Crud<E>
-        implements HasUrlParameter<Long>, HasNotifications {
+        implements HasUrlParameter<Long>, HasNotifications 
+{
 
     private static final String DISCARD_MESSAGE = "Hay modificaciones sin guardar a %s. Descartar los cambios?";
-    private static final String DELETE_MESSAGE = "Esta seguro de eliminar el %s seleccionado? Esta accion no puede deshacerse.";
+    private static final String DELETE_MESSAGE  = "Esta seguro de eliminar el %s seleccionado? Esta accion no puede deshacerse.";
 
     private final Grid<E> grid;
 
@@ -32,7 +33,8 @@ public abstract class AbstractBakeryCrudView<E extends AbstractEntity> extends C
     protected abstract void setupGrid(Grid<E> grid);
 
     public AbstractBakeryCrudView(Class<E> beanType, FilterableCrudService<E> service,
-                                  Grid<E> grid, CrudEditor<E> editor, CurrentUser currentUser) {
+                                  Grid<E> grid, CrudEditor<E> editor, CurrentUser currentUser) 
+    {
         super(beanType, grid, editor);
         this.grid = grid;
         grid.setSelectionMode(Grid.SelectionMode.NONE);
@@ -62,9 +64,10 @@ public abstract class AbstractBakeryCrudView<E extends AbstractEntity> extends C
 
         setToolbar(searchBar);
         setupCrudEventListeners(entityPresenter);
-    }
+    }//AbstractBakeryCrudView
 
-    private void setupCrudEventListeners(CrudEntityPresenter<E> entityPresenter) {
+    private void setupCrudEventListeners(CrudEntityPresenter<E> entityPresenter) 
+    {
         Consumer<E> onSuccess = entity -> navigateToEntity(null);
         Consumer<E> onFail = entity -> {
             throw new RuntimeException("La operacion no pudo ser ejecutada.");
@@ -81,14 +84,16 @@ public abstract class AbstractBakeryCrudView<E extends AbstractEntity> extends C
 
         addDeleteListener(e ->
                 entityPresenter.delete(e.getItem(), onSuccess, onFail));
-    }
+    }//setupCrudEventListeners
 
-    protected void navigateToEntity(String id) {
+    protected void navigateToEntity(String id) 
+    {
         getUI().ifPresent(ui -> ui.navigate(TemplateUtil.generateLocation(getBasePage(), id)));
-    }
+    }//navigateToEntity
 
     @Override
-    public void setParameter(BeforeEvent event, @OptionalParameter Long id) {
+    public void setParameter(BeforeEvent event, @OptionalParameter Long id) 
+    {
         if (id != null) {
             E item = getEditor().getItem();
             if (item != null && id.equals(item.getId())) {
@@ -98,7 +103,7 @@ public abstract class AbstractBakeryCrudView<E extends AbstractEntity> extends C
         } else {
             setOpened(false);
         }
-    }
+    }//setParameter
 
 
-}
+}//AbstractBakeryCrudView

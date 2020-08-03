@@ -1,5 +1,6 @@
 package com.f.thoth.backend.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,47 +18,60 @@ import com.f.thoth.backend.repositories.RoleRepository;
 @Service
 public class RoleService implements FilterableCrudService<Role>
 {
-
    private final RoleRepository roleRepository;
 
    @Autowired
-   public RoleService(RoleRepository roleRepository) {
+   public RoleService(RoleRepository roleRepository)
+   {
       this.roleRepository = roleRepository;
    }
 
+   public List<Role> findAll()
+   {
+      return roleRepository.findAll(ThothSession.getTenant());  //TODO: Remplazar por .getCurrentTenant()
+   }//findAll
+
    @Override
-   public Page<Role> findAnyMatching(Optional<String> filter, Pageable pageable) {
+   public Page<Role> findAnyMatching(Optional<String> filter, Pageable pageable)
+   {
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return roleRepository.findByNameLikeIgnoreCase(repositoryFilter, pageable);
+         return roleRepository.findByNameLikeIgnoreCase(ThothSession.getTenant(), repositoryFilter, pageable);
       } else {
          return find(pageable);
       }
    }//findAnyMatching
 
    @Override
-   public long countAnyMatching(Optional<String> filter) {
+   public long countAnyMatching(Optional<String> filter)
+   {
       if (filter.isPresent()) {
          String repositoryFilter = "%" + filter.get() + "%";
-         return roleRepository.countByNameLikeIgnoreCase(repositoryFilter);
+         return roleRepository.countByNameLikeIgnoreCase(ThothSession.getTenant(), repositoryFilter);
       } else {
-         return count();
+         long n = roleRepository.countAll(ThothSession.getTenant());
+         return n;
       }
    }//countAnyMatching
 
-   public Page<Role> find(Pageable pageable) {
-      return roleRepository.findBy(pageable);
+   public Page<Role> find(Pageable pageable)
+   {
+      return roleRepository.findBy(ThothSession.getTenant(), pageable);
    }
 
    @Override
-   public JpaRepository<Role, Long> getRepository() {
+   public JpaRepository<Role, Long> getRepository()
+   {
       return roleRepository;
    }
 
    @Override
-   public Role createNew(User currentUser) {
-      return new Role();
+   public Role createNew(User currentUser)
+   {
+      Role role = new Role();
+      role.setTenant(ThothSession.getTenant()); // Remplazar por .getCurrentTenant()
+      return role;
    }
 
    @Override

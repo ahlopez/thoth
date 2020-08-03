@@ -25,15 +25,15 @@ import com.vaadin.flow.router.Route;
 public class RoleView extends AbstractBakeryCrudView<Role>
 {
    @Autowired
-   public RoleView(RoleService service, CurrentUser currentUser) {
+   public RoleView(RoleService service, CurrentUser currentUser) 
+   {
       super(Role.class, service, new Grid<>(), createForm(), currentUser);
    }
 
    @Override
    protected void setupGrid(Grid<Role> grid)
    {
-      grid.addColumn(Role::getName).setHeader("Identificador del rol").setFlexGrow(30);
-
+      grid.addColumn(Role::getName).setHeader("Identificador del rol").setFlexGrow(20);
    }//setupGrid
 
    @Override
@@ -41,9 +41,10 @@ public class RoleView extends AbstractBakeryCrudView<Role>
       return PAGE_ROLES;
    }
 
-   private static BinderCrudEditor<Role> createForm() {
+   private static BinderCrudEditor<Role> createForm() 
+   {
       TextField name = new TextField("Nombre del rol");
-      name.getElement().setAttribute("colspan", "4");
+      name.getElement().setAttribute("colspan", "3");
 
       FormLayout form = new FormLayout(name);
 

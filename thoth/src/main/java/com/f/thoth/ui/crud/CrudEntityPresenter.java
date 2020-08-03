@@ -16,7 +16,8 @@ import com.f.thoth.backend.service.UserFriendlyDataException;
 import com.f.thoth.ui.utils.messages.CrudErrorMessage;
 import com.f.thoth.ui.views.HasNotifications;
 
-public class CrudEntityPresenter<E extends AbstractEntity>  implements HasLogger {
+public class CrudEntityPresenter<E extends AbstractEntity>  implements HasLogger 
+{
 
    private final CrudService<E> crudService;
 
@@ -24,29 +25,33 @@ public class CrudEntityPresenter<E extends AbstractEntity>  implements HasLogger
 
    private final HasNotifications view;
 
-   public CrudEntityPresenter(CrudService<E> crudService, CurrentUser currentUser, HasNotifications view) {
+   public CrudEntityPresenter(CrudService<E> crudService, CurrentUser currentUser, HasNotifications view) 
+   {
       this.crudService = crudService;
       this.currentUser = currentUser;
       this.view = view;
-   }
+   }//CrudEntityPresenter
 
-   public void delete(E entity, Consumer<E> onSuccess, Consumer<E> onFail) {
+   public void delete(E entity, Consumer<E> onSuccess, Consumer<E> onFail) 
+   {
       if (executeOperation(() -> crudService.delete(currentUser.getUser(), entity))) {
          onSuccess.accept(entity);
       } else {
          onFail.accept(entity);
       }
-   }
+   }//delete
 
-   public void save(E entity, Consumer<E> onSuccess, Consumer<E> onFail) {
+   public void save(E entity, Consumer<E> onSuccess, Consumer<E> onFail) 
+   {
       if (executeOperation(() -> saveEntity(entity))) {
          onSuccess.accept(entity);
       } else {
          onFail.accept(entity);
       }
-   }
+   }//save
 
-   private boolean executeOperation(Runnable operation) {
+   private boolean executeOperation(Runnable operation) 
+   {
       try {
          operation.run();
          return true;
@@ -55,8 +60,7 @@ public class CrudEntityPresenter<E extends AbstractEntity>  implements HasLogger
          consumeError(e, e.getMessage(), true);
       } catch (DataIntegrityViolationException e) {
          // Commit failed because of validation errors
-         consumeError(
-               e, CrudErrorMessage.OPERATION_PREVENTED_BY_REFERENCES, true);
+         consumeError( e, CrudErrorMessage.OPERATION_PREVENTED_BY_REFERENCES, true);
       } catch (OptimisticLockingFailureException e) {
          consumeError(e, CrudErrorMessage.CONCURRENT_UPDATE, true);
       } catch (EntityNotFoundException e) {
@@ -65,12 +69,13 @@ public class CrudEntityPresenter<E extends AbstractEntity>  implements HasLogger
          consumeError(e, CrudErrorMessage.REQUIRED_FIELDS_MISSING, false);
       }
       return false;
-   }
+   }//executeOperation
 
-   private void consumeError(Exception e, String message, boolean isPersistent) {
+   private void consumeError(Exception e, String message, boolean isPersistent) 
+   {
       getLogger().debug(message, e);
       view.showNotification(message, isPersistent);
-   }
+   }//consumeError
 
    private void saveEntity(E entity) {
       crudService.save(currentUser.getUser(), entity);
@@ -79,4 +84,4 @@ public class CrudEntityPresenter<E extends AbstractEntity>  implements HasLogger
    public boolean loadEntity(Long id, Consumer<E> onSuccess) {
       return executeOperation(() -> onSuccess.accept(crudService.load(id)));
    }
-}
+}//CrudEntityPresenter

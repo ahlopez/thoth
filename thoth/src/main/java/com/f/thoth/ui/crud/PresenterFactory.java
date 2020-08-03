@@ -14,12 +14,13 @@ import com.f.thoth.backend.service.OrderService;
 import com.f.thoth.ui.views.storefront.StorefrontView;
 
 @Configuration
-public class PresenterFactory {
-
+public class PresenterFactory 
+{
    @Bean
    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-   public EntityPresenter<Order, StorefrontView> orderEntityPresenter(OrderService crudService, CurrentUser currentUser) {
+   public EntityPresenter<Order, StorefrontView> orderEntityPresenter(OrderService crudService, CurrentUser currentUser) 
+   {
       return new EntityPresenter<>(crudService, currentUser);
    }
 
-}
+}//PresenterFactory

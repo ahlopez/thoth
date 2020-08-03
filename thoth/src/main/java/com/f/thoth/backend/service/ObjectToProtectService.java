@@ -1,5 +1,6 @@
 package com.f.thoth.backend.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.security.ObjectToProtect;
+import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 
 @Service
@@ -20,43 +22,57 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
    private final ObjectToProtectRepository objectToProtectRepository;
 
    @Autowired
-   public ObjectToProtectService(ObjectToProtectRepository objectToProtectRepository) {
+   public ObjectToProtectService(ObjectToProtectRepository objectToProtectRepository)
+   {
       this.objectToProtectRepository = objectToProtectRepository;
    }
 
+   public List<ObjectToProtect> findAll()
+   {
+      return objectToProtectRepository.findAll(ThothSession.getTenant());  //TODO: Remplazar por .getCurrentTenant()
+   }//findAll
+
    @Override
-   public Page<ObjectToProtect> findAnyMatching(Optional<String> filter, Pageable pageable) {
+   public Page<ObjectToProtect> findAnyMatching(Optional<String> filter, Pageable pageable)
+   {
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return objectToProtectRepository.findByNameLikeIgnoreCase(repositoryFilter, pageable);
+         return objectToProtectRepository.findByNameLikeIgnoreCase(ThothSession.getTenant(), repositoryFilter, pageable);
       } else {
          return find(pageable);
       }
    }//findAnyMatching
 
    @Override
-   public long countAnyMatching(Optional<String> filter) {
+   public long countAnyMatching(Optional<String> filter)
+   {
       if (filter.isPresent()) {
          String repositoryFilter = "%" + filter.get() + "%";
-         return objectToProtectRepository.countByNameLikeIgnoreCase(repositoryFilter);
+         return objectToProtectRepository.countByNameLikeIgnoreCase(ThothSession.getTenant(), repositoryFilter);
       } else {
-         return count();
+         long n = objectToProtectRepository.countAll(ThothSession.getTenant());
+         return n;
       }
    }//countAnyMatching
 
-   public Page<ObjectToProtect> find(Pageable pageable) {
-      return objectToProtectRepository.findBy(pageable);
+   public Page<ObjectToProtect> find(Pageable pageable)
+   {
+      return objectToProtectRepository.findBy(ThothSession.getTenant(), pageable);
    }
 
    @Override
-   public JpaRepository<ObjectToProtect, Long> getRepository() {
+   public JpaRepository<ObjectToProtect, Long> getRepository()
+   {
       return objectToProtectRepository;
    }
 
    @Override
-   public ObjectToProtect createNew(User currentUser) {
-      return new ObjectToProtect();
+   public ObjectToProtect createNew(User currentUser)
+   {
+      ObjectToProtect objectToProtect = new ObjectToProtect();
+      objectToProtect.setTenant(ThothSession.getTenant()); // Remplazar por .getCurrentTenant()
+      return objectToProtect;
    }
 
    @Override
