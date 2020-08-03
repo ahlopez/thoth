@@ -84,11 +84,10 @@ public class DataGenerator implements HasLogger {
 		getLogger().info("Generating demo data");
 			
 		getLogger().info("... generating tenants");
-		Tenant tenant1 = createTenant(tenantRepository, "FCONSULTORES");      
+		Tenant tenant1 = createTenant(tenantRepository, "FCONSULTORES"); 
 		ThothSession.setTenant(tenant1);
-
-		Tenant tenant2 = createTenant(tenantRepository,"SEI");
 		
+		Tenant tenant2 = createTenant(tenantRepository,"SEI");		
 		getLogger().info("... generating roles");
 		com.f.thoth.backend.data.security.Role role1 = createRole(tenant1, "Gerente");
 		com.f.thoth.backend.data.security.Role role2 = createRole(tenant1, "Admin");
@@ -156,10 +155,12 @@ public class DataGenerator implements HasLogger {
 		role.setTenant(tenant);
 		role.setName(name);
 		roleRepository.saveAndFlush(role);
+		
 		return role;
-	}
+	}//createRole
 
-	private void fillCustomer(Customer customer) {
+	private void fillCustomer(Customer customer) 
+	{
 		String first = getRandom(FIRST_NAME);
 		String last = getRandom(LAST_NAME);
 		customer.setFullName(first + " " + last);
@@ -175,7 +176,8 @@ public class DataGenerator implements HasLogger {
 	}
 
 	private void createOrders(OrderRepository orderRepo, Supplier<Product> productSupplier,
-			Supplier<PickupLocation> pickupLocationSupplier, User barista, User baker) {
+			Supplier<PickupLocation> pickupLocationSupplier, User barista, User baker) 
+	{
 		int yearsToInclude = 2;
 		LocalDate now = LocalDate.now();
 		LocalDate oldestDate = LocalDate.of(now.getYear() - yearsToInclude, 1, 1);
@@ -188,7 +190,8 @@ public class DataGenerator implements HasLogger {
 		order.setItems(order.getItems().subList(0, 1));
 		orderRepo.save(order);
 
-		for (LocalDate dueDate = oldestDate; dueDate.isBefore(newestDate); dueDate = dueDate.plusDays(1)) {
+		for (LocalDate dueDate = oldestDate; dueDate.isBefore(newestDate); dueDate = dueDate.plusDays(1)) 
+		{
 			// Create a slightly upwards trend - everybody wants to be
 			// successful
 			int relativeYear = dueDate.getYear() - now.getYear() + yearsToInclude;
@@ -198,11 +201,12 @@ public class DataGenerator implements HasLogger {
 			for (int i = 0; i < ordersThisDay; i++) {
 				orderRepo.save(createOrder(productSupplier, pickupLocationSupplier, barista, baker, dueDate));
 			}
-		}
-	}
+		}// for dueDate...
+	}//createOrders
 
 	private Order createOrder(Supplier<Product> productSupplier, Supplier<PickupLocation> pickupLocationSupplier,
-			User barista, User baker, LocalDate dueDate) {
+			User barista, User baker, LocalDate dueDate) 
+	{
 		Order order = new Order(barista);
 
 		fillCustomer(order.getCustomer());
@@ -237,9 +241,10 @@ public class DataGenerator implements HasLogger {
 		order.setHistory(createOrderHistory(order, barista, baker));
 
 		return order;
-	}
+	}//createOrder
 
-	private List<HistoryItem> createOrderHistory(Order order, User barista, User baker) {
+	private List<HistoryItem> createOrderHistory(Order order, User barista, User baker) 
+	{
 		ArrayList<HistoryItem> history = new ArrayList<>();
 		HistoryItem item = new HistoryItem(barista, "Order placed");
 		item.setNewState(OrderState.NEW);
@@ -279,24 +284,26 @@ public class DataGenerator implements HasLogger {
 		}
 
 		return history;
-	}
+	}//createOrderHistory
 
-	private boolean containsProduct(List<OrderItem> items, Product product) {
+	private boolean containsProduct(List<OrderItem> items, Product product) 
+	{
 		for (OrderItem item : items) {
 			if (item.getProduct() == product) {
 				return true;
 			}
 		}
 		return false;
-	}
+	}//containsProduct
 
-	private LocalTime getRandomDueTime() {
+	private LocalTime getRandomDueTime() 
+	{
 		int time = 8 + 4 * random.nextInt(3);
-
 		return LocalTime.of(time, 0);
-	}
+	}//getRandomDueTime
 
-	private OrderState getRandomState(LocalDate due) {
+	private OrderState getRandomState(LocalDate due) 
+	{
 		LocalDate today = LocalDate.now();
 		LocalDate tomorrow = today.plusDays(1);
 		LocalDate twoDays = today.plusDays(2);
@@ -334,27 +341,31 @@ public class DataGenerator implements HasLogger {
 			}
 
 		}
-	}
+	}//getRandomState
 
-	private <T> T getRandom(T[] array) {
+	private <T> T getRandom(T[] array) 
+	{
 		return array[random.nextInt(array.length)];
 	}
 
-	private Supplier<PickupLocation> createPickupLocations(PickupLocationRepository pickupLocationRepository) {
+	private Supplier<PickupLocation> createPickupLocations(PickupLocationRepository pickupLocationRepository) 
+	{
 		List<PickupLocation> pickupLocations = Arrays.asList(
 				pickupLocationRepository.save(createPickupLocation("Store")),
 				pickupLocationRepository.save(createPickupLocation("Bakery")));
 		return () -> pickupLocations.get(random.nextInt(pickupLocations.size()));
-	}
+	}//createPickupLocations
 
-	private PickupLocation createPickupLocation(String name) {
+	private PickupLocation createPickupLocation(String name) 
+	{
 		PickupLocation store = new PickupLocation();
 		store.setName(name);
 		store.setCode( name);
 		return store;
-	}
+	}//createPickupLocation
 
-	private Supplier<Product> createProducts(ProductRepository productsRepo, int numberOfItems) {
+	private Supplier<Product> createProducts(ProductRepository productsRepo, int numberOfItems) 
+	{
 		List<Product> products  = new ArrayList<>();
 		for (int i = 0; i < numberOfItems; i++) {
 			Product product = new Product();
@@ -373,9 +384,10 @@ public class DataGenerator implements HasLogger {
 			g /= (cutoff * 2.0);
 			return products.get((int) (g * (products.size() - 1)));
 		};
-	}
+	}//createProducts
 
-	private String getRandomProductName() {
+	private String getRandomProductName() 
+	{
 		String firstFilling = getRandom(FILLING);
 		String name;
 		if (random.nextBoolean()) {
@@ -391,32 +403,36 @@ public class DataGenerator implements HasLogger {
 		name += " " + getRandom(TYPE);
 
 		return name;
-	}
+	}//getRandomProductName
 
-	private User createBaker(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+	private User createBaker(UserRepository userRepository, PasswordEncoder passwordEncoder) 
+	{
 		return userRepository.save(
 				createUser("baker@vaadin.com", "Heidi", "Carter", passwordEncoder.encode("baker"), Role.BAKER, false));
-	}
+	}//createBaker
 
-	private User createBarista(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+	private User createBarista(UserRepository userRepository, PasswordEncoder passwordEncoder) 
+	{
 		return userRepository.save(createUser("barista@vaadin.com", "Malin", "Castro",
 				passwordEncoder.encode("barista"), Role.BARISTA, true));
-	}
+	}//createBarista
 
-	private User createAdmin(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+	private User createAdmin(UserRepository userRepository, PasswordEncoder passwordEncoder) 
+	{
 		return userRepository.save(
 				createUser("admin@vaadin.com", "Göran", "Rich", passwordEncoder.encode("admin"), Role.ADMIN, true));
-	}
+	}//createAdmin
 
-	private void createDeletableUsers(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+	private void createDeletableUsers(UserRepository userRepository, PasswordEncoder passwordEncoder) 
+	{
 		userRepository.save(
 				createUser("peter@vaadin.com", "Peter", "Bush", passwordEncoder.encode("peter"), Role.BARISTA, false));
 		userRepository
 		.save(createUser("mary@vaadin.com", "Mary", "Ocon", passwordEncoder.encode("mary"), Role.BAKER, true));
-	}
+	}//createDeletableUsers
 
-	private User createUser(String email, String firstName, String lastName, String passwordHash, String role,
-			boolean locked) {
+	private User createUser(String email, String firstName, String lastName, String passwordHash, String role, boolean locked) 
+	{
 		User user = new User();
 		user.setEmail(email);
 		user.setCode(email);
@@ -426,5 +442,6 @@ public class DataGenerator implements HasLogger {
 		user.setRole(role);
 		user.setLocked(locked);
 		return user;
-	}
-}
+	}//createUser
+	
+}//DataGenerator

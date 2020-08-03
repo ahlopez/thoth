@@ -29,7 +29,7 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
 
    public List<ObjectToProtect> findAll()
    {
-      return objectToProtectRepository.findAll(ThothSession.getTenant());  //TODO: Remplazar por .getCurrentTenant()
+      return objectToProtectRepository.findAll(ThothSession.getCurrentTenant()); 
    }//findAll
 
    @Override
@@ -38,7 +38,7 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return objectToProtectRepository.findByNameLikeIgnoreCase(ThothSession.getTenant(), repositoryFilter, pageable);
+         return objectToProtectRepository.findByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter, pageable);
       } else {
          return find(pageable);
       }
@@ -49,16 +49,16 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
    {
       if (filter.isPresent()) {
          String repositoryFilter = "%" + filter.get() + "%";
-         return objectToProtectRepository.countByNameLikeIgnoreCase(ThothSession.getTenant(), repositoryFilter);
+         return objectToProtectRepository.countByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter);
       } else {
-         long n = objectToProtectRepository.countAll(ThothSession.getTenant());
+         long n = objectToProtectRepository.countAll(ThothSession.getCurrentTenant());
          return n;
       }
    }//countAnyMatching
 
    public Page<ObjectToProtect> find(Pageable pageable)
    {
-      return objectToProtectRepository.findBy(ThothSession.getTenant(), pageable);
+      return objectToProtectRepository.findBy(ThothSession.getCurrentTenant(), pageable);
    }
 
    @Override
@@ -71,7 +71,7 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
    public ObjectToProtect createNew(User currentUser)
    {
       ObjectToProtect objectToProtect = new ObjectToProtect();
-      objectToProtect.setTenant(ThothSession.getTenant()); // Remplazar por .getCurrentTenant()
+      objectToProtect.setTenant(ThothSession.getCurrentTenant()); 
       return objectToProtect;
    }
 

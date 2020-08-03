@@ -17,7 +17,7 @@ public class ThothSession
    public static Tenant getCurrentTenant()
    {
       VaadinSession session = VaadinSession.getCurrent();
-      return  session == null? tenant: (Tenant)session.getAttribute(TENANT);//TODO: Vaadin session siempre debe existir
+      return  session == null? null: (Tenant)session.getAttribute(TENANT);//TODO: Vaadin session siempre debe existir
    }//getCurrentTenant
 
    public static SingleUser getCurrentUser()

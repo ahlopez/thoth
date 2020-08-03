@@ -28,7 +28,7 @@ public class RoleService implements FilterableCrudService<Role>
 
    public List<Role> findAll()
    {
-      return roleRepository.findAll(ThothSession.getTenant());  //TODO: Remplazar por .getCurrentTenant()
+      return roleRepository.findAll(ThothSession.getCurrentTenant());  
    }//findAll
 
    @Override
@@ -37,7 +37,7 @@ public class RoleService implements FilterableCrudService<Role>
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return roleRepository.findByNameLikeIgnoreCase(ThothSession.getTenant(), repositoryFilter, pageable);
+         return roleRepository.findByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter, pageable);
       } else {
          return find(pageable);
       }
@@ -48,16 +48,16 @@ public class RoleService implements FilterableCrudService<Role>
    {
       if (filter.isPresent()) {
          String repositoryFilter = "%" + filter.get() + "%";
-         return roleRepository.countByNameLikeIgnoreCase(ThothSession.getTenant(), repositoryFilter);
+         return roleRepository.countByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter);
       } else {
-         long n = roleRepository.countAll(ThothSession.getTenant());
+         long n = roleRepository.countAll(ThothSession.getCurrentTenant());
          return n;
       }
    }//countAnyMatching
 
    public Page<Role> find(Pageable pageable)
    {
-      return roleRepository.findBy(ThothSession.getTenant(), pageable);
+      return roleRepository.findBy(ThothSession.getCurrentTenant(), pageable);
    }
 
    @Override
@@ -70,7 +70,7 @@ public class RoleService implements FilterableCrudService<Role>
    public Role createNew(User currentUser)
    {
       Role role = new Role();
-      role.setTenant(ThothSession.getTenant()); // Remplazar por .getCurrentTenant()
+      role.setTenant(ThothSession.getCurrentTenant());
       return role;
    }
 
