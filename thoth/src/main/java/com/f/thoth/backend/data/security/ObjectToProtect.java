@@ -58,7 +58,9 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Com
 	@PreUpdate
 	public void prepareData()
 	{
-    	this.tenant = ThothSession.getCurrentTenant();
+    	if (tenant == null)
+    	    this.tenant = ThothSession.getCurrentTenant();
+    	
 		this.name     =  TextUtil.nameTidy(name).toLowerCase();
 		buildCode();
 	}//prepareData

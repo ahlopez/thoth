@@ -6,7 +6,7 @@ import com.vaadin.flow.server.VaadinSession;
 
 public class ThothSession
 {
-   private static Tenant tenant;
+   private static Tenant tenant; // Solo usar mientras no hay Vaadin Session
    public  static Tenant getTenant() { return tenant;}
    public  static void   setTenant(Tenant newTenant) { tenant = newTenant;}
    
@@ -17,7 +17,7 @@ public class ThothSession
    public static Tenant getCurrentTenant()
    {
       VaadinSession session = VaadinSession.getCurrent();
-      return  session == null? null: (Tenant)session.getAttribute(TENANT);//TODO: Vaadin session siempre debe existir
+      return  session == null? tenant: (Tenant)session.getAttribute(TENANT);
    }//getCurrentTenant
 
    public static SingleUser getCurrentUser()
