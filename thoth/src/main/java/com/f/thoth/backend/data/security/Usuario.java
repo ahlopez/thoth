@@ -31,6 +31,8 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 @MappedSuperclass
 public abstract class Usuario extends BaseEntity
 {
+	private static final long DEFAULT_TO_DATE = 90L;
+
 	@NotNull (message = "{evidentia.category.required}")
 	@Min(value=0, message= "{evidentia.category.minvalue}")
 	@Max(value=5, message= "{evidentia.category.maxvalue}")
@@ -75,7 +77,7 @@ public abstract class Usuario extends BaseEntity
 	public void prepareData()
 	{
 		this.fromDate  =  fromDate  != null ? fromDate : LocalDateTime.MIN;
-		this.toDate    =  toDate    != null ? toDate   : LocalDateTime.now().plusDays(1L);
+		this.toDate    =  toDate    != null ? toDate   : LocalDateTime.now().plusDays(DEFAULT_TO_DATE);
 		this.category  =  category  != null ? category : 0;
 		this.firstName =  TextUtil.nameTidy( firstName);
 		this.locked    =  isLocked();
@@ -105,9 +107,15 @@ public abstract class Usuario extends BaseEntity
 
 	public boolean    isLocked()
 	{
-		LocalDateTime now = LocalDateTime.now();
-		locked = (locked || now.compareTo(fromDate) < 0 || now.compareTo(toDate) > 0);
-		return locked;
+		if (locked)
+			return true;
+
+		if (fromDate != null && toDate != null)
+		{
+			LocalDateTime now = LocalDateTime.now();
+			return now.compareTo(fromDate) < 0 || now.compareTo(toDate) > 0;
+		}
+		return false;
 	}
 	public void       setLocked(boolean locked) { this.locked = locked;}
 
@@ -119,15 +127,13 @@ public abstract class Usuario extends BaseEntity
 		if (this == o)
 			return true;
 
-		if (o == null || getClass() != o.getClass())
-			return false;
-
-		if (!super.equals(o))
+		if (o == null || ! (o instanceof Usuario))
 			return false;
 
 		Usuario that = (Usuario) o;
 
-		return isLocked() == that.isLocked() &&
+		return  isLocked() == that.isLocked()            &&
+				Objects.equals(code,      that.code)     &&
 				Objects.equals(tenant,    that.tenant)   &&
 				Objects.equals(category,  that.category) &&
 				Objects.equals(firstName, that.firstName);
@@ -137,7 +143,7 @@ public abstract class Usuario extends BaseEntity
 	@Override
 	public int hashCode()
 	{
-		return Objects.hash(super.hashCode(), tenant, category, firstName, isLocked());
+		return Objects.hash(super.hashCode(), tenant, code, category, firstName, isLocked());
 	}
 
 	@Override
@@ -145,14 +151,7 @@ public abstract class Usuario extends BaseEntity
 
 	// --------------- function ----------------
 
-	public void addToGroup( UserGroup group)
-	{
-		if (group != null )
-		{
-			groups.add( group);
-			group.addMember(this);
-		}
-	}//addToGroup
+	public void addToGroup( UserGroup group) { groups.add( group); }
 
 	public void addToRole( Role role)
 	{

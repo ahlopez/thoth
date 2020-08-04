@@ -9,6 +9,7 @@ import static com.f.thoth.ui.utils.BakeryConst.TITLE_ROLES;
 import static com.f.thoth.ui.utils.BakeryConst.TITLE_STOREFRONT;
 import static com.f.thoth.ui.utils.BakeryConst.TITLE_TENANTS;
 import static com.f.thoth.ui.utils.BakeryConst.TITLE_USERS;
+import static com.f.thoth.ui.utils.BakeryConst.TITLE_USER_GROUPS;
 import static com.f.thoth.ui.utils.BakeryConst.VIEWPORT;
 
 import java.util.ArrayList;
@@ -21,6 +22,7 @@ import com.f.thoth.ui.views.admin.objects.ObjectToProtectView;
 import com.f.thoth.ui.views.admin.products.ProductsView;
 import com.f.thoth.ui.views.admin.roles.RoleView;
 import com.f.thoth.ui.views.admin.tenants.TenantsView;
+import com.f.thoth.ui.views.admin.users.UserGroupView;
 import com.f.thoth.ui.views.admin.users.UsersView;
 import com.f.thoth.ui.views.dashboard.DashboardView;
 import com.f.thoth.ui.views.storefront.StorefrontView;
@@ -122,6 +124,9 @@ public class MainView extends AppLayout
        }
       if (SecurityUtils.isAccessGranted(RoleView.class)) {
           tabs.add(createTab(VaadinIcon.ACADEMY_CAP, TITLE_ROLES, RoleView.class));
+       }
+      if (SecurityUtils.isAccessGranted(UserGroupView.class)) {
+          tabs.add(createTab(VaadinIcon.USERS, TITLE_USER_GROUPS, UserGroupView.class));
        }
       final String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
       final Tab logoutTab = createTab(createLogoutLink(contextPath));

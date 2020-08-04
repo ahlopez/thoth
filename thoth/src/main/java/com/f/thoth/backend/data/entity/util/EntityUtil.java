@@ -15,7 +15,9 @@ public final class EntityUtil
 	   className.put( "Permission",      "Permiso");
 	   className.put( "Role",            "Rol");
 	   className.put( "Schema",          "Esquema");
+	   className.put( "SingleUser",      "Usuario");
 	   className.put( "Tenant",          "Cliente");
+	   className.put( "UserGroup",       "Grupo de Usuarios");
    }
   
    public static final String getName(Class<? extends AbstractEntity> type)

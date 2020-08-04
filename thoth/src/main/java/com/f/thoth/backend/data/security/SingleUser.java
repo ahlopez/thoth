@@ -177,7 +177,7 @@ public class SingleUser extends Usuario implements Comparable<SingleUser>
 
       for (UserGroup ug: groups)
       {
-         if (ug.hasAccess(object, this.category))
+         if (ug.canAccess(object))
             return true;
       }
 

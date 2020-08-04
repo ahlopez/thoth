@@ -15,6 +15,8 @@ public class BakeryConst
    public static final String PAGE_STOREFRONT_EDIT = "storefront/edit";
    public static final String PAGE_DASHBOARD = "dashboard";
    public static final String PAGE_USERS = "users";
+   public static final String PAGE_USER_GROUPS = "user_groups";
+   public static final String PAGE_SINGLE_USERS = "single_users";
    public static final String PAGE_ROLES = "roles";
    public static final String PAGE_PRODUCTS = "products";
    public static final String PAGE_TENANTS = "tenants";
@@ -25,6 +27,8 @@ public class BakeryConst
 
    public static final String TITLE_ADMINISTRATION = "Administración";
    public static final String TITLE_USERS = "Usuarios";
+   public static final String TITLE_USER_GROUPS = "Grupos de Usuarios";
+   public static final String TITLE_SINGLE_USERS = "Usuarios individuales";
    public static final String TITLE_PRODUCTS = "Products";
    public static final String TITLE_ROLES = "Roles";
    public static final String TITLE_LOGOUT = "Terminar";

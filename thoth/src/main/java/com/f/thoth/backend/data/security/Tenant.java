@@ -102,7 +102,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 	@Valid
 	private Set<SingleUser>  singleUsers;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@OrderColumn
 	@JoinColumn
 	@BatchSize(size = 50)
@@ -248,6 +248,8 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 	public void addType( DocType type) { docTypes.add(type);}
 
 	public void addRole( Role role) { roles.add(role);}
+	
+	public void addUserGroup( UserGroup group) { userGroups.add(group); }
 
 
 	public SingleUser getSingleUserById( String userCode)
