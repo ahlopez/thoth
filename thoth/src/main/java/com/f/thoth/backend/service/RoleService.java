@@ -79,7 +79,7 @@ public class RoleService implements FilterableCrudService<Role>
    {
       try {
          Role newRole =  FilterableCrudService.super.save(currentUser, entity);
-         ThothSession.getCurrentTenant().addRole(newRole);
+         ThothSession.updateSession();
          return newRole;
       } catch (DataIntegrityViolationException e) {
          throw new UserFriendlyDataException("Ya hay un rol con esa llave. Por favor escoja una llave única para el rol");

@@ -7,6 +7,7 @@ import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
 import com.f.thoth.backend.data.security.Tenant;
+import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.Usuario;
 import com.f.thoth.ui.utils.FormattingUtils;
 
@@ -29,12 +30,13 @@ public abstract class Expediente implements NeedsProtection, Comparable<Expedien
    // --------------- Constructors --------------------
    public Expediente()
    {
+      this.tenant = ThothSession.getCurrentTenant();
    }
 
    // ---------------- Getters & Setters --------------
 
    public Tenant getTenant() { return tenant; }
-   public void setTenant(Tenant tenant) {this.tenant = tenant;}
+   //public void setTenant(Tenant tenant) {this.tenant = tenant;}
 
    public String getId() {return id;}
    public void setId(String id) {this.id = id;}

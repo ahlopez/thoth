@@ -2,22 +2,25 @@ package com.f.thoth.ui.utils.converters;
 
 import com.vaadin.flow.templatemodel.ModelEncoder;
 
-public class LongToStringConverter implements ModelEncoder<Long, String> {
+public class LongToStringConverter implements ModelEncoder<Long, String>
+{
 
    @Override
-   public String encode(Long modelValue) {
-      if (modelValue == null) {
+   public String encode(Long modelValue)
+   {
+      if (modelValue == null)
          return null;
-      }
+
       return modelValue.toString();
-   }
+   }//encode
 
    @Override
-   public Long decode(String presentationValue) {
-      if (presentationValue == null) {
+   public Long decode(String presentationValue)
+   {
+      if (presentationValue == null)
          return null;
-      }
-      return Long.parseLong(presentationValue);
-   }
 
-}
+      return Long.parseLong(presentationValue);
+   }//decode
+
+}//LongToStringConverter

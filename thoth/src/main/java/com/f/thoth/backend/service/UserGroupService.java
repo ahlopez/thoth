@@ -72,16 +72,20 @@ public class UserGroupService implements FilterableCrudService<UserGroup>
       UserGroup userGroup = new UserGroup();
       userGroup.setTenant(ThothSession.getCurrentTenant());
       return userGroup;
-   }
+   }//createNew
 
    @Override
    public UserGroup save(User currentUser, UserGroup entity)
    {
-      try {
+      try 
+      {
          UserGroup newUserGroup =  FilterableCrudService.super.save(currentUser, entity);
-         ThothSession.getCurrentTenant().addUserGroup(newUserGroup);
+         if (newUserGroup != null)
+             ThothSession.updateSession();
+         
          return newUserGroup;
-      } catch (DataIntegrityViolationException e) {
+      } catch (DataIntegrityViolationException e) 
+      {
          throw new UserFriendlyDataException("Ya hay un grupo con esa llave. Por favor escoja una llave única para el grupo");
       }
 

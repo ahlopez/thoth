@@ -9,6 +9,9 @@ public class BakeryConst
 
    public static final Locale APP_LOCALE = Locale.US;
    public static final String TENANT= "TENANT";
+   public static final Integer MIN_CATEGORY = new Integer(0);
+   public static final Integer MAX_CATEGORY = new Integer(5);
+   public static final Integer DEFAULT_CATEGORY = MIN_CATEGORY;
 
    public static final String PAGE_ROOT = "";
    public static final String PAGE_STOREFRONT = "storefront";

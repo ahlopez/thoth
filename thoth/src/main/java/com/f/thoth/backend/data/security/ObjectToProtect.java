@@ -52,23 +52,20 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Com
       this.name = name;
       buildCode();
    }//ObjectToProtect
-   
+
 
     @PrePersist
-	@PreUpdate
-	public void prepareData()
-	{
-    	if (tenant == null)
-    	    this.tenant = ThothSession.getCurrentTenant();
-    	
-		this.name     =  TextUtil.nameTidy(name).toLowerCase();
-		buildCode();
-	}//prepareData
+   @PreUpdate
+   public void prepareData()
+   {
+      this.name     =  TextUtil.nameTidy(name).toLowerCase();
+      buildCode();
+   }//prepareData
 
-   @Override public void buildCode() 
-   { 
-	   this.code = (tenant == null? "[Tenant]": tenant.getCode())+ 
-			        ">"+ 
+   @Override public void buildCode()
+   {
+      this.code = (tenant == null? "[Tenant]": tenant.getCode())+
+                 ">"+
                    (name == null? "[name]" : name);
    }
 

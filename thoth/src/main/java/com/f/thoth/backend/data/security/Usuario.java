@@ -1,6 +1,6 @@
 package com.f.thoth.backend.data.security;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
@@ -40,10 +40,10 @@ public abstract class Usuario extends BaseEntity
 
 	@NotNull(message = "{evidentia.date.required}")
 	@PastOrPresent(message="{evidentia.date.pastorpresent}")
-	protected LocalDateTime fromDate;
+	protected LocalDate     fromDate;
 
 	@NotNull(message = "{evidentia.date.required}")
-	protected LocalDateTime toDate;
+	protected LocalDate     toDate;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@OrderColumn
@@ -76,8 +76,8 @@ public abstract class Usuario extends BaseEntity
 
 	public void prepareData()
 	{
-		this.fromDate  =  fromDate  != null ? fromDate : LocalDateTime.MIN;
-		this.toDate    =  toDate    != null ? toDate   : LocalDateTime.now().plusDays(DEFAULT_TO_DATE);
+		this.fromDate  =  fromDate  != null ? fromDate : LocalDate.MIN;
+		this.toDate    =  toDate    != null ? toDate   : LocalDate.now().plusDays(DEFAULT_TO_DATE);
 		this.category  =  category  != null ? category : 0;
 		this.firstName =  TextUtil.nameTidy( firstName);
 		this.locked    =  isLocked();
@@ -93,11 +93,11 @@ public abstract class Usuario extends BaseEntity
 	public String     getFirstName() { return firstName;}
 	public void       setFirstName(String firstName) { this.firstName = firstName;}
 
-	public LocalDateTime getFromDate() {	return fromDate;}
-	public void setFromDate(LocalDateTime fromDate) { this.fromDate = fromDate;}
+	public LocalDate  getFromDate() {	return fromDate;}
+	public void       setFromDate(LocalDate fromDate) { this.fromDate = fromDate;}
 
-	public LocalDateTime getToDate() { return toDate; }
-	public void setToDate(LocalDateTime toDate) { this.toDate = toDate; }
+	public LocalDate  getToDate() { return toDate; }
+	public void       setToDate(LocalDate toDate) { this.toDate = toDate; }
 
 	public Set<UserGroup> getGroups() { return groups;}
 	public void           setGroups( Set<UserGroup> groups) { this.groups = groups;}
@@ -112,7 +112,7 @@ public abstract class Usuario extends BaseEntity
 
 		if (fromDate != null && toDate != null)
 		{
-			LocalDateTime now = LocalDateTime.now();
+			LocalDate now = LocalDate.now();
 			return now.compareTo(fromDate) < 0 || now.compareTo(toDate) > 0;
 		}
 		return false;

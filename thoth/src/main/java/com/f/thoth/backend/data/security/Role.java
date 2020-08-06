@@ -53,7 +53,6 @@ public class Role extends BaseEntity implements Comparable<Role>
    public Role( String name)
    {
       super();
-
       if ( !TextUtil.isValidName( name))
          throw new IllegalArgumentException("Nombre["+ name+ "] es inválido");
 
@@ -66,9 +65,6 @@ public class Role extends BaseEntity implements Comparable<Role>
    @PreUpdate
    public void prepareData()
    {
-	  if( tenant == null)
-            this.tenant = ThothSession.getCurrentTenant();
-	  
       this.name   = name != null ? name.trim() : "Anonimo";
       buildCode();
    }//prepareData

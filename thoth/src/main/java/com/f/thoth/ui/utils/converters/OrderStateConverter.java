@@ -10,23 +10,27 @@ import java.util.stream.Collectors;
 import com.f.thoth.backend.data.OrderState;
 import com.vaadin.flow.templatemodel.ModelEncoder;
 
-public class OrderStateConverter implements ModelEncoder<OrderState, String> {
+public class OrderStateConverter implements ModelEncoder<OrderState, String>
+{
 
    private Map<String, OrderState> values;
 
-   public OrderStateConverter() {
+   public OrderStateConverter()
+   {
       values = Arrays.stream(OrderState.values())
             .collect(Collectors.toMap(OrderState::toString, Function.identity()));
-   }
+   }//OrderStateConverter
 
    @Override
-   public OrderState decode(String presentationValue) {
+   public OrderState decode(String presentationValue)
+   {
       return convertIfNotNull(presentationValue, values::get);
    }
 
    @Override
-   public String encode(OrderState modelValue) {
+   public String encode(OrderState modelValue)
+   {
       return convertIfNotNull(modelValue, OrderState::toString);
    }
 
-}
+}//OrderStateConverter

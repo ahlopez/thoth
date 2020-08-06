@@ -102,6 +102,7 @@ public class SingleUser extends Usuario implements Comparable<SingleUser>
    @PreUpdate
    public void prepareData()
    {
+	  super.prepareData();
       this.email     =  email     != null ? email.trim().toLowerCase(): null ;
       this.lastName  =  TextUtil.nameTidy(lastName);
       buildCode();

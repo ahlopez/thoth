@@ -5,6 +5,7 @@ import javax.persistence.MappedSuperclass;
 import javax.validation.constraints.NotNull;
 
 import com.f.thoth.backend.data.security.Tenant;
+import com.f.thoth.backend.data.security.ThothSession;
 
 @MappedSuperclass
 public abstract class BaseEntity extends AbstractEntity
@@ -12,6 +13,12 @@ public abstract class BaseEntity extends AbstractEntity
 	@ManyToOne
 	@NotNull (message = "{evidentia.tenant.required}")
 	protected Tenant tenant;
+	
+	public BaseEntity()
+	{
+		super();
+		this.tenant = ThothSession.getCurrentTenant();
+	}
 
 	public Tenant  getTenant() { return tenant;}
 	public void    setTenant( Tenant tenant) { this.tenant = tenant;}  

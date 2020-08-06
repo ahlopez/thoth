@@ -62,7 +62,7 @@ public class LoginView extends LoginOverlay
    public void afterNavigation(AfterNavigationEvent event) 
    {
 	  VaadinSession session = VaadinSession.getCurrent();
-	  session.setAttribute(TENANT, ThothSession.getTenant());
+	  session.setAttribute(TENANT, ThothSession.getCurrentTenant());
       setError(event.getLocation().getQueryParameters().getParameters().containsKey("error"));
    }//afterNavigation
 

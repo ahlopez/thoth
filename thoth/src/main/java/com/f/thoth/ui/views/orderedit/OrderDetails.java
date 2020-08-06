@@ -96,7 +96,8 @@ public class OrderDetails extends PolymerTemplate<OrderDetails.Model> {
       this.isDirty = isDirty;
    }
 
-   public interface Model extends TemplateModel {
+   public interface Model extends TemplateModel
+   {
       @Include({ "id", "dueDate.day", "dueDate.weekday", "dueDate.date", "dueTime", "state", "pickupLocation.name",
          "customer.fullName", "customer.phoneNumber", "customer.details", "items.product.name", "items.comment",
          "items.quantity", "items.product.price", "history.message", "history.createdBy.firstName",
@@ -112,9 +113,10 @@ public class OrderDetails extends PolymerTemplate<OrderDetails.Model> {
       void setItem(Order order);
 
       void setReview(boolean review);
-   }
+   }//Model
 
-   public Registration addSaveListenter(ComponentEventListener<SaveEvent> listener) {
+   public Registration addSaveListenter(ComponentEventListener<SaveEvent> listener)
+   {
       return addListener(SaveEvent.class, listener);
    }
 

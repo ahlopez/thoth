@@ -210,6 +210,20 @@ public class TextUtil
     }//isValidName
 
     /**
+     * Determina si una cadena es alfanumérica,
+     * incluyendo los caracteres '_' y '-'.
+     * @param source String a examinar
+     * @return true si es válido; false si no lo es
+     */
+    public static boolean isAlphaNumeric( String source)
+    {
+    	if (source == null)
+    		return false;
+    	
+    	return source.matches("[a-zA-Z0-9_]([a-zA-Z0-9_-]){0,255}");
+    }//isAlphaNumeric
+
+    /**
      * Determina si una cadena presentada es una ruta válida
      * @param source Cadena a examinar
      * @return true si es válida; false si no lo es
