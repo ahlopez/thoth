@@ -17,7 +17,7 @@ public class LocalDateToLocalDate implements Converter<LocalDate, LocalDate>
 	    @Override
 	    public LocalDate convertToPresentation( LocalDate date, ValueContext context) 
 	    {
-	    	return date;
+	    	return date == null? LocalDate.now(): date;
 	    }
 
 }//LocalDateToLocalDate

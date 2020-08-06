@@ -1,10 +1,11 @@
 package com.f.thoth.ui.views.login;
 
-import org.springframework.beans.factory.annotation.Autowired;
-
 import static com.f.thoth.ui.utils.BakeryConst.TENANT;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.f.thoth.app.security.SecurityUtils;
+import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.TenantRepository;
 import com.f.thoth.ui.utils.BakeryConst;
@@ -62,7 +63,8 @@ public class LoginView extends LoginOverlay
    public void afterNavigation(AfterNavigationEvent event) 
    {
 	  VaadinSession session = VaadinSession.getCurrent();
-	  session.setAttribute(TENANT, ThothSession.getCurrentTenant());
+	  session.setAttribute(TENANT, ThothSession.getCurrentTenant());//TODO: Salvar aquí también el currrent user
+	  Tenant t = (Tenant)session.getAttribute(TENANT);
       setError(event.getLocation().getQueryParameters().getParameters().containsKey("error"));
    }//afterNavigation
 

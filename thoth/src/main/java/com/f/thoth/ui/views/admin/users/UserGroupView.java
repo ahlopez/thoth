@@ -2,7 +2,6 @@ package com.f.thoth.ui.views.admin.users;
 
 import static com.f.thoth.ui.dataproviders.DataProviderUtil.createItemLabelGenerator;
 import static com.f.thoth.ui.utils.BakeryConst.PAGE_USER_GROUPS;
-import static com.f.thoth.ui.utils.BakeryConst.TENANT;
 
 import java.time.LocalDate;
 import java.util.TreeSet;
@@ -13,6 +12,7 @@ import org.springframework.security.access.annotation.Secured;
 import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.security.Tenant;
+import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.UserGroup;
 import com.f.thoth.backend.service.UserGroupService;
 import com.f.thoth.ui.MainView;
@@ -32,7 +32,6 @@ import com.vaadin.flow.data.converter.StringToIntegerConverter;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.VaadinSession;
 
 @Route(value = PAGE_USER_GROUPS, layout = MainView.class)
 @PageTitle(BakeryConst.TITLE_USER_GROUPS)
@@ -72,6 +71,7 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
    {
       TextField name = new TextField("Nombre");
       name.setRequired(true);
+      name.setValue("--NOMBRE DEL GRUPO--");
       name.setRequiredIndicatorVisible(true);
       name.getElement().setAttribute("colspan", "6");
 
@@ -81,6 +81,7 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
       blocked.getElement().setAttribute("colspan", "1");
 
       TextField category = new TextField("Categoría");
+      category.setRequired(true);
       category.setValue(BakeryConst.DEFAULT_CATEGORY.toString());
       category.setRequiredIndicatorVisible(true);
       category.getElement().setAttribute("colspan", "1");
@@ -88,11 +89,13 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
       LocalDate now = LocalDate.now();
       LocalDate yearStart =now.minusDays(now.getDayOfYear());
       DatePicker fromDate = new DatePicker("Fecha desde");
+      fromDate.setRequired(true);
       fromDate.setValue(yearStart);
       fromDate.setRequiredIndicatorVisible(true);
       fromDate.getElement().setAttribute("colspan", "2");
 
       DatePicker toDate   = new DatePicker("Fecha hasta");
+      toDate.setRequired(true);
       toDate.setValue(yearStart.plusYears(1));
       toDate.setRequiredIndicatorVisible(true);
       toDate.getElement().setAttribute("colspan", "2");
@@ -142,8 +145,7 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
 
 	private static ListDataProvider<UserGroup> getTenantGroups()
 	{
-		VaadinSession currentSession = VaadinSession.getCurrent();
-		Tenant tenant = (Tenant)currentSession.getAttribute(TENANT);
+		Tenant tenant = ThothSession.getCurrentTenant();
 		return new ListDataProvider<UserGroup>( tenant == null? new TreeSet<>() : tenant.getUserGroups());
 	}//getTenantRoles
 
