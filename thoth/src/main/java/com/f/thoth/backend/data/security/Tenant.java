@@ -1,7 +1,6 @@
 package com.f.thoth.backend.data.security;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -81,10 +80,10 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 
 	@NotNull(message = "{evidentia.date.required}")
 	@PastOrPresent(message="{evidentia.date.pastorpresent}")
-	protected LocalDateTime  fromDate;
+	protected LocalDate  fromDate;
 
 	@NotNull(message = "{evidentia.date.required}")
-	protected LocalDateTime toDate;
+	protected LocalDate  toDate;
 
 	protected boolean locked = false;
 
@@ -121,7 +120,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 	public Tenant()
 	{
 		super();
-		allocate();
+		init();
 		buildCode();
 	}
 
@@ -133,7 +132,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 			throw new IllegalArgumentException("Nombre["+ name+ "] es inválido");
 
 		this.name = TextUtil.nameTidy(name);
-		allocate();
+		init();
 		buildCode();
 	}//Tenant
 
@@ -149,8 +148,14 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 
 	@Override protected void buildCode(){ this.code = (name == null? "[name]" : name);}
 
-	private void allocate()
+	private void init()
 	{
+		LocalDate now = LocalDate.now();
+		LocalDate yearStart =now.minusDays(now.getDayOfYear());
+
+		administrator= "";
+		fromDate     = yearStart;
+		toDate       = yearStart.plusYears(1);
 		roles        = new TreeSet<>();
 		singleUsers  = new TreeSet<>();
 		userGroups   = new TreeSet<>();
@@ -171,8 +176,6 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 	public void         setName( String name)
 	{
 		this.name = name;
-		this.fromDate = LocalDateTime.MIN;
-		this.toDate   = LocalDateTime.MAX;
 		buildCode();
 	}
 
@@ -183,7 +186,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 			return true;
 		else
 		{
-			LocalDateTime now = LocalDateTime.now();
+			LocalDate now = LocalDate.now();
 			return (fromDate != null && now.compareTo(fromDate) < 0) || (toDate != null && now.compareTo(toDate) > 0);
 		}
 	}//isLocked
@@ -191,13 +194,11 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 	public String         getAdministrator() { return administrator;}
 	public void           setAdministrator( String administrator) { this.administrator = administrator;}
 
-	public LocalDateTime  getFromDate() {  return fromDate;}
-	public void           setFromDate(LocalDateTime fromDate) { this.fromDate = fromDate;}
-	public void           setFromDate(LocalDate     fromDate) { this.fromDate = fromDate.atStartOfDay();}
+	public LocalDate      getFromDate() {  return fromDate;}
+	public void           setFromDate(LocalDate fromDate) { this.fromDate = fromDate;}
 
-	public LocalDateTime  getToDate() { return toDate; }
-	public void           setToDate(LocalDateTime toDate) { this.toDate = toDate; }
-	public void           setToDate(LocalDate     toDate) { this.toDate = toDate.plusDays(1).atStartOfDay(); }
+	public LocalDate      getToDate() { return toDate; }
+	public void           setToDate(LocalDate toDate) { this.toDate = toDate; }
 
 	public Set<Role>      getRoles() { return roles;}
 	public void           setRoles( Set<Role> roles) { this.roles = roles;}

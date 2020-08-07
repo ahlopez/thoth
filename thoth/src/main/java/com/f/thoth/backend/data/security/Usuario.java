@@ -24,6 +24,7 @@ import org.hibernate.annotations.BatchSize;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
+import com.f.thoth.ui.utils.BakeryConst;
 
 /**
  *  Representa un usuario sencillo o compuesto del sistema
@@ -33,35 +34,29 @@ public abstract class Usuario extends BaseEntity
 {
 	private static final long DEFAULT_TO_DATE = 90L;
 
-	@NotNull (message = "{evidentia.category.required}")
+	@NotNull     (message= "{evidentia.category.required}")
 	@Min(value=0, message= "{evidentia.category.minvalue}")
 	@Max(value=5, message= "{evidentia.category.maxvalue}")
-	protected Integer       category;
+	protected Integer       category; // security category
 
 	@NotNull(message = "{evidentia.date.required}")
 	@PastOrPresent(message="{evidentia.date.pastorpresent}")
-	protected LocalDate     fromDate;
+	protected LocalDate     fromDate; // initial date it can be used. default = now
 
 	@NotNull(message = "{evidentia.date.required}")
-	protected LocalDate     toDate;
+	protected LocalDate     toDate;   // final date it can be used. default = a year from now
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@OrderColumn
 	@JoinColumn
 	@BatchSize(size = 10)
 	@Valid
-	protected Set<Role>       roles;
+	protected Set<Role>       roles; // roles assigned to it
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-	@OrderColumn
-	@JoinColumn
-	@BatchSize(size = 10)
-	@Valid
-	protected Set<UserGroup>  groups;
-
-	@NotBlank(message = "{evidentia.name.required}")
+	@NotNull(message  = "{evidentia.name.required}")
 	@NotEmpty(message = "{evidentia.name.required}")
-	@Size(min = 2, max = 255, message="{evidentia.name.min.max.length}")
+	@NotBlank(message = "{evidentia.name.required}")
+	@Size(min = 1, max = 255, message="{evidentia.name.min.max.length}")
 	protected String firstName;
 
 	protected boolean locked = false;
@@ -70,9 +65,16 @@ public abstract class Usuario extends BaseEntity
 	public Usuario()
 	{
 		super();
-		groups = new TreeSet<>();
-		roles  = new TreeSet<>();
-	}
+		LocalDate now = LocalDate.now();
+		LocalDate yearStart =now.minusDays(now.getDayOfYear());
+		
+		firstName = "";
+		category  = BakeryConst.DEFAULT_CATEGORY;
+		locked    = false;
+		fromDate  = yearStart;
+		toDate    = yearStart.plusYears(1);
+		roles     = new TreeSet<>();
+	}//Usuario
 
 	public void prepareData()
 	{
@@ -98,9 +100,6 @@ public abstract class Usuario extends BaseEntity
 
 	public LocalDate  getToDate() { return toDate; }
 	public void       setToDate(LocalDate toDate) { this.toDate = toDate; }
-
-	public Set<UserGroup> getGroups() { return groups;}
-	public void           setGroups( Set<UserGroup> groups) { this.groups = groups;}
 
 	public Set<Role> getRoles() { return roles;}
 	public void       setRoles(Set<Role> roles) { this.roles = roles;}
@@ -150,8 +149,6 @@ public abstract class Usuario extends BaseEntity
 	public String toString() { return " Usuario{" + super.toString()+ " tenant["+ tenant.getName()+ "] category["+ category+ "] locked["+ isLocked()+ "]"+ "] name[" + firstName+ "]}" ; }
 
 	// --------------- function ----------------
-
-	public void addToGroup( UserGroup group) { groups.add( group); }
 
 	public void addToRole( Role role)
 	{

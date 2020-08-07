@@ -32,6 +32,7 @@ import com.f.thoth.backend.repositories.ProductRepository;
 import com.f.thoth.backend.repositories.RoleRepository;
 import com.f.thoth.backend.repositories.TenantRepository;
 import com.f.thoth.backend.repositories.UserRepository;
+import com.f.thoth.backend.service.TenantService;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
 @SpringComponent
@@ -51,6 +52,7 @@ public class DataGenerator implements HasLogger {
 
 	private final Random random = new Random(1L);
 
+	private TenantService    tenantService;
 	private TenantRepository tenantRepository;
 	private RoleRepository   roleRepository;
 	private OrderRepository orderRepository;
@@ -62,9 +64,11 @@ public class DataGenerator implements HasLogger {
 	private int itemSequence = 0;
 
 	@Autowired
-	public DataGenerator(OrderRepository orderRepository, UserRepository userRepository,
+	public DataGenerator(TenantService tenantService, OrderRepository orderRepository, UserRepository userRepository,
 			ProductRepository productRepository, PickupLocationRepository pickupLocationRepository,
-			TenantRepository tenantRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+			TenantRepository tenantRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) 
+	{
+		this.tenantService = tenantService;
 		this.orderRepository = orderRepository;
 		this.userRepository = userRepository;
 		this.productRepository = productRepository;
@@ -84,6 +88,8 @@ public class DataGenerator implements HasLogger {
 		getLogger().info("Generating demo data");
 			
 		getLogger().info("... generating tenants");
+		@SuppressWarnings("unused")
+		ThothSession session = new ThothSession(tenantService);
 		Tenant tenant1 = createTenant(tenantRepository, "FCONSULTORES"); 
 		ThothSession.setTenant(tenant1);
 		
@@ -142,8 +148,8 @@ public class DataGenerator implements HasLogger {
 		tenant.setName(name);
 		tenant.setLocked(false);
 		tenant.setAdministrator("admin@vaadin.com");
-		tenant.setFromDate(LocalDateTime.MIN);
-		tenant.setToDate(LocalDateTime.MAX);
+		tenant.setFromDate(LocalDate.MIN);
+		tenant.setToDate(LocalDate.MAX);
 		tenantRepository.save(tenant);
 
 		return tenant;

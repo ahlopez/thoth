@@ -46,7 +46,8 @@ public class Role extends BaseEntity implements Comparable<Role>
    public Role()
    {
       super();
-      allocate();
+      name = "";
+      init();
       buildCode();
    }
 
@@ -57,7 +58,7 @@ public class Role extends BaseEntity implements Comparable<Role>
          throw new IllegalArgumentException("Nombre["+ name+ "] es inválido");
 
       this.name = TextUtil.nameTidy(name);
-      allocate();
+      init();
       buildCode();
    }//Role
 
@@ -71,7 +72,10 @@ public class Role extends BaseEntity implements Comparable<Role>
 
    @Override protected void buildCode(){ this.code = (tenant == null? "[Tenant]": tenant.getCode())+ ">"+ this.name; }
 
-   private void allocate() { this.permissions = new TreeSet<>(); }
+   private void init() 
+   { 
+	   this.permissions = new TreeSet<>(); 
+   }
 
    // -------------- Getters & Setters ----------------
 

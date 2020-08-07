@@ -29,8 +29,7 @@ import javax.persistence.Table;
                @NamedAttributeNode("firstName"),
                @NamedAttributeNode("fromDate"),
                @NamedAttributeNode("toDate"),
-               @NamedAttributeNode("roles"),
-               @NamedAttributeNode("groups")
+               @NamedAttributeNode("roles")
          }) })
 @Entity
 @Table(name = "USER_GROUP", indexes = { @Index(columnList = "code")})
@@ -46,6 +45,7 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>
    public UserGroup()
    {
       super();
+      parentGroup = null;
       buildCode();
    }
 
@@ -72,7 +72,13 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>
    }//setFirstName
 
    public UserGroup       getParentGroup() { return parentGroup; }
-   public void            setParentGroup(UserGroup parentGroup) { this.parentGroup = parentGroup; }
+   public void            setParentGroup(UserGroup parentGroup) 
+   { 
+	   if ( parentGroup == null || parentGroup.canBeParentOf( this))
+	        this.parentGroup = parentGroup; 
+	   else  
+	        throw new IllegalArgumentException(parentGroup.getFirstName()+ " no puede ser padre de este grupo");   
+   }//setParentGroup
 
    @Override
    public int compareTo(UserGroup that)
@@ -85,20 +91,14 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>
 
    // --------------- Logic ---------------------
 
-   public void addMember( Usuario member)
+   public boolean canBeParentOf( UserGroup child)
    {
-      if ( canAdd(member))
-          member.addToGroup(this);
-   }//addMember
-
-   public boolean canAdd( Usuario member)
-   {
-      if (this.equals(member))
+      if (this.equals(child))
          return false;
 
-      return  parentGroup == null || parentGroup.canAdd(member);
+      return  parentGroup == null || parentGroup.canBeParentOf(child);
 
-   }//canAdd
+   }//canBeParentOf
 
 
    @Override public boolean canAccess( NeedsProtection object)

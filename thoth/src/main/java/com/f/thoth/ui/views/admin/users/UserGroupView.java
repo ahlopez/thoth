@@ -19,6 +19,7 @@ import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.crud.AbstractBakeryCrudView;
 import com.f.thoth.ui.utils.BakeryConst;
 import com.f.thoth.ui.utils.converters.LocalDateToLocalDate;
+import com.f.thoth.ui.utils.converters.StringToString;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.crud.BinderCrudEditor;
@@ -38,10 +39,11 @@ import com.vaadin.flow.router.Route;
 @Secured(com.f.thoth.backend.data.Role.ADMIN)
 public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
 {
-   private static final Converter<String, Integer> CATEGORY_CONVERTER = 
+   private static final Converter<LocalDate, LocalDate> DATE_CONVERTER   = new LocalDateToLocalDate();
+   private static final Converter<String, String>       STRING_CONVERTER = new StringToString("");
+   private static final Converter<String, Integer>    CATEGORY_CONVERTER = 
 		                 new StringToIntegerConverter( BakeryConst.DEFAULT_CATEGORY, "Número inválido");
    
-   private static final Converter<LocalDate, LocalDate> DATE_CONVERTER = new LocalDateToLocalDate();
    
    @Autowired
    public UserGroupView(UserGroupService service, CurrentUser currentUser)
@@ -57,7 +59,7 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
       grid.addColumn(group -> group.getCategory() == null? "0" : group.getCategory().toString()).setHeader("Categoría").setFlexGrow(8);
       grid.addColumn(UserGroup::getFromDate).setHeader("Fecha Desde").setFlexGrow(10);
       grid.addColumn(UserGroup::getToDate).setHeader("Fecha Hasta").setFlexGrow(10);
-      grid.addColumn(group -> group.getParentGroup()== null? "-NINGUNO-" : group.getParentGroup().getFirstName()).setHeader("Grupo padre").setFlexGrow(15);
+      grid.addColumn(group -> group.getParentGroup()== null? "---" : group.getParentGroup().getFirstName()).setHeader("Grupo padre").setFlexGrow(15);
 
    // protected Set<Role>       userGroups;
    // protected Set<UserGroup>  groups;
@@ -71,7 +73,7 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
    {
       TextField name = new TextField("Nombre");
       name.setRequired(true);
-      name.setValue("--NOMBRE DEL GRUPO--");
+      name.setValue("--nombre--");
       name.setRequiredIndicatorVisible(true);
       name.getElement().setAttribute("colspan", "6");
 
@@ -116,6 +118,7 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
       BeanValidationBinder<UserGroup> binder = new BeanValidationBinder<>(UserGroup.class);
  
       binder.forField(name)
+                .withConverter(STRING_CONVERTER)
                 .withValidator(text -> TextUtil.isAlphaNumeric(text), "El nombre debe ser alfanumérico")
                 .bind("firstName");
       
