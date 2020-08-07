@@ -11,8 +11,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import com.f.thoth.backend.data.entity.User;
-import com.f.thoth.backend.data.security.UserGroup;
+import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.data.security.UserGroup;
 import com.f.thoth.backend.repositories.UserGroupRepository;
 
 @Service
@@ -80,8 +81,9 @@ public class UserGroupService implements FilterableCrudService<UserGroup>
       try 
       {
          UserGroup newUserGroup =  FilterableCrudService.super.save(currentUser, entity);
-         if (newUserGroup != null)
-             ThothSession.updateSession();
+         Tenant tenant = ThothSession.getCurrentTenant();
+         if (tenant != null)
+        	 tenant.addUserGroup(newUserGroup);
          
          return newUserGroup;
       } catch (DataIntegrityViolationException e) 

@@ -1,7 +1,6 @@
 package com.f.thoth.backend.data.security;
 
 import java.time.LocalDate;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -126,24 +125,16 @@ public abstract class Usuario extends BaseEntity
 		if (this == o)
 			return true;
 
-		if (o == null || ! (o instanceof Usuario))
+		if (!(o instanceof Usuario )) 
 			return false;
 
 		Usuario that = (Usuario) o;
-
-		return  isLocked() == that.isLocked()            &&
-				Objects.equals(code,      that.code)     &&
-				Objects.equals(tenant,    that.tenant)   &&
-				Objects.equals(category,  that.category) &&
-				Objects.equals(firstName, that.firstName);
+        return this.id != null && this.id.equals(that.id);
 
 	}// equals
 
 	@Override
-	public int hashCode()
-	{
-		return Objects.hash(super.hashCode(), tenant, code, category, firstName, isLocked());
-	}
+	public int hashCode() {	return 7; }
 
 	@Override
 	public String toString() { return " Usuario{" + super.toString()+ " tenant["+ tenant.getName()+ "] category["+ category+ "] locked["+ isLocked()+ "]"+ "] name[" + firstName+ "]}" ; }

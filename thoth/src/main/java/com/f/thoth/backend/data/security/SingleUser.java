@@ -1,6 +1,5 @@
 package com.f.thoth.backend.data.security;
 
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -160,19 +159,16 @@ public class SingleUser extends Usuario implements Comparable<SingleUser>
 		if (this == o)
 			return true;
 
-		if (o == null || getClass() != o.getClass())
-			return false;
-
-		if (!super.equals(o))
+		if (!(o instanceof SingleUser )) 
 			return false;
 
 		SingleUser that = (SingleUser) o;
-		return Objects.equals(email, that.email) && Objects.equals(lastName, that.lastName);
+        return this.id != null && this.id.equals(that.id);
 
 	}// equals
 
 	@Override
-	public int hashCode() { return Objects.hash(super.hashCode(), email, lastName);}
+	public int hashCode() { return 257;}
 
 	@Override
 	public String toString() { return "SingleUser{" + super.toString() + " lastName[" + lastName + "] email[" + email + "]}";}

@@ -161,6 +161,7 @@ public class DataGenerator implements HasLogger {
 		role.setTenant(tenant);
 		role.setName(name);
 		roleRepository.saveAndFlush(role);
+		tenant.addRole(role);
 		
 		return role;
 	}//createRole

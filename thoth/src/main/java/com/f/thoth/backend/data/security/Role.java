@@ -1,6 +1,5 @@
 package com.f.thoth.backend.data.security;
 
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -94,21 +93,19 @@ public class Role extends BaseEntity implements Comparable<Role>
    @Override
    public boolean equals(Object o)
    {
-      if (this == o)
-         return true;
+		if (this == o)
+			return true;
 
-      if ( !(o instanceof Role))
-         return false;
+		if (!(o instanceof Role )) 
+			return false;
 
-      Role that = (Role) o;
-
-      return Objects.equals(this.tenant, that.tenant) &&
-             Objects.equals(this.name,   that.name);
+		Role that = (Role) o;
+        return this.id != null && this.id.equals(that.id);
 
    }// equals
 
    @Override
-   public int hashCode() { return Objects.hash(this.tenant, this.name); }
+   public int hashCode() { return 8191; }
 
    @Override
    public String toString() { return "Role{"+ super.toString()+ " name["+ name+ "] permissions["+ permissions.size()+ "]}";}

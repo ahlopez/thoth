@@ -66,11 +66,11 @@ public abstract class AbstractBakeryCrudView<E extends AbstractEntity> extends C
         setupCrudEventListeners(entityPresenter);
     }//AbstractBakeryCrudView
 
-    private void setupCrudEventListeners(CrudEntityPresenter<E> entityPresenter) 
+    protected void setupCrudEventListeners(CrudEntityPresenter<E> entityPresenter) 
     {
         Consumer<E> onSuccess = entity -> navigateToEntity(null);
         Consumer<E> onFail = entity -> {
-            throw new RuntimeException("La operacion no pudo ser ejecutada.");
+            throw new RuntimeException("La operación no pudo ser ejecutada.");
         };
 
         addEditListener(e ->

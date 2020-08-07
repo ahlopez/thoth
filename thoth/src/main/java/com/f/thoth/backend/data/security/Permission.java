@@ -1,7 +1,6 @@
 package com.f.thoth.backend.data.security;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 import javax.persistence.Entity;
 import javax.persistence.Index;
@@ -102,23 +101,19 @@ public class Permission extends BaseEntity implements Comparable<Permission>
    @Override
    public boolean equals(Object o)
    {
-      if (this == o)
-         return true;
+		if (this == o)
+			return true;
 
-      if (o == null || getClass() != o.getClass())
-         return false;
+		if (!(o instanceof Permission )) 
+			return false;
 
-      Permission that = (Permission) o;
-
-      return this.role.equals(that.role) &&
-           this.objectToProtect.equals(that.objectToProtect) &&
-           this.fromDate.equals(that.fromDate) &&
-           this.toDate.equals(that.toDate);
+		Permission that = (Permission) o;
+       return this.id != null && this.id.equals(that.id);
 
    }// equals
 
    @Override
-   public int hashCode() { return Objects.hash(role.hashCode(), objectToProtect.hashCode(), fromDate, toDate); }
+   public int hashCode() { return 2047; }
 
    @Override
    public String toString() { return "Permission{ role["+ role.getName()+ "] object["+ objectToProtect.toString()+ "] from["+  fromDate+ "] to["+ toDate+ "] grantedBy["+ grantedBy.getEmail()+ "]}";}

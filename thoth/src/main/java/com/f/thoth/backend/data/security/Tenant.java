@@ -1,6 +1,7 @@
 package com.f.thoth.backend.data.security;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -18,6 +19,7 @@ import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.Valid;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -54,11 +56,13 @@ import com.f.thoth.backend.data.gdoc.metadata.DocType;
 					@NamedAttributeNode("administrator"),
 					@NamedAttributeNode("fromDate"),
 					@NamedAttributeNode("toDate"),
-					@NamedAttributeNode("locked"),
+					@NamedAttributeNode("locked")
+					/*
 					@NamedAttributeNode("roles"),
 					@NamedAttributeNode("singleUsers"),
 					@NamedAttributeNode("userGroups"),
 					@NamedAttributeNode("docTypes")
+					*/
 			}) })
 @Entity
 @Table(name = "TENANT", indexes = { @Index(columnList = "name") })
@@ -87,11 +91,13 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 
 	protected boolean locked = false;
 
+	/*
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
 	@OrderColumn
 	@JoinColumn
 	@BatchSize(size = 50)
 	@Valid
+	
 	private Set<Role>     roles;
 
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
@@ -114,6 +120,17 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 	@BatchSize(size = 50)
 	@Valid
 	private Set<DocType>  docTypes;
+	*/
+	
+	@Transient
+	private Set<Role>        roles;
+	@Transient
+	private Set<SingleUser>  singleUsers;
+	@Transient
+	private Set<UserGroup>   userGroups;
+	@Transient
+	private Set<DocType>     docTypes;
+
 
 	// ------------- Constructors ----------------------
 
@@ -220,17 +237,16 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 		if (this == o)
 			return true;
 
-		if (o == null || getClass() != o.getClass())
+		if (!(o instanceof Tenant )) 
 			return false;
 
 		Tenant that = (Tenant) o;
-
-		return this.name.equals(that.name);
+        return this.id != null && this.id.equals(that.id);
 
 	}// equals
 
 	@Override
-	public int hashCode() { return name.hashCode(); }
+	public int hashCode() { return 1023; }
 
 	@Override
 	public String toString()
@@ -251,7 +267,6 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 	public void addRole( Role role) { roles.add(role);}
 	
 	public void addUserGroup( UserGroup group) { userGroups.add(group); }
-
 
 	public SingleUser getSingleUserById( String userCode)
 	{

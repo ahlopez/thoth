@@ -79,6 +79,31 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>
 	   else  
 	        throw new IllegalArgumentException(parentGroup.getFirstName()+ " no puede ser padre de este grupo");   
    }//setParentGroup
+ 
+	// --------------- Object ------------------
+
+	@Override
+	public boolean equals(Object o)
+	{
+		if (this == o)
+			return true;
+
+		if (!(o instanceof UserGroup )) 
+			return false;
+
+		UserGroup that = (UserGroup) o;
+       return this.id != null && this.id.equals(that.id);
+
+	}// equals
+
+	@Override
+	public int hashCode() { return 511;}
+
+	@Override
+	public String toString() 
+	{ 
+		return "UserGroup{" + super.toString() + " parent[" + (parentGroup == null? "-ninguno-": parentGroup.getFirstName()) + "]}";
+	}
 
    @Override
    public int compareTo(UserGroup that)

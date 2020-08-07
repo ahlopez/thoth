@@ -107,14 +107,15 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Com
 		if (this == o)
 			return true;
 
-		if (o == null || getClass() != o.getClass())
+		if (!(o instanceof ObjectToProtect )) 
 			return false;
 
 		ObjectToProtect that = (ObjectToProtect) o;
-		return this.tenant.equals(that.tenant) && this.name.equals(that.name);
+        return this.id != null && this.id.equals(that.id);
+
 	}//equals
 
-	@Override public int hashCode() { return tenant.hashCode()* 1023+ name.hashCode();}
+	@Override public int hashCode() { return 4097;}
 
 	@Override public String toString()
 	{

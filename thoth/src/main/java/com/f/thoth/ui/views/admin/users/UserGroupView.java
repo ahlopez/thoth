@@ -5,6 +5,7 @@ import static com.f.thoth.ui.utils.BakeryConst.PAGE_USER_GROUPS;
 
 import java.time.LocalDate;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -17,6 +18,7 @@ import com.f.thoth.backend.data.security.UserGroup;
 import com.f.thoth.backend.service.UserGroupService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.crud.AbstractBakeryCrudView;
+import com.f.thoth.ui.crud.CrudEntityPresenter;
 import com.f.thoth.ui.utils.BakeryConst;
 import com.f.thoth.ui.utils.converters.LocalDateToLocalDate;
 import com.f.thoth.ui.utils.converters.StringToString;
@@ -43,6 +45,8 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
    private static final Converter<String, String>       STRING_CONVERTER = new StringToString("");
    private static final Converter<String, Integer>    CATEGORY_CONVERTER = 
 		                 new StringToIntegerConverter( BakeryConst.DEFAULT_CATEGORY, "Número inválido");
+   
+   private static ComboBox<UserGroup> parentCombo;
    
    
    @Autowired
@@ -103,6 +107,7 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
       toDate.getElement().setAttribute("colspan", "2");
 
       ComboBox<UserGroup> parentGroup = new ComboBox<>();
+      parentCombo = parentGroup;
       parentGroup.getElement().setAttribute("colspan", "6");
       parentGroup.setLabel("Grupo Padre");
       parentGroup.setDataProvider(getTenantGroups());
@@ -114,7 +119,7 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
       parentGroup.setPageSize(20);
 
       FormLayout form = new FormLayout(name, blocked, category, fromDate, toDate, parentGroup);
-
+   
       BeanValidationBinder<UserGroup> binder = new BeanValidationBinder<>(UserGroup.class);
  
       binder.forField(name)
@@ -144,6 +149,35 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
 
       return new BinderCrudEditor<UserGroup>(binder, form);
    }//BinderCrudEditor
+   
+   protected void setupCrudEventListeners(CrudEntityPresenter<UserGroup> entityPresenter) 
+   {
+       Consumer<UserGroup> onSuccess = entity -> navigateToEntity(null);
+       Consumer<UserGroup> onFail = entity -> {
+           throw new RuntimeException("La operación no pudo ser ejecutada.");
+       };
+
+       addEditListener(e ->
+               entityPresenter.loadEntity(e.getItem().getId(),
+                       entity -> navigateToEntity(entity.getId().toString())));
+
+       addCancelListener(e -> navigateToEntity(null));
+
+       addSaveListener(e -> {
+               entityPresenter.save(e.getItem(), onSuccess, onFail);
+               updateCombo();
+               
+       });
+
+       addDeleteListener(e ->
+               entityPresenter.delete(e.getItem(), onSuccess, onFail));
+   }//setupCrudEventListeners
+   
+   private void updateCombo()
+   {
+	      parentCombo.setDataProvider(getTenantGroups());
+   }
+
    
 
 	private static ListDataProvider<UserGroup> getTenantGroups()
