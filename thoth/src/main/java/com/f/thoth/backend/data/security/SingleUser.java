@@ -32,183 +32,183 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
  * Representa un usuario autenticado del sistema
  */
 @NamedEntityGraphs({
-	@NamedEntityGraph(
-			name = SingleUser.BRIEF,
-			attributeNodes = {
-					@NamedAttributeNode("tenant"),
-					@NamedAttributeNode("firstName"),
-					@NamedAttributeNode("lastName"),
-					@NamedAttributeNode("email"),
-					@NamedAttributeNode("fromDate"),
-					@NamedAttributeNode("toDate"),
-					@NamedAttributeNode("locked")
-			}),
-	@NamedEntityGraph(
-			name = SingleUser.FULL,
-			attributeNodes = {
-					@NamedAttributeNode("tenant"),
-					@NamedAttributeNode("firstName"),
-					@NamedAttributeNode("lastName"),
-					@NamedAttributeNode("email"),
-					@NamedAttributeNode("fromDate"),
-					@NamedAttributeNode("toDate"),
-					@NamedAttributeNode("locked"),
-					@NamedAttributeNode("roles"),
-					@NamedAttributeNode("groups")
-			}) })
+   @NamedEntityGraph(
+         name = SingleUser.BRIEF,
+         attributeNodes = {
+               @NamedAttributeNode("tenant"),
+               @NamedAttributeNode("firstName"),
+               @NamedAttributeNode("lastName"),
+               @NamedAttributeNode("email"),
+               @NamedAttributeNode("fromDate"),
+               @NamedAttributeNode("toDate"),
+               @NamedAttributeNode("locked")
+         }),
+   @NamedEntityGraph(
+         name = SingleUser.FULL,
+         attributeNodes = {
+               @NamedAttributeNode("tenant"),
+               @NamedAttributeNode("firstName"),
+               @NamedAttributeNode("lastName"),
+               @NamedAttributeNode("email"),
+               @NamedAttributeNode("fromDate"),
+               @NamedAttributeNode("toDate"),
+               @NamedAttributeNode("locked"),
+               @NamedAttributeNode("roles"),
+               @NamedAttributeNode("groups")
+         }) })
 @Entity
 @Table(name = "SINGLE_USER", indexes = { @Index(columnList = "email"), @Index(columnList = "lastName,firstName") })
 public class SingleUser extends Usuario implements Comparable<SingleUser>
 {
 
-	public static final String BRIEF = "SingleUser.brief";
-	public static final String FULL  = "SingleUser.full";
+   public static final String BRIEF = "SingleUser.brief";
+   public static final String FULL  = "SingleUser.full";
 
-	@NotNull(message  = "{evidentia.email.required}")
-	@NotEmpty(message = "{evidentia.email.required}")
-	@Email
-	@Size(min=3, max = 255, message="{evidentia.email.length}")
-	@Column(unique = true)
-	private String email;        // user email
+   @NotNull(message  = "{evidentia.email.required}")
+   @NotEmpty(message = "{evidentia.email.required}")
+   @Email
+   @Size(min=3, max = 255, message="{evidentia.email.length}")
+   @Column(unique = true)
+   protected String email;        // user email
 
-	@NotNull
-	@Size(min = 4, max = 255)
-	private String passwordHash; // user password
+   @NotNull
+   @Size(min = 4, max = 255)
+   protected String passwordHash; // user password
 
-	@NotNull (message = "{evidentia.lastname.required}")
-	@NotBlank(message = "{evidentia.lastname.required}")
-	@NotEmpty(message = "{evidentia.lastname.required}")
-	@Size(min= 2, max = 255, message= "{evidentia.lastname.length}")
-	private String lastName;  // User last name
+   @NotNull (message = "{evidentia.lastname.required}")
+   @NotBlank(message = "{evidentia.lastname.required}")
+   @NotEmpty(message = "{evidentia.lastname.required}")
+   @Size(min= 2, max = 255, message= "{evidentia.lastname.length}")
+   protected String lastName;  // User last name
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-	@OrderColumn
-	@JoinColumn
-	@BatchSize(size = 10)
-	@Valid
-	protected Set<UserGroup>  groups; // groups it belongs
-
-
-	// ----------------- Constructor -----------------
-	public SingleUser()
-	{
-		super();
-		email     = "";
-		lastName  = "";
-		groups    = new TreeSet<>();
-		buildCode();
-	}
-
-	public SingleUser( String email, String passwordHash, String lastName)
-	{
-		super();
-
-		if ( !TextUtil.isValidEmail(email))
-			throw new IllegalArgumentException("Email["+ email+ "] inválido");
-
-		if (passwordHash ==  null)
-			throw new IllegalArgumentException("Password inválido");
-
-		if (TextUtil.isEmpty(lastName))
-			throw new IllegalArgumentException("Apellido["+ lastName+ "] inválido");
-
-		this.email        = email;
-		this.passwordHash = passwordHash;
-		this.lastName     = lastName;
-		buildCode();
-
-	}//SingleUser
-
-	@PrePersist
-	@PreUpdate
-	public void prepareData()
-	{
-		super.prepareData();
-		this.email     =  email     != null ? email.trim().toLowerCase(): null ;
-		this.lastName  =  TextUtil.nameTidy(lastName);
-		buildCode();
-
-	}//prepareData
-
-	@Override protected void buildCode(){this.code = (tenant == null? "[Tenant]": tenant.getCode())+ ">"+ (email==null? "[email]": email);}
-
-	// --------------- Getters & Setters -----------------
-	public String getPasswordHash() { return passwordHash;}
-	public void   setPasswordHash(String passwordHash) { this.passwordHash = passwordHash;}
-
-	public String getLastName() { return lastName;}
-	public void   setLastName(String lastName) { this.lastName = lastName;}
-	public String getFullName() { return lastName+ " "+ firstName;}
-
-	public String getEmail() { return email;}
-	public void   setEmail(String email)
-	{
-		this.email = email;
-		buildCode();
-	}// setEmail
-	
-	public Set<UserGroup> getGroups() { return groups;}
-	public void           setGroups( Set<UserGroup> groups) { this.groups = groups;}
+   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+   @OrderColumn
+   @JoinColumn
+   @BatchSize(size = 10)
+   @Valid
+   protected Set<UserGroup>  groups; // groups it belongs
 
 
-	// --------------- Object ------------------
+   // ----------------- Constructor -----------------
+   public SingleUser()
+   {
+      super();
+      email     = "";
+      lastName  = "";
+      groups    = new TreeSet<>();
+      buildCode();
+   }
 
-	@Override
-	public boolean equals(Object o)
-	{
-		if (this == o)
-			return true;
+   public SingleUser( String email, String passwordHash, String lastName)
+   {
+      super();
 
-		if (!(o instanceof SingleUser )) 
-			return false;
+      if ( !TextUtil.isValidEmail(email))
+         throw new IllegalArgumentException("Email["+ email+ "] inválido");
 
-		SingleUser that = (SingleUser) o;
+      if (passwordHash ==  null)
+         throw new IllegalArgumentException("Password inválido");
+
+      if (TextUtil.isEmpty(lastName))
+         throw new IllegalArgumentException("Apellido["+ lastName+ "] inválido");
+
+      this.email        = email;
+      this.passwordHash = passwordHash;
+      this.lastName     = lastName;
+      buildCode();
+
+   }//SingleUser
+
+   @PrePersist
+   @PreUpdate
+   public void prepareData()
+   {
+      super.prepareData();
+      this.email     =  email     != null ? email.trim().toLowerCase(): null ;
+      this.lastName  =  TextUtil.nameTidy(lastName);
+      buildCode();
+
+   }//prepareData
+
+   @Override protected void buildCode(){this.code = (tenant == null? "[Tenant]": tenant.getCode())+ ">"+ (email==null? "[email]": email);}
+
+   // --------------- Getters & Setters -----------------
+   public String getPasswordHash() { return passwordHash;}
+   public void   setPasswordHash(String passwordHash) { this.passwordHash = passwordHash;}
+
+   public String getLastName() { return lastName;}
+   public void   setLastName(String lastName) { this.lastName = lastName;}
+   public String getFullName() { return lastName+ " "+ firstName;}
+
+   public String getEmail() { return email;}
+   public void   setEmail(String email)
+   {
+      this.email = email;
+      buildCode();
+   }// setEmail
+
+   public Set<UserGroup> getGroups() { return groups;}
+   public void           setGroups( Set<UserGroup> groups) { this.groups = groups;}
+
+
+   // --------------- Object ------------------
+
+   @Override
+   public boolean equals(Object o)
+   {
+      if (this == o)
+         return true;
+
+      if (!(o instanceof SingleUser ))
+         return false;
+
+      SingleUser that = (SingleUser) o;
         return this.id != null && this.id.equals(that.id);
 
-	}// equals
+   }// equals
 
-	@Override
-	public int hashCode() { return 257;}
+   @Override
+   public int hashCode() { return 257;}
 
-	@Override
-	public String toString() { return "SingleUser{" + super.toString() + " lastName[" + lastName + "] email[" + email + "]}";}
+   @Override
+   public String toString() { return "SingleUser{" + super.toString() + " lastName[" + lastName + "] email[" + email + "]}";}
 
-	@Override
-	public int compareTo(SingleUser that)
-	{
-		return this.equals(that)? 0 :
-			that == null ?     1 :
-				(this.lastName + ":" + this.firstName).compareTo(that.lastName + ":" + that.firstName);
+   @Override
+   public int compareTo(SingleUser that)
+   {
+      return this.equals(that)? 0 :
+         that == null ?     1 :
+            (this.lastName + ":" + this.firstName).compareTo(that.lastName + ":" + that.firstName);
 
-	}// compareTo
+   }// compareTo
 
 
-	// --------------- Logic ---------------------
-	
-	public void addToGroup( UserGroup group) { groups.add( group); }
+   // --------------- Logic ---------------------
 
-	@Override public boolean canAccess( NeedsProtection object)
-	{
-		if ( object.isOwnedBy( this))
-			return true;
+   public void addToGroup( UserGroup group) { groups.add( group); }
 
-		if ( ! object.canBeAccessedBy( this.category))
-			return false;
+   @Override public boolean canAccess( NeedsProtection object)
+   {
+      if ( object.isOwnedBy( this))
+         return true;
 
-		for ( Role r : roles)
-		{
-			if ( r.canAccess( object))
-				return true;
-		}
+      if ( ! object.canBeAccessedBy( this.category))
+         return false;
 
-		for (UserGroup ug: groups)
-		{
-			if (ug.canAccess(object))
-				return true;
-		}
+      for ( Role r : roles)
+      {
+         if ( r.canAccess( object))
+            return true;
+      }
 
-		return false;
+      for (UserGroup ug: groups)
+      {
+         if (ug.canAccess(object))
+            return true;
+      }
 
-	}//canAccess
+      return false;
+
+   }//canAccess
 
 }//SingleUser

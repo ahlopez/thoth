@@ -31,122 +31,122 @@ import com.f.thoth.ui.utils.BakeryConst;
 @MappedSuperclass
 public abstract class Usuario extends BaseEntity
 {
-	private static final long DEFAULT_TO_DATE = 90L;
+   private static final long DEFAULT_TO_DATE = 90L;
 
-	@NotNull     (message= "{evidentia.category.required}")
-	@Min(value=0, message= "{evidentia.category.minvalue}")
-	@Max(value=5, message= "{evidentia.category.maxvalue}")
-	protected Integer       category; // security category
+   @NotNull     (message= "{evidentia.category.required}")
+   @Min(value=0, message= "{evidentia.category.minvalue}")
+   @Max(value=5, message= "{evidentia.category.maxvalue}")
+   protected Integer       category;   // security category
 
-	@NotNull(message = "{evidentia.date.required}")
-	@PastOrPresent(message="{evidentia.date.pastorpresent}")
-	protected LocalDate     fromDate; // initial date it can be used. default = now
+   @NotNull(message = "{evidentia.date.required}")
+   @PastOrPresent(message="{evidentia.date.pastorpresent}")
+   protected LocalDate     fromDate;   // initial date it can be used. default = now
 
-	@NotNull(message = "{evidentia.date.required}")
-	protected LocalDate     toDate;   // final date it can be used. default = a year from now
+   @NotNull(message = "{evidentia.date.required}")
+   protected LocalDate     toDate;     // final date it can be used. default = a year from now
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-	@OrderColumn
-	@JoinColumn
-	@BatchSize(size = 10)
-	@Valid
-	protected Set<Role>       roles; // roles assigned to it
+   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+   @OrderColumn
+   @JoinColumn
+   @BatchSize(size = 10)
+   @Valid
+   protected Set<Role>       roles;    // roles assigned to it
 
-	@NotNull(message  = "{evidentia.name.required}")
-	@NotEmpty(message = "{evidentia.name.required}")
-	@NotBlank(message = "{evidentia.name.required}")
-	@Size(min = 1, max = 255, message="{evidentia.name.min.max.length}")
-	protected String firstName;
+   @NotNull(message  = "{evidentia.name.required}")
+   @NotEmpty(message = "{evidentia.name.required}")
+   @NotBlank(message = "{evidentia.name.required}")
+   @Size(min = 1, max = 255, message="{evidentia.name.min.max.length}")
+   protected String firstName;         // user first name
 
-	protected boolean locked = false;
+   protected boolean locked;           // is the user locked?
 
-	// ----------------- Constructor -----------------
-	public Usuario()
-	{
-		super();
-		LocalDate now = LocalDate.now();
-		LocalDate yearStart =now.minusDays(now.getDayOfYear());
-		
-		firstName = "";
-		category  = BakeryConst.DEFAULT_CATEGORY;
-		locked    = false;
-		fromDate  = yearStart;
-		toDate    = yearStart.plusYears(1);
-		roles     = new TreeSet<>();
-	}//Usuario
+   // ----------------- Constructor -----------------
+   public Usuario()
+   {
+      super();
+      LocalDate now = LocalDate.now();
+      LocalDate yearStart =now.minusDays(now.getDayOfYear());
 
-	public void prepareData()
-	{
-		this.fromDate  =  fromDate  != null ? fromDate : LocalDate.MIN;
-		this.toDate    =  toDate    != null ? toDate   : LocalDate.now().plusDays(DEFAULT_TO_DATE);
-		this.category  =  category  != null ? category : 0;
-		this.firstName =  TextUtil.nameTidy( firstName);
-		this.locked    =  isLocked();
+      firstName = "";
+      category  = BakeryConst.DEFAULT_CATEGORY;
+      locked    = false;
+      fromDate  = yearStart;
+      toDate    = yearStart.plusYears(1);
+      roles     = new TreeSet<>();
+   }//Usuario
 
-	}//prepareData
+   public void prepareData()
+   {
+      this.fromDate  =  fromDate  != null ? fromDate : LocalDate.MIN;
+      this.toDate    =  toDate    != null ? toDate   : LocalDate.now().plusDays(DEFAULT_TO_DATE);
+      this.category  =  category  != null ? category : 0;
+      this.firstName =  TextUtil.nameTidy( firstName);
+      this.locked    =  isLocked();
+
+   }//prepareData
 
 
-	// --------------- Getters & Setters -----------------
+   // --------------- Getters & Setters -----------------
 
-	public Integer    getCategory() { return category;}
-	public void       setCategory(Integer category) { this.category = (category == null? 0: category);}
+   public Integer    getCategory() { return category;}
+   public void       setCategory(Integer category) { this.category = (category == null? 0: category);}
 
-	public String     getFirstName() { return firstName;}
-	public void       setFirstName(String firstName) { this.firstName = firstName;}
+   public String     getFirstName() { return firstName;}
+   public void       setFirstName(String firstName) { this.firstName = firstName;}
 
-	public LocalDate  getFromDate() {	return fromDate;}
-	public void       setFromDate(LocalDate fromDate) { this.fromDate = fromDate;}
+   public LocalDate  getFromDate() {   return fromDate;}
+   public void       setFromDate(LocalDate fromDate) { this.fromDate = fromDate;}
 
-	public LocalDate  getToDate() { return toDate; }
-	public void       setToDate(LocalDate toDate) { this.toDate = toDate; }
+   public LocalDate  getToDate() { return toDate; }
+   public void       setToDate(LocalDate toDate) { this.toDate = toDate; }
 
-	public Set<Role> getRoles() { return roles;}
-	public void       setRoles(Set<Role> roles) { this.roles = roles;}
+   public Set<Role> getRoles() { return roles;}
+   public void       setRoles(Set<Role> roles) { this.roles = roles;}
 
-	public boolean    isLocked()
-	{
-		if (locked)
-			return true;
+   public boolean    isLocked()
+   {
+      if (locked)
+         return true;
 
-		if (fromDate != null && toDate != null)
-		{
-			LocalDate now = LocalDate.now();
-			return now.compareTo(fromDate) < 0 || now.compareTo(toDate) > 0;
-		}
-		return false;
-	}
-	public void       setLocked(boolean locked) { this.locked = locked;}
+      if (fromDate != null && toDate != null)
+      {
+         LocalDate now = LocalDate.now();
+         return now.compareTo(fromDate) < 0 || now.compareTo(toDate) > 0;
+      }
+      return false;
+   }
+   public void       setLocked(boolean locked) { this.locked = locked;}
 
-	// --------------- Object ------------------
+   // --------------- Object ------------------
 
-	@Override
-	public boolean equals(Object o)
-	{
-		if (this == o)
-			return true;
+   @Override
+   public boolean equals(Object o)
+   {
+      if (this == o)
+         return true;
 
-		if (!(o instanceof Usuario )) 
-			return false;
+      if (!(o instanceof Usuario ))
+         return false;
 
-		Usuario that = (Usuario) o;
+      Usuario that = (Usuario) o;
         return this.id != null && this.id.equals(that.id);
 
-	}// equals
+   }// equals
 
-	@Override
-	public int hashCode() {	return 7; }
+   @Override
+   public int hashCode() { return 7; }
 
-	@Override
-	public String toString() { return " Usuario{" + super.toString()+ " tenant["+ tenant.getName()+ "] category["+ category+ "] locked["+ isLocked()+ "]"+ "] name[" + firstName+ "]}" ; }
+   @Override
+   public String toString() { return " Usuario{" + super.toString()+ " tenant["+ tenant.getName()+ "] category["+ category+ "] locked["+ isLocked()+ "]"+ "] name[" + firstName+ "]}" ; }
 
-	// --------------- function ----------------
+   // --------------- function ----------------
 
-	public void addToRole( Role role)
-	{
-		if ( role != null)
-			roles.add(role);
-	}//addToRole
+   public void addToRole( Role role)
+   {
+      if ( role != null)
+         roles.add(role);
+   }//addToRole
 
-	public abstract boolean canAccess( NeedsProtection object);
+   public abstract boolean canAccess( NeedsProtection object);
 
 }//Usuario

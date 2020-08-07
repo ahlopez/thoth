@@ -6,6 +6,7 @@ import static com.f.thoth.ui.utils.BakeryConst.TITLE_LOGOUT;
 import static com.f.thoth.ui.utils.BakeryConst.TITLE_OBJECT_TO_PROTECT;
 import static com.f.thoth.ui.utils.BakeryConst.TITLE_PRODUCTS;
 import static com.f.thoth.ui.utils.BakeryConst.TITLE_ROLES;
+import static com.f.thoth.ui.utils.BakeryConst.TITLE_SINGLE_USERS;
 import static com.f.thoth.ui.utils.BakeryConst.TITLE_STOREFRONT;
 import static com.f.thoth.ui.utils.BakeryConst.TITLE_TENANTS;
 import static com.f.thoth.ui.utils.BakeryConst.TITLE_USERS;
@@ -22,6 +23,7 @@ import com.f.thoth.ui.views.admin.objects.ObjectToProtectView;
 import com.f.thoth.ui.views.admin.products.ProductsView;
 import com.f.thoth.ui.views.admin.roles.RoleView;
 import com.f.thoth.ui.views.admin.tenants.TenantsView;
+import com.f.thoth.ui.views.admin.users.SingleUserView;
 import com.f.thoth.ui.views.admin.users.UserGroupView;
 import com.f.thoth.ui.views.admin.users.UsersView;
 import com.f.thoth.ui.views.dashboard.DashboardView;
@@ -127,6 +129,9 @@ public class MainView extends AppLayout
        }
       if (SecurityUtils.isAccessGranted(UserGroupView.class)) {
           tabs.add(createTab(VaadinIcon.USERS, TITLE_USER_GROUPS, UserGroupView.class));
+       }
+      if (SecurityUtils.isAccessGranted(SingleUserView.class)) {
+          tabs.add(createTab(VaadinIcon.USER, TITLE_SINGLE_USERS, UserGroupView.class));
        }
       final String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
       final Tab logoutTab = createTab(createLogoutLink(contextPath));
