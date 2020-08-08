@@ -101,14 +101,16 @@ public class MainView extends AppLayout
       }
    }
 
-   private static Tabs createMenuTabs() {
+   private static Tabs createMenuTabs() 
+   {
       final Tabs tabs = new Tabs();
       tabs.setOrientation(Tabs.Orientation.HORIZONTAL);
       tabs.add(getAvailableTabs());
       return tabs;
-   }
+   }//createMenuTabs
 
-   private static Tab[] getAvailableTabs() {
+   private static Tab[] getAvailableTabs() 
+   {
       final List<Tab> tabs = new ArrayList<>(6);
       tabs.add(createTab(VaadinIcon.EDIT, TITLE_STOREFRONT, StorefrontView.class));
       tabs.add(createTab(VaadinIcon.CLOCK,TITLE_DASHBOARD, DashboardView.class));
@@ -131,37 +133,44 @@ public class MainView extends AppLayout
           tabs.add(createTab(VaadinIcon.USERS, TITLE_USER_GROUPS, UserGroupView.class));
        }
       if (SecurityUtils.isAccessGranted(SingleUserView.class)) {
-          tabs.add(createTab(VaadinIcon.USER, TITLE_SINGLE_USERS, UserGroupView.class));
+          tabs.add(createTab(VaadinIcon.USER, TITLE_SINGLE_USERS, SingleUserView.class));
        }
       final String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
       final Tab logoutTab = createTab(createLogoutLink(contextPath));
       tabs.add(logoutTab);
       return tabs.toArray(new Tab[tabs.size()]);
-   }
+      
+   }//getAvailableTabs
 
-   private static Tab createTab(VaadinIcon icon, String title, Class<? extends Component> viewClass) {
+   private static Tab createTab(VaadinIcon icon, String title, Class<? extends Component> viewClass) 
+   {
       return createTab(populateLink(new RouterLink(null, viewClass), icon, title));
-   }
+   }//createTab
 
-   private static Tab createTab(Component content) {
+   private static Tab createTab(Component content) 
+   {
       final Tab tab = new Tab();
       tab.addThemeVariants(TabVariant.LUMO_ICON_ON_TOP);
       tab.add(content);
       return tab;
-   }
+   }//createTab
 
-   private static Anchor createLogoutLink(String contextPath) {
+   private static Anchor createLogoutLink(String contextPath) 
+   {
       final Anchor a = populateLink(new Anchor(), VaadinIcon.ARROW_RIGHT, TITLE_LOGOUT);
       a.setHref(contextPath + "/logout");
       return a;
-   }
+   }//createLogoutLink
 
-   private static <T extends HasComponents> T populateLink(T a, VaadinIcon icon, String title) {
+   private static <T extends HasComponents> T populateLink(T a, VaadinIcon icon, String title) 
+   {
       a.add(icon.create());
       if (title.equals(TITLE_ADMINISTRATION) )
-        a.add(TITLE_USERS);
+         a.add(TITLE_USERS);
       else
           a.add(title);
+      
       return a;
-   }
-}
+   }//populateLink
+   
+}//MainView
