@@ -1,6 +1,5 @@
 package com.f.thoth.ui.views.admin.users;
 
-import static com.f.thoth.ui.dataproviders.DataProviderUtil.createItemLabelGenerator;
 import static com.f.thoth.ui.utils.BakeryConst.PAGE_USER_GROUPS;
 
 import java.time.LocalDate;
@@ -15,6 +14,7 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.UserGroup;
+import com.f.thoth.backend.repositories.UserGroupRepository;
 import com.f.thoth.backend.service.UserGroupService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.crud.AbstractBakeryCrudView;
@@ -22,6 +22,7 @@ import com.f.thoth.ui.crud.CrudEntityPresenter;
 import com.f.thoth.ui.utils.BakeryConst;
 import com.f.thoth.ui.utils.converters.LocalDateToLocalDate;
 import com.f.thoth.ui.utils.converters.StringToString;
+import com.f.thoth.ui.views.admin.selector.TreeGridSelector;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.crud.BinderCrudEditor;
@@ -48,6 +49,8 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
 
    private static ComboBox<UserGroup> parentCombo;
 
+   @Autowired private static UserGroupService service;
+
 
    @Autowired
    public UserGroupView(UserGroupService service, CurrentUser currentUser)
@@ -58,12 +61,12 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
    @Override
    protected void setupGrid(Grid<UserGroup> grid)
    {
-      grid.addColumn(group -> group.getFirstName().toLowerCase()).setHeader("Grupo").setFlexGrow(15);
+      grid.addColumn(group -> group.getName().toLowerCase()).setHeader("Grupo").setFlexGrow(15);
       grid.addColumn(group -> group.isLocked() ? "SI" : "--").setHeader("Bloqueado?").setFlexGrow(8);
       grid.addColumn(group -> group.getCategory() == null? "0" : group.getCategory().toString()).setHeader("Categoría").setFlexGrow(8);
       grid.addColumn(UserGroup::getFromDate).setHeader("Fecha Desde").setFlexGrow(6);
       grid.addColumn(UserGroup::getToDate).setHeader("Fecha Hasta").setFlexGrow(6);
-      grid.addColumn(group -> group.getParentGroup()== null? "---" : group.getParentGroup().getFirstName()).setHeader("Grupo padre").setFlexGrow(15);
+      grid.addColumn(group -> group.getParentGroup()== null? "---" : group.getParentGroup().getName()).setHeader("Grupo padre").setFlexGrow(15);
 
    }//setupGrid
 
@@ -103,17 +106,22 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
       toDate.setRequiredIndicatorVisible(true);
       toDate.getElement().setAttribute("colspan", "2");
 
+      /*
       ComboBox<UserGroup> parentGroup = new ComboBox<>();
       parentCombo = parentGroup;
       parentGroup.getElement().setAttribute("colspan", "6");
       parentGroup.setLabel("Grupo Padre");
       parentGroup.setDataProvider(getTenantGroups());
-      parentGroup.setItemLabelGenerator(createItemLabelGenerator(UserGroup::getFirstName));
+      parentGroup.setItemLabelGenerator(createItemLabelGenerator(UserGroup::getName));
       parentGroup.setAllowCustomValue(false);
       parentGroup.setRequired(false);
       parentGroup.setRequiredIndicatorVisible(false);
       parentGroup.setClearButtonVisible(true);
       parentGroup.setPageSize(20);
+      */
+      Tenant tenant = ThothSession.getCurrentTenant();
+      UserGroupRepository repository = (UserGroupRepository)service.getRepository();
+      TreeGridSelector<UserGroup> parentGroup = new TreeGridSelector<>(tenant, repository);
 
       FormLayout form = new FormLayout(name, blocked, category, fromDate, toDate, parentGroup);
 
@@ -122,7 +130,7 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
       binder.forField(name)
                 .withConverter(STRING_CONVERTER)
                 .withValidator(text -> TextUtil.isAlphaNumeric(text), "El nombre debe ser alfanumérico")
-                .bind("firstName");
+                .bind("name");
 
       binder.bind(blocked, "locked");
       binder.forField(category)

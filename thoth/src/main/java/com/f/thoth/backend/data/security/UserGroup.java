@@ -10,6 +10,8 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
+import com.f.thoth.backend.data.entity.HierarchicalEntity;
+
 /**
  * Representa un Grupo de Usuarios
  */
@@ -18,7 +20,7 @@ import javax.persistence.Table;
          name = UserGroup.BRIEF,
          attributeNodes = {
                @NamedAttributeNode("tenant"),
-               @NamedAttributeNode("firstName"),
+               @NamedAttributeNode("name"),
                @NamedAttributeNode("fromDate"),
                @NamedAttributeNode("toDate")
          }),
@@ -26,26 +28,26 @@ import javax.persistence.Table;
          name = UserGroup.FULL,
          attributeNodes = {
                @NamedAttributeNode("tenant"),
-               @NamedAttributeNode("firstName"),
+               @NamedAttributeNode("name"),
                @NamedAttributeNode("fromDate"),
                @NamedAttributeNode("toDate"),
                @NamedAttributeNode("roles")
          }) })
 @Entity
 @Table(name = "USER_GROUP", indexes = { @Index(columnList = "code")})
-public class UserGroup extends Usuario implements Comparable<UserGroup>
+public class UserGroup extends Usuario implements Comparable<UserGroup>, HierarchicalEntity
 {
    public static final String BRIEF = "UserGroup.brief";
    public static final String FULL  = "UserGroup.full";
 
    @ManyToOne
-   protected UserGroup   parentGroup;
+   protected UserGroup   parent;
 
    // ----------------- Constructor -----------------
    public UserGroup()
    {
       super();
-      parentGroup = null;
+      parent = null;
       buildCode();
    }
 
@@ -60,50 +62,57 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>
    @Override protected void buildCode()
    {
       this.code = (tenant == null?    "[Tenant]": tenant.getCode())+ ">"+
-                  (firstName == null? "[firstName]": firstName);
+                  (name == null? "[name]": name);
    }//buildCode
 
    // --------------- Getters & Setters -----------------
    @Override
-   public void   setFirstName(String firstName)
+   public void   setName(String name)
    {
-      this.firstName = firstName;
+      this.name = name;
       buildCode();
    }//setFirstName
 
-   public UserGroup       getParentGroup() { return parentGroup; }
-   public void            setParentGroup(UserGroup parentGroup) 
-   { 
-	   if ( parentGroup == null || parentGroup.canBeParentOf( this))
-	        this.parentGroup = parentGroup; 
-	   else  
-	        throw new IllegalArgumentException(parentGroup.getFirstName()+ " no puede ser padre de este grupo");   
+   public UserGroup       getParentGroup() { return parent; }
+   public void            setParentGroup(UserGroup parent)
+   {
+      if ( parent == null || parent.canBeParentOf( this))
+           this.parent = parent;
+      else
+           throw new IllegalArgumentException(parent.getName()+ " no puede ser padre de este grupo");
    }//setParentGroup
- 
-	// --------------- Object ------------------
 
-	@Override
-	public boolean equals(Object o)
-	{
-		if (this == o)
-			return true;
+    // Implements HierarchicalEntity
+    @Override public Long    getId()     { return super.getId();}
+    @Override public String  getCode()   { return super.getCode();}
+    @Override public String  getName()   { return name;}
+    @Override public Long    getParent() { return parent == null? null: parent.getId();}
 
-		if (!(o instanceof UserGroup )) 
-			return false;
 
-		UserGroup that = (UserGroup) o;
+   // --------------- Object ------------------
+
+   @Override
+   public boolean equals(Object o)
+   {
+      if (this == o)
+         return true;
+
+      if (!(o instanceof UserGroup ))
+         return false;
+
+      UserGroup that = (UserGroup) o;
        return this.id != null && this.id.equals(that.id);
 
-	}// equals
+   }// equals
 
-	@Override
-	public int hashCode() { return 511;}
+   @Override
+   public int hashCode() { return 511;}
 
-	@Override
-	public String toString() 
-	{ 
-		return "UserGroup{" + super.toString() + " parent[" + (parentGroup == null? "-ninguno-": parentGroup.getFirstName()) + "]}";
-	}
+   @Override
+   public String toString()
+   {
+      return "UserGroup{" + super.toString() + " parent[" + (parent == null? "-ninguno-": parent.getName()) + "]}";
+   }
 
    @Override
    public int compareTo(UserGroup that)
@@ -121,7 +130,7 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>
       if (this.equals(child))
          return false;
 
-      return  parentGroup == null || parentGroup.canBeParentOf(child);
+      return  parent == null || parent.canBeParentOf(child);
 
    }//canBeParentOf
 
@@ -137,7 +146,7 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>
             return true;
       }
 
-      return parentGroup == null? false : parentGroup.canAccess( object);
+      return parent == null? false : parent.canAccess( object);
 
    }//canAccess
 

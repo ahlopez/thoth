@@ -13,7 +13,7 @@ import org.springframework.data.jpa.repository.Query;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.UserGroup;
 
-public interface UserGroupRepository extends JpaRepository<UserGroup, Long>
+public interface UserGroupRepository extends JpaRepository<UserGroup, Long>, HierarchicalRepository<UserGroup>
 {
    @EntityGraph(value = UserGroup.BRIEF, type = EntityGraphType.LOAD)
    @Query("SELECT g FROM UserGroup g where g.tenant=?1")
@@ -30,10 +30,7 @@ public interface UserGroupRepository extends JpaRepository<UserGroup, Long>
    long countAll(Tenant tenant);
 
    @EntityGraph(value = UserGroup.BRIEF, type = EntityGraphType.LOAD)
-   @Query("SELECT g FROM UserGroup g where g.tenant=?1 and g.firstName like ?2")
-   Page<UserGroup> findByFirstNameLikeIgnoreCase(Tenant tenant, String name, Pageable page);
-
-   @Query("SELECT count(g) FROM UserGroup g where g.tenant=?1 and g.firstName like ?2")
-   long countByFirstNameLikeIgnoreCase(Tenant tenant, String name);
+   @Query("SELECT g FROM UserGroup g where g.tenant=?1 and g.name like ?2")
+   Page<UserGroup> findByNameLikeIgnoreCase(Tenant tenant, String name, Pageable page);
 
 }//UserGroupRepository

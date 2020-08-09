@@ -30,10 +30,10 @@ public interface SingleUserRepository extends JpaRepository<SingleUser, Long>
    long countAll(Tenant tenant);
 
    @EntityGraph(value = SingleUser.BRIEF, type = EntityGraphType.LOAD)
-   @Query("SELECT u FROM SingleUser u where u.tenant=?1 and u.firstName like ?2")
-   Page<SingleUser> findByFirstNameLikeIgnoreCase(Tenant tenant, String name, Pageable page);
+   @Query("SELECT u FROM SingleUser u where u.tenant=?1 and u.name like ?2")
+   Page<SingleUser> findByNameLikeIgnoreCase(Tenant tenant, String name, Pageable page);
 
-   @Query("SELECT count(u) FROM SingleUser u where u.tenant=?1 and u.firstName like ?2")
-   long countByFirstNameLikeIgnoreCase(Tenant tenant, String name);
+   @Query("SELECT count(u) FROM SingleUser u where u.tenant=?1 and u.name like ?2")
+   long countByNameLikeIgnoreCase(Tenant tenant, String name);
 
 }//SingleUserRepository

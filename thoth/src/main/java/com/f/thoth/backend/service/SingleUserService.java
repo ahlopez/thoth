@@ -37,7 +37,7 @@ public class SingleUserService implements FilterableCrudService<SingleUser>
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return SingleUserRepository.findByFirstNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter, pageable);
+         return SingleUserRepository.findByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter, pageable);
       } else {
          return find(pageable);
       }
@@ -48,7 +48,7 @@ public class SingleUserService implements FilterableCrudService<SingleUser>
    {
       if (filter.isPresent()) {
          String repositoryFilter = "%" + filter.get() + "%";
-         return SingleUserRepository.countByFirstNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter);
+         return SingleUserRepository.countByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter);
       } else {
          long n = SingleUserRepository.countAll(ThothSession.getCurrentTenant());
          return n;

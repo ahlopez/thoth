@@ -36,7 +36,7 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
          name = SingleUser.BRIEF,
          attributeNodes = {
                @NamedAttributeNode("tenant"),
-               @NamedAttributeNode("firstName"),
+               @NamedAttributeNode("name"),
                @NamedAttributeNode("lastName"),
                @NamedAttributeNode("email"),
                @NamedAttributeNode("fromDate"),
@@ -47,7 +47,7 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
          name = SingleUser.FULL,
          attributeNodes = {
                @NamedAttributeNode("tenant"),
-               @NamedAttributeNode("firstName"),
+               @NamedAttributeNode("name"),
                @NamedAttributeNode("lastName"),
                @NamedAttributeNode("email"),
                @NamedAttributeNode("fromDate"),
@@ -57,7 +57,7 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
                @NamedAttributeNode("groups")
          }) })
 @Entity
-@Table(name = "SINGLE_USER", indexes = { @Index(columnList = "email"), @Index(columnList = "lastName,firstName") })
+@Table(name = "SINGLE_USER", indexes = { @Index(columnList = "email"), @Index(columnList = "lastName, name") })
 public class SingleUser extends Usuario implements Comparable<SingleUser>
 {
 
@@ -138,7 +138,7 @@ public class SingleUser extends Usuario implements Comparable<SingleUser>
 
    public String getLastName() { return lastName;}
    public void   setLastName(String lastName) { this.lastName = lastName;}
-   public String getFullName() { return lastName+ " "+ firstName;}
+   public String getFullName() { return lastName+ " "+ name;}
 
    public String getEmail() { return email;}
    public void   setEmail(String email)
@@ -178,7 +178,7 @@ public class SingleUser extends Usuario implements Comparable<SingleUser>
    {
       return this.equals(that)? 0 :
          that == null ?     1 :
-            (this.lastName + ":" + this.firstName).compareTo(that.lastName + ":" + that.firstName);
+            (this.lastName + ":" + this.name).compareTo(that.lastName + ":" + that.name);
 
    }// compareTo
 

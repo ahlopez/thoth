@@ -38,7 +38,7 @@ public class UserGroupService implements FilterableCrudService<UserGroup>
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return userGroupRepository.findByFirstNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter, pageable);
+         return userGroupRepository.findByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter, pageable);
       } else {
          return find(pageable);
       }
@@ -49,7 +49,7 @@ public class UserGroupService implements FilterableCrudService<UserGroup>
    {
       if (filter.isPresent()) {
          String repositoryFilter = "%" + filter.get() + "%";
-         return userGroupRepository.countByFirstNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter);
+         return userGroupRepository.countByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter);
       } else {
          long n = userGroupRepository.countAll(ThothSession.getCurrentTenant());
          return n;
@@ -78,19 +78,30 @@ public class UserGroupService implements FilterableCrudService<UserGroup>
    @Override
    public UserGroup save(User currentUser, UserGroup entity)
    {
-      try 
+      try
       {
          UserGroup newUserGroup =  FilterableCrudService.super.save(currentUser, entity);
          Tenant tenant = ThothSession.getCurrentTenant();
          if (tenant != null)
-        	 tenant.addUserGroup(newUserGroup);
-         
+          tenant.addUserGroup(newUserGroup);
+
          return newUserGroup;
-      } catch (DataIntegrityViolationException e) 
+      } catch (DataIntegrityViolationException e)
       {
          throw new UserFriendlyDataException("Ya hay un grupo con esa llave. Por favor escoja una llave única para el grupo");
       }
 
    }//save
+
+    List<UserGroup> findByParent( Long parentId) { return userGroupRepository.findByParent(parentId);}
+
+     int countByParent( Long parentId) { return userGroupRepository.countByParent( parentId); }
+
+     boolean existsByParent(Long parentId) { return countByParent( parentId) > 0; }
+
+     List<UserGroup> findByNameLikeIgnoreCase(Tenant tenant, String name) { return userGroupRepository.findByNameLikeIgnoreCase(tenant, name);}
+
+     long countByNameLikeIgnoreCase(Tenant tenant, String name) { return userGroupRepository.countByNameLikeIgnoreCase(tenant, name); }
+
 
 }//UserGroupService

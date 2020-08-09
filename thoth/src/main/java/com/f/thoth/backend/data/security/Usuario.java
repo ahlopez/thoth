@@ -56,7 +56,7 @@ public abstract class Usuario extends BaseEntity
    @NotEmpty(message = "{evidentia.name.required}")
    @NotBlank(message = "{evidentia.name.required}")
    @Size(min = 1, max = 255, message="{evidentia.name.min.max.length}")
-   protected String firstName;         // user first name
+   protected String name;         // user first name
 
    protected boolean locked;           // is the user locked?
 
@@ -67,7 +67,7 @@ public abstract class Usuario extends BaseEntity
       LocalDate now = LocalDate.now();
       LocalDate yearStart =now.minusDays(now.getDayOfYear());
 
-      firstName = "";
+      name = "";
       category  = BakeryConst.DEFAULT_CATEGORY;
       locked    = false;
       fromDate  = yearStart;
@@ -80,7 +80,7 @@ public abstract class Usuario extends BaseEntity
       this.fromDate  =  fromDate  != null ? fromDate : LocalDate.MIN;
       this.toDate    =  toDate    != null ? toDate   : LocalDate.now().plusDays(DEFAULT_TO_DATE);
       this.category  =  category  != null ? category : 0;
-      this.firstName =  TextUtil.nameTidy( firstName);
+      this.name      =  TextUtil.nameTidy( name);
       this.locked    =  isLocked();
 
    }//prepareData
@@ -91,8 +91,8 @@ public abstract class Usuario extends BaseEntity
    public Integer    getCategory() { return category;}
    public void       setCategory(Integer category) { this.category = (category == null? 0: category);}
 
-   public String     getFirstName() { return firstName;}
-   public void       setFirstName(String firstName) { this.firstName = firstName;}
+   public String     getName() { return name;}
+   public void       setName(String name) { this.name = name;}
 
    public LocalDate  getFromDate() {   return fromDate;}
    public void       setFromDate(LocalDate fromDate) { this.fromDate = fromDate;}
@@ -137,7 +137,7 @@ public abstract class Usuario extends BaseEntity
    public int hashCode() { return 7; }
 
    @Override
-   public String toString() { return " Usuario{" + super.toString()+ " tenant["+ tenant.getName()+ "] category["+ category+ "] locked["+ isLocked()+ "]"+ "] name[" + firstName+ "]}" ; }
+   public String toString() { return " Usuario{" + super.toString()+ " tenant["+ tenant.getName()+ "] category["+ category+ "] locked["+ isLocked()+ "]"+ "] name[" + name+ "]}" ; }
 
    // --------------- function ----------------
 

@@ -61,7 +61,7 @@ public class SingleUserView extends AbstractBakeryCrudView<SingleUser>
    {
       /*
       protected Tenant          tenant;         // Tenant the user belongs to
-      protected String          firstName;      // User first name
+      protected String          name;           // User first name
       protected String          lastName;       // User last name
       protected String          email;          // user email
       protected boolean         locked;         // Is the user blocked?
@@ -73,15 +73,15 @@ public class SingleUserView extends AbstractBakeryCrudView<SingleUser>
       protected Set<UserGroup>  groups;         // groups it belongs
        */
 
-      grid.addColumn(user -> user.getFirstName().toLowerCase()).setHeader("Nombre").setFlexGrow(13);
+      grid.addColumn(user -> user.getName().toLowerCase()).setHeader("Nombre").setFlexGrow(13);
       grid.addColumn(user -> user.getLastName().toLowerCase()).setHeader("Apellido").setFlexGrow(13);
       grid.addColumn(user -> user.getEmail().toLowerCase()).setHeader("Correo").setFlexGrow(15);
       grid.addColumn(user -> user.isLocked() ? "SI" : "--").setHeader("Bloqueado?").setFlexGrow(8);
       grid.addColumn(user -> user.getCategory() == null? "0" : user.getCategory().toString()).setHeader("Categoría").setFlexGrow(8);
       grid.addColumn(SingleUser::getFromDate).setHeader("Fecha Desde").setFlexGrow(6);
       grid.addColumn(SingleUser::getToDate).setHeader("Fecha Hasta").setFlexGrow(6);
-      //grid.addColumn(user -> user.getParentUser()== null? "---" : user.getParentUser().getFirstName()).setHeader("Grupo padre").setFlexGrow(30);
-      //grid.addColumn(user -> user.getParentUser()== null? "---" : user.getParentUser().getFirstName()).setHeader("Grupo padre").setFlexGrow(30);
+      //grid.addColumn(user -> user.getParentUser()== null? "---" : user.getParentUser().getName()).setHeader("Grupo padre").setFlexGrow(30);
+      //grid.addColumn(user -> user.getParentUser()== null? "---" : user.getParentUser().getName()).setHeader("Grupo padre").setFlexGrow(30);
 
    }//setupGrid
 
@@ -90,11 +90,11 @@ public class SingleUserView extends AbstractBakeryCrudView<SingleUser>
 
    private static BinderCrudEditor<SingleUser> createForm()
    {
-      TextField firstName = new TextField("Nombre");
-      firstName.setRequired(true);
-      firstName.setValue("--nombre--");
-      firstName.setRequiredIndicatorVisible(true);
-      firstName.getElement().setAttribute("colspan", "3");
+      TextField name = new TextField("Nombre");
+      name.setRequired(true);
+      name.setValue("--nombre--");
+      name.setRequiredIndicatorVisible(true);
+      name.getElement().setAttribute("colspan", "3");
 
       TextField lastName = new TextField("Apellido");
       lastName.setRequired(true);
@@ -151,14 +151,14 @@ public class SingleUserView extends AbstractBakeryCrudView<SingleUser>
       parentGroup.setPageSize(20);
        */
 
-      FormLayout form = new FormLayout(firstName, lastName, password, email,  blocked, category, fromDate, toDate);
+      FormLayout form = new FormLayout(name, lastName, password, email,  blocked, category, fromDate, toDate);
 
       BeanValidationBinder<SingleUser> binder = new BeanValidationBinder<>(SingleUser.class);
 
-      binder.forField(firstName)
+      binder.forField(name)
             .withConverter(STRING_CONVERTER)
             .withValidator(text -> TextUtil.isAlphaNumeric(text), "El nombre debe ser alfanumérico")
-            .bind("firstName");
+            .bind("name");
 
       binder.forField(lastName)
             .withConverter(STRING_CONVERTER)
@@ -168,7 +168,7 @@ public class SingleUserView extends AbstractBakeryCrudView<SingleUser>
       binder.forField(password)
             .withConverter(STRING_CONVERTER)
             .bind("passwordHash");
-      
+
       binder.forField(email)
             .withConverter(STRING_CONVERTER)
             .withValidator(new EmailValidator("Ingrese un correo electrónico válido"))
@@ -181,7 +181,7 @@ public class SingleUserView extends AbstractBakeryCrudView<SingleUser>
             .withValidator(cat -> cat >= BakeryConst.MIN_CATEGORY && cat <= BakeryConst.MAX_CATEGORY,
             "La categoría debe estar entre "+ BakeryConst.MIN_CATEGORY+ " y "+ BakeryConst.MAX_CATEGORY) // Validación del número
             .bind("category");
- 
+
       binder.forField(fromDate)
             .withConverter(DATE_CONVERTER)
             .withValidator( date -> date.compareTo(LocalDate.now()) <= 0, "Fecha desde no puede ser futura")
