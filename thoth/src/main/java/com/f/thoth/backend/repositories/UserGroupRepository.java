@@ -13,14 +13,11 @@ import org.springframework.data.jpa.repository.Query;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.UserGroup;
 
-public interface UserGroupRepository extends JpaRepository<UserGroup, Long>, HierarchicalRepository<UserGroup>
+public interface UserGroupRepository extends JpaRepository<UserGroup, Long>
 {
    @EntityGraph(value = UserGroup.BRIEF, type = EntityGraphType.LOAD)
    @Query("SELECT g FROM UserGroup g where g.tenant=?1")
    Page<UserGroup> findBy(Tenant tenant, Pageable page);
-
-   @EntityGraph(value = UserGroup.FULL, type = EntityGraphType.LOAD)
-   Optional<UserGroup> findById(Long id);
 
    @EntityGraph(value = UserGroup.BRIEF, type = EntityGraphType.LOAD)
    @Query("SELECT g FROM UserGroup g where g.tenant=?1")
@@ -32,5 +29,25 @@ public interface UserGroupRepository extends JpaRepository<UserGroup, Long>, Hie
    @EntityGraph(value = UserGroup.BRIEF, type = EntityGraphType.LOAD)
    @Query("SELECT g FROM UserGroup g where g.tenant=?1 and g.name like ?2")
    Page<UserGroup> findByNameLikeIgnoreCase(Tenant tenant, String name, Pageable page);
+
+   //   ----------- Hierarchical handling ----------------
+   @EntityGraph(value = UserGroup.FULL, type = EntityGraphType.LOAD)
+   Optional<UserGroup> findById(Long id);
+
+   @EntityGraph(value = UserGroup.BRIEF, type = EntityGraphType.LOAD)
+   @Query("SELECT g FROM UserGroup g where g.parent.id=?1")
+   List<UserGroup> findByParent( Long parentId);
+
+   @Query("SELECT count(g) FROM UserGroup g where g.parent.id=?1")
+   int countByParent( Long parentId);
+
+   boolean existsByParent(Long parentId);
+
+   @EntityGraph(value = UserGroup.BRIEF, type = EntityGraphType.LOAD)
+   @Query("SELECT g FROM UserGroup g where g.tenant=?1 and g.name like ?2")
+   List<UserGroup> findByNameLikeIgnoreCase(Tenant tenant, String name);
+
+   @Query("SELECT count(g) FROM UserGroup g where g.tenant=?1 and g.name like ?2")
+   long countByNameLikeIgnoreCase(Tenant tenant, String name);
 
 }//UserGroupRepository

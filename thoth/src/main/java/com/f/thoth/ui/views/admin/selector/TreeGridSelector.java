@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 
 import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.security.Tenant;
-import com.f.thoth.backend.repositories.HierarchicalRepository;
+import com.f.thoth.backend.service.HierarchicalService;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -22,27 +22,27 @@ import com.vaadin.flow.shared.Registration;
 public class TreeGridSelector<E extends HierarchicalEntity> extends  VerticalLayout 
                                 implements HasValue
 {
-   private HierarchicalRepository<E> repository;
+   private HierarchicalService<E> service;
    private Collection<E> result;
    final Grid<E> searchGrid;
 
-   public TreeGridSelector ( Tenant tenant, HierarchicalRepository<E> repository)
+   public TreeGridSelector ( Tenant tenant, HierarchicalService<E> service)
    {
-      this.repository = repository;
+      this.service = service;
       HierarchicalDataProvider<E, Void> dataProvider = getDataProvider();
 
       final TreeGrid<E> lazyTree = new TreeGrid<>();
-      lazyTree.addHierarchyColumn(E::getName).setFlexGrow(70).setHeader("Name");
+      lazyTree.addHierarchyColumn(E::getName).setFlexGrow(70).setHeader("Nombre");
       lazyTree.addColumn(E::getCode).setFlexGrow(30).setHeader("ID");
       lazyTree.setDataProvider(dataProvider);
 
       searchGrid = new Grid<>();
       searchGrid.addColumn(E::getCode).setHeader("ID").setFlexGrow(30);
-      searchGrid.addColumn(E::getName).setHeader("Name").setFlexGrow(70);
+      searchGrid.addColumn(E::getName).setHeader("Nombre").setFlexGrow(70);
 
       // Display search results independent of their hierarchy-level
 
-      searchGrid.setItems(repository.findByNameLikeIgnoreCase( tenant, "a"));  //TODO:  La búsqueda debe ser abierta
+      searchGrid.setItems(service.findByNameLikeIgnoreCase( tenant, "a"));  //TODO:  La búsqueda debe ser abierta
       searchGrid.asSingleSelect().addValueChangeListener(e ->
                  {
                     lazyTree.deselectAll();
@@ -66,7 +66,7 @@ public class TreeGridSelector<E extends HierarchicalEntity> extends  VerticalLay
       E currentItem = value;
       while (currentItem != null && currentItem.getParent() != null)
       {
-       Optional<E> item = repository.findById(currentItem.getParent());
+       Optional<E> item = service.findById(currentItem.getParent());
        if (item.isPresent())
        {
               currentItem = item.get();
@@ -95,7 +95,7 @@ public class TreeGridSelector<E extends HierarchicalEntity> extends  VerticalLay
                                   .map(E::getId)
                                   .orElse(null);
 
-            return repository.countByParent(parentId);
+            return service.countByParent(parentId);
 
          }//getChildCount
 
@@ -107,7 +107,7 @@ public class TreeGridSelector<E extends HierarchicalEntity> extends  VerticalLay
                                   .map(E::getId)
                                   .orElse(null);
 
-            return repository.existsByParent(parentId);
+            return service.existsByParent(parentId);
 
          }//hasChildren
 
@@ -119,7 +119,7 @@ public class TreeGridSelector<E extends HierarchicalEntity> extends  VerticalLay
                                     .map(E::getId)
                                     .orElse(null);
 
-            return repository.findByParent(parentId).stream();
+            return service.findByParent(parentId).stream();
 
          }//fetchChildrenFromBackEnd
 

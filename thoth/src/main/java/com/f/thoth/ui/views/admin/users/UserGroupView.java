@@ -14,7 +14,6 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.UserGroup;
-import com.f.thoth.backend.repositories.UserGroupRepository;
 import com.f.thoth.backend.service.UserGroupService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.crud.AbstractBakeryCrudView;
@@ -49,13 +48,11 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
 
    private static ComboBox<UserGroup> parentCombo;
 
-   @Autowired private static UserGroupService service;
-
 
    @Autowired
    public UserGroupView(UserGroupService service, CurrentUser currentUser)
    {
-      super(UserGroup.class, service, new Grid<>(), createForm(), currentUser);
+      super(UserGroup.class, service, new Grid<>(), createForm(service), currentUser);
    }
 
    @Override
@@ -73,7 +70,7 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
    @Override
    protected String getBasePage() { return PAGE_USER_GROUPS; }
 
-   private static BinderCrudEditor<UserGroup> createForm()
+   private static BinderCrudEditor<UserGroup> createForm(UserGroupService service)
    {
       TextField name = new TextField("Nombre");
       name.setRequired(true);
@@ -120,8 +117,7 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
       parentGroup.setPageSize(20);
       */
       Tenant tenant = ThothSession.getCurrentTenant();
-      UserGroupRepository repository = (UserGroupRepository)service.getRepository();
-      TreeGridSelector<UserGroup> parentGroup = new TreeGridSelector<>(tenant, repository);
+      TreeGridSelector<UserGroup> parentGroup = new TreeGridSelector<>(tenant, service);
 
       FormLayout form = new FormLayout(name, blocked, category, fromDate, toDate, parentGroup);
 
