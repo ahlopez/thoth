@@ -22,16 +22,18 @@ import com.vaadin.flow.shared.Registration;
 public class TreeGridSelector<E extends HierarchicalEntity> extends  VerticalLayout 
                                 implements HasValue
 {
+   private HierarchicalDataProvider<E, Void> dataProvider;
    private HierarchicalService<E> service;
-   private Collection<E> result;
-   final Grid<E> searchGrid;
+   private Collection<E>          result;
+   private TreeGrid<E>            lazyTree;
+   private Grid<E>                searchGrid;
 
    public TreeGridSelector ( Tenant tenant, HierarchicalService<E> service)
    {
       this.service = service;
-      HierarchicalDataProvider<E, Void> dataProvider = getDataProvider();
+      dataProvider = getDataProvider();
 
-      final TreeGrid<E> lazyTree = new TreeGrid<>();
+      lazyTree = new TreeGrid<>();
       lazyTree.addHierarchyColumn(E::getName).setFlexGrow(70).setHeader("Nombre");
       lazyTree.addColumn(E::getCode).setFlexGrow(30).setHeader("ID");
       lazyTree.setDataProvider(dataProvider);
@@ -58,6 +60,12 @@ public class TreeGridSelector<E extends HierarchicalEntity> extends  VerticalLay
                  } );
 
    }//TreeGridSelector constructor
+   
+   public void refresh( )
+   {
+	   dataProvider = getDataProvider();
+	   lazyTree.setDataProvider(dataProvider);
+   }
 
 
    private void backtrackParents(Consumer<Collection<E>> fn, final E value)

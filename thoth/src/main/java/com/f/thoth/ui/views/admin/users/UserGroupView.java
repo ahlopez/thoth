@@ -3,7 +3,6 @@ package com.f.thoth.ui.views.admin.users;
 import static com.f.thoth.ui.utils.BakeryConst.PAGE_USER_GROUPS;
 
 import java.time.LocalDate;
-import java.util.TreeSet;
 import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,6 @@ import com.f.thoth.ui.utils.converters.LocalDateToLocalDate;
 import com.f.thoth.ui.utils.converters.StringToString;
 import com.f.thoth.ui.views.admin.selector.TreeGridSelector;
 import com.vaadin.flow.component.checkbox.Checkbox;
-import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.crud.BinderCrudEditor;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -32,7 +30,6 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.converter.Converter;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
-import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
@@ -46,7 +43,7 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
    private static final Converter<String, Integer>    CATEGORY_CONVERTER =
                        new StringToIntegerConverter( BakeryConst.DEFAULT_CATEGORY, "Número inválido");
 
-   private static ComboBox<UserGroup> parentCombo;
+  // private static ComboBox<UserGroup> parentCombo;
 
 
    @Autowired
@@ -166,16 +163,16 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
 
    private void updateCombo()
    {
-         parentCombo.setDataProvider(getTenantGroups());
+     //    parentCombo.setDataProvider(getTenantGroups());
    }
 
 
-
+/*
    private static ListDataProvider<UserGroup> getTenantGroups()
    {
       Tenant tenant = ThothSession.getCurrentTenant();
       return new ListDataProvider<UserGroup>( tenant == null? new TreeSet<>() : tenant.getUserGroups());
    }//getTenantRoles
-
+*/
 
 }//UserGroupView
