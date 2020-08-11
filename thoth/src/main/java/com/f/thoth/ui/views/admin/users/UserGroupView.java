@@ -15,12 +15,13 @@ import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.UserGroup;
 import com.f.thoth.backend.service.UserGroupService;
 import com.f.thoth.ui.MainView;
+import com.f.thoth.ui.components.TreeGridSelector;
 import com.f.thoth.ui.crud.AbstractBakeryCrudView;
 import com.f.thoth.ui.crud.CrudEntityPresenter;
 import com.f.thoth.ui.utils.BakeryConst;
 import com.f.thoth.ui.utils.converters.LocalDateToLocalDate;
 import com.f.thoth.ui.utils.converters.StringToString;
-import com.f.thoth.ui.views.admin.selector.TreeGridSelector;
+import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.crud.BinderCrudEditor;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -60,7 +61,7 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
       grid.addColumn(group -> group.getCategory() == null? "0" : group.getCategory().toString()).setHeader("Categoría").setFlexGrow(8);
       grid.addColumn(UserGroup::getFromDate).setHeader("Fecha Desde").setFlexGrow(6);
       grid.addColumn(UserGroup::getToDate).setHeader("Fecha Hasta").setFlexGrow(6);
-      grid.addColumn(group -> group.getParentGroup()== null? "---" : group.getParentGroup().getName()).setHeader("Grupo padre").setFlexGrow(15);
+      grid.addColumn(group -> group.getOwnerGroup()== null? "---" : group.getOwnerGroup().getName()).setHeader("Grupo padre").setFlexGrow(15);
 
    }//setupGrid
 
@@ -114,7 +115,7 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
       parentGroup.setPageSize(20);
       */
       Tenant tenant = ThothSession.getCurrentTenant();
-      TreeGridSelector<UserGroup> parentGroup = new TreeGridSelector<>(tenant, service);
+      TreeGridSelector<UserGroup, HasValue.ValueChangeEvent<UserGroup>> parentGroup = new TreeGridSelector<>(tenant, service);
 
       FormLayout form = new FormLayout(name, blocked, category, fromDate, toDate, parentGroup);
 

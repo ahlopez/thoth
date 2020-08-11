@@ -100,7 +100,7 @@ public abstract class Usuario extends BaseEntity
    public LocalDate  getToDate() { return toDate; }
    public void       setToDate(LocalDate toDate) { this.toDate = toDate; }
 
-   public Set<Role> getRoles() { return roles;}
+   public Set<Role>  getRoles() { return roles;}
    public void       setRoles(Set<Role> roles) { this.roles = roles;}
 
    public boolean    isLocked()

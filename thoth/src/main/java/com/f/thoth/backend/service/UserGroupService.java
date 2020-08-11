@@ -27,11 +27,6 @@ public class UserGroupService implements FilterableCrudService<UserGroup>, Hiera
       this.userGroupRepository = userGroupRepository;
    }
 
-   public List<UserGroup> findAll()
-   {
-      return userGroupRepository.findAll(ThothSession.getCurrentTenant());
-   }//findAll
-
    @Override public Page<UserGroup> findAnyMatching(Optional<String> filter, Pageable pageable)
    {
       if (filter.isPresent())
@@ -95,11 +90,14 @@ public class UserGroupService implements FilterableCrudService<UserGroup>, Hiera
    }//save
 
    //  ----- implements HierarchicalService ------
+   @Override public List<UserGroup> findAll() { return userGroupRepository.findAll(ThothSession.getCurrentTenant()); }
+
    @Override public Optional<UserGroup> findById(Long id)              { return userGroupRepository.findById( id);}
 
-   @Override public List<UserGroup>     findByParent  ( Long parentId) { return userGroupRepository.findByParent  (parentId); }
-   @Override public int                 countByParent ( Long parentId) { return userGroupRepository.countByParent (parentId); }
-   @Override public boolean             existsByParent( Long parentId) { return countByParent(parentId) > 0; }
+   @Override public List<UserGroup>     findByParent  ( UserGroup owner) { return userGroupRepository.findByParent  (owner); }
+   @Override public long                countByParent ( UserGroup owner) { return userGroupRepository.countByParent (owner); }
+             public long                countByParent ( Long ownerId)    { return userGroupRepository.countByParent (ownerId); }
+   @Override public boolean             existsByParent( UserGroup owner) { return countByParent(owner) > 0; }
 
    @Override public List<UserGroup>     findByNameLikeIgnoreCase (Tenant tenant, String name) { return userGroupRepository.findByNameLikeIgnoreCase (tenant, name); }
    @Override public long                countByNameLikeIgnoreCase(Tenant tenant, String name) { return userGroupRepository.countByNameLikeIgnoreCase(tenant, name); }

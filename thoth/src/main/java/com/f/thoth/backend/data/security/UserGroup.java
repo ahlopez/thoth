@@ -31,23 +31,24 @@ import com.f.thoth.backend.data.entity.HierarchicalEntity;
                @NamedAttributeNode("name"),
                @NamedAttributeNode("fromDate"),
                @NamedAttributeNode("toDate"),
+               @NamedAttributeNode("owner"),
                @NamedAttributeNode("roles")
          }) })
 @Entity
 @Table(name = "USER_GROUP", indexes = { @Index(columnList = "code")})
-public class UserGroup extends Usuario implements Comparable<UserGroup>, HierarchicalEntity
+public class UserGroup extends Usuario implements Comparable<UserGroup>, HierarchicalEntity<UserGroup>
 {
    public static final String BRIEF = "UserGroup.brief";
    public static final String FULL  = "UserGroup.full";
 
    @ManyToOne
-   protected UserGroup   parent;
+   protected UserGroup   owner;
 
    // ----------------- Constructor -----------------
    public UserGroup()
    {
       super();
-      parent = null;
+      owner = null;
       buildCode();
    }
 
@@ -73,20 +74,20 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>, Hierarc
       buildCode();
    }//setFirstName
 
-   public UserGroup       getParentGroup() { return parent; }
-   public void            setParentGroup(UserGroup parent)
+   public UserGroup       getOwnerGroup() { return owner; }
+   public void            setOwnerGroup(UserGroup owner)
    {
-      if ( parent == null || parent.canBeParentOf( this))
-           this.parent = parent;
+      if ( owner == null || owner.canBeOwnerOf( this))
+           this.owner = owner;
       else
-           throw new IllegalArgumentException(parent.getName()+ " no puede ser padre de este grupo");
-   }//setParentGroup
+           throw new IllegalArgumentException(owner.getName()+ " no puede ser padre de este grupo");
+   }//setOwnerGroup
 
     // Implements HierarchicalEntity
-    @Override public Long    getId()     { return super.getId();}
-    @Override public String  getCode()   { return super.getCode();}
-    @Override public String  getName()   { return name;}
-    @Override public Long    getParent() { return parent == null? null: parent.getId();}
+    @Override public Long        getId()     { return super.getId();}
+    @Override public String      getCode()   { return super.getCode();}
+    @Override public String      getName()   { return name;}
+    @Override public UserGroup   getOwner()  { return owner;}
 
 
    // --------------- Object ------------------
@@ -111,7 +112,7 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>, Hierarc
    @Override
    public String toString()
    {
-      return "UserGroup{" + super.toString() + " parent[" + (parent == null? "-ninguno-": parent.getName()) + "]}";
+      return "UserGroup{" + super.toString() + " parent[" + (owner == null? "-ninguno-": owner.getName()) + "]}";
    }
 
    @Override
@@ -125,14 +126,14 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>, Hierarc
 
    // --------------- Logic ---------------------
 
-   public boolean canBeParentOf( UserGroup child)
+   public boolean canBeOwnerOf( UserGroup child)
    {
       if (this.equals(child))
          return false;
 
-      return  parent == null || parent.canBeParentOf(child);
+      return  owner == null || owner.canBeOwnerOf(child);
 
-   }//canBeParentOf
+   }//canBeOwnerOf
 
 
    @Override public boolean canAccess( NeedsProtection object)
@@ -146,7 +147,7 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>, Hierarc
             return true;
       }
 
-      return parent == null? false : parent.canAccess( object);
+      return owner == null? false : owner.canAccess( object);
 
    }//canAccess
 

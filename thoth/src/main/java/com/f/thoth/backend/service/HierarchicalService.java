@@ -8,12 +8,15 @@ import com.f.thoth.backend.data.security.Tenant;
 
 public interface HierarchicalService<T>
 {
+   List<T> findAll();
+   
    Optional<T> findById(Long id);
 
-   List<T> findByParent ( Long parentId);
-   int     countByParent( Long parentId);
+   List<T> findByParent ( T parent);
+   long    countByParent( T parent);
+   long    countByParent( Long parentId);
 
-   boolean existsByParent(Long parentId);
+   boolean existsByParent(T parent);
 
    List<T> findByNameLikeIgnoreCase (Tenant tenant, String name);
    long    countByNameLikeIgnoreCase(Tenant tenant, String name);

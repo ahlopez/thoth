@@ -35,13 +35,16 @@ public interface UserGroupRepository extends JpaRepository<UserGroup, Long>
    Optional<UserGroup> findById(Long id);
 
    @EntityGraph(value = UserGroup.BRIEF, type = EntityGraphType.LOAD)
-   @Query("SELECT g FROM UserGroup g where g.parent.id=?1")
-   List<UserGroup> findByParent( Long parentId);
+   @Query("SELECT g FROM UserGroup g where g.parent=?1")
+   List<UserGroup> findByParent( UserGroup parent);
+
+   @Query("SELECT count(g) FROM UserGroup g where g.parent=?1")
+   long countByParent( UserGroup parent);
 
    @Query("SELECT count(g) FROM UserGroup g where g.parent.id=?1")
-   int countByParent( Long parentId);
+   long countByParent( Long parentId);
 
-   boolean existsByParent(Long parentId);
+   boolean existsByParent(UserGroup parent);
 
    @EntityGraph(value = UserGroup.BRIEF, type = EntityGraphType.LOAD)
    @Query("SELECT g FROM UserGroup g where g.tenant=?1 and g.name like ?2")

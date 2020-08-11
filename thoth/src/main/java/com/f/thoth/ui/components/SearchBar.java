@@ -18,9 +18,11 @@ import com.vaadin.flow.templatemodel.TemplateModel;
 
 @Tag("search-bar")
 @JsModule("./src/components/search-bar.js")
-public class SearchBar extends PolymerTemplate<SearchBar.Model> {
+public class SearchBar extends PolymerTemplate<SearchBar.Model>
+{
 
-   public interface Model extends TemplateModel {
+   public interface Model extends TemplateModel
+   {
       boolean isCheckboxChecked();
 
       void setCheckboxChecked(boolean checkboxChecked);
@@ -28,7 +30,7 @@ public class SearchBar extends PolymerTemplate<SearchBar.Model> {
       void setCheckboxText(String checkboxText);
 
       void setButtonText(String actionText);
-   }
+   }//TemplateModel
 
    @Id("field")
    private TextField textField;
@@ -39,60 +41,49 @@ public class SearchBar extends PolymerTemplate<SearchBar.Model> {
    @Id("action")
    private Button actionButton;
 
-   public SearchBar() {
+   public SearchBar()
+   {
       textField.setValueChangeMode(ValueChangeMode.EAGER);
-      ComponentUtil.addListener(textField, SearchValueChanged.class,
-            e -> fireEvent(new FilterChanged(this, false)));
-      clearButton.addClickListener(e -> {
-         textField.clear();
-         getModel().setCheckboxChecked(false);
-      });
+      ComponentUtil.addListener(textField, SearchValueChanged.class,  e -> fireEvent(new FilterChanged(this, false)));
+      clearButton.addClickListener(e ->
+                  {
+                     textField.clear();
+                     getModel().setCheckboxChecked(false);
+                  });
 
       getElement().addPropertyChangeListener("checkboxChecked", e -> fireEvent(new FilterChanged(this, false)));
-   }
+   }//SearchBar
 
-   public String getFilter() {
-      return textField.getValue();
-   }
+   public String getFilter() {  return textField.getValue(); }
 
-   public boolean isCheckboxChecked() {
-      return getModel().isCheckboxChecked();
-   }
+   public boolean isCheckboxChecked() { return getModel().isCheckboxChecked(); }
 
-   public void setPlaceHolder(String placeHolder) {
-      textField.setPlaceholder(placeHolder);
-   }
+   public void setPlaceHolder(String placeHolder) { textField.setPlaceholder(placeHolder); }
 
-   public void setActionText(String actionText) {
-      getModel().setButtonText(actionText);
-   }
+   public void setActionText(String actionText) { getModel().setButtonText(actionText); }
 
-   public void setCheckboxText(String checkboxText) {
-      getModel().setCheckboxText(checkboxText);
-   }
+   public void setCheckboxText(String checkboxText) { getModel().setCheckboxText(checkboxText); }
 
-   public void addFilterChangeListener(ComponentEventListener<FilterChanged> listener) {
-      this.addListener(FilterChanged.class, listener);
-   }
+   public void addFilterChangeListener(ComponentEventListener<FilterChanged> listener) { this.addListener(FilterChanged.class, listener); }
 
-   public void addActionClickListener(ComponentEventListener<ClickEvent<Button>> listener) {
-      actionButton.addClickListener(listener);
-   }
+   public void addActionClickListener(ComponentEventListener<ClickEvent<Button>> listener) { actionButton.addClickListener(listener); }
 
-   public Button getActionButton() {
-      return actionButton;
-   }
+   public Button getActionButton() {  return actionButton; }
 
    @DomEvent(value = "value-changed", debounce = @DebounceSettings(timeout = 300, phases = DebouncePhase.TRAILING))
-   public static class SearchValueChanged extends ComponentEvent<TextField> {
-      public SearchValueChanged(TextField source, boolean fromClient) {
+   public static class SearchValueChanged extends ComponentEvent<TextField>
+   {
+      public SearchValueChanged(TextField source, boolean fromClient)
+      {
          super(source, fromClient);
       }
-   }
+   }//SearchValueChanged
 
-   public static class FilterChanged extends ComponentEvent<SearchBar> {
-      public FilterChanged(SearchBar source, boolean fromClient) {
+   public static class FilterChanged extends ComponentEvent<SearchBar>
+   {
+      public FilterChanged(SearchBar source, boolean fromClient)
+      {
          super(source, fromClient);
       }
-   }
-}
+   }//FilterChanged
+}//SearchBar

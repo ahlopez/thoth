@@ -1,10 +1,10 @@
 package com.f.thoth.backend.data.entity;
 
-public interface HierarchicalEntity
+public interface HierarchicalEntity<T>
 {
    public Long    getId();
    public String  getCode();
    public String  getName();
-   public Long    getParent();
+   public T       getOwner();
 
 }//HierarchicalEntity
