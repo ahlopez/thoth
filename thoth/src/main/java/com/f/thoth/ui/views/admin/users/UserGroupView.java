@@ -42,9 +42,9 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
    private static final Converter<LocalDate, LocalDate> DATE_CONVERTER   = new LocalDateToLocalDate();
    private static final Converter<String, String>       STRING_CONVERTER = new StringToString("");
    private static final Converter<String, Integer>    CATEGORY_CONVERTER =
-                       new StringToIntegerConverter( BakeryConst.DEFAULT_CATEGORY, "Número inválido");
+                        new StringToIntegerConverter( BakeryConst.DEFAULT_CATEGORY, "Número inválido");
 
-  // private static ComboBox<UserGroup> parentCombo;
+   private static TreeGridSelector<UserGroup, HasValue.ValueChangeEvent<UserGroup>> parentGroup;
 
 
    @Autowired
@@ -56,12 +56,12 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
    @Override
    protected void setupGrid(Grid<UserGroup> grid)
    {
-      grid.addColumn(group -> group.getName().toLowerCase()).setHeader("Grupo").setFlexGrow(15);
-      grid.addColumn(group -> group.isLocked() ? "SI" : "--").setHeader("Bloqueado?").setFlexGrow(8);
-      grid.addColumn(group -> group.getCategory() == null? "0" : group.getCategory().toString()).setHeader("Categoría").setFlexGrow(8);
-      grid.addColumn(UserGroup::getFromDate).setHeader("Fecha Desde").setFlexGrow(6);
-      grid.addColumn(UserGroup::getToDate).setHeader("Fecha Hasta").setFlexGrow(6);
-      grid.addColumn(group -> group.getOwnerGroup()== null? "---" : group.getOwnerGroup().getName()).setHeader("Grupo padre").setFlexGrow(15);
+      grid.addColumn(group -> group.getName().toLowerCase()).setHeader("Grupo").setFlexGrow(60);
+      grid.addColumn(group -> group.isLocked() ? "SI" : "--").setHeader("Bloqueado?").setFlexGrow(10);
+      grid.addColumn(group -> group.getCategory() == null? "0" : group.getCategory().toString()).setHeader("Categoría").setFlexGrow(30);
+      grid.addColumn(UserGroup::getFromDate).setHeader("Fecha Desde").setFlexGrow(50);
+      grid.addColumn(UserGroup::getToDate).setHeader("Fecha Hasta").setFlexGrow(50);
+      grid.addColumn(group -> group.getOwnerGroup()== null? "---" : group.getOwnerGroup().getName()).setHeader("Grupo padre").setFlexGrow(100);
 
    }//setupGrid
 
@@ -74,7 +74,7 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
       name.setRequired(true);
       name.setValue("--nombre--");
       name.setRequiredIndicatorVisible(true);
-      name.getElement().setAttribute("colspan", "6");
+      name.getElement().setAttribute("colspan", "2");
 
       Checkbox   blocked    = new Checkbox("Bloqueado?");
       blocked.setRequiredIndicatorVisible(true);
@@ -115,7 +115,7 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
       parentGroup.setPageSize(20);
       */
       Tenant tenant = ThothSession.getCurrentTenant();
-      TreeGridSelector<UserGroup, HasValue.ValueChangeEvent<UserGroup>> parentGroup = new TreeGridSelector<>(tenant, service);
+      parentGroup = new TreeGridSelector<>(tenant, service, Grid.SelectionMode.SINGLE, "Grupos Definidos");
 
       FormLayout form = new FormLayout(name, blocked, category, fromDate, toDate, parentGroup);
 
@@ -144,7 +144,8 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
                 .withValidator( date -> date.compareTo(LocalDate.now()) > 0, "Fecha hasta debe ser futura")
                 .bind("toDate");
 
-      binder.bind(parentGroup, "parentGroup");
+      binder.forField(parentGroup)
+                .bind("owner");
 
       return new BinderCrudEditor<UserGroup>(binder, form);
    }//BinderCrudEditor
@@ -158,14 +159,9 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
 
        addEditListener(e ->  entityPresenter.loadEntity(e.getItem().getId(), entity -> navigateToEntity(entity.getId().toString())));
        addCancelListener(e -> navigateToEntity(null));
-       addSaveListener(e -> {  entityPresenter.save(e.getItem(), onSuccess, onFail); updateCombo(); });
+       addSaveListener(e -> { entityPresenter.save(e.getItem(), onSuccess, onFail); parentGroup.refresh(); });
        addDeleteListener(e -> entityPresenter.delete(e.getItem(), onSuccess, onFail));
    }//setupCrudEventListeners
-
-   private void updateCombo()
-   {
-     //    parentCombo.setDataProvider(getTenantGroups());
-   }
 
 
 /*

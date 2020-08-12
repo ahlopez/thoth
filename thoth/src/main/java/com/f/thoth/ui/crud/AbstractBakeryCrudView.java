@@ -18,7 +18,7 @@ import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.OptionalParameter;
 
 public abstract class AbstractBakeryCrudView<E extends AbstractEntity> extends Crud<E>
-        implements HasUrlParameter<Long>, HasNotifications 
+        implements HasUrlParameter<Long>, HasNotifications
 {
 
     private static final String DISCARD_MESSAGE = "Hay modificaciones sin guardar a %s. Descartar los cambios?";
@@ -33,7 +33,7 @@ public abstract class AbstractBakeryCrudView<E extends AbstractEntity> extends C
     protected abstract void setupGrid(Grid<E> grid);
 
     public AbstractBakeryCrudView(Class<E> beanType, FilterableCrudService<E> service,
-                                  Grid<E> grid, CrudEditor<E> editor, CurrentUser currentUser) 
+                                  Grid<E> grid, CrudEditor<E> editor, CurrentUser currentUser)
     {
         super(beanType, grid, editor);
         this.grid = grid;
@@ -66,33 +66,28 @@ public abstract class AbstractBakeryCrudView<E extends AbstractEntity> extends C
         setupCrudEventListeners(entityPresenter);
     }//AbstractBakeryCrudView
 
-    protected void setupCrudEventListeners(CrudEntityPresenter<E> entityPresenter) 
+    protected void setupCrudEventListeners(CrudEntityPresenter<E> entityPresenter)
     {
         Consumer<E> onSuccess = entity -> navigateToEntity(null);
-        Consumer<E> onFail = entity -> {
-            throw new RuntimeException("La operación no pudo ser ejecutada.");
-        };
+        Consumer<E> onFail    = entity -> { throw new RuntimeException("La operación no pudo ser ejecutada."); };
 
         addEditListener(e ->
-                entityPresenter.loadEntity(e.getItem().getId(),
-                        entity -> navigateToEntity(entity.getId().toString())));
+                entityPresenter.loadEntity(e.getItem().getId(),  entity -> navigateToEntity(entity.getId().toString())));
 
         addCancelListener(e -> navigateToEntity(null));
 
-        addSaveListener(e ->
-                entityPresenter.save(e.getItem(), onSuccess, onFail));
+        addSaveListener(e ->  entityPresenter.save(e.getItem(), onSuccess, onFail));
 
-        addDeleteListener(e ->
-                entityPresenter.delete(e.getItem(), onSuccess, onFail));
+        addDeleteListener(e ->  entityPresenter.delete(e.getItem(), onSuccess, onFail));
     }//setupCrudEventListeners
 
-    protected void navigateToEntity(String id) 
+    protected void navigateToEntity(String id)
     {
         getUI().ifPresent(ui -> ui.navigate(TemplateUtil.generateLocation(getBasePage(), id)));
     }//navigateToEntity
 
     @Override
-    public void setParameter(BeforeEvent event, @OptionalParameter Long id) 
+    public void setParameter(BeforeEvent event, @OptionalParameter Long id)
     {
         if (id != null) {
             E item = getEditor().getItem();

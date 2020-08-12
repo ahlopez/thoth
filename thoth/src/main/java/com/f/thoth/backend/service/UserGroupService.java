@@ -95,9 +95,8 @@ public class UserGroupService implements FilterableCrudService<UserGroup>, Hiera
    @Override public Optional<UserGroup> findById(Long id)              { return userGroupRepository.findById( id);}
 
    @Override public List<UserGroup>     findByParent  ( UserGroup owner) { return userGroupRepository.findByParent  (owner); }
-   @Override public long                countByParent ( UserGroup owner) { return userGroupRepository.countByParent (owner); }
-             public long                countByParent ( Long ownerId)    { return userGroupRepository.countByParent (ownerId); }
-   @Override public boolean             existsByParent( UserGroup owner) { return countByParent(owner) > 0; }
+   @Override public int                 countByParent ( UserGroup owner) { return userGroupRepository.countByParent (owner); }
+   @Override public boolean             hasChildren   ( UserGroup group) { return userGroupRepository.countByChildren(group) > 0; }
 
    @Override public List<UserGroup>     findByNameLikeIgnoreCase (Tenant tenant, String name) { return userGroupRepository.findByNameLikeIgnoreCase (tenant, name); }
    @Override public long                countByNameLikeIgnoreCase(Tenant tenant, String name) { return userGroupRepository.countByNameLikeIgnoreCase(tenant, name); }

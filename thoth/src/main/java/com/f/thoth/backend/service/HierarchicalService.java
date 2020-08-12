@@ -12,11 +12,9 @@ public interface HierarchicalService<T>
    
    Optional<T> findById(Long id);
 
-   List<T> findByParent ( T parent);
-   long    countByParent( T parent);
-   long    countByParent( Long parentId);
-
-   boolean existsByParent(T parent);
+   List<T> findByParent  ( T parent);
+   int     countByParent ( T parent);
+   boolean hasChildren   ( T node);
 
    List<T> findByNameLikeIgnoreCase (Tenant tenant, String name);
    long    countByNameLikeIgnoreCase(Tenant tenant, String name);
