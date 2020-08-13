@@ -159,11 +159,10 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 	private void init()
 	{
 		LocalDate now = LocalDate.now();
-		LocalDate yearStart =now.minusDays(now.getDayOfYear());
 
 		administrator= "";
-		fromDate     = yearStart;
-		toDate       = yearStart.plusYears(1);
+		fromDate     = now;
+		toDate       = now.plusYears(1);
 		roles        = new TreeSet<>();
 		singleUsers  = new TreeSet<>();
 		userGroups   = new TreeSet<>();

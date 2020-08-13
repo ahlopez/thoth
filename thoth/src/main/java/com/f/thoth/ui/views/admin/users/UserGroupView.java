@@ -26,6 +26,7 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.crud.BinderCrudEditor;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -115,9 +116,15 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
       parentGroup.setPageSize(20);
       */
       Tenant tenant = ThothSession.getCurrentTenant();
-      parentGroup = new TreeGridSelector<>(tenant, service, Grid.SelectionMode.SINGLE, "Grupos Definidos");
+      parentGroup = new TreeGridSelector<>(tenant, service, Grid.SelectionMode.SINGLE, "Grupo padre");
+      parentGroup.getElement().setAttribute("colspan", "4");
 
       FormLayout form = new FormLayout(name, blocked, category, fromDate, toDate, parentGroup);
+      form.setResponsiveSteps(
+            new ResponsiveStep("30em", 1),
+            new ResponsiveStep("30em", 2),
+            new ResponsiveStep("30em", 3),
+            new ResponsiveStep("30em", 4));
 
       BeanValidationBinder<UserGroup> binder = new BeanValidationBinder<>(UserGroup.class);
 

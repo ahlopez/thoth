@@ -148,8 +148,9 @@ public class DataGenerator implements HasLogger {
 		tenant.setName(name);
 		tenant.setLocked(false);
 		tenant.setAdministrator("admin@vaadin.com");
-		tenant.setFromDate(LocalDate.MIN);
-		tenant.setToDate(LocalDate.MAX);
+		LocalDate now = LocalDate.now();
+		tenant.setFromDate( now.minusMonths(random.nextInt(36)));
+		tenant.setToDate(now.plusYears(random.nextInt(10)));
 		tenantRepository.save(tenant);
 
 		return tenant;
@@ -376,7 +377,7 @@ public class DataGenerator implements HasLogger {
 		List<Product> products  = new ArrayList<>();
 		for (int i = 0; i < numberOfItems; i++) {
 			Product product = new Product();
-			product.setName(getRandomProductName());
+			product.setName(getRandomProductName()+i);
 			product.setCode(product.getName());
 			double doublePrice = 2.0 + random.nextDouble() * 100.0;
 			product.setPrice((int) (doublePrice * 100.0));

@@ -37,7 +37,6 @@ implements HasValue<E, T>
       this.result         = new ArrayList<>();
       this.selectionMode  = selectionMode;
       this.service        = service;
-      getElement().setAttribute("colspan", "4");
       add( new Label(name));
       this.treeGrid       = buildTreeGrid  (tenant, service);
 
@@ -49,7 +48,7 @@ implements HasValue<E, T>
       }
       
       HorizontalLayout  layout = new HorizontalLayout();
-      layout.getElement().setAttribute("colspan",  "4");
+      layout.setWidthFull();
       layout.add(treeGrid, searchGrid);
       add( layout);
 
@@ -61,8 +60,8 @@ implements HasValue<E, T>
       dataProvider = getDataProvider();
       TreeGrid<T> tGrid = new TreeGrid<>();
       tGrid.setVisible(true);
-      tGrid.getElement().setAttribute("colspan", "1");
-      tGrid.setWidth("50");
+      //tGrid.setWidth("500");
+      tGrid.setWidthFull();
       tGrid.addHierarchyColumn(T::getCode).setFlexGrow(70).setHeader("Nombre");      
       tGrid.addColumn(T::getName).setFlexGrow(30).setHeader("ID");
       tGrid.setDataProvider(dataProvider);
@@ -75,9 +74,9 @@ implements HasValue<E, T>
    private Grid<T> buildSearchGrid(Tenant tenant, HierarchicalService<T> service, TreeGrid<T> tGrid)
    {
       Grid<T> sGrid = new Grid<>();
-      sGrid.getElement().setAttribute("colspan", "1");
       sGrid.setVisible(selectionMode != Grid.SelectionMode.NONE);
-      sGrid.setWidth("50");
+      //sGrid.setWidth("500");
+      sGrid.setWidthFull();
       sGrid.addColumn(T::getCode).setHeader("ID").setFlexGrow(30);
       sGrid.addColumn(T::getName).setHeader("Nombre").setFlexGrow(70);
       sGrid.setSelectionMode(selectionMode);

@@ -16,7 +16,7 @@ import com.f.thoth.ui.crud.AbstractBakeryCrudView;
 import com.f.thoth.ui.utils.BakeryConst;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.crud.BinderCrudEditor;
-import com.vaadin.flow.component.datetimepicker.DateTimePicker;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.textfield.TextField;
@@ -38,10 +38,10 @@ public class TenantsView extends AbstractBakeryCrudView<Tenant>
    protected void setupGrid(Grid<Tenant> grid) 
    {
       grid.addColumn(Tenant::getName).setHeader("Cliente").setFlexGrow(20);
-      grid.addColumn(Tenant::getAdministrator).setHeader("Administrador").setFlexGrow(20);
-      grid.addColumn(Tenant::getFromDate).setHeader("Fecha Desde").setFlexGrow(10);
-      grid.addColumn(Tenant::getToDate).setHeader("Fecha Hasta").setFlexGrow(10);
-      grid.addColumn(Tenant::isLocked).setHeader("Bloqueado").setFlexGrow(5);
+      grid.addColumn(Tenant::isLocked).setHeader("Bloqueado").setFlexGrow(10);
+      grid.addColumn(Tenant::getAdministrator).setHeader("Administrador").setFlexGrow(30);
+      grid.addColumn(Tenant::getFromDate).setHeader("Fecha Desde").setFlexGrow(15);
+      grid.addColumn(Tenant::getToDate).setHeader("Fecha Hasta").setFlexGrow(15);
 
    }//setupGrid
 
@@ -56,10 +56,9 @@ public class TenantsView extends AbstractBakeryCrudView<Tenant>
       TextField administrator = new TextField("Administrador");
       administrator.getElement().setAttribute("colspan", "4");
       LocalDate now = LocalDate.now();
-      LocalDate yearStart =now.minusDays(now.getDayOfYear());
-      DateTimePicker fromDate = new DateTimePicker("Fecha desde", yearStart.atStartOfDay());
+      DatePicker fromDate = new DatePicker("Fecha desde", now);
       fromDate.getElement().setAttribute("colspan", "2");
-      DateTimePicker toDate   = new DateTimePicker("Fecha hasta",yearStart.plusYears(1).atStartOfDay());
+      DatePicker toDate   = new DatePicker("Fecha hasta", now.plusYears(1));
       toDate.getElement().setAttribute("colspan", "2");
       Checkbox   blocked    = new Checkbox("Bloqueado?");
       blocked.getElement().setAttribute("colspan", "1");

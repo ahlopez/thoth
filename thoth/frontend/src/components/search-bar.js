@@ -85,11 +85,11 @@ class SearchBar extends PolymerElement {
     </style>
 
     <div class="row">
-      <vaadin-text-field id="field" class="field" placeholder="[[fieldPlaceholder]]" value="{{fieldValue}}" on-focus="_onFieldFocus" 
+      <vaadin-text-field id="field" class="field" placeholder="[[fieldPlaceholder]]" value="{{fieldValue}}" on-focus="_onFieldFocus"
         on-blur="_onFieldBlur" theme="white">
         <iron-icon icon\$="[[fieldIcon]]" slot="prefix"></iron-icon>
       </vaadin-text-field>
-      <vaadin-checkbox class="checkbox desktop" checked="{{checkboxChecked}}" on-focus="_onFieldFocus" 
+      <vaadin-checkbox class="checkbox desktop" checked="{{checkboxChecked}}" on-focus="_onFieldFocus"
         on-blur="_onFieldBlur">[[checkboxText]]</vaadin-checkbox>
       <vaadin-button id="clear" class="clear-btn" theme="tertiary">
         [[clearText]]
@@ -100,7 +100,7 @@ class SearchBar extends PolymerElement {
       </vaadin-button>
     </div>
 
-    <vaadin-checkbox class="checkbox mobile" checked="{{checkboxChecked}}" on-focus="_onFieldFocus" 
+    <vaadin-checkbox class="checkbox mobile" checked="{{checkboxChecked}}" on-focus="_onFieldFocus"
       on-blur="_onFieldBlur">[[checkboxText]]</vaadin-checkbox>
 `;
   }
@@ -142,7 +142,7 @@ class SearchBar extends PolymerElement {
       },
       clearText: {
         type: String,
-        value: 'Clear search'
+        value: 'Limpiar'
       },
       showExtraFilters: {
         type: Boolean,
@@ -166,8 +166,7 @@ class SearchBar extends PolymerElement {
 
   ready() {
     super.ready();
-    // In iOS prevent body scrolling to avoid going out of the viewport
-    // when keyboard is opened
+    // In iOS prevent body scrolling to avoid going out of the viewport when keyboard is opened
     this.addEventListener('touchmove', e => e.preventDefault());
   }
 
