@@ -28,6 +28,7 @@ implements HasValue<E, T>
    private HierarchicalDataProvider<T, Void> dataProvider;
    private HierarchicalService<T> service;
    private ArrayList<T>           result;
+   private SearchBar              searchBar;
    private TreeGrid<T>            treeGrid;
    private Grid<T>                searchGrid;
    private Grid.SelectionMode     selectionMode ;
@@ -42,8 +43,8 @@ implements HasValue<E, T>
 
       if ( selectionMode != Grid.SelectionMode.NONE)
       {
-         this.searchGrid     = buildSearchGrid(tenant, service, treeGrid);
-         SearchBar searchBar = buildSearchBar(tenant, searchGrid);
+         this.searchGrid   = buildSearchGrid(tenant, service, treeGrid);
+         this.searchBar    = buildSearchBar(tenant, searchGrid);
          add(searchBar);
       }
       
@@ -60,10 +61,9 @@ implements HasValue<E, T>
       dataProvider = getDataProvider();
       TreeGrid<T> tGrid = new TreeGrid<>();
       tGrid.setVisible(true);
-      //tGrid.setWidth("500");
       tGrid.setWidthFull();
-      tGrid.addHierarchyColumn(T::getCode).setFlexGrow(70).setHeader("Nombre");      
-      tGrid.addColumn(T::getName).setFlexGrow(30).setHeader("ID");
+      tGrid.addColumn(T::getName).setFlexGrow(30).setHeader("Nombre");
+      tGrid.addHierarchyColumn(T::getCode).setFlexGrow(70).setHeader("Id");      
       tGrid.setDataProvider(dataProvider);
       
       return tGrid;
@@ -75,7 +75,6 @@ implements HasValue<E, T>
    {
       Grid<T> sGrid = new Grid<>();
       sGrid.setVisible(selectionMode != Grid.SelectionMode.NONE);
-      //sGrid.setWidth("500");
       sGrid.setWidthFull();
       sGrid.addColumn(T::getCode).setHeader("ID").setFlexGrow(30);
       sGrid.addColumn(T::getName).setHeader("Nombre").setFlexGrow(70);
@@ -92,7 +91,12 @@ implements HasValue<E, T>
       SearchBar searchBar = new SearchBar();
       searchBar.setActionText("Buscar ");
       searchBar.getActionButton().getElement().setAttribute("new-button", false);
-      searchBar.addFilterChangeListener(e -> searchGrid.setItems(service.findByNameLikeIgnoreCase( tenant, searchBar.getFilter())));
+      searchBar.addFilterChangeListener(e -> 
+          {
+             String filter = searchBar.getFilter();
+             Collection<T> filteredItems = service.findByNameLikeIgnoreCase( tenant,filter);
+             searchGrid.setItems(filteredItems);
+          });
       
       return searchBar;  
       
@@ -107,7 +111,9 @@ implements HasValue<E, T>
          registration = sGrid.asSingleSelect().addValueChangeListener(e ->
          {
             tGrid.deselectAll();
-            tGrid.select(e.getValue());
+            T value = e.getValue();
+            setValue(value);
+            tGrid.select(value);
             backtrackParents(tGrid::expand, e.getValue());
          }); 
       }else if (selectionMode == Grid.SelectionMode.MULTI)
@@ -117,6 +123,7 @@ implements HasValue<E, T>
          {
             for (T g: e.getValue())
             {
+               setValue(g);
                tGrid.select(g);
                backtrackParents(tGrid::expand, g);
             }
@@ -189,7 +196,9 @@ implements HasValue<E, T>
 
    public void refresh( )
    {
+      //treeGrid.setDataProvider(treeGrid.getDataProvider());
       dataProvider.refreshAll();
+      searchBar.setPlaceHolder("");
    }
 
 
@@ -214,7 +223,10 @@ implements HasValue<E, T>
    }//addValueChangeListener
 
    //Returns the current value of this object.
-   @Override public T  getValue() { return result.isEmpty()? null: result.get(0) ; }
+   @Override public T  getValue() 
+   { 
+      return result.isEmpty()? null: result.get(0) ; 
+   }
 
    public Collection<T> getValues(){ return result;}
 

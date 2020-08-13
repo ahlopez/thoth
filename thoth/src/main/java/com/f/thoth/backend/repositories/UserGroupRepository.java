@@ -35,20 +35,20 @@ public interface UserGroupRepository extends JpaRepository<UserGroup, Long>
    Optional<UserGroup> findById(Long id);
 
    @EntityGraph(value = UserGroup.BRIEF, type = EntityGraphType.LOAD)
-   @Query("SELECT g FROM UserGroup g where g.owner=?1")
+   @Query("SELECT g FROM UserGroup g where (g.owner is null and ?1 is null) or (g.owner=?1)")
    List<UserGroup> findByParent( UserGroup parent);
 
-   @Query("SELECT count(g) FROM UserGroup g where g.owner=?1")
+   @Query("SELECT count(g) FROM UserGroup g where (g.owner is null and ?1 is null) or (g.owner=?1)")
    int countByParent( UserGroup parent);
 
-   @Query("SELECT count(g) FROM UserGroup g where g.owner=?1")
+   @Query("SELECT count(g) FROM UserGroup g where (g.owner is null and ?1 is null) or (g.owner=?1)")
    int countByChildren(UserGroup group);
 
    @EntityGraph(value = UserGroup.BRIEF, type = EntityGraphType.LOAD)
-   @Query("SELECT g FROM UserGroup g where g.tenant=?1 and g.name like ?2")
+   @Query("SELECT g FROM UserGroup g where g.tenant=?1 and lower(g.name) like lower(concat('%', ?2,'%'))")
    List<UserGroup> findByNameLikeIgnoreCase(Tenant tenant, String name);
 
-   @Query("SELECT count(g) FROM UserGroup g where g.tenant=?1 and g.name like ?2")
+   @Query("SELECT count(g) FROM UserGroup g where g.tenant=?1 and lower(g.name) like lower(concat('%', ?2,'%'))")
    long countByNameLikeIgnoreCase(Tenant tenant, String name);
 
 }//UserGroupRepository

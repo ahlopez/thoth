@@ -166,7 +166,9 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
 
        addEditListener(e ->  entityPresenter.loadEntity(e.getItem().getId(), entity -> navigateToEntity(entity.getId().toString())));
        addCancelListener(e -> navigateToEntity(null));
-       addSaveListener(e -> { entityPresenter.save(e.getItem(), onSuccess, onFail); parentGroup.refresh(); });
+       addSaveListener(e -> { 
+          entityPresenter.save(e.getItem(), onSuccess, onFail); 
+          parentGroup.refresh(); });
        addDeleteListener(e -> entityPresenter.delete(e.getItem(), onSuccess, onFail));
    }//setupCrudEventListeners
 
