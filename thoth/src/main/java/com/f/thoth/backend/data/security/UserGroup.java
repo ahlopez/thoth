@@ -74,8 +74,7 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>, Hierarc
       buildCode();
    }//setFirstName
 
-   public UserGroup       getOwnerGroup() { return owner; }
-   public void            setOwnerGroup(UserGroup owner)
+   public void  setOwner(UserGroup owner)
    {
       if ( owner == null || owner.canBeOwnerOf( this))
            this.owner = owner;

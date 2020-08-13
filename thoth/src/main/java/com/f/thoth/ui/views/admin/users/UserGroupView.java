@@ -62,7 +62,7 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
       grid.addColumn(group -> group.getCategory() == null? "0" : group.getCategory().toString()).setHeader("Categoría").setFlexGrow(30);
       grid.addColumn(UserGroup::getFromDate).setHeader("Fecha Desde").setFlexGrow(50);
       grid.addColumn(UserGroup::getToDate).setHeader("Fecha Hasta").setFlexGrow(50);
-      grid.addColumn(group -> group.getOwnerGroup()== null? "---" : group.getOwnerGroup().getName()).setHeader("Grupo padre").setFlexGrow(100);
+      grid.addColumn(group -> group.getOwner()== null? "---" : group.getOwner().getName()).setHeader("Grupo padre").setFlexGrow(100);
 
    }//setupGrid
 

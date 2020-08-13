@@ -22,7 +22,6 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.BatchSize;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
-import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.ui.utils.BakeryConst;
 
 /**
@@ -80,9 +79,7 @@ public abstract class Usuario extends BaseEntity
       this.fromDate  =  fromDate  != null ? fromDate : LocalDate.MIN;
       this.toDate    =  toDate    != null ? toDate   : LocalDate.now().plusDays(DEFAULT_TO_DATE);
       this.category  =  category  != null ? category : 0;
-      this.name      =  TextUtil.nameTidy( name);
       this.locked    =  isLocked();
-
    }//prepareData
 
 
