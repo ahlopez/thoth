@@ -10,8 +10,6 @@ import org.springframework.security.access.annotation.Secured;
 
 import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.entity.util.TextUtil;
-import com.f.thoth.backend.data.security.Tenant;
-import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.UserGroup;
 import com.f.thoth.backend.service.UserGroupService;
 import com.f.thoth.ui.MainView;
@@ -115,8 +113,7 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
       parentGroup.setClearButtonVisible(true);
       parentGroup.setPageSize(20);
       */
-      Tenant tenant = ThothSession.getCurrentTenant();
-      parentGroup = new TreeGridSelector<>(tenant, service, Grid.SelectionMode.SINGLE, "Grupo padre");
+      parentGroup = new TreeGridSelector<>(service, Grid.SelectionMode.SINGLE, "Grupo padre");
       parentGroup.getElement().setAttribute("colspan", "4");
 
       FormLayout form = new FormLayout(name, blocked, category, fromDate, toDate, parentGroup);
