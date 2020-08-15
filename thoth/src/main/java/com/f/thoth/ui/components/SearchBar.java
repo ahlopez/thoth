@@ -53,6 +53,8 @@ public class SearchBar extends PolymerTemplate<SearchBar.Model>
 
       getElement().addPropertyChangeListener("checkboxChecked", e -> fireEvent(new FilterChanged(this, false)));
    }//SearchBar
+   
+   public void clear() { textField.clear();  getModel().setCheckboxChecked(false); }
 
    public String getFilter() {  return textField.getValue(); }
 

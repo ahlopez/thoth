@@ -9,6 +9,8 @@ import java.util.TreeSet;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+import javax.jcr.Item;
+
 import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.security.Tenant;
@@ -20,6 +22,7 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.treegrid.TreeGrid;
+import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider;
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider;
 import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery;
@@ -85,6 +88,12 @@ implements HasValue<E, T>
       tGrid.addHierarchyColumn(T::getCode).setFlexGrow(70).setHeader("Id");
       this.dataProvider = getDataProvider(service);
       tGrid.setDataProvider(dataProvider);
+      tGrid.asSingleSelect().addValueChangeListener(e->
+      {
+            T node = e.getValue();
+            if ( tGrid.isExpanded(node))
+               tGrid.collapse(node);
+      });
 
       return tGrid;
 
@@ -120,8 +129,8 @@ implements HasValue<E, T>
             Collection<T> filteredItems = service.findByNameLikeIgnoreCase( tenant,filter);
             if ( filteredItems.size() > 0) 
             {
-                searchGrid.setVisible(true);
-                searchGrid.setItems(filteredItems); 
+               searchGrid.setVisible(true);
+               searchGrid.setItems(filteredItems); 
             }
          }
       });
@@ -146,7 +155,7 @@ implements HasValue<E, T>
             {
                setValue(value);
                tGrid.select(value);
-               backtrackParents(tGrid::expand, value);
+               //   backtrackParents(tGrid::expand, value);
             }
          });
          break;
@@ -159,7 +168,7 @@ implements HasValue<E, T>
             {
                setValue(value);
                tGrid.select(value);
-               backtrackParents(tGrid::expand, value);
+               //    backtrackParents(tGrid::expand, value);
             }
          });
          break;
@@ -199,18 +208,21 @@ implements HasValue<E, T>
    {
       final HierarchicalDataProvider<T, Void> dataProvider = new AbstractBackEndHierarchicalDataProvider<T, Void>()
       {
+         
          @Override
          public int getChildCount(final HierarchicalQuery<T, Void> hierarchicalQuery)
          {
             final T owner = hierarchicalQuery.getParent();
-            return  service.countByParent(owner);
+            int count =  service.countByParent(owner);
+            return count;
          }//getChildCount
 
 
          @Override
          public boolean hasChildren(final T node)
          {
-            return service.hasChildren(node);
+            boolean has = service.hasChildren(node);
+            return has;
          }//hasChildren
 
 
@@ -218,7 +230,8 @@ implements HasValue<E, T>
          protected Stream<T> fetchChildrenFromBackEnd(final HierarchicalQuery<T, Void> hierarchicalQuery)
          {
             final T owner = hierarchicalQuery.getParent();
-            return service.findByParent(owner).stream();
+            Collection<T> children = service.findByParent(owner);
+            return children.stream();
 
          }//fetchChildrenFromBackEnd
 
@@ -232,13 +245,12 @@ implements HasValue<E, T>
 
    public void refresh( )
    {
-      //treeGrid.setDataProvider(treeGrid.getDataProvider());
       result.clear();
-      dataProvider.refreshAll();
+      searchBar.clear();
       treeGrid.deselectAll();
+      dataProvider.refreshAll();
       searchGrid.setItems(emptyGrid);
-      searchBar.setPlaceHolder("");
-   }//refreshrefresh
+   }//refresh
 
 
    // ---------- implements HasValue<E,T> --------------------
