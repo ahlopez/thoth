@@ -168,7 +168,7 @@ public class SingleUser extends Usuario implements Comparable<SingleUser>
    }// equals
 
    @Override
-   public int hashCode() { return 257;}
+   public int hashCode() { return id == null? 257: id.hashCode();}
 
    @Override
    public String toString() { return "SingleUser{" + super.toString() + " lastName[" + lastName + "] email[" + email + "]}";}
@@ -176,9 +176,12 @@ public class SingleUser extends Usuario implements Comparable<SingleUser>
    @Override
    public int compareTo(SingleUser that)
    {
-      return this.equals(that)? 0 :
-         that == null ?     1 :
-            (this.lastName + ":" + this.name).compareTo(that.lastName + ":" + that.name);
+      return this.equals(that)?  0 :
+         that ==  null        ?  1 :
+         this.code == null  && that.code == null?  0 :   
+         this.code != null  && that.code == null?  1 :
+         this.code == null  && that.code != null? -1 :   
+         this.code.compareTo(that.code);     
 
    }// compareTo
 

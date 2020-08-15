@@ -115,7 +115,7 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Com
 
 	}//equals
 
-	@Override public int hashCode() { return 4097;}
+	@Override public int hashCode() { return id == null? 7: id.hashCode();}
 
 	@Override public String toString()
 	{
@@ -129,7 +129,16 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Com
 		return s.toString();
 	}//toString
 
-	@Override public int compareTo(ObjectToProtect other){ return other == null? 1 : this.code.compareTo(other.code); }
+	@Override public int compareTo(ObjectToProtect that)
+	{ 
+      return this.equals(that)?  0 :
+         that ==  null    ?  1 :
+         this.code == null  && that.code == null?  0 :   
+         this.code != null  && that.code == null?  1 :
+         this.code == null  && that.code != null? -1 :   
+         this.code.compareTo(that.code);
+      
+	}//compareTo
 
 	// -----------------  Logic ----------------
 	@Override public String  getKey() { return code;}

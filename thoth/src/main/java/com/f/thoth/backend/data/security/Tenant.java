@@ -236,7 +236,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 	}// equals
 
 	@Override
-	public int hashCode() { return 1023; }
+	public int hashCode() { return id == null? 1023: id.hashCode(); }
 
 	@Override
 	public String toString()
@@ -246,7 +246,17 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 	}
 
 	@Override
-	public int compareTo(Tenant that) { return this.equals(that)?  0:  that == null? 1: this.name.compareTo(that.name); }
+	public int compareTo(Tenant that) 
+   {
+      return this.equals(that)?  0 :
+         that ==  null        ?  1 :
+         this.name == null  && that.name == null?  0 :   
+         this.name != null  && that.name == null?  1 :
+         this.name == null  && that.name != null? -1 :   
+         this.name.compareTo(that.name);     
+
+   }// compareTo
+
 
 	// --------------- Logic ---------------------
 

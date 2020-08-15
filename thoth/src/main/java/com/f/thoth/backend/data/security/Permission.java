@@ -113,7 +113,7 @@ public class Permission extends BaseEntity implements Comparable<Permission>
    }// equals
 
    @Override
-   public int hashCode() { return 2047; }
+   public int hashCode() { return id == null? 11: id.hashCode(); }
 
    @Override
    public String toString() { return "Permission{ role["+ role.getName()+ "] object["+ objectToProtect.toString()+ "] from["+  fromDate+ "] to["+ toDate+ "] grantedBy["+ grantedBy.getEmail()+ "]}";}
@@ -121,15 +121,13 @@ public class Permission extends BaseEntity implements Comparable<Permission>
    @Override
    public int compareTo(Permission that)
    {
-     if (that == null)
-        return 1;
-
-     if (this.equals(that))
-        return 0;
-
-     String key1 = this.role.getName()+ ":"+ this.objectToProtect+ this.fromDate+ ":"+ this.toDate;
-     String key2 = this.role.getName()+ ":"+ that.objectToProtect+ that.fromDate+ ":"+ that.toDate;
-     return key1.compareTo(key2);
+      return this.equals(that)?  0 :
+         that ==  null        ?  1 :
+         this.code == null  && that.code == null?  0 :   
+         this.code != null  && that.code == null?  1 :
+         this.code == null  && that.code != null? -1 :   
+         this.code.compareTo(that.code);
+      
 
    }// compareTo
 

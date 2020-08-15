@@ -7,9 +7,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
-
-import javax.jcr.Item;
 
 import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
@@ -22,24 +19,21 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.treegrid.TreeGrid;
-import com.vaadin.flow.data.provider.Query;
-import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider;
-import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider;
-import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery;
+import com.vaadin.flow.data.provider.hierarchy.TreeData;
+import com.vaadin.flow.data.provider.hierarchy.TreeDataProvider;
 import com.vaadin.flow.shared.Registration;
 
-public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValue.ValueChangeEvent<T>>
-extends  VerticalLayout
-implements HasValue<E, T>
-{
-   private enum Mode { NONE, SINGLE, MULTI}
 
-   private HierarchicalDataProvider<T, Void> dataProvider;
-   private final Mode                   mode;
-   private final Tenant                 tenant;         
+public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValue.ValueChangeEvent<T>>
+             extends  VerticalLayout
+             implements HasValue<E, T>
+{
+   private TreeDataProvider<T>          dataProvider;
+   private final Tenant                 tenant;
    private final ArrayList<T>           result;
    private SearchBar                    searchBar;
    private TreeGrid<T>                  treeGrid;
+   private List<T>                      gridNodes;
    private Grid<T>                      searchGrid;
    private final Grid.SelectionMode     selectionMode;
    private final HierarchicalService<T> service;
@@ -48,18 +42,16 @@ implements HasValue<E, T>
 
    public TreeGridSelector ( HierarchicalService<T> service, Grid.SelectionMode selectionMode, String name)
    {
-      this.mode           = selectionMode == Grid.SelectionMode.SINGLE? Mode.SINGLE :
-         selectionMode == Grid.SelectionMode.MULTI?  Mode.MULTI:  
-            Mode.NONE;
       this.tenant         = ThothSession.getCurrentTenant();
       this.result         = new ArrayList<>();
       this.selectionMode  = selectionMode;
       this.service        = service;
-      setup(tenant, name);
+      setup(name);
 
    }//TreeGridSelector constructor
 
-   private void setup(Tenant tenant, String name)
+   
+   private void setup( String name)
    {
       add( new Label(name));
       this.treeGrid = buildTreeGrid();
@@ -67,7 +59,7 @@ implements HasValue<E, T>
       layout.setWidthFull();
       layout.add(treeGrid);
 
-      if ( mode != Mode.NONE)
+      if ( selectionMode != Grid.SelectionMode.NONE)
       {
          this.searchGrid   = buildSearchGrid(treeGrid);
          searchGrid.setVisible(false);
@@ -76,23 +68,21 @@ implements HasValue<E, T>
          layout.add(searchGrid);
       }
       add( layout);
+      refresh();
 
-   }//buildLayout
+   }//setup
 
 
    private TreeGrid<T> buildTreeGrid()
    {
-      TreeGrid<T> tGrid = new TreeGrid<>();
+      TreeGrid<T>tGrid = new TreeGrid<>();
       tGrid.setWidthFull();
-      tGrid.addColumn(T::getName).setFlexGrow(30).setHeader("Nombre");
-      tGrid.addHierarchyColumn(T::getCode).setFlexGrow(70).setHeader("Id");
-      this.dataProvider = getDataProvider(service);
-      tGrid.setDataProvider(dataProvider);
-      tGrid.asSingleSelect().addValueChangeListener(e->
+      tGrid.addHierarchyColumn(T::getName).setHeader("Nombre");
+
+      tGrid.addSelectionListener((e)->
       {
-            T node = e.getValue();
-            if ( tGrid.isExpanded(node))
-               tGrid.collapse(node);
+         Set<T> values = e.getAllSelectedItems();
+         values.forEach(value-> setValue(value));
       });
 
       return tGrid;
@@ -105,8 +95,8 @@ implements HasValue<E, T>
       Grid<T> sGrid = new Grid<>();
       sGrid.setVisible(false);
       sGrid.setWidthFull();
-      sGrid.addColumn(T::getCode).setHeader("ID").setFlexGrow(30);
-      sGrid.addColumn(T::getName).setHeader("Nombre").setFlexGrow(70);
+      sGrid.addColumn(T::getName).setHeader("Nombre").setFlexGrow(50);
+      sGrid.addColumn(T::getCode).setHeader("ID").setFlexGrow(50);
       sGrid.setSelectionMode(selectionMode);
       addValueChangeListener(sGrid, tGrid);
 
@@ -126,11 +116,11 @@ implements HasValue<E, T>
          searchGrid.setVisible(false);
          if ( TextUtil.isNotEmpty(filter))
          {
-            Collection<T> filteredItems = service.findByNameLikeIgnoreCase( tenant,filter);
-            if ( filteredItems.size() > 0) 
+            Collection<T> filteredItems = service.findByNameLikeIgnoreCase(tenant, filter);
+            if ( filteredItems.size() > 0)
             {
                searchGrid.setVisible(true);
-               searchGrid.setItems(filteredItems); 
+               searchGrid.setItems(filteredItems);
             }
          }
       });
@@ -143,36 +133,36 @@ implements HasValue<E, T>
    private Registration addValueChangeListener( Grid<T> sGrid, TreeGrid<T> tGrid)
    {
       Registration registration = null;
-      switch (mode)
+      switch (selectionMode)
       {
       case SINGLE:
-      {
-         registration = sGrid.asSingleSelect().addValueChangeListener(e ->
          {
-            tGrid.deselectAll();
-            T value = e.getValue();
-            if (value != null)
-            {
-               setValue(value);
-               tGrid.select(value);
-               //   backtrackParents(tGrid::expand, value);
-            }
-         });
-         break;
-      }
+            registration = sGrid.asSingleSelect().addValueChangeListener(e ->
+                           {
+                              tGrid.deselectAll();
+                              T value = e.getValue();
+                              if (value != null)
+                              {
+                                 setValue(value);
+                                 tGrid.select(value);
+                                 backtrackParents(tGrid::expand, value);
+                              }
+                           });
+            break;
+         }
       case MULTI:
-      {
-         registration = sGrid.asMultiSelect().addValueChangeListener(e ->
          {
-            for (T value: e.getValue())
-            {
-               setValue(value);
-               tGrid.select(value);
-               //    backtrackParents(tGrid::expand, value);
-            }
-         });
-         break;
-      }
+            registration = sGrid.asMultiSelect().addValueChangeListener(e ->
+                           {
+                              for (T value: e.getValue())
+                              {
+                                 setValue(value);
+                                 tGrid.select(value);
+                                 backtrackParents(tGrid::expand, value);
+                              }
+                           });
+            break;
+         }
       default:
          tGrid.deselectAll();
       }
@@ -204,55 +194,59 @@ implements HasValue<E, T>
 
    }//backtrackParents
 
-   private  HierarchicalDataProvider<T, Void>  getDataProvider(HierarchicalService<T> service )
+   
+   private  TreeDataProvider<T>  getDataProvider(HierarchicalService<T> service )
    {
-      final HierarchicalDataProvider<T, Void> dataProvider = new AbstractBackEndHierarchicalDataProvider<T, Void>()
-      {
-         
-         @Override
-         public int getChildCount(final HierarchicalQuery<T, Void> hierarchicalQuery)
-         {
-            final T owner = hierarchicalQuery.getParent();
-            int count =  service.countByParent(owner);
-            return count;
-         }//getChildCount
-
-
-         @Override
-         public boolean hasChildren(final T node)
-         {
-            boolean has = service.hasChildren(node);
-            return has;
-         }//hasChildren
-
-
-         @Override
-         protected Stream<T> fetchChildrenFromBackEnd(final HierarchicalQuery<T, Void> hierarchicalQuery)
-         {
-            final T owner = hierarchicalQuery.getParent();
-            Collection<T> children = service.findByParent(owner);
-            return children.stream();
-
-         }//fetchChildrenFromBackEnd
-
-
-      }; //new AbstractBackEndHierarchicalDataProvider<>()
-
+      gridNodes = service.findAll();
+      TreeData<T> treeData = new TreeData<T>();
+      addChildrenOf(null, treeData);
+      TreeDataProvider<T> dataProvider = new TreeDataProvider<>(treeData);
       return dataProvider;
 
    }//getDataProvider
 
+   
+   private void addChildrenOf(T parent, TreeData<T> treeData)
+   {
+      List<T> children = getChildrenOf( parent);
+      children.forEach( child->
+      {
+          treeData.addItem(parent, child);
+          addChildrenOf(child, treeData);
+          gridNodes.remove(child);
+      });
+   }//addChildrenOf
+
+   
+   private List<T>getChildrenOf( T owner)
+   {
+      List<T> children = new ArrayList<>();
+      gridNodes.forEach(item->
+      {
+         T parent =  item.getOwner();
+         if (parent == null)
+         {
+            if (owner == null)
+               children.add(item);
+         }else if(parent.equals(owner))
+            children.add(item);
+      });
+      return children;
+   }//getChildrenOf
+
+
 
    public void refresh( )
    {
-      result.clear();
       searchBar.clear();
-      treeGrid.deselectAll();
+      dataProvider = getDataProvider(service);
+      treeGrid.setDataProvider(dataProvider);
       dataProvider.refreshAll();
       searchGrid.setItems(emptyGrid);
    }//refresh
 
 
+   
    // ---------- implements HasValue<E,T> --------------------
 
    //Resets the value to the empty one.
@@ -262,7 +256,7 @@ implements HasValue<E, T>
    @Override public T getEmptyValue() { return null;}
 
    //Returns the current value of this object, wrapped in an Optional.
-   @Override public Optional<T>   getOptionalValue() { return Optional.ofNullable(getValue()); }
+   @Override public Optional<T>   getOptionalValue() { return Optional.ofNullable(getValue());}
 
    //Returns whether this HasValue is considered to be empty.
    @Override public boolean isEmpty() { return result.isEmpty();}
@@ -282,7 +276,7 @@ implements HasValue<E, T>
    public Collection<T> getValues(){ return result;}
 
    //Returns whether this HasValue is in read-only mode or not.
-   @Override public boolean  isReadOnly() { return mode == Mode.NONE;}
+   @Override public boolean  isReadOnly() { return selectionMode == Grid.SelectionMode.NONE;}
 
    //Checks whether the required indicator is visible.
    @Override public boolean  isRequiredIndicatorVisible() { return true;}
@@ -290,35 +284,23 @@ implements HasValue<E, T>
    //Sets the read-only mode of this HasValue to given mode.
    @Override public void  setReadOnly(boolean readOnly)
    {
-      if ( mode == Mode.SINGLE)
+      if ( selectionMode == Grid.SelectionMode.SINGLE)
          searchGrid.asSingleSelect().setReadOnly(readOnly);
       else
          searchGrid.asMultiSelect().setReadOnly(readOnly);
    }//setReadOnly
 
    //Sets the required indicator visible or not.
-   @Override public void  setRequiredIndicatorVisible(boolean requiredIndicatorVisible) { }
+   @Override public void  setRequiredIndicatorVisible(boolean requiredIndicatorVisible) {}
 
    //Sets the value of this object.
    @Override public void  setValue(T value)
    {
-      switch (mode)
-      {
-      case MULTI:    
-      {
-         result.add(value);
-         break;
-      }
-      case SINGLE:
-      {
+      if ( selectionMode != Grid.SelectionMode.MULTI)
          result.clear();
+      
+      if ( selectionMode != Grid.SelectionMode.NONE)
          result.add(value);
-         break;
-      }
-      default:
-         result.clear();
-
-      }
 
    }//setValue
 

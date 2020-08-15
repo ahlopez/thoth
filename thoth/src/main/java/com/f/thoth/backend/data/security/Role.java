@@ -105,7 +105,7 @@ public class Role extends BaseEntity implements Comparable<Role>
    }// equals
 
    @Override
-   public int hashCode() { return 8191; }
+   public int hashCode() { return id == null? 13: id.hashCode(); }
 
    @Override
    public String toString() { return "Role{"+ super.toString()+ " name["+ name+ "] permissions["+ permissions.size()+ "]}";}
@@ -113,9 +113,12 @@ public class Role extends BaseEntity implements Comparable<Role>
    @Override
    public int compareTo(Role that)
    {
-     return that == null? 1 :
-            this.equals(that)? 0 :
-            (this.tenant.toString()+ ":"+ this.name).compareTo(that.tenant.toString()+ ":"+ that.name);
+      return this.equals(that)?  0 :
+         that ==  null        ?  1 :
+         this.code == null  && that.code == null?  0 :   
+         this.code != null  && that.code == null?  1 :
+         this.code == null  && that.code != null? -1 :   
+         this.code.compareTo(that.code);     
 
    }// compareTo
 

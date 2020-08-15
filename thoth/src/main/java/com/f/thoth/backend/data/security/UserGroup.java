@@ -101,12 +101,12 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>, Hierarc
          return false;
 
       UserGroup that = (UserGroup) o;
-       return this.id != null && this.id.equals(that.id);
+      return this.id != null && this.id.equals(that.id);
 
    }// equals
 
    @Override
-   public int hashCode() { return 511;}
+   public int hashCode() { return id == null? 257: id.hashCode();}
 
    @Override
    public String toString()
@@ -117,8 +117,12 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>, Hierarc
    @Override
    public int compareTo(UserGroup that)
    {
-      return this.equals(that)? 0 :
-         that == null ? 1 :   (this.code).compareTo(that.code);
+      return this.equals(that)?  0 :
+             that ==  null    ?  1 :
+             this.code == null  && that.code == null?  0 :   
+             this.code != null  && that.code == null?  1 :
+             this.code == null  && that.code != null? -1 :   
+             this.code.compareTo(that.code);
 
    }// compareTo
 
