@@ -31,14 +31,19 @@ import com.f.thoth.ui.views.storefront.StorefrontView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasComponents;
 import com.vaadin.flow.component.applayout.AppLayout;
+import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Viewport;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.TabVariant;
 import com.vaadin.flow.component.tabs.Tabs;
+import com.vaadin.flow.router.HighlightConditions;
 import com.vaadin.flow.router.RouteConfiguration;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.PWA;
@@ -46,62 +51,126 @@ import com.vaadin.flow.server.VaadinServlet;
 
 @Viewport(VIEWPORT)
 @PWA(name = "Evidentia", shortName = "Evidentia",
-      startPath = "login",
-      backgroundColor = "#227aef", themeColor = "#227aef",
-      offlinePath = "offline-page.html",
-      offlineResources = {"images/offline-login-banner.jpg"},
-      enableInstallPrompt = false)
+startPath = "login",
+backgroundColor = "#227aef", themeColor = "#227aef",
+offlinePath = "offline-page.html",
+offlineResources = {"images/offline-login-banner.jpg"},
+enableInstallPrompt = false)
 public class MainView extends AppLayout
 {
-
    private final ConfirmDialog confirmDialog = new ConfirmDialog();
    private final Tabs menu;
 
-   public MainView() {
+   public MainView()
+   {
       confirmDialog.setCancelable(true);
       confirmDialog.setConfirmButtonTheme("raised tertiary error");
       confirmDialog.setCancelButtonTheme("raised tertiary");
+      createHeader();
+      createDrawer();
 
-      this.setDrawerOpened(false);
-      Span appName = new Span("Evidentia");
-      appName.addClassName("hide-on-mobile");
+      this.setDrawerOpened(true);
+      //   Span appName = new Span("Evidentia");
+      //   appName.addClassName("hide-on-mobile");
 
       menu = createMenuTabs();
 
-      this.addToNavbar(appName);
+      //   this.addToNavbar(appName);
       this.addToNavbar(true, menu);
       this.getElement().appendChild(confirmDialog.getElement());
 
-      getElement().addEventListener("search-focus", e -> {
+      getElement().addEventListener("search-focus", e ->
+      {
          getElement().getClassList().add("hide-navbar");
       });
 
-      getElement().addEventListener("search-blur", e -> {
+      getElement().addEventListener("search-blur", e ->
+      {
          getElement().getClassList().remove("hide-navbar");
       });
-   }
+
+   }//MainView
+
+   private void createHeader()
+   {
+      H2 logo = new H2("Evidentia");
+      logo.addClassName("hide-on-mobile");
+      HorizontalLayout header = new HorizontalLayout(new DrawerToggle(), logo);
+
+      header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+      header.setWidth("100%");
+      header.addClassName("header");
+      addToNavbar(header);
+   }//createHeader
+
+   private void createDrawer()
+   {
+      VerticalLayout mainMenu = new VerticalLayout();
+      mainMenu.add(createLink(VaadinIcon.EDIT, TITLE_STOREFRONT, StorefrontView.class));
+      mainMenu.add(createLink(VaadinIcon.CLOCK,TITLE_DASHBOARD, DashboardView.class));
+
+      if (SecurityUtils.isAccessGranted(UsersView.class))
+         mainMenu.add(createLink(VaadinIcon.KEY,TITLE_ADMINISTRATION, UsersView.class));
+
+      if (SecurityUtils.isAccessGranted(ProductsView.class))
+         mainMenu.add(createLink(VaadinIcon.CALENDAR, TITLE_PRODUCTS, ProductsView.class));
+
+      if (SecurityUtils.isAccessGranted(TenantsView.class))
+         mainMenu.add(createLink(VaadinIcon.HOSPITAL, TITLE_TENANTS, TenantsView.class));
+
+      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
+         mainMenu.add(createLink(VaadinIcon.COG, TITLE_OBJECT_TO_PROTECT, ObjectToProtectView.class));
+
+      if (SecurityUtils.isAccessGranted(RoleView.class))
+         mainMenu.add(createLink(VaadinIcon.ACADEMY_CAP, TITLE_ROLES, RoleView.class));
+
+      if (SecurityUtils.isAccessGranted(UserGroupView.class))
+         mainMenu.add(createLink(VaadinIcon.USERS, TITLE_USER_GROUPS, UserGroupView.class));
+
+      if (SecurityUtils.isAccessGranted(SingleUserView.class))
+         mainMenu.add(createLink(VaadinIcon.USER, TITLE_SINGLE_USERS, SingleUserView.class));
+
+      final String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
+      mainMenu.add(createLogoutLink(contextPath));
+      addToDrawer(mainMenu);
+
+   }//createDrawer
+
+
+
+   private RouterLink createLink(VaadinIcon icon, String title, Class<? extends Component> viewClass)
+   {
+      RouterLink link = populateLink(new RouterLink(null, viewClass), icon, title);
+      link.setHighlightCondition(HighlightConditions.sameLocation());
+    //  addToDrawer(link);
+      return link;
+   }//createTab
 
    @Override
-   protected void afterNavigation() {
+   protected void afterNavigation()
+   {
       super.afterNavigation();
       confirmDialog.setOpened(false);
-      if (getContent() instanceof HasConfirmation) {
+      if (getContent() instanceof HasConfirmation)
          ((HasConfirmation) getContent()).setConfirmDialog(confirmDialog);
-      }
+
       RouteConfiguration configuration = RouteConfiguration.forSessionScope();
-      if (configuration.isRouteRegistered(this.getContent().getClass())) {
+      if (configuration.isRouteRegistered(this.getContent().getClass()))
+      {
          String target = configuration.getUrl(this.getContent().getClass());
-         Optional < Component > tabToSelect = menu.getChildren().filter(tab -> {
+         Optional<Component> tabToSelect = menu.getChildren().filter(tab ->
+         {
             Component child = tab.getChildren().findFirst().get();
             return child instanceof RouterLink && ((RouterLink) child).getHref().equals(target);
          }).findFirst();
          tabToSelect.ifPresent(tab -> menu.setSelectedTab((Tab) tab));
-      } else {
+      } else
+      {
          menu.setSelectedTab(null);
       }
-   }
+   }//afterNavigation
 
-   private static Tabs createMenuTabs() 
+   private static Tabs createMenuTabs()
    {
       final Tabs tabs = new Tabs();
       tabs.setOrientation(Tabs.Orientation.HORIZONTAL);
@@ -109,45 +178,46 @@ public class MainView extends AppLayout
       return tabs;
    }//createMenuTabs
 
-   private static Tab[] getAvailableTabs() 
+   private static Tab[] getAvailableTabs()
    {
       final List<Tab> tabs = new ArrayList<>(6);
       tabs.add(createTab(VaadinIcon.EDIT, TITLE_STOREFRONT, StorefrontView.class));
       tabs.add(createTab(VaadinIcon.CLOCK,TITLE_DASHBOARD, DashboardView.class));
-      if (SecurityUtils.isAccessGranted(UsersView.class)){
+
+      if (SecurityUtils.isAccessGranted(UsersView.class))
          tabs.add(createTab(VaadinIcon.KEY,TITLE_ADMINISTRATION, UsersView.class));
-      }
-      if (SecurityUtils.isAccessGranted(ProductsView.class)) {
+
+      if (SecurityUtils.isAccessGranted(ProductsView.class))
          tabs.add(createTab(VaadinIcon.CALENDAR, TITLE_PRODUCTS, ProductsView.class));
-      }
-      if (SecurityUtils.isAccessGranted(TenantsView.class)) {
-          tabs.add(createTab(VaadinIcon.HOSPITAL, TITLE_TENANTS, TenantsView.class));
-       }
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class)) {
-          tabs.add(createTab(VaadinIcon.COG, TITLE_OBJECT_TO_PROTECT, ObjectToProtectView.class));
-       }
-      if (SecurityUtils.isAccessGranted(RoleView.class)) {
-          tabs.add(createTab(VaadinIcon.ACADEMY_CAP, TITLE_ROLES, RoleView.class));
-       }
-      if (SecurityUtils.isAccessGranted(UserGroupView.class)) {
-          tabs.add(createTab(VaadinIcon.USERS, TITLE_USER_GROUPS, UserGroupView.class));
-       }
-      if (SecurityUtils.isAccessGranted(SingleUserView.class)) {
-          tabs.add(createTab(VaadinIcon.USER, TITLE_SINGLE_USERS, SingleUserView.class));
-       }
+
+      if (SecurityUtils.isAccessGranted(TenantsView.class))
+         tabs.add(createTab(VaadinIcon.HOSPITAL, TITLE_TENANTS, TenantsView.class));
+
+      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
+         tabs.add(createTab(VaadinIcon.COG, TITLE_OBJECT_TO_PROTECT, ObjectToProtectView.class));
+
+      if (SecurityUtils.isAccessGranted(RoleView.class))
+         tabs.add(createTab(VaadinIcon.ACADEMY_CAP, TITLE_ROLES, RoleView.class));
+
+      if (SecurityUtils.isAccessGranted(UserGroupView.class))
+         tabs.add(createTab(VaadinIcon.USERS, TITLE_USER_GROUPS, UserGroupView.class));
+
+      if (SecurityUtils.isAccessGranted(SingleUserView.class))
+         tabs.add(createTab(VaadinIcon.USER, TITLE_SINGLE_USERS, SingleUserView.class));
+
       final String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
       final Tab logoutTab = createTab(createLogoutLink(contextPath));
       tabs.add(logoutTab);
       return tabs.toArray(new Tab[tabs.size()]);
-      
+
    }//getAvailableTabs
 
-   private static Tab createTab(VaadinIcon icon, String title, Class<? extends Component> viewClass) 
+   private static Tab createTab(VaadinIcon icon, String title, Class<? extends Component> viewClass)
    {
       return createTab(populateLink(new RouterLink(null, viewClass), icon, title));
    }//createTab
 
-   private static Tab createTab(Component content) 
+   private static Tab createTab(Component content)
    {
       final Tab tab = new Tab();
       tab.addThemeVariants(TabVariant.LUMO_ICON_ON_TOP);
@@ -155,22 +225,22 @@ public class MainView extends AppLayout
       return tab;
    }//createTab
 
-   private static Anchor createLogoutLink(String contextPath) 
+   private static Anchor createLogoutLink(String contextPath)
    {
       final Anchor a = populateLink(new Anchor(), VaadinIcon.ARROW_RIGHT, TITLE_LOGOUT);
       a.setHref(contextPath + "/logout");
       return a;
    }//createLogoutLink
 
-   private static <T extends HasComponents> T populateLink(T a, VaadinIcon icon, String title) 
+   private static <T extends HasComponents> T populateLink(T a, VaadinIcon icon, String title)
    {
       a.add(icon.create());
       if (title.equals(TITLE_ADMINISTRATION) )
          a.add(TITLE_USERS);
       else
-          a.add(title);
-      
+         a.add(title);
+
       return a;
    }//populateLink
-   
+
 }//MainView

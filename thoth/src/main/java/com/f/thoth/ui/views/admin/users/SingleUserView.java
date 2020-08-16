@@ -19,11 +19,15 @@ import com.f.thoth.ui.crud.CrudEntityPresenter;
 import com.f.thoth.ui.utils.BakeryConst;
 import com.f.thoth.ui.utils.converters.LocalDateToLocalDate;
 import com.f.thoth.ui.utils.converters.StringToString;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.crud.BinderCrudEditor;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -42,7 +46,12 @@ public class SingleUserView extends AbstractBakeryCrudView<SingleUser>
    private static final Converter<LocalDate, LocalDate> DATE_CONVERTER   = new LocalDateToLocalDate();
    private static final Converter<String, String>       STRING_CONVERTER = new StringToString("");
    private static final Converter<String, Integer>    CATEGORY_CONVERTER =
-         new StringToIntegerConverter( BakeryConst.DEFAULT_CATEGORY, "CategorÃ­a invÃ¡lida");
+         new StringToIntegerConverter( BakeryConst.DEFAULT_CATEGORY, "Categoría inválida");
+
+
+   private static Button groups = new Button("Grupos");
+   private static Button roles  = new Button("Roles");
+
 
    /*
    private static ComboBox<UserGroup> groupsItBelongs;
@@ -150,52 +159,55 @@ public class SingleUserView extends AbstractBakeryCrudView<SingleUser>
       parentGroup.setClearButtonVisible(true);
       parentGroup.setPageSize(20);
        */
+      Component buttonsComponent = createButtons();
 
-      FormLayout form = new FormLayout(name, lastName, password, email,  blocked, category, fromDate, toDate);
+
+      FormLayout form = new FormLayout(name, lastName, password, email,  blocked, category, fromDate, toDate, buttonsComponent);
 
       BeanValidationBinder<SingleUser> binder = new BeanValidationBinder<>(SingleUser.class);
 
       binder.forField(name)
-            .withConverter(STRING_CONVERTER)
-            .withValidator(text -> TextUtil.isAlphaNumeric(text), "El nombre debe ser alfanumérico")
-            .bind("name");
+      .withConverter(STRING_CONVERTER)
+      .withValidator(text -> TextUtil.isAlphaNumeric(text), "El nombre debe ser alfanumérico")
+      .bind("name");
 
       binder.forField(lastName)
-            .withConverter(STRING_CONVERTER)
-            .withValidator(text -> TextUtil.isAlphaNumeric(text), "El apellido debe ser alfanumérico")
-            .bind("lastName");
+      .withConverter(STRING_CONVERTER)
+      .withValidator(text -> TextUtil.isAlphaNumeric(text), "El apellido debe ser alfanumérico")
+      .bind("lastName");
 
       binder.forField(password)
-            .withConverter(STRING_CONVERTER)
-            .bind("passwordHash");
+      .withConverter(STRING_CONVERTER)
+      .bind("passwordHash");
 
       binder.forField(email)
-            .withConverter(STRING_CONVERTER)
-            .withValidator(new EmailValidator("Ingrese un correo electrónico válido"))
-            .bind("email");
+      .withConverter(STRING_CONVERTER)
+      .withValidator(new EmailValidator("Ingrese un correo electrónico válido"))
+      .bind("email");
 
       binder.bind(blocked, "locked");
       binder.forField(category)
-            .withValidator(text -> text.length() == 1, "Categorías solo tienen un dígito") //Validación del texto
-            .withConverter(CATEGORY_CONVERTER)
-            .withValidator(cat -> cat >= BakeryConst.MIN_CATEGORY && cat <= BakeryConst.MAX_CATEGORY,
-            "La categoría debe estar entre "+ BakeryConst.MIN_CATEGORY+ " y "+ BakeryConst.MAX_CATEGORY) // Validación del número
-            .bind("category");
+      .withValidator(text -> text.length() == 1, "Categorías solo tienen un dígito") //Validación del texto
+      .withConverter(CATEGORY_CONVERTER)
+      .withValidator(cat -> cat >= BakeryConst.MIN_CATEGORY && cat <= BakeryConst.MAX_CATEGORY,
+      "La categoría debe estar entre "+ BakeryConst.MIN_CATEGORY+ " y "+ BakeryConst.MAX_CATEGORY) // Validación del número
+      .bind("category");
 
       binder.forField(fromDate)
-            .withConverter(DATE_CONVERTER)
-            .withValidator( date -> date.compareTo(LocalDate.now()) <= 0, "Fecha desde no puede ser futura")
-            .bind("fromDate");
+      .withConverter(DATE_CONVERTER)
+      .withValidator( date -> date.compareTo(LocalDate.now()) <= 0, "Fecha desde no puede ser futura")
+      .bind("fromDate");
 
       binder.forField(toDate)
-            .withConverter(DATE_CONVERTER)
-            .withValidator( date -> date.compareTo(LocalDate.now()) > 0, "Fecha hasta debe ser futura")
-            .bind("toDate");
+      .withConverter(DATE_CONVERTER)
+      .withValidator( date -> date.compareTo(LocalDate.now()) > 0, "Fecha hasta debe ser futura")
+      .bind("toDate");
 
       //  binder.bind(parentGroup, "parentGroup");
 
       return new BinderCrudEditor<SingleUser>(binder, form);
    }//BinderCrudEditor
+
 
    protected void setupCrudEventListeners(CrudEntityPresenter<SingleUser> entityPresenter)
    {
@@ -205,33 +217,39 @@ public class SingleUserView extends AbstractBakeryCrudView<SingleUser>
       };
 
       addEditListener(e ->
-      entityPresenter.loadEntity(e.getItem().getId(),
-            entity -> navigateToEntity(entity.getId().toString())));
+      {
+         entityPresenter.loadEntity(e.getItem().getId(), entity -> navigateToEntity(entity.getId().toString()));
+      });
 
       addCancelListener(e -> navigateToEntity(null));
 
-      addSaveListener(e -> {
-         entityPresenter.save(e.getItem(), onSuccess, onFail);
-         updateCombo();
+      addSaveListener(e -> entityPresenter.save(e.getItem(), onSuccess, onFail));
 
-      });
+      addDeleteListener(e -> entityPresenter.delete(e.getItem(), onSuccess, onFail));
 
-      addDeleteListener(e ->
-      entityPresenter.delete(e.getItem(), onSuccess, onFail));
    }//setupCrudEventListeners
 
-   private void updateCombo()
+
+   private static Component createButtons() 
    {
-      //  parentCombo.setDataProvider(getTenantGroups());
+      groups.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+      roles.addThemeVariants (ButtonVariant.LUMO_PRIMARY);
+
+      groups.addClickListener(click -> selectGroups());
+      roles.addClickListener(click ->  selectRoles());
+
+      return new HorizontalLayout(groups, roles);
+
+   }//createButtonsLayout
+   
+   private static void selectGroups()
+   {
+      System.out.println("))) En selectGroups");
+   }
+   
+   private static void selectRoles()
+   {     
+      System.out.println("))) En selectRoles");
    }
 
-   /*
-
-   private static ListDataProvider<SingleUser> getTenantGroups()
-   {
-      Tenant tenant = ThothSession.getCurrentTenant();
-      return new ListDataProvider<SingleUser>( tenant == null? new TreeSet<>() : tenant.getSingleUsers());
-   }//getTenantRoles
-
-    */
 }//SingleUserView
