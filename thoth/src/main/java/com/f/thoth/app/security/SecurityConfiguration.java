@@ -30,7 +30,8 @@ import com.f.thoth.ui.utils.BakeryConst;
  */
 @EnableWebSecurity
 @Configuration
-public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class SecurityConfiguration extends WebSecurityConfigurerAdapter
+{
 
    private static final String LOGIN_PROCESSING_URL = "/login";
    private static final String LOGIN_FAILURE_URL = "/login?error";
@@ -78,7 +79,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     * Require login to access internal pages and configure login form.
     */
    @Override
-   protected void configure(HttpSecurity http) throws Exception {
+   protected void configure(HttpSecurity http) throws Exception
+   {
       // Not using Spring CSRF here to be able to use plain HTML for the login page
       http.csrf().disable()
 
@@ -105,13 +107,15 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
             // Configure logout
             .and().logout().logoutSuccessUrl(LOGOUT_SUCCESS_URL);
-   }
+
+   }//configure
 
    /**
     * Allows access to static resources, bypassing Spring security.
     */
    @Override
-   public void configure(WebSecurity web) {
+   public void configure(WebSecurity web)
+   {
       web.ignoring().antMatchers(
             // client-side JS code
             "/VAADIN/**",
@@ -134,5 +138,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
             // (development mode) H2 debugging console
             "/h2-console/**"
       );
-   }
-}
+
+   }//configure
+
+}//SecurityConfiguration

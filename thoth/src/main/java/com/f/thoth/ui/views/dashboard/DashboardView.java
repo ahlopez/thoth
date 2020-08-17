@@ -10,9 +10,11 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 
 import com.f.thoth.backend.data.DashboardData;
 import com.f.thoth.backend.data.DeliveryStats;
+import com.f.thoth.backend.data.Role;
 import com.f.thoth.backend.data.entity.Order;
 import com.f.thoth.backend.data.entity.OrderSummary;
 import com.f.thoth.backend.data.entity.Product;
@@ -50,6 +52,7 @@ import com.vaadin.flow.templatemodel.TemplateModel;
 @JsModule("./src/views/dashboard/dashboard-view.js")
 @Route(value = BakeryConst.PAGE_DASHBOARD, layout = MainView.class)
 @PageTitle(BakeryConst.TITLE_DASHBOARD)
+@Secured(Role.ADMIN)
 public class DashboardView extends PolymerTemplate<TemplateModel> {
 
    private static final String[] MONTH_LABELS = new String[] {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul",

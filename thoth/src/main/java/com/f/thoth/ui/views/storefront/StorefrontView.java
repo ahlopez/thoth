@@ -3,8 +3,10 @@ package com.f.thoth.ui.views.storefront;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 
 import com.f.thoth.app.HasLogger;
+import com.f.thoth.backend.data.Role;
 import com.f.thoth.backend.data.entity.Order;
 import com.f.thoth.backend.data.entity.util.EntityUtil;
 import com.f.thoth.ui.MainView;
@@ -37,6 +39,7 @@ import com.vaadin.flow.templatemodel.TemplateModel;
 @RouteAlias(value = BakeryConst.PAGE_STOREFRONT_EDIT, layout = MainView.class)
 @RouteAlias(value = BakeryConst.PAGE_ROOT, layout = MainView.class)
 @PageTitle(BakeryConst.TITLE_STOREFRONT)
+@Secured(Role.ADMIN)
 public class StorefrontView extends PolymerTemplate<TemplateModel>
       implements HasLogger, HasUrlParameter<Long>, EntityView<Order> {
 

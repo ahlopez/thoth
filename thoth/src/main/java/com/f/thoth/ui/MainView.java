@@ -51,11 +51,11 @@ import com.vaadin.flow.server.VaadinServlet;
 
 @Viewport(VIEWPORT)
 @PWA(name = "Evidentia", shortName = "Evidentia",
-startPath = "login",
-backgroundColor = "#227aef", themeColor = "#227aef",
-offlinePath = "offline-page.html",
-offlineResources = {"images/offline-login-banner.jpg"},
-enableInstallPrompt = false)
+     startPath = "login",
+     backgroundColor = "#227aef", themeColor = "#227aef",
+     offlinePath = "offline-page.html",
+     offlineResources = {"images/offline-login-banner.jpg"},
+     enableInstallPrompt = false)
 public class MainView extends AppLayout
 {
    private final ConfirmDialog confirmDialog = new ConfirmDialog();
@@ -65,11 +65,11 @@ public class MainView extends AppLayout
    {
       confirmDialog.setCancelable(true);
       confirmDialog.setConfirmButtonTheme("raised tertiary error");
-      confirmDialog.setCancelButtonTheme("raised tertiary");
+      confirmDialog.setCancelButtonTheme ("raised tertiary");
       createHeader();
       createDrawer();
 
-      this.setDrawerOpened(true);
+      this.setDrawerOpened(false);
       //   Span appName = new Span("Evidentia");
       //   appName.addClassName("hide-on-mobile");
 
@@ -106,29 +106,15 @@ public class MainView extends AppLayout
    private void createDrawer()
    {
       VerticalLayout mainMenu = new VerticalLayout();
-      mainMenu.add(createLink(VaadinIcon.EDIT, TITLE_STOREFRONT, StorefrontView.class));
-      mainMenu.add(createLink(VaadinIcon.CLOCK,TITLE_DASHBOARD, DashboardView.class));
-
-      if (SecurityUtils.isAccessGranted(UsersView.class))
-         mainMenu.add(createLink(VaadinIcon.KEY,TITLE_ADMINISTRATION, UsersView.class));
-
-      if (SecurityUtils.isAccessGranted(ProductsView.class))
-         mainMenu.add(createLink(VaadinIcon.CALENDAR, TITLE_PRODUCTS, ProductsView.class));
-
-      if (SecurityUtils.isAccessGranted(TenantsView.class))
-         mainMenu.add(createLink(VaadinIcon.HOSPITAL, TITLE_TENANTS, TenantsView.class));
-
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         mainMenu.add(createLink(VaadinIcon.COG, TITLE_OBJECT_TO_PROTECT, ObjectToProtectView.class));
-
-      if (SecurityUtils.isAccessGranted(RoleView.class))
-         mainMenu.add(createLink(VaadinIcon.ACADEMY_CAP, TITLE_ROLES, RoleView.class));
-
-      if (SecurityUtils.isAccessGranted(UserGroupView.class))
-         mainMenu.add(createLink(VaadinIcon.USERS, TITLE_USER_GROUPS, UserGroupView.class));
-
-      if (SecurityUtils.isAccessGranted(SingleUserView.class))
-         mainMenu.add(createLink(VaadinIcon.USER, TITLE_SINGLE_USERS, SingleUserView.class));
+      createLink(VaadinIcon.EDIT,        TITLE_STOREFRONT,        StorefrontView.class,      mainMenu);
+      createLink(VaadinIcon.CLOCK,       TITLE_DASHBOARD,         DashboardView.class,       mainMenu);
+      createLink(VaadinIcon.KEY,         TITLE_ADMINISTRATION,    UsersView.class,           mainMenu);
+      createLink(VaadinIcon.CALENDAR,    TITLE_PRODUCTS,          ProductsView.class,        mainMenu);
+      createLink(VaadinIcon.HOSPITAL,    TITLE_TENANTS,           TenantsView.class,         mainMenu);
+      createLink(VaadinIcon.COG,         TITLE_OBJECT_TO_PROTECT, ObjectToProtectView.class, mainMenu);
+      createLink(VaadinIcon.ACADEMY_CAP, TITLE_ROLES,             RoleView.class,            mainMenu);
+      createLink(VaadinIcon.USERS,       TITLE_USER_GROUPS,       UserGroupView.class,       mainMenu);
+      createLink(VaadinIcon.USER,        TITLE_SINGLE_USERS,      SingleUserView.class,      mainMenu);
 
       final String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
       mainMenu.add(createLogoutLink(contextPath));
@@ -137,14 +123,16 @@ public class MainView extends AppLayout
    }//createDrawer
 
 
-
-   private RouterLink createLink(VaadinIcon icon, String title, Class<? extends Component> viewClass)
+   private void createLink(VaadinIcon icon, String title, Class<? extends Component> viewClass, VerticalLayout mainMenu)
    {
-      RouterLink link = populateLink(new RouterLink(null, viewClass), icon, title);
-      link.setHighlightCondition(HighlightConditions.sameLocation());
-    //  addToDrawer(link);
-      return link;
-   }//createTab
+      if (SecurityUtils.isAccessGranted(viewClass))
+      {
+         RouterLink link = populateLink(new RouterLink(null, viewClass), icon, title);
+         link.setHighlightCondition(HighlightConditions.sameLocation());
+         mainMenu.add(link);
+      }
+   }//createLink
+
 
    @Override
    protected void afterNavigation()
@@ -164,7 +152,8 @@ public class MainView extends AppLayout
             return child instanceof RouterLink && ((RouterLink) child).getHref().equals(target);
          }).findFirst();
          tabToSelect.ifPresent(tab -> menu.setSelectedTab((Tab) tab));
-      } else
+      }
+      else
       {
          menu.setSelectedTab(null);
       }
@@ -180,6 +169,101 @@ public class MainView extends AppLayout
 
    private static Tab[] getAvailableTabs()
    {
+      /*
+  PAGE_CLIENTES                                 = "Cliente";
+     PAGE_TENANTS                               = "Tenant";
+  PAGE_SEGURIDAD                                = "Seguridad";
+     PAGE_OBJETOS                               = "ObjetoProteger";
+     PAGE_ROLES                                 = "Rol";
+     PAGE_PERMISOS_EJECUCION                    = "PermisoEjecucion";
+     PAGE_PERMISOS_ACCESO                       = "PermisoAcceso";
+  PAGE_ADMINISTRACION                           = "Administracion";
+     PAGE_PARAMETROS                            = "Parametros";
+     PAGE_USUARIOS                              = "Usuario";
+     PAGE_GRUPOS_USUARIOS                       = "GrupoUsuario";
+  PAGE_CLASIFICACION                            = "Clasificacion";
+     PAGE_FONDOS                                = "Fondo";
+     PAGE_OFICINAS                              = "Oficina";
+     PAGE_SERIES                                = "Serie";
+     PAGE_SUBSERIES                             = "Subserie";
+     PAGE_TIPOS_DOCUMENTALES                    = "TipoDocumental";
+  PAGE_EXPEDIENTES                              = "AdminExpediente";
+     PAGE_EXPEDIENTES                           = "Expediente";
+     PAGE_SUBEXPEDIENTES                        = "SubExpediente";
+     PAGE_VOLUMENES                             = "Volumen";
+     PAGE_INDICE                                = "Indice";
+     PAGE_EXPORTACION                           = "ExportaExpediente";
+     PAGE_IMPORTACION                           = "ImportaExpediente";
+     PAGE_COPIA_DOCUMENTOS                      = "CopiaDocumento";
+     PAGE_TRANSFER_DOCUMENTOS                   = "TransferenciaDocumento";
+  PAGE_TRAMITE                                  = "Tramite";
+     PAGE_BANDEJA                               = "Bandeja";
+     PAGE_CLASIFICACION_DOCUMENTOS              = "ClasificaDoc";
+     PAGE_RETORNO                               = "Retorno";
+     PAGE_RE_ENVIO                              = "ReEnvio";
+     PAGE_BORRADORES                            = "Borrador";
+     PAGE_FIRMA                                 = "FirmaDocumento";
+     PAGE_ENVIO                                 = "EnvioInterno";
+  PAGE_RECEPCION                                = "Recepcion";
+     PAGE_DOCUMENTOS                            = "RecibeDoc";
+     PAGE_E_MAIL                                = "RecibeEmail";
+     PAGE_DIGITALIZACION                        = "Digitalizacion";
+     PAGE_DIRECCIONAMIENTO                      = "EnrutadDoc";
+  PAGE_CORRESPONDENCIA_EXTERNA                  = "CorrespondenciaExterna";
+     PAGE_REGISTRO_ENVIOS                       = "ConsolidaEnvios";
+     PAGE_ENVIO_EXTERNO                         = "EnvioExterno";
+     PAGE_CONFIRMACI�N_ENVIO                    = "ConfirmacionEnvio";
+  PAGE_CONSULTA                                 = "Consulta";
+     PAGE_DOCUMENTOS                            = "ConsultaDoc";
+        PAGE_CONSULTA_LIBRE                     = "ConsultaDocLibre";
+        PAGE_CONSULTA_METADATOS                 = "ConsultaDocMetadatos";
+     PAGE_EXPEDIENTES                           = "Expedientes";
+        PAGE_CONSULTA_EXPEDIENTES_LIBRE         = "ConsultaExpedLibre";
+        PAGE_CONSULTA_EXPEDIENTES_METADATOS     = "ConsultaExpedMeta";
+        PAGE_CONSULTA_EXPEDIENTES_CLASIFICACION = "ConsultaExpedClasificacion";
+  PAGE_PROCESOS                                 = "Proceso";
+     PAGE_EJECUCION_PROCESO                     = "EjecucionProceso";
+     PAGE_DEFINICION_PROCESO                    = "DefinicionProceso";
+  PAGE_ARCHIVO                                  = "Archivo";
+     PAGE_LOCALES                               = "Local";
+     PAGE_TRANSFERENCIA                         = "PreparaTransferencia";
+     PAGE_RECIBO_TRANSFERENCIA                  = "ReciboTransferencia";
+     PAGE_LOCALIZACION                          = "Localizacion";
+     PAGE_PRESTAMO                              = "Prestamo";
+        PAGE_PRESTAMO                           = "PrestamoExpediente";
+        PAGE_DEVOLUCION                         = "RetornoExpediente";
+     PAGE_INDICES_ARCHIVO                       = "IndiceArchivo";
+     
+     MenuBar menuBar = new MenuBar();
+
+menuBar.setOpenOnHover(true);
+
+Text selected = new Text("");
+Div message = new Div(new Text("Selected: "), selected);
+
+MenuItem project = menuBar.addItem("Project");
+MenuItem account = menuBar.addItem("Account");
+menuBar.addItem("Sign Out", e -> selected.setText("Sign Out"));
+
+SubMenu projectSubMenu = project.getSubMenu();
+MenuItem users = projectSubMenu.addItem("Users");
+MenuItem billing = projectSubMenu.addItem("Billing");
+
+SubMenu usersSubMenu = users.getSubMenu();
+usersSubMenu.addItem("List", e -> selected.setText("List"));
+usersSubMenu.addItem("Add", e -> selected.setText("Add"));
+
+SubMenu billingSubMenu = billing.getSubMenu();
+billingSubMenu.addItem("Invoices", e -> selected.setText("Invoices"));
+billingSubMenu.addItem("Balance Events",
+        e -> selected.setText("Balance Events"));
+
+account.getSubMenu().addItem("Edit Profile",
+        e -> selected.setText("Edit Profile"));
+account.getSubMenu().addItem("Privacy Settings",
+        e -> selected.setText("Privacy Settings"));
+add(menuBar, message);
+       */
       final List<Tab> tabs = new ArrayList<>(6);
       tabs.add(createTab(VaadinIcon.EDIT, TITLE_STOREFRONT, StorefrontView.class));
       tabs.add(createTab(VaadinIcon.CLOCK,TITLE_DASHBOARD, DashboardView.class));
