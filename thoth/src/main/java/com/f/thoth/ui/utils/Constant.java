@@ -4,7 +4,7 @@ import java.util.Locale;
 
 import org.springframework.data.domain.Sort;
 
-public class BakeryConst
+public class Constant
 {
 
    public static final Locale APP_LOCALE = Locale.US;
@@ -40,7 +40,8 @@ public class BakeryConst
   public static final String  PAGE_CLIENTES                                 = "cliente";
   public static final String     PAGE_TENANTS                               = "tenants";
   public static final String  PAGE_SEGURIDAD                                = "seguridad";
-  public static final String     PAGE_OBJETOS                               = "objetos_a-proteger";
+  public static final String     PAGE_OBJETOS                               = "objetos_a_proteger";
+  public static final String     PAGE_INFORMACION                           = "informacion_a_proteger";
   public static final String     PAGE_ROLES                                 = "roles";
   public static final String     PAGE_PERMISOS_EJECUCION                    = "permisos_ejecucion";
   public static final String     PAGE_PERMISOS_ACCESO                       = "permisos_acceso";
@@ -94,7 +95,7 @@ public class BakeryConst
   public static final String  PAGE_ARCHIVO                                  = "archivo";
   public static final String     PAGE_LOCALES                               = "local";
   public static final String     PAGE_TRANSFERENCIA                         = "prepara_transferencia_archivo";
-  public static final String     PAGE_RECIBO_TRANSFERENCIA                  = "recibo_transferencia_archivo";
+  public static final String     PAGE_RECIBO_TRANSFERENCIA                  = "recibe_transferencia_archivo";
   public static final String     PAGE_LOCALIZACION                          = "localizacion";
   public static final String     PAGE_PRESTAMO                              = "prestamos";
   public static final String        PAGE_PRESTAMO_EXPEDIENTE                = "prestamo_expediente";
@@ -104,7 +105,8 @@ public class BakeryConst
   public static final String  TITLE_CLIENTES                                 = "Clientes";
   public static final String     TITLE_TENANTS                               = "Tenants";
   public static final String  TITLE_SEGURIDAD                                = "Seguridad";
-  public static final String     TITLE_OBJETOS                               = "Objetos a proteger";
+  public static final String     TITLE_OBJETOS                               = "Operaciones";
+  public static final String     TITLE_INFORMACION                           = "Información";
   public static final String     TITLE_ROLES                                 = "Roles";
   public static final String     TITLE_PERMISOS_EJECUCION                    = "Permisos de ejecución";
   public static final String     TITLE_PERMISOS_ACCESO                       = "Permisos de acceso";
@@ -142,8 +144,8 @@ public class BakeryConst
   public static final String     TITLE_DIRECCIONAMIENTO                      = "Enrutamiento de documentos";
   public static final String  TITLE_CORRESPONDENCIA_EXTERNA                  = "Correspondencia externa";
   public static final String     TITLE_REGISTRO_ENVIOS                       = "Consolidación envíos externos";
-  public static final String     TITLE_ENVIO_EXTERNO                         = "Prepara planillas envío";
-  public static final String     TITLE_CONFIRMACIÓN_ENVIO                    = "Confirmación de recepción";
+  public static final String     TITLE_ENVIO_EXTERNO                         = "Envía correspondencia externa";
+  public static final String     TITLE_CONFIRMACION_ENVIO                    = "Confirmación de recepción";
   public static final String  TITLE_CONSULTA                                 = "Consulta";
   public static final String     TITLE_DOCUMENTOS                            = "Consulta de documentos";
   public static final String        TITLE_CONSULTA_LIBRE                     = "Consulta libre documentos";

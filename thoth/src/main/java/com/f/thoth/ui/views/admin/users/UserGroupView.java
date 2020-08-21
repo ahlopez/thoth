@@ -1,6 +1,6 @@
 package com.f.thoth.ui.views.admin.users;
 
-import static com.f.thoth.ui.utils.BakeryConst.PAGE_USER_GROUPS;
+import static com.f.thoth.ui.utils.Constant.PAGE_USER_GROUPS;
 
 import java.time.LocalDate;
 import java.util.function.Consumer;
@@ -16,7 +16,7 @@ import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.components.TreeGridSelector;
 import com.f.thoth.ui.crud.AbstractBakeryCrudView;
 import com.f.thoth.ui.crud.CrudEntityPresenter;
-import com.f.thoth.ui.utils.BakeryConst;
+import com.f.thoth.ui.utils.Constant;
 import com.f.thoth.ui.utils.converters.LocalDateToLocalDate;
 import com.f.thoth.ui.utils.converters.StringToString;
 import com.vaadin.flow.component.HasValue;
@@ -34,14 +34,14 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 @Route(value = PAGE_USER_GROUPS, layout = MainView.class)
-@PageTitle(BakeryConst.TITLE_USER_GROUPS)
+@PageTitle(Constant.TITLE_USER_GROUPS)
 @Secured(com.f.thoth.backend.data.Role.ADMIN)
 public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
 {
    private static final Converter<LocalDate, LocalDate> DATE_CONVERTER   = new LocalDateToLocalDate();
    private static final Converter<String, String>       STRING_CONVERTER = new StringToString("");
    private static final Converter<String, Integer>    CATEGORY_CONVERTER =
-                        new StringToIntegerConverter( BakeryConst.DEFAULT_CATEGORY, "Número inválido");
+                        new StringToIntegerConverter( Constant.DEFAULT_CATEGORY, "Número inválido");
 
    private static TreeGridSelector<UserGroup, HasValue.ValueChangeEvent<UserGroup>> parentGroup;
 
@@ -82,7 +82,7 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
 
       TextField category = new TextField("Categoría");
       category.setRequired(true);
-      category.setValue(BakeryConst.DEFAULT_CATEGORY.toString());
+      category.setValue(Constant.DEFAULT_CATEGORY.toString());
       category.setRequiredIndicatorVisible(true);
       category.getElement().setAttribute("colspan", "1");
 
@@ -134,8 +134,8 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
       binder.forField(category)
                 .withValidator(text -> text.length() == 1, "Categorías solo tienen un dígito") //Validación del texto
                 .withConverter(CATEGORY_CONVERTER)
-                .withValidator(cat -> cat >= BakeryConst.MIN_CATEGORY && cat <= BakeryConst.MAX_CATEGORY,
-                     "La categoría debe estar entre "+ BakeryConst.MIN_CATEGORY+ " y "+ BakeryConst.MAX_CATEGORY) // Validación del número
+                .withValidator(cat -> cat >= Constant.MIN_CATEGORY && cat <= Constant.MAX_CATEGORY,
+                     "La categoría debe estar entre "+ Constant.MIN_CATEGORY+ " y "+ Constant.MAX_CATEGORY) // Validación del número
                 .bind("category");
 
       binder.forField(fromDate)

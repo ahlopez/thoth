@@ -22,7 +22,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.BatchSize;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
-import com.f.thoth.ui.utils.BakeryConst;
+import com.f.thoth.ui.utils.Constant;
 
 /**
  *  Representa un usuario sencillo o compuesto del sistema
@@ -67,7 +67,7 @@ public abstract class Usuario extends BaseEntity
       LocalDate yearStart =now.minusDays(now.getDayOfYear());
 
       name = "";
-      category  = BakeryConst.DEFAULT_CATEGORY;
+      category  = Constant.DEFAULT_CATEGORY;
       locked    = false;
       fromDate  = yearStart;
       toDate    = yearStart.plusYears(1);

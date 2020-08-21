@@ -1,0 +1,58 @@
+Clientes
+   Tenants
+Seguridad
+   Objetos
+   Roles
+   Permisos ejecución
+   Permisos acceso
+Administración
+   Usuarios
+   Grupos de usuarios
+   Roles
+Clasificación
+   Fondos
+   Oficinas
+   Series
+   Subseries
+   Tipos documentales
+Expedientes
+   Expedientes
+   SubExpedientes
+   Volúmenes
+   Índice
+   Exportación
+   Importación
+Trámite
+   Consulta de bandeja
+   Clasificación documentos
+   Retorno
+   Re-envío
+   Borradores
+   Envío
+Recepción
+   Documentos
+   E-mail
+   Digitalización
+   Direccionamiento
+Consulta
+   Documentos
+      Consulta libre
+      Consulta metadatos
+   Expedientes
+      Consulta libre
+      Consulta metadatos
+      Consulta clasificación
+Procesos
+   Ejecutar proceso
+   Definir  proceso
+Archivo
+   Locales
+   Transferencia
+   Localización
+   Préstamo
+      Préstamo
+      Devolución
+   Índices de archivo
+
+
+

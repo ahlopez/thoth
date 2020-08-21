@@ -4,7 +4,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.exceptions.AccessDeniedException;
-import com.f.thoth.ui.utils.BakeryConst;
+import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.component.Tag;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.polymertemplate.PolymerTemplate;
@@ -18,7 +18,7 @@ import com.vaadin.flow.templatemodel.TemplateModel;
 @Tag("access-denied-view")
 @JsModule("./src/views/errors/access-denied-view.js")
 @ParentLayout(MainView.class)
-@PageTitle(BakeryConst.TITLE_ACCESS_DENIED)
+@PageTitle(Constant.TITLE_ACCESS_DENIED)
 public class AccessDeniedView extends PolymerTemplate<TemplateModel> implements HasErrorParameter<AccessDeniedException> {
 
    @Override

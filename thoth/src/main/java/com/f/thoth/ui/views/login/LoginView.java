@@ -1,13 +1,13 @@
 package com.f.thoth.ui.views.login;
 
-import static com.f.thoth.ui.utils.BakeryConst.TENANT;
+import static com.f.thoth.ui.utils.Constant.TENANT;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.f.thoth.app.security.SecurityUtils;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.TenantRepository;
-import com.f.thoth.ui.utils.BakeryConst;
+import com.f.thoth.ui.utils.Constant;
 import com.f.thoth.ui.views.storefront.StorefrontView;
 import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.login.LoginI18n;
@@ -24,7 +24,7 @@ import com.vaadin.flow.server.VaadinSession;
 @Route
 @PageTitle("Evidentia")
 @JsModule("./styles/shared-styles.js")
-@Viewport(BakeryConst.VIEWPORT)
+@Viewport(Constant.VIEWPORT)
 public class LoginView extends LoginOverlay
    implements AfterNavigationObserver, BeforeEnterObserver 
 {

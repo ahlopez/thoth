@@ -25,9 +25,11 @@ import com.vaadin.flow.shared.ApplicationConstants;
  * security and querying rights from different beans of the UI.
  *
  */
-public final class SecurityUtils {
+public final class SecurityUtils 
+{
 
-   private SecurityUtils() {
+   private SecurityUtils() 
+   {
       // Util methods only
    }
 
@@ -37,16 +39,19 @@ public final class SecurityUtils {
     * @return the user name of the current user or <code>null</code> if the user
     *         has not signed in
     */
-   public static String getUsername() {
+   public static String getUsername() 
+   {
       SecurityContext context = SecurityContextHolder.getContext();
       Object principal = context.getAuthentication().getPrincipal();
       if(principal instanceof UserDetails) {
          UserDetails userDetails = (UserDetails) context.getAuthentication().getPrincipal();
          return userDetails.getUsername();
       }
+      
       // Anonymous or no authentication.
       return null;
-   }
+      
+   }//getUsername
 
    /**
     * Checks if access is granted for the current user for the given secured view,
@@ -55,7 +60,8 @@ public final class SecurityUtils {
     * @param securedClass View class
     * @return true if access is granted, false otherwise.
     */
-   public static boolean isAccessGranted(Class<?> securedClass) {
+   public static boolean isAccessGranted(Class<?> securedClass) 
+   {
       final boolean publicView = LoginView.class.equals(securedClass)
          || AccessDeniedView.class.equals(securedClass)
          || CustomRouteNotFoundError.class.equals(securedClass);
@@ -81,7 +87,8 @@ public final class SecurityUtils {
       List<String> allowedRoles = Arrays.asList(secured.value());
       return userAuthentication.getAuthorities().stream().map(GrantedAuthority::getAuthority)
             .anyMatch(allowedRoles::contains);
-   }
+      
+   }//isAccessGranted
 
    /**
     * Checks if the user is logged in.
@@ -101,16 +108,18 @@ public final class SecurityUtils {
     * Tests if the request is an internal framework request. The test consists of
     * checking if the request parameter is present and if its value is consistent
     * with any of the request types know.
+    * Nota: Cambié ServletHelper por HandlerHelper
     *
     * @param request
     *            {@link HttpServletRequest}
     * @return true if is an internal framework request. False otherwise.
     */
-   @SuppressWarnings("deprecation")
-   static boolean isFrameworkInternalRequest(HttpServletRequest request) {
+  // @SuppressWarnings("deprecation")
+   static boolean isFrameworkInternalRequest(HttpServletRequest request) 
+   {
       final String parameterValue = request.getParameter(ApplicationConstants.REQUEST_TYPE_PARAMETER);
       return parameterValue != null
-            && Stream.of(com.vaadin.flow.server.ServletHelper.RequestType.values()).anyMatch(r -> r.getIdentifier().equals(parameterValue));
-   }
+            && Stream.of(com.vaadin.flow.server.HandlerHelper.RequestType.values()).anyMatch(r -> r.getIdentifier().equals(parameterValue));
+   }//isFrameworkInternalRequest
 
-}
+}//SecurityUtils

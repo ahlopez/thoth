@@ -14,7 +14,7 @@ import com.f.thoth.testbench.elements.ui.OrderItemEditorElement;
 import com.f.thoth.testbench.elements.ui.StorefrontViewElement;
 import com.f.thoth.testbench.elements.ui.StorefrontViewElement.OrderEditorElement;
 import com.f.thoth.testbench.elements.ui.UsersViewElement;
-import com.f.thoth.ui.utils.BakeryConst;
+import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.component.button.testbench.ButtonElement;
 import com.vaadin.flow.component.notification.testbench.NotificationElement;
 import com.vaadin.flow.component.textfield.testbench.TextFieldElement;
@@ -39,7 +39,7 @@ public class StorefrontViewIT extends AbstractIT<StorefrontViewElement> {
       order.click();
       ButtonElement editBtn = storefrontPage.getOrderDetails().getEditButton();
       editBtn.click();
-      Assert.assertThat(getDriver().getCurrentUrl(), containsString(BakeryConst.PAGE_STOREFRONT_EDIT));
+      Assert.assertThat(getDriver().getCurrentUrl(), containsString(Constant.PAGE_STOREFRONT_EDIT));
 
       OrderEditorElement orderEditor = storefrontPage.getOrderEditor();
       orderEditor.getOrderItemEditor(0).clickAmountFieldPlus();

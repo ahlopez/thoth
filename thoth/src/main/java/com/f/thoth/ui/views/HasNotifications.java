@@ -1,6 +1,6 @@
 package com.f.thoth.ui.views;
 
-import com.f.thoth.ui.utils.BakeryConst;
+import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.component.HasElement;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
@@ -27,7 +27,7 @@ public interface HasNotifications extends HasElement {
          close.addClickListener(event -> notification.close());
          notification.open();
       } else {
-         Notification.show(message, BakeryConst.NOTIFICATION_DURATION, Position.BOTTOM_STRETCH);
+         Notification.show(message, Constant.NOTIFICATION_DURATION, Position.BOTTOM_STRETCH);
       }
    }
 }

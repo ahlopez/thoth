@@ -1,6 +1,6 @@
 package com.f.thoth.ui.views.admin.users;
 
-import static com.f.thoth.ui.utils.BakeryConst.PAGE_USERS;
+import static com.f.thoth.ui.utils.Constant.PAGE_USERS;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -12,7 +12,7 @@ import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.service.UserService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.crud.AbstractBakeryCrudView;
-import com.f.thoth.ui.utils.BakeryConst;
+import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.crud.BinderCrudEditor;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -27,7 +27,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 @Route(value = PAGE_USERS, layout = MainView.class)
-@PageTitle(BakeryConst.TITLE_USERS)
+@PageTitle(Constant.TITLE_USERS)
 @Secured(Role.ADMIN)
 public class UsersView extends AbstractBakeryCrudView<User> {
 

@@ -1,8 +1,8 @@
 package com.f.thoth.ui.views.admin.objects;
 
 import static com.f.thoth.ui.dataproviders.DataProviderUtil.createItemLabelGenerator;
-import static com.f.thoth.ui.utils.BakeryConst.PAGE_OBJECT_TO_PROTECT;
-import static com.f.thoth.ui.utils.BakeryConst.TENANT;
+import static com.f.thoth.ui.utils.Constant.PAGE_OBJECT_TO_PROTECT;
+import static com.f.thoth.ui.utils.Constant.TENANT;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -15,7 +15,7 @@ import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.service.ObjectToProtectService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.crud.AbstractBakeryCrudView;
-import com.f.thoth.ui.utils.BakeryConst;
+import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.crud.BinderCrudEditor;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -29,7 +29,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.VaadinSession;
 
 @Route(value = PAGE_OBJECT_TO_PROTECT, layout = MainView.class)
-@PageTitle(BakeryConst.TITLE_OBJECT_TO_PROTECT)
+@PageTitle(Constant.TITLE_OBJECT_TO_PROTECT)
 @Secured(com.f.thoth.backend.data.Role.ADMIN)
 public class ObjectToProtectView extends AbstractBakeryCrudView<ObjectToProtect>
 {

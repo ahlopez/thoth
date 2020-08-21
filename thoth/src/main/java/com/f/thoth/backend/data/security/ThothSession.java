@@ -4,7 +4,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static com.f.thoth.ui.utils.BakeryConst.TENANT;
+import static com.f.thoth.ui.utils.Constant.TENANT;
 import com.f.thoth.backend.service.TenantService;
 import com.vaadin.flow.server.VaadinSession;
 

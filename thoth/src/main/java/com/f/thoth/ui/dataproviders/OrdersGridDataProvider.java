@@ -14,7 +14,7 @@ import org.vaadin.artur.spring.dataprovider.FilterablePageableDataProvider;
 
 import com.f.thoth.backend.data.entity.Order;
 import com.f.thoth.backend.service.OrderService;
-import com.f.thoth.ui.utils.BakeryConst;
+import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.data.provider.Query;
 import com.vaadin.flow.data.provider.QuerySortOrder;
 import com.vaadin.flow.data.provider.QuerySortOrderBuilder;
@@ -57,7 +57,7 @@ public class OrdersGridDataProvider extends FilterablePageableDataProvider<Order
    @Autowired
    public OrdersGridDataProvider(OrderService orderService) {
       this.orderService = orderService;
-      setSortOrders(BakeryConst.DEFAULT_SORT_DIRECTION, BakeryConst.ORDER_SORT_FIELDS);
+      setSortOrders(Constant.DEFAULT_SORT_DIRECTION, Constant.ORDER_SORT_FIELDS);
    }
 
    private void setSortOrders(Sort.Direction direction, String[] properties) {

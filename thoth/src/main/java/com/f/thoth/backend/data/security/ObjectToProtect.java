@@ -16,7 +16,7 @@ import javax.validation.constraints.Size;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
-import com.f.thoth.ui.utils.BakeryConst;
+import com.f.thoth.ui.utils.Constant;
 
 /**
  * Representa un objeto que requiere protección
@@ -65,7 +65,7 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Com
 	
 	private void init()
 	{
-		category  = BakeryConst.DEFAULT_CATEGORY;
+		category  = Constant.DEFAULT_CATEGORY;
 		userOwner = null;
 		roleOwner = null;
 	}//init

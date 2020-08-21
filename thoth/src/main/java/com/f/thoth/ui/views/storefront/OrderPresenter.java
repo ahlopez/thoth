@@ -13,7 +13,7 @@ import com.f.thoth.backend.service.OrderService;
 import com.f.thoth.ui.crud.EntityPresenter;
 import com.f.thoth.ui.dataproviders.OrdersGridDataProvider;
 import com.f.thoth.ui.dataproviders.OrdersGridDataProvider.OrderFilter;
-import com.f.thoth.ui.utils.BakeryConst;
+import com.f.thoth.ui.utils.Constant;
 import com.f.thoth.ui.views.storefront.beans.OrderCardHeader;
 import com.vaadin.flow.component.Focusable;
 import com.vaadin.flow.component.HasValue;
@@ -85,7 +85,7 @@ public class OrderPresenter {
    }
 
    void edit() {
-      UI.getCurrent().navigate(BakeryConst.PAGE_STOREFRONT_EDIT + "/" + entityPresenter.getEntity().getId());
+      UI.getCurrent().navigate(Constant.PAGE_STOREFRONT_EDIT + "/" + entityPresenter.getEntity().getId());
    }
 
    void back() {

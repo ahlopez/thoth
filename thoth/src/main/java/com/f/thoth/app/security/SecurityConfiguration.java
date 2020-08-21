@@ -18,7 +18,7 @@ import org.springframework.security.web.authentication.SavedRequestAwareAuthenti
 import com.f.thoth.backend.data.Role;
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.repositories.UserRepository;
-import com.f.thoth.ui.utils.BakeryConst;
+import com.f.thoth.ui.utils.Constant;
 
 /**
  * Configures spring security, doing the following:
@@ -36,7 +36,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
    private static final String LOGIN_PROCESSING_URL = "/login";
    private static final String LOGIN_FAILURE_URL = "/login?error";
    private static final String LOGIN_URL = "/login";
-   private static final String LOGOUT_SUCCESS_URL = "/" + BakeryConst.PAGE_STOREFRONT;
+   private static final String LOGOUT_SUCCESS_URL = "/" + Constant.PAGE_STOREFRONT;
 
    private final UserDetailsService userDetailsService;
 

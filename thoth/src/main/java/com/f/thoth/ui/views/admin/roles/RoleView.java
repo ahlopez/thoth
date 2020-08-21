@@ -1,6 +1,6 @@
 package com.f.thoth.ui.views.admin.roles;
 
-import static com.f.thoth.ui.utils.BakeryConst.PAGE_ROLES;
+import static com.f.thoth.ui.utils.Constant.PAGE_ROLES;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -10,7 +10,7 @@ import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.service.RoleService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.crud.AbstractBakeryCrudView;
-import com.f.thoth.ui.utils.BakeryConst;
+import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.component.crud.BinderCrudEditor;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
@@ -20,7 +20,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 @Route(value = PAGE_ROLES, layout = MainView.class)
-@PageTitle(BakeryConst.TITLE_ROLES)
+@PageTitle(Constant.TITLE_ROLES)
 @Secured(com.f.thoth.backend.data.Role.ADMIN)
 public class RoleView extends AbstractBakeryCrudView<Role>
 {

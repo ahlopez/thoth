@@ -1,6 +1,6 @@
 package com.f.thoth.ui.views.admin.tenants;
 
-import static com.f.thoth.ui.utils.BakeryConst.PAGE_TENANTS;
+import static com.f.thoth.ui.utils.Constant.PAGE_TENANTS;
 
 import java.time.LocalDate;
 
@@ -13,7 +13,7 @@ import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.service.TenantService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.crud.AbstractBakeryCrudView;
-import com.f.thoth.ui.utils.BakeryConst;
+import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.crud.BinderCrudEditor;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -25,7 +25,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 @Route(value = PAGE_TENANTS, layout = MainView.class)
-@PageTitle(BakeryConst.TITLE_TENANTS)
+@PageTitle(Constant.TITLE_TENANTS)
 @Secured(Role.ADMIN)
 public class TenantsView extends AbstractBakeryCrudView<Tenant>
 {

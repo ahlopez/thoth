@@ -21,7 +21,7 @@ import com.f.thoth.backend.data.entity.Product;
 import com.f.thoth.backend.service.OrderService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.dataproviders.OrdersGridDataProvider;
-import com.f.thoth.ui.utils.BakeryConst;
+import com.f.thoth.ui.utils.Constant;
 import com.f.thoth.ui.utils.FormattingUtils;
 import com.f.thoth.ui.views.storefront.OrderCard;
 import com.f.thoth.ui.views.storefront.beans.OrdersCountDataWithChart;
@@ -50,8 +50,8 @@ import com.vaadin.flow.templatemodel.TemplateModel;
 
 @Tag("dashboard-view")
 @JsModule("./src/views/dashboard/dashboard-view.js")
-@Route(value = BakeryConst.PAGE_DASHBOARD, layout = MainView.class)
-@PageTitle(BakeryConst.TITLE_DASHBOARD)
+@Route(value = Constant.PAGE_DASHBOARD, layout = MainView.class)
+@PageTitle(Constant.TITLE_DASHBOARD)
 @Secured(Role.ADMIN)
 public class DashboardView extends PolymerTemplate<TemplateModel> {
 
@@ -98,7 +98,7 @@ public class DashboardView extends PolymerTemplate<TemplateModel> {
             .withProperty("orderCard", OrderCard::create)
             .withProperty("header", order -> null)
             .withEventHandler("cardClick",
-                  order -> UI.getCurrent().navigate(BakeryConst.PAGE_STOREFRONT + "/" + order.getId())));
+                  order -> UI.getCurrent().navigate(Constant.PAGE_STOREFRONT + "/" + order.getId())));
 
       grid.setSelectionMode(Grid.SelectionMode.NONE);
       grid.setDataProvider(orderDataProvider);

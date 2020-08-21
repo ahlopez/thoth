@@ -6,7 +6,7 @@ import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.f.thoth.testbench.elements.ui.LoginViewElement;
-import com.f.thoth.ui.utils.BakeryConst;
+import com.f.thoth.ui.utils.Constant;
 import com.vaadin.testbench.IPAddress;
 import com.vaadin.testbench.ScreenshotOnFailureRule;
 import com.vaadin.testbench.TestBenchDriverProxy;
@@ -18,7 +18,7 @@ public abstract class AbstractIT<E extends TestBenchElement> extends ParallelTes
 
    static {
       // Let notifications persist longer during tests
-      BakeryConst.NOTIFICATION_DURATION = 10000;
+      Constant.NOTIFICATION_DURATION = 10000;
    }
 
    @Rule

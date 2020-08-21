@@ -1,7 +1,7 @@
 package com.f.thoth.ui.views.admin.users;
 
-import static com.f.thoth.ui.utils.BakeryConst.PAGE_SINGLE_USERS;
-import static com.f.thoth.ui.utils.BakeryConst.TITLE_SINGLE_USERS;
+import static com.f.thoth.ui.utils.Constant.PAGE_SINGLE_USERS;
+import static com.f.thoth.ui.utils.Constant.TITLE_SINGLE_USERS;
 
 import java.time.LocalDate;
 import java.util.function.Consumer;
@@ -16,7 +16,7 @@ import com.f.thoth.backend.service.SingleUserService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.crud.AbstractBakeryCrudView;
 import com.f.thoth.ui.crud.CrudEntityPresenter;
-import com.f.thoth.ui.utils.BakeryConst;
+import com.f.thoth.ui.utils.Constant;
 import com.f.thoth.ui.utils.converters.LocalDateToLocalDate;
 import com.f.thoth.ui.utils.converters.StringToString;
 import com.vaadin.flow.component.Component;
@@ -46,7 +46,7 @@ public class SingleUserView extends AbstractBakeryCrudView<SingleUser>
    private static final Converter<LocalDate, LocalDate> DATE_CONVERTER   = new LocalDateToLocalDate();
    private static final Converter<String, String>       STRING_CONVERTER = new StringToString("");
    private static final Converter<String, Integer>    CATEGORY_CONVERTER =
-         new StringToIntegerConverter( BakeryConst.DEFAULT_CATEGORY, "Categoría inválida");
+         new StringToIntegerConverter( Constant.DEFAULT_CATEGORY, "Categoría inválida");
 
 
    private static Button groups = new Button("Grupos");
@@ -128,7 +128,7 @@ public class SingleUserView extends AbstractBakeryCrudView<SingleUser>
 
       TextField category = new TextField("Categoría");
       category.setRequired(true);
-      category.setValue(BakeryConst.DEFAULT_CATEGORY.toString());
+      category.setValue(Constant.DEFAULT_CATEGORY.toString());
       category.setRequiredIndicatorVisible(true);
       category.getElement().setAttribute("colspan", "1");
 
@@ -189,8 +189,8 @@ public class SingleUserView extends AbstractBakeryCrudView<SingleUser>
       binder.forField(category)
       .withValidator(text -> text.length() == 1, "Categorías solo tienen un dígito") //Validación del texto
       .withConverter(CATEGORY_CONVERTER)
-      .withValidator(cat -> cat >= BakeryConst.MIN_CATEGORY && cat <= BakeryConst.MAX_CATEGORY,
-      "La categoría debe estar entre "+ BakeryConst.MIN_CATEGORY+ " y "+ BakeryConst.MAX_CATEGORY) // Validación del número
+      .withValidator(cat -> cat >= Constant.MIN_CATEGORY && cat <= Constant.MAX_CATEGORY,
+      "La categoría debe estar entre "+ Constant.MIN_CATEGORY+ " y "+ Constant.MAX_CATEGORY) // Validación del número
       .bind("category");
 
       binder.forField(fromDate)
