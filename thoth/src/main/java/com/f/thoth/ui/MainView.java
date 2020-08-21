@@ -345,7 +345,7 @@ public class MainView extends AppLayout
 
    private void createProcessMenu()
    {
-      Div procesos = new Div(VaadinIcon.TOOLS.create(), new Label(Constant.TITLE_PROCESOS));
+      Div procesos = new Div(VaadinIcon.COGS.create(), new Label(Constant.TITLE_PROCESOS));
       ContextMenu procesosMenu = new ContextMenu(procesos);
       procesosMenu.setOpenOnClick(true);
 

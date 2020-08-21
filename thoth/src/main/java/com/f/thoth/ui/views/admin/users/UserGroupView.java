@@ -100,19 +100,6 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
       toDate.setRequiredIndicatorVisible(true);
       toDate.getElement().setAttribute("colspan", "2");
 
-      /*
-      ComboBox<UserGroup> parentGroup = new ComboBox<>();
-      parentCombo = parentGroup;
-      parentGroup.getElement().setAttribute("colspan", "6");
-      parentGroup.setLabel("Grupo Padre");
-      parentGroup.setDataProvider(getTenantGroups());
-      parentGroup.setItemLabelGenerator(createItemLabelGenerator(UserGroup::getName));
-      parentGroup.setAllowCustomValue(false);
-      parentGroup.setRequired(false);
-      parentGroup.setRequiredIndicatorVisible(false);
-      parentGroup.setClearButtonVisible(true);
-      parentGroup.setPageSize(20);
-      */
       parentGroup = new TreeGridSelector<>(service, Grid.SelectionMode.SINGLE, "Grupo padre");
       parentGroup.getElement().setAttribute("colspan", "4");
 
@@ -126,32 +113,33 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
       BeanValidationBinder<UserGroup> binder = new BeanValidationBinder<>(UserGroup.class);
 
       binder.forField(name)
-                .withConverter(STRING_CONVERTER)
-                .withValidator(text -> TextUtil.isAlphaNumeric(text), "El nombre debe ser alfanumérico")
-                .bind("name");
+            .withConverter(STRING_CONVERTER)
+            .withValidator(text -> TextUtil.isAlphaNumeric(text), "El nombre debe ser alfanumérico")
+            .bind("name");
 
       binder.bind(blocked, "locked");
       binder.forField(category)
-                .withValidator(text -> text.length() == 1, "Categorías solo tienen un dígito") //Validación del texto
-                .withConverter(CATEGORY_CONVERTER)
-                .withValidator(cat -> cat >= Constant.MIN_CATEGORY && cat <= Constant.MAX_CATEGORY,
-                     "La categoría debe estar entre "+ Constant.MIN_CATEGORY+ " y "+ Constant.MAX_CATEGORY) // Validación del número
-                .bind("category");
+            .withValidator(text -> text.length() == 1, "Categorías solo tienen un dígito") //Validación del texto
+            .withConverter(CATEGORY_CONVERTER)
+            .withValidator(cat -> cat >= Constant.MIN_CATEGORY && cat <= Constant.MAX_CATEGORY,
+                 "La categoría debe estar entre "+ Constant.MIN_CATEGORY+ " y "+ Constant.MAX_CATEGORY) // Validación del número
+            .bind("category");
 
       binder.forField(fromDate)
-                .withConverter(DATE_CONVERTER)
-                .withValidator( date -> date.compareTo(LocalDate.now()) <= 0, "Fecha desde no puede ser futura")
-                .bind("fromDate");
+            .withConverter(DATE_CONVERTER)
+            .withValidator( date -> date.compareTo(LocalDate.now()) <= 0, "Fecha desde no puede ser futura")
+            .bind("fromDate");
 
       binder.forField(toDate)
-                .withConverter(DATE_CONVERTER)
-                .withValidator( date -> date.compareTo(LocalDate.now()) > 0, "Fecha hasta debe ser futura")
-                .bind("toDate");
+            .withConverter(DATE_CONVERTER)
+            .withValidator( date -> date.compareTo(LocalDate.now()) > 0, "Fecha hasta debe ser futura")
+            .bind("toDate");
 
       binder.forField(parentGroup)
-                .bind("owner");
+            .bind("owner");
 
       return new BinderCrudEditor<UserGroup>(binder, form);
+
    }//BinderCrudEditor
 
    protected void setupCrudEventListeners(CrudEntityPresenter<UserGroup> entityPresenter)
@@ -163,22 +151,14 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
 
        addEditListener(e ->  entityPresenter.loadEntity(e.getItem().getId(), entity -> navigateToEntity(entity.getId().toString())));
        addCancelListener(e -> navigateToEntity(null));
-       addSaveListener(e -> 
-       { 
+       addSaveListener(e ->
+       {
           UserGroup newGroup = e.getItem();
-          entityPresenter.save(newGroup, onSuccess, onFail); 
-          parentGroup.refresh(); 
+          entityPresenter.save(newGroup, onSuccess, onFail);
+          parentGroup.refresh();
        });
        addDeleteListener(e -> entityPresenter.delete(e.getItem(), onSuccess, onFail));
    }//setupCrudEventListeners
 
-
-/*
-   private static ListDataProvider<UserGroup> getTenantGroups()
-   {
-      Tenant tenant = ThothSession.getCurrentTenant();
-      return new ListDataProvider<UserGroup>( tenant == null? new TreeSet<>() : tenant.getUserGroups());
-   }//getTenantRoles
-*/
 
 }//UserGroupView

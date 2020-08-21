@@ -120,8 +120,8 @@ public class Constant
   public static final String     TITLE_SERIES                                = "Series";
   public static final String     TITLE_SUBSERIES                             = "Subseries";
   public static final String     TITLE_TIPOS_DOCUMENTALES                    = "Tipos documentales";
-  public static final String  TITLE_ADMIN_EXPEDIENTES                        = "Administración expedientes";
-  public static final String     TITLE_EXPEDIENTES                           = "Expedientes";
+  public static final String  TITLE_ADMIN_EXPEDIENTES                        = "Gestión expedientes";
+  public static final String     TITLE_EXPEDIENTES                           = "Expedientes mayores";
   public static final String     TITLE_SUBEXPEDIENTES                        = "Sub-expedientes";
   public static final String     TITLE_VOLUMENES                             = "Volúmenes";
   public static final String     TITLE_INDICE                                = "Índice de expedientes";
@@ -136,13 +136,13 @@ public class Constant
   public static final String     TITLE_RE_ENVIO                              = "Re-envío de documento";
   public static final String     TITLE_BORRADORES                            = "Carga borrador de documento";
   public static final String     TITLE_FIRMA                                 = "Firma de documento";
-  public static final String     TITLE_ENVIO                                 = "Envío de documento";
+  public static final String     TITLE_ENVIO                                 = "Ordena envío de documento";
   public static final String  TITLE_RECEPCION                                = "Recepción de documentos";
   public static final String     TITLE_RECEPCION_DOCUMENTOS                  = "Recepción en ventanilla";
   public static final String     TITLE_RECEPCION_E_MAIL                      = "Recepción correo electrónico";
   public static final String     TITLE_DIGITALIZACION                        = "Digitalización";
   public static final String     TITLE_DIRECCIONAMIENTO                      = "Enrutamiento de documentos";
-  public static final String  TITLE_CORRESPONDENCIA_EXTERNA                  = "Correspondencia externa";
+  public static final String  TITLE_CORRESPONDENCIA_EXTERNA                  = "Envío de documentos";
   public static final String     TITLE_REGISTRO_ENVIOS                       = "Consolidación envíos externos";
   public static final String     TITLE_ENVIO_EXTERNO                         = "Envía correspondencia externa";
   public static final String     TITLE_CONFIRMACION_ENVIO                    = "Confirmación de recepción";

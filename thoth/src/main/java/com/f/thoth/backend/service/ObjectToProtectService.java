@@ -12,11 +12,12 @@ import org.springframework.stereotype.Service;
 
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.security.ObjectToProtect;
+import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 
 @Service
-public class ObjectToProtectService implements FilterableCrudService<ObjectToProtect>
+public class ObjectToProtectService implements FilterableCrudService<ObjectToProtect>, HierarchicalService<ObjectToProtect>
 {
 
    private final ObjectToProtectRepository objectToProtectRepository;
@@ -26,11 +27,6 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
    {
       this.objectToProtectRepository = objectToProtectRepository;
    }
-
-   public List<ObjectToProtect> findAll()
-   {
-      return objectToProtectRepository.findAll(ThothSession.getCurrentTenant()); 
-   }//findAll
 
    @Override
    public Page<ObjectToProtect> findAnyMatching(Optional<String> filter, Pageable pageable)
@@ -85,5 +81,19 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
       }
 
    }//save
+   
+
+   //  ----- implements HierarchicalService ------
+   @Override public List<ObjectToProtect> findAll() { return objectToProtectRepository.findAll(ThothSession.getCurrentTenant()); }
+
+   @Override public Optional<ObjectToProtect> findById(Long id)              { return objectToProtectRepository.findById( id);}
+
+   @Override public List<ObjectToProtect> findByParent  ( ObjectToProtect owner) { return objectToProtectRepository.findByParent  (owner); }
+   @Override public int                   countByParent ( ObjectToProtect owner) { return objectToProtectRepository.countByParent (owner); }
+   @Override public boolean               hasChildren   ( ObjectToProtect object) { return objectToProtectRepository.countByChildren(object) > 0; }
+
+   @Override public List<ObjectToProtect> findByNameLikeIgnoreCase (Tenant tenant, String name) { return objectToProtectRepository.findByNameLikeIgnoreCase (tenant, name); }
+   @Override public long                  countByNameLikeIgnoreCase(Tenant tenant, String name) { return objectToProtectRepository.countByNameLikeIgnoreCase(tenant, name); }
+
 
 }//ObjectToProtectService

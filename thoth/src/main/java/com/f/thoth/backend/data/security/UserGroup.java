@@ -42,7 +42,7 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>, Hierarc
    public static final String FULL  = "UserGroup.full";
 
    @ManyToOne
-   protected UserGroup   owner;
+   protected UserGroup   owner;   // Owner Group to which this group belongs
 
    // ----------------- Constructor -----------------
    public UserGroup()
@@ -50,7 +50,7 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>, Hierarc
       super();
       owner = null;
       buildCode();
-   }
+   }//UserGroup
 
    @PrePersist
    @PreUpdate
@@ -119,9 +119,9 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>, Hierarc
    {
       return this.equals(that)?  0 :
              that ==  null    ?  1 :
-             this.code == null  && that.code == null?  0 :   
+             this.code == null  && that.code == null?  0 :
              this.code != null  && that.code == null?  1 :
-             this.code == null  && that.code != null? -1 :   
+             this.code == null  && that.code != null? -1 :
              this.code.compareTo(that.code);
 
    }// compareTo
