@@ -37,7 +37,7 @@ public class Constant
    public static final String TITLE_OBJECT_TO_PROTECT = "Protección";
 
 
-  public static final String  PAGE_CLIENTES                                 = "cliente";
+  public static final String  PAGE_CLIENTES                                 = "clientes";
   public static final String     PAGE_TENANTS                               = "tenants";
   public static final String  PAGE_SEGURIDAD                                = "seguridad";
   public static final String     PAGE_OBJETOS                               = "objetos_a_proteger";
@@ -103,7 +103,7 @@ public class Constant
   public static final String     PAGE_INDICES_ARCHIVO                       = "indice_archivo";
 
   public static final String  TITLE_CLIENTES                                 = "Clientes";
-  public static final String     TITLE_TENANTS                               = "Tenants";
+  public static final String     TITLE_TENANTS                               = "Fondo";
   public static final String  TITLE_SEGURIDAD                                = "Seguridad";
   public static final String     TITLE_OBJETOS                               = "Operaciones";
   public static final String     TITLE_INFORMACION                           = "Información";
