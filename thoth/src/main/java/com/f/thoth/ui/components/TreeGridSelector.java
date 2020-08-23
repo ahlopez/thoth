@@ -170,6 +170,14 @@ public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValu
       return registration;
 
    }//addValueChangeListener
+   
+   /*
+        permit.addClickListener          (listener);
+        permit.addDoubleClickListener    (listener);
+        permit.addRightClickListener     (listener);
+        permit.addSingleSelectionListener(listener);
+        permit.addMultiSelectionListener (listener);
+    */
 
 
    private void backtrackParents(Consumer<Collection<T>> fn, final T value)

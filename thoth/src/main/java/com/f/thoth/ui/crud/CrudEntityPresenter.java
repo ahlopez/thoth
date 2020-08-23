@@ -77,11 +77,10 @@ public class CrudEntityPresenter<E extends AbstractEntity>  implements HasLogger
       view.showNotification(message, isPersistent);
    }//consumeError
 
-   private void saveEntity(E entity) {
-      crudService.save(currentUser.getUser(), entity);
-   }
+   private void saveEntity(E entity) { crudService.save(currentUser.getUser(), entity);}
 
-   public boolean loadEntity(Long id, Consumer<E> onSuccess) {
+   public boolean loadEntity(Long id, Consumer<E> onSuccess) 
+   {
       return executeOperation(() -> onSuccess.accept(crudService.load(id)));
    }
 }//CrudEntityPresenter

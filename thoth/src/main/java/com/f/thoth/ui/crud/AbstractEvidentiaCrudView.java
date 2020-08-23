@@ -17,7 +17,7 @@ import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.OptionalParameter;
 
-public abstract class AbstractBakeryCrudView<E extends AbstractEntity> extends Crud<E>
+public abstract class AbstractEvidentiaCrudView<E extends AbstractEntity> extends Crud<E>
         implements HasUrlParameter<Long>, HasNotifications
 {
 
@@ -32,7 +32,7 @@ public abstract class AbstractBakeryCrudView<E extends AbstractEntity> extends C
 
     protected abstract void setupGrid(Grid<E> grid);
 
-    public AbstractBakeryCrudView(Class<E> beanType, FilterableCrudService<E> service,
+    public AbstractEvidentiaCrudView(Class<E> beanType, FilterableCrudService<E> service,
                                   Grid<E> grid, CrudEditor<E> editor, CurrentUser currentUser)
     {
         super(beanType, grid, editor);

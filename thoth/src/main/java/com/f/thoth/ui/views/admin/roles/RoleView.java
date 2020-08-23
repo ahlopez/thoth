@@ -9,7 +9,7 @@ import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.service.RoleService;
 import com.f.thoth.ui.MainView;
-import com.f.thoth.ui.crud.AbstractBakeryCrudView;
+import com.f.thoth.ui.crud.AbstractEvidentiaCrudView;
 import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.component.crud.BinderCrudEditor;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -22,7 +22,7 @@ import com.vaadin.flow.router.Route;
 @Route(value = PAGE_ROLES, layout = MainView.class)
 @PageTitle(Constant.TITLE_ROLES)
 @Secured(com.f.thoth.backend.data.Role.ADMIN)
-public class RoleView extends AbstractBakeryCrudView<Role>
+public class RoleView extends AbstractEvidentiaCrudView<Role>
 {
    @Autowired
    public RoleView(RoleService service, CurrentUser currentUser) 

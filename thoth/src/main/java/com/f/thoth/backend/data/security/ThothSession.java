@@ -1,11 +1,13 @@
 package com.f.thoth.backend.data.security;
 
+import static com.f.thoth.ui.utils.Constant.TENANT;
+
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static com.f.thoth.ui.utils.Constant.TENANT;
 import com.f.thoth.backend.service.TenantService;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.server.VaadinSession;
 
 public class ThothSession
@@ -56,5 +58,13 @@ public class ThothSession
 			}
 		}
 	}//updateSession
+	
+
+   public static ListDataProvider<Role> getTenantRoles()
+   {
+      Tenant tenant = getCurrentTenant();
+      return new ListDataProvider<Role>( tenant.getRoles());
+   }//getTenantRoles
+
 
 }//ThothSession

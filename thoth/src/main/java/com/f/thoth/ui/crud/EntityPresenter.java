@@ -188,6 +188,7 @@ public class EntityPresenter<T extends AbstractEntity, V extends EntityView<T>> 
 
 }//EntityPresenter
 
+//-----------------------------------------------------------------------------------------
 /**
  * Holds variables that change.
  */

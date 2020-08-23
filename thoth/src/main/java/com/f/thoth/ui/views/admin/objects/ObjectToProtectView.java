@@ -2,7 +2,6 @@ package com.f.thoth.ui.views.admin.objects;
 
 import static com.f.thoth.ui.dataproviders.DataProviderUtil.createItemLabelGenerator;
 import static com.f.thoth.ui.utils.Constant.PAGE_OBJECT_TO_PROTECT;
-import static com.f.thoth.ui.utils.Constant.TENANT;
 
 import java.util.function.Consumer;
 
@@ -14,11 +13,11 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
-import com.f.thoth.backend.data.security.Tenant;
+import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.service.ObjectToProtectService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.components.TreeGridSelector;
-import com.f.thoth.ui.crud.AbstractBakeryCrudView;
+import com.f.thoth.ui.crud.AbstractEvidentiaCrudView;
 import com.f.thoth.ui.crud.CrudEntityPresenter;
 import com.f.thoth.ui.utils.Constant;
 import com.f.thoth.ui.utils.converters.StringToString;
@@ -32,15 +31,13 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.converter.Converter;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
-import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.VaadinSession;
 
 @Route(value = PAGE_OBJECT_TO_PROTECT, layout = MainView.class)
 @PageTitle(Constant.TITLE_OBJECT_TO_PROTECT)
 @Secured(com.f.thoth.backend.data.Role.ADMIN)
-public class ObjectToProtectView extends AbstractBakeryCrudView<ObjectToProtect>
+public class ObjectToProtectView extends AbstractEvidentiaCrudView<ObjectToProtect>
 {
    private static final Converter<String, String>  STRING_CONVERTER  = new StringToString("");
    private static final Converter<String, Integer> CATEGORY_CONVERTER= new StringToIntegerConverter( Constant.DEFAULT_CATEGORY, "Número inválido");
@@ -93,7 +90,7 @@ public class ObjectToProtectView extends AbstractBakeryCrudView<ObjectToProtect>
       ComboBox<Role> roleOwner = new ComboBox<>();
       roleOwner.getElement().setAttribute("colspan", "2");
       roleOwner.setLabel("Rol dueño");
-      roleOwner.setDataProvider(getTenantRoles());
+      roleOwner.setDataProvider(ThothSession.getTenantRoles());
       roleOwner.setItemLabelGenerator(createItemLabelGenerator(Role::getName));
       roleOwner.setRequired(false);
       roleOwner.setRequiredIndicatorVisible(false);
@@ -134,13 +131,6 @@ public class ObjectToProtectView extends AbstractBakeryCrudView<ObjectToProtect>
       return new BinderCrudEditor<ObjectToProtect>(binder, form);
 
    }//BinderCrudEditor
-
-   private static ListDataProvider<Role> getTenantRoles()
-   {
-      VaadinSession currentSession = VaadinSession.getCurrent();
-      Tenant tenant = (Tenant)currentSession.getAttribute(TENANT);
-      return new ListDataProvider<Role>( tenant.getRoles());
-   }//getTenantRoles
 
    protected void setupCrudEventListeners(CrudEntityPresenter<ObjectToProtect> entityPresenter)
    {

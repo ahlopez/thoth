@@ -11,7 +11,7 @@ import com.f.thoth.backend.data.Role;
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.service.UserService;
 import com.f.thoth.ui.MainView;
-import com.f.thoth.ui.crud.AbstractBakeryCrudView;
+import com.f.thoth.ui.crud.AbstractEvidentiaCrudView;
 import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.crud.BinderCrudEditor;
@@ -29,7 +29,7 @@ import com.vaadin.flow.router.Route;
 @Route(value = PAGE_USERS, layout = MainView.class)
 @PageTitle(Constant.TITLE_USERS)
 @Secured(Role.ADMIN)
-public class UsersView extends AbstractBakeryCrudView<User> {
+public class UsersView extends AbstractEvidentiaCrudView<User> {
 
    @Autowired
    public UsersView(UserService service, CurrentUser currentUser, PasswordEncoder passwordEncoder) {

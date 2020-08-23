@@ -10,8 +10,8 @@ import org.springframework.data.jpa.repository.EntityGraph.EntityGraphType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.SingleUser;
+import com.f.thoth.backend.data.security.Tenant;
 
 public interface SingleUserRepository extends JpaRepository<SingleUser, Long>
 {

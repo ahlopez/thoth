@@ -12,7 +12,7 @@ import com.f.thoth.backend.data.Role;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.service.TenantService;
 import com.f.thoth.ui.MainView;
-import com.f.thoth.ui.crud.AbstractBakeryCrudView;
+import com.f.thoth.ui.crud.AbstractEvidentiaCrudView;
 import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.crud.BinderCrudEditor;
@@ -27,7 +27,7 @@ import com.vaadin.flow.router.Route;
 @Route(value = PAGE_TENANTS, layout = MainView.class)
 @PageTitle(Constant.TITLE_TENANTS)
 @Secured(Role.ADMIN)
-public class TenantsView extends AbstractBakeryCrudView<Tenant>
+public class TenantsView extends AbstractEvidentiaCrudView<Tenant>
 {
    @Autowired
    public TenantsView(TenantService service, CurrentUser currentUser) {

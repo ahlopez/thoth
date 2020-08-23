@@ -14,7 +14,7 @@ import com.f.thoth.backend.data.security.UserGroup;
 import com.f.thoth.backend.service.UserGroupService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.components.TreeGridSelector;
-import com.f.thoth.ui.crud.AbstractBakeryCrudView;
+import com.f.thoth.ui.crud.AbstractEvidentiaCrudView;
 import com.f.thoth.ui.crud.CrudEntityPresenter;
 import com.f.thoth.ui.utils.Constant;
 import com.f.thoth.ui.utils.converters.LocalDateToLocalDate;
@@ -36,7 +36,7 @@ import com.vaadin.flow.router.Route;
 @Route(value = PAGE_USER_GROUPS, layout = MainView.class)
 @PageTitle(Constant.TITLE_USER_GROUPS)
 @Secured(com.f.thoth.backend.data.Role.ADMIN)
-public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
+public class UserGroupView extends AbstractEvidentiaCrudView<UserGroup>
 {
    private static final Converter<LocalDate, LocalDate> DATE_CONVERTER   = new LocalDateToLocalDate();
    private static final Converter<String, String>       STRING_CONVERTER = new StringToString("");
@@ -140,7 +140,7 @@ public class UserGroupView extends AbstractBakeryCrudView<UserGroup>
 
       return new BinderCrudEditor<UserGroup>(binder, form);
 
-   }//BinderCrudEditor
+   }//createForm
 
    protected void setupCrudEventListeners(CrudEntityPresenter<UserGroup> entityPresenter)
    {

@@ -14,7 +14,7 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.security.SingleUser;
 import com.f.thoth.backend.service.SingleUserService;
 import com.f.thoth.ui.MainView;
-import com.f.thoth.ui.crud.AbstractBakeryCrudView;
+import com.f.thoth.ui.crud.AbstractEvidentiaCrudView;
 import com.f.thoth.ui.crud.CrudEntityPresenter;
 import com.f.thoth.ui.utils.Constant;
 import com.f.thoth.ui.utils.converters.LocalDateToLocalDate;
@@ -41,7 +41,7 @@ import com.vaadin.flow.router.Route;
 @Route(value = PAGE_SINGLE_USERS, layout = MainView.class)
 @PageTitle(TITLE_SINGLE_USERS)
 @Secured(com.f.thoth.backend.data.Role.ADMIN)
-public class SingleUserView extends AbstractBakeryCrudView<SingleUser>
+public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
 {
    private static final Converter<LocalDate, LocalDate> DATE_CONVERTER   = new LocalDateToLocalDate();
    private static final Converter<String, String>       STRING_CONVERTER = new StringToString("");
