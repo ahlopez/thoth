@@ -1,8 +1,8 @@
 package com.f.thoth.backend.service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -19,7 +19,7 @@ import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 
 @Service
-public class ObjectToProtectService implements FilterableCrudService<ObjectToProtect>, HierarchicalService<ObjectToProtect>
+public class ObjectToProtectService implements FilterableCrudService<ObjectToProtect>, PermissionService<ObjectToProtect>
 {
 
    private final ObjectToProtectRepository objectToProtectRepository;
@@ -99,12 +99,9 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
 
    //  --------  Permission handling ---------------------
 
-   public List<ObjectToProtect> findGrants( Role role)
-   {
-      return objectToProtectRepository.findGrants(role);
-   }
-
-   public void grant(User currentUser, Role role, Set<ObjectToProtect>newGrants)
+   @Override public List<ObjectToProtect> findGrants( Role role){ return objectToProtectRepository.findGrants(role); }
+      
+   public void grant(User currentUser, Role role, Collection<ObjectToProtect>newGrants)
    {
       newGrants.forEach( objectToProtect->  
       {
@@ -114,7 +111,7 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
    }//grant
 
 
-   public void revoke(User currentUser, Role role, Set<ObjectToProtect> revokedGrants)
+   public void revoke(User currentUser, Role role, Collection<ObjectToProtect> revokedGrants)
    {
       revokedGrants.forEach( objectToProtect->  
       {

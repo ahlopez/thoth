@@ -299,7 +299,10 @@ public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValu
 
    //Sets the value of this object.
    @Override public void  setValue(T value)
-   {
+   {  
+      if (value == null)
+         return;
+      
       if ( selectionMode != Grid.SelectionMode.MULTI)
          result.clear();
       

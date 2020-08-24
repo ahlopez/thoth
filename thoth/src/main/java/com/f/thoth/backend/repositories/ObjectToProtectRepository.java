@@ -52,7 +52,7 @@ public interface ObjectToProtectRepository extends JpaRepository<ObjectToProtect
 
    //   ----------- ACL handling ----------------
    @EntityGraph(value = ObjectToProtect.BRIEF, type = EntityGraphType.LOAD)
-   @Query("SELECT o FROM ObjectToProtect o WHERE ?1 = ANY (SELECT role WHERE o.acl= ?1))")
+   @Query("SELECT o FROM ObjectToProtect o join fetch o.acl a WHERE  a = ?1")
    List<ObjectToProtect> findGrants( Role role);
    
 

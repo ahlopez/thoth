@@ -25,12 +25,11 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.shared.Registration;
 
 public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E>> 
                 extends    VerticalLayout 
-                implements HasUrlParameter<Long>, HasNotifications
+                implements HasNotifications
 {
 
    // private TreeDataProvider<ObjectToProtect>   dataProvider;
