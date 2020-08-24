@@ -89,7 +89,7 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
    @ManyToOne
    protected Role            roleOwner;  // Role that owns this object
 
-   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
    @OrderColumn
    @JoinColumn
    @BatchSize(size = 20)
@@ -222,5 +222,11 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
    @Override public boolean isOwnedBy( SingleUser user) { return userOwner != null && user != null && userOwner.equals(user);}
 
    @Override public boolean isOwnedBy( Role role) { return roleOwner != null && role != null && roleOwner.equals(role);}
+   
+   @Override public boolean admits( Role role) { return acl.contains(role); }
+   
+   @Override public void grant( Role role) { acl.add(role);}
+   
+   @Override public void revoke( Role role) { acl.remove(role);}
 
 }//ObjectToProtect

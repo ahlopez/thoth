@@ -95,6 +95,14 @@ public class DocType extends BaseEntity implements NeedsProtection, Comparable<D
 
    protected boolean   requiresContent;
 
+   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+   @OrderColumn
+   @JoinColumn
+   @BatchSize(size = 20)
+   protected Set<Role>       acl;   // Access control list
+   
+   
+
    // ------------- Constructors ------------------
    public DocType()
    {
@@ -180,6 +188,9 @@ public class DocType extends BaseEntity implements NeedsProtection, Comparable<D
    public Set<DocType> getChildren(){ return children;}
    public void         setChildren( Set<DocType> children){ this.children = children;}
 
+   public Set<Role>       getAcl() {return acl;}
+   public void            setAcl(Set<Role> acl) {this.acl = acl;}
+
    // --------------- Object methods ---------------------
 
    @Override
@@ -250,6 +261,12 @@ public class DocType extends BaseEntity implements NeedsProtection, Comparable<D
    @Override public boolean isOwnedBy( SingleUser user) { return userOwner != null && userOwner.equals(user);}
 
    @Override public boolean isOwnedBy( Role role) { return roleOwner != null && roleOwner.equals(role);}
+   
+   @Override public boolean admits( Role role) { return acl.contains(role); }
+   
+   @Override public void grant( Role role) { acl.add(role);}
+   
+   @Override public void revoke( Role role) { acl.remove(role);}
 
 
 

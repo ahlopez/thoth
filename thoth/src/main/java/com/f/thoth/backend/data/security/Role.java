@@ -1,24 +1,13 @@
 package com.f.thoth.backend.data.security;
 
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
-import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
-
-import org.hibernate.annotations.BatchSize;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
@@ -35,18 +24,10 @@ public class Role extends BaseEntity implements Comparable<Role>
    @Size(max = 50)
    private String name;
 
-   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-   @OrderColumn
-   @JoinColumn
-   @BatchSize(size = 50)
-   @Valid
-   private Set<Permission> permissions;
-
    public Role()
    {
       super();
       name = "";
-      init();
       buildCode();
    }
 
@@ -57,7 +38,6 @@ public class Role extends BaseEntity implements Comparable<Role>
          throw new IllegalArgumentException("Nombre["+ name+ "] es inválido");
 
       this.name = TextUtil.nameTidy(name);
-      init();
       buildCode();
    }//Role
 
@@ -71,11 +51,6 @@ public class Role extends BaseEntity implements Comparable<Role>
 
    @Override protected void buildCode(){ this.code = (tenant == null? "[Tenant]": tenant.getCode())+ ">"+ this.name; }
 
-   private void init() 
-   { 
-	   this.permissions = new TreeSet<>(); 
-   }
-
    // -------------- Getters & Setters ----------------
 
    public String       getName()  { return name;}
@@ -84,9 +59,6 @@ public class Role extends BaseEntity implements Comparable<Role>
       this.name = name;
       buildCode();
    }//setName
-
-   public Set<Permission> getPermissions() { return permissions;}
-   public void setPermissions( Set<Permission> permissions) { this.permissions = permissions;}
 
    // --------------- Object methods ---------------------
 
@@ -108,7 +80,7 @@ public class Role extends BaseEntity implements Comparable<Role>
    public int hashCode() { return id == null? 13: id.hashCode(); }
 
    @Override
-   public String toString() { return "Role{"+ super.toString()+ " name["+ name+ "] permissions["+ permissions.size()+ "]}";}
+   public String toString() { return "Role{"+ super.toString()+ " name["+ name+ "]}";}
 
    @Override
    public int compareTo(Role that)
@@ -136,13 +108,7 @@ public class Role extends BaseEntity implements Comparable<Role>
       if( object.isOwnedBy(this))
          return true;
 
-      for(Permission p: permissions)
-      {
-         if ( p.getObjectToProtect().getCode().equals(object.getKey()) && p.isCurrent())
-          return true;
-      }
-
-      return  false;
+      return object.admits(this);
    }//canAccess
 
 

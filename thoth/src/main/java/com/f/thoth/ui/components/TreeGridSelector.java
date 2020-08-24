@@ -30,7 +30,7 @@ public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValu
 {
    private TreeDataProvider<T>          dataProvider;
    private final Tenant                 tenant;
-   private final ArrayList<T>           result;
+   private final Set<T>                 result;  
    private SearchBar                    searchBar;
    private TreeGrid<T>                  treeGrid;
    private List<T>                      gridNodes;
@@ -43,7 +43,7 @@ public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValu
    public TreeGridSelector ( HierarchicalService<T> service, Grid.SelectionMode selectionMode, String name)
    {
       this.tenant         = ThothSession.getCurrentTenant();
-      this.result         = new ArrayList<>();
+      this.result         = new TreeSet<>();
       this.selectionMode  = selectionMode;
       this.service        = service;
       setup(name);
@@ -62,7 +62,6 @@ public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValu
       if ( selectionMode != Grid.SelectionMode.NONE)
       {
          this.searchGrid   = buildSearchGrid(treeGrid);
-         searchGrid.setVisible(false);
          this.searchBar    = buildSearchBar(searchGrid);
          add(searchBar);
          layout.add(searchGrid);
@@ -71,6 +70,11 @@ public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValu
       refresh();
 
    }//setup
+   
+   public void init( Collection<T> initialSelection)
+   {
+      initialSelection.forEach( val-> setValue(val));
+   }//init
 
 
    private TreeGrid<T> buildTreeGrid()
@@ -171,14 +175,6 @@ public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValu
 
    }//addValueChangeListener
    
-   /*
-        permit.addClickListener          (listener);
-        permit.addDoubleClickListener    (listener);
-        permit.addRightClickListener     (listener);
-        permit.addSingleSelectionListener(listener);
-        permit.addMultiSelectionListener (listener);
-    */
-
 
    private void backtrackParents(Consumer<Collection<T>> fn, final T value)
    {
@@ -278,10 +274,10 @@ public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValu
    //Returns the current value of this object.
    @Override public T  getValue()
    {
-      return result.isEmpty()? null: result.get(0) ;
+      return result.isEmpty()? null: result.iterator().next() ;
    }
 
-   public Collection<T> getValues(){ return result;}
+   public Set<T> getValues(){ return result;}
 
    //Returns whether this HasValue is in read-only mode or not.
    @Override public boolean  isReadOnly() { return selectionMode == Grid.SelectionMode.NONE;}

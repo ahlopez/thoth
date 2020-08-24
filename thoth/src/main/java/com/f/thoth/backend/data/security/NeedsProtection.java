@@ -14,5 +14,11 @@ public interface NeedsProtection
    public boolean isOwnedBy( SingleUser user);
 
    public boolean isOwnedBy( Role role);
+   
+   public boolean admits( Role role);
+   
+   public void    grant( Role role);
+   
+   public void    revoke( Role role);
 
 }//NeedsProtection

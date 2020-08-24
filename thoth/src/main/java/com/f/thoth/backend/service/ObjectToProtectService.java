@@ -2,6 +2,7 @@ package com.f.thoth.backend.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.security.ObjectToProtect;
+import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
@@ -81,7 +83,7 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
       }
 
    }//save
-   
+
 
    //  ----- implements HierarchicalService ------
    @Override public List<ObjectToProtect> findAll() { return objectToProtectRepository.findAll(ThothSession.getCurrentTenant()); }
@@ -94,6 +96,32 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
 
    @Override public List<ObjectToProtect> findByNameLikeIgnoreCase (Tenant tenant, String name) { return objectToProtectRepository.findByNameLikeIgnoreCase (tenant, name); }
    @Override public long                  countByNameLikeIgnoreCase(Tenant tenant, String name) { return objectToProtectRepository.countByNameLikeIgnoreCase(tenant, name); }
+
+   //  --------  Permission handling ---------------------
+
+   public List<ObjectToProtect> findGrants( Role role)
+   {
+      return objectToProtectRepository.findGrants(role);
+   }
+
+   public void grant(User currentUser, Role role, Set<ObjectToProtect>newGrants)
+   {
+      newGrants.forEach( objectToProtect->  
+      {
+         objectToProtect.grant(role);
+         save(currentUser, objectToProtect);
+      });
+   }//grant
+
+
+   public void revoke(User currentUser, Role role, Set<ObjectToProtect> revokedGrants)
+   {
+      revokedGrants.forEach( objectToProtect->  
+      {
+         objectToProtect.revoke(role);
+         save(currentUser, objectToProtect);
+      });
+   }//revoke
 
 
 }//ObjectToProtectService

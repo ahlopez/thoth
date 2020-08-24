@@ -2,12 +2,20 @@ package com.f.thoth.backend.data.gdoc.classification;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import org.hibernate.annotations.BatchSize;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
@@ -44,6 +52,12 @@ public class Office extends BaseEntity implements NeedsProtection, Comparable<Of
 
    @NotNull(message = "{remun.status.required}")
    public RetentionSchedule retentionSchedule;
+
+   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+   @OrderColumn
+   @JoinColumn
+   @BatchSize(size = 20)
+   protected Set<Role>       acl;   // Access control list   
 
    // ------------- Constructors ------------------
    public Office()
@@ -124,6 +138,9 @@ public class Office extends BaseEntity implements NeedsProtection, Comparable<Of
    public RetentionSchedule getRetentionSchedule() { return retentionSchedule;}
    public void              setRetentionSchedule( RetentionSchedule retentionSchedule){ this.retentionSchedule= retentionSchedule;}
 
+   public Set<Role>       getAcl() {return acl;}
+   public void            setAcl(Set<Role> acl) {this.acl = acl;}
+
    // --------------- Object methods ---------------------
 
    @Override
@@ -190,5 +207,12 @@ public class Office extends BaseEntity implements NeedsProtection, Comparable<Of
    @Override public boolean isOwnedBy( SingleUser user) { return false;}
 
    @Override public boolean isOwnedBy( Role role){ return roleOwner != null && roleOwner.equals(role); }
+   
+   @Override public boolean admits( Role role) { return acl.contains(role); }
+   
+   @Override public void grant( Role role) { acl.add(role);}
+   
+   @Override public void revoke( Role role) { acl.remove(role);}
+   
 
 }//Office

@@ -1,23 +1,21 @@
-package com.f.thoth.ui.presenters;
+package com.f.thoth.ui.views.security.permission;
 
-import java.util.function.Consumer;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
-import javax.management.relation.Role;
-import javax.persistence.EntityNotFoundException;
-import javax.validation.ConstraintViolationException;
-
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import com.f.thoth.app.HasLogger;
 import com.f.thoth.app.security.CurrentUser;
-import com.f.thoth.backend.data.entity.HierarchicalEntity;
-import com.f.thoth.backend.service.HierarchicalService;
-import com.f.thoth.backend.service.UserFriendlyDataException;
+import com.f.thoth.backend.data.security.Role;
+import com.f.thoth.backend.service.PermissionService;
 import com.f.thoth.ui.views.HasNotifications;
 
-public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements HasLogger
+public class PermissionPresenter<E>  implements HasLogger
 {
+   /*
    public enum Message
    {
        DATA_INTEGRITY  ("La operación no puede ser ejecutada pues dañaría las referencias a otras entidades en la base de datos."),
@@ -30,41 +28,43 @@ public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements Ha
        private String text() { return msg;}
 
    }//Message
+   */
 
-   private final HierarchicalService<E> service;
-   private final CurrentUser            currentUser;
-   private final HasNotifications       view;
+   private final PermissionService<E>   service;
+  // private final CurrentUser            currentUser;
+  // private final HasNotifications       view;
 
-   public PermissionPresenter(HierarchicalService<E> service, CurrentUser currentUser, HasNotifications view)
+   @Autowired
+   public PermissionPresenter(PermissionService<E> service, CurrentUser currentUser, HasNotifications view)
    {
       this.service     = service;
-      this.currentUser = currentUser;
-      this.view        = view;
+   //   this.currentUser = currentUser;
+   //   this.view        = view;
 
-   }//PermitPresenter
+   }//PermissionPresenter
+   
+   public List<E> loadGrants( Role role )
+   {  
+      List<E> oldGrants = service.findGrants(role);
+      return oldGrants;
+   }//loadGrants
 
-   public Role loadRole( Long id) { return null; }
-
-   public void grant(E entity, Role role, Consumer<E> onSuccess, Consumer<E> onFail)
+   public void grantRevoke( Collection<E> grants, Role role, CurrentUser currentUser )
    {
-      if (executeOperation(() -> service.grant(currentUser.getUser(), entity, role)))
-         onSuccess.accept(entity);
-      else
-         onFail.accept(entity);
+      Set<E> oldGrants  = new TreeSet<>();
+      oldGrants.addAll(loadGrants(role));
+      
+      Set<E> newGrants  = new TreeSet<>();
+      grants.forEach (object -> {if( !oldGrants.contains(object)) newGrants.add(object);});
+      service.grant  (currentUser, role, newGrants);
+      
+      Set<E> newRevokes = new TreeSet<>();
+      oldGrants.forEach (object -> {if( !grants.contains(object)) newRevokes.add(object);});
+      service.revoke    (currentUser, role, newRevokes);
 
-   }//grant
+   }//grantRevoke
 
-
-
-   public void revoke(E entity, Role role, Consumer<E> onSuccess, Consumer<E> onFail)
-   {
-      if (executeOperation(() -> service.revoke(currentUser.getUser(), entity, role)))
-         onSuccess.accept(entity);
-      else
-         onFail.accept(entity);
-
-   }//revoke
-
+   /*
    private boolean executeOperation(Runnable operation)
    {
       try {
@@ -88,6 +88,7 @@ public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements Ha
       }
       return false;
    }//executeOperation
+  
 
 
    private void consumeError(Exception e, String message, boolean isPersistent)
@@ -95,11 +96,6 @@ public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements Ha
       getLogger().debug(message, e);
       view.showNotification(message, isPersistent);
    }//consumeError
-
-
-   private void saveEntity(E entity) { service.save(currentUser.getUser(), entity); }
-
-
-   public boolean loadEntity(Long id, Consumer<E> onSuccess) { return executeOperation(() -> onSuccess.accept(service.load(id))); }
+    */
 
 }//PermitPresenter

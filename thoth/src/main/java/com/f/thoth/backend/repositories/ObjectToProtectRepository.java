@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.f.thoth.backend.data.security.ObjectToProtect;
+import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
 
 public interface ObjectToProtectRepository extends JpaRepository<ObjectToProtect, Long>
@@ -33,21 +34,27 @@ public interface ObjectToProtectRepository extends JpaRepository<ObjectToProtect
    Optional<ObjectToProtect> findById(Long id);
 
    @EntityGraph(value = ObjectToProtect.BRIEF, type = EntityGraphType.LOAD)
-   @Query("SELECT o FROM ObjectToProtect o where (o.owner is null and ?1 is null) or (o.owner=?1)")
+   @Query("SELECT o FROM ObjectToProtect o WHERE (o.owner is null and ?1 is null) or (o.owner=?1)")
    List<ObjectToProtect> findByParent( ObjectToProtect parent);
 
-   @Query("SELECT count(o) FROM ObjectToProtect o where (o.owner is null and ?1 is null) or (o.owner=?1)")
+   @Query("SELECT count(o) FROM ObjectToProtect o WHERE (o.owner is null and ?1 is null) or (o.owner=?1)")
    int countByParent( ObjectToProtect parent);
 
-   @Query("SELECT count(o) FROM ObjectToProtect o where (o.owner is null and ?1 is null) or (o.owner=?1)")
+   @Query("SELECT count(o) FROM ObjectToProtect o WHERE (o.owner is null and ?1 is null) or (o.owner=?1)")
    int countByChildren(ObjectToProtect group);
 
    @EntityGraph(value = ObjectToProtect.BRIEF, type = EntityGraphType.LOAD)
-   @Query("SELECT o FROM ObjectToProtect o where o.tenant=?1 and lower(o.name) like lower(concat('%', ?2,'%'))")
+   @Query("SELECT o FROM ObjectToProtect o WHERE o.tenant=?1 and lower(o.name) like lower(concat('%', ?2,'%'))")
    List<ObjectToProtect> findByNameLikeIgnoreCase(Tenant tenant, String name);
 
-   @Query("SELECT count(o) FROM ObjectToProtect o where o.tenant=?1 and lower(o.name) like lower(concat('%', ?2,'%'))")
+   @Query("SELECT count(o) FROM ObjectToProtect o WHERE o.tenant=?1 and lower(o.name) like lower(concat('%', ?2,'%'))")
    long countByNameLikeIgnoreCase(Tenant tenant, String name);
+
+   //   ----------- ACL handling ----------------
+   @EntityGraph(value = ObjectToProtect.BRIEF, type = EntityGraphType.LOAD)
+   @Query("SELECT o FROM ObjectToProtect o WHERE ?1 = ANY (SELECT role WHERE o.acl= ?1))")
+   List<ObjectToProtect> findGrants( Role role);
+   
 
 
 }//ObjectToProtectRepository

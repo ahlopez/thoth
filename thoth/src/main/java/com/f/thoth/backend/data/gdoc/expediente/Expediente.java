@@ -1,6 +1,16 @@
 package com.f.thoth.backend.data.gdoc.expediente;
 
 import java.time.LocalDateTime;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
+import javax.persistence.OrderColumn;
+
+import org.hibernate.annotations.BatchSize;
 
 import com.f.thoth.backend.data.gdoc.metadata.DocType;
 import com.f.thoth.backend.data.security.NeedsProtection;
@@ -14,6 +24,7 @@ import com.f.thoth.ui.utils.FormattingUtils;
 /**
  * Representa un expediente documental
  */
+@MappedSuperclass
 public abstract class Expediente implements NeedsProtection, Comparable<Expediente>
 {
    private Tenant        tenant;
@@ -26,6 +37,13 @@ public abstract class Expediente implements NeedsProtection, Comparable<Expedien
    private LocalDateTime openingDate;
    private LocalDateTime closingDate;
    private boolean       open;
+   
+   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+   @OrderColumn
+   @JoinColumn
+   @BatchSize(size = 20)
+   protected Set<Role>       acl;   // Access control list
+   
 
    // --------------- Constructors --------------------
    public Expediente()
@@ -63,6 +81,9 @@ public abstract class Expediente implements NeedsProtection, Comparable<Expedien
    public void setClosingDate(LocalDateTime closingDate) {this.closingDate = closingDate;}
 
    public void setOpen(boolean open) {this.open = open;}
+
+   public Set<Role>       getAcl() {return acl;}
+   public void            setAcl(Set<Role> acl) {this.acl = acl;}
 
 
    // ------------------ Object ------------------------
@@ -125,6 +146,12 @@ public abstract class Expediente implements NeedsProtection, Comparable<Expedien
    @Override public boolean isOwnedBy( SingleUser user) { return userOwner != null && user != null && userOwner.equals(user);}
 
    @Override public boolean isOwnedBy( Role role) { return roleOwner != null && role != null && roleOwner.equals(role);}
+   
+   @Override public boolean admits( Role role) { return acl.contains(role); }
+   
+   @Override public void grant( Role role) { acl.add(role);}
+   
+   @Override public void revoke( Role role) { acl.remove(role);}
 
 
 }//Expediente
