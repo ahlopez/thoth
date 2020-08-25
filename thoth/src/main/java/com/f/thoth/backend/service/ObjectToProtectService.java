@@ -3,6 +3,7 @@ package com.f.thoth.backend.service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -77,6 +78,13 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
    public ObjectToProtect save(User currentUser, ObjectToProtect entity)
    {
       try {
+         // return objectToProtectRepository.saveAndFlush(entity);
+         Optional<ObjectToProtect> opt2 = objectToProtectRepository.findById( entity.getId());
+         if ( opt2.isPresent())
+         {
+            ObjectToProtect obj2 = opt2.get();
+            System.out.println(obj2.toString());
+         }
          return FilterableCrudService.super.save(currentUser, entity);
       } catch (DataIntegrityViolationException e) {
          throw new UserFriendlyDataException("Ya hay un Objeto con esa llave. Por favor escoja una llave única para el objeto");
@@ -100,7 +108,32 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
    //  --------  Permission handling ---------------------
 
    @Override public List<ObjectToProtect> findGrants( Role role){ return objectToProtectRepository.findGrants(role); }
+
+   public void grantRevoke( User currentUser, Role role, Set<ObjectToProtect> newGrants, Set<ObjectToProtect> newRevokes)
+   {
+      newGrants.forEach( grant-> 
+      {
+         Optional<ObjectToProtect> optionalGrant= objectToProtectRepository.findById(grant.getId());
+         if ( optionalGrant.isPresent())
+         {
+            ObjectToProtect object = optionalGrant.get();
+            object.grant(role);
+            objectToProtectRepository.saveAndFlush(object);
+         }
+      });
       
+      newRevokes.forEach( revoke->
+      {
+         Optional<ObjectToProtect> optionalRevoke= objectToProtectRepository.findById(revoke.getId());
+         if ( optionalRevoke.isPresent())
+         {
+            ObjectToProtect object = optionalRevoke.get();
+            object.revoke(role);
+            objectToProtectRepository.saveAndFlush(object);
+         }
+      });
+   }//grantRevoke
+   
    public void grant(User currentUser, Role role, Collection<ObjectToProtect>newGrants)
    {
       newGrants.forEach( objectToProtect->  

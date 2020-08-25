@@ -33,7 +33,7 @@ public interface ObjectToProtectRepository extends JpaRepository<ObjectToProtect
    @EntityGraph(value = ObjectToProtect.FULL, type = EntityGraphType.LOAD)
    Optional<ObjectToProtect> findById(Long id);
 
-   @EntityGraph(value = ObjectToProtect.BRIEF, type = EntityGraphType.LOAD)
+   @EntityGraph(value = ObjectToProtect.BRIEF, type = EntityGraphType.FETCH)
    @Query("SELECT o FROM ObjectToProtect o WHERE (o.owner is null and ?1 is null) or (o.owner=?1)")
    List<ObjectToProtect> findByParent( ObjectToProtect parent);
 
@@ -43,7 +43,7 @@ public interface ObjectToProtectRepository extends JpaRepository<ObjectToProtect
    @Query("SELECT count(o) FROM ObjectToProtect o WHERE (o.owner is null and ?1 is null) or (o.owner=?1)")
    int countByChildren(ObjectToProtect group);
 
-   @EntityGraph(value = ObjectToProtect.BRIEF, type = EntityGraphType.LOAD)
+   @EntityGraph(value = ObjectToProtect.BRIEF, type = EntityGraphType.FETCH)
    @Query("SELECT o FROM ObjectToProtect o WHERE o.tenant=?1 and lower(o.name) like lower(concat('%', ?2,'%'))")
    List<ObjectToProtect> findByNameLikeIgnoreCase(Tenant tenant, String name);
 
@@ -51,10 +51,8 @@ public interface ObjectToProtectRepository extends JpaRepository<ObjectToProtect
    long countByNameLikeIgnoreCase(Tenant tenant, String name);
 
    //   ----------- ACL handling ----------------
-   @EntityGraph(value = ObjectToProtect.BRIEF, type = EntityGraphType.LOAD)
+   @EntityGraph(value = ObjectToProtect.FULL, type = EntityGraphType.LOAD)
    @Query("SELECT o FROM ObjectToProtect o join fetch o.acl a WHERE  a = ?1")
    List<ObjectToProtect> findGrants( Role role);
    
-
-
 }//ObjectToProtectRepository

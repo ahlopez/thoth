@@ -82,8 +82,10 @@ public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValu
       TreeGrid<T>tGrid = new TreeGrid<>();
       tGrid.setWidthFull();
       tGrid.addHierarchyColumn(T::getName).setHeader("Nombre");
-
-      tGrid.addSelectionListener((e)->
+      
+      tGrid.addItemClickListener      ( e-> tGrid.select(e.getItem()));
+      tGrid.addItemDoubleClickListener( e-> tGrid.deselect(e.getItem()));
+      tGrid.addSelectionListener(      (e)->
       {
          Set<T> values = e.getAllSelectedItems();
          values.forEach(value-> setValue(value));
@@ -158,10 +160,11 @@ public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValu
          {
             registration = sGrid.asMultiSelect().addValueChangeListener(e ->
                            {
-                              for (T value: e.getValue())
+                              Set<T> vals= (Set<T>)e.getValue();
+                              tGrid.asMultiSelect().setValue(vals);
+                              for (T value: vals)
                               {
                                  setValue(value);
-                                 tGrid.select(value);
                                  backtrackParents(tGrid::expand, value);
                               }
                            });

@@ -133,13 +133,22 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
    private void saveGrants( GrantRevokeEvent<E> event)
    {
       permissionPresenter.grantRevoke( event.getGrants(), event.getRole(), currentUser);
-   }
+      clear();
+      
+   }//saveGrants
 
    
    private void close( CloseEvent<E> event)
    {
-      
+      clear();
    }
+   
+   private void clear()
+   {
+      roleSelector.clear();
+      permissionSelector.clear();
+      permissionLayout.setVisible(false);      
+   }//clear
 
 
 

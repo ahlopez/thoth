@@ -1,5 +1,6 @@
 package com.f.thoth.ui.views.security.permission;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
 import com.f.thoth.app.security.CurrentUser;
@@ -15,6 +16,7 @@ import com.vaadin.flow.router.Route;
 @Secured(com.f.thoth.backend.data.Role.ADMIN)
 public class ExecutePermissionView extends AbstractPermissionView<ObjectToProtect>
 {
+   @Autowired
    public ExecutePermissionView( PermissionService<ObjectToProtect> service, CurrentUser currentUser)
    {
       super(ObjectToProtect.class, service, currentUser, Constant.TITLE_PERMISOS_EJECUCION);

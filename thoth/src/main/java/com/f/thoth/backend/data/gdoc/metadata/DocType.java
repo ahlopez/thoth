@@ -56,7 +56,8 @@ import com.f.thoth.backend.data.security.SingleUser;
                @NamedAttributeNode("roleOwner"),
                @NamedAttributeNode("parent"),
                @NamedAttributeNode("requiresContent"),
-               @NamedAttributeNode("children")
+               @NamedAttributeNode("children"),
+               @NamedAttributeNode("acl")
 
          }) })
 @Entity
