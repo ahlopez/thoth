@@ -36,11 +36,12 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
    private PermissionPresenter<E>   permissionPresenter;
    private Role                     role;
    private CurrentUser              currentUser;
-   private TreeGridSelector<E, HasValue.ValueChangeEvent<E>> permissionSelector;
    
-   private ComboBox<Role> roleSelector = new ComboBox<>(); 
-   private Button         save         = new Button("Guardar");
-   private Button         close        = new Button("Cancelar");
+   private VerticalLayout           permissionLayout;
+   private ComboBox<Role>           roleSelector = new ComboBox<>(); 
+   private Button                   save         = new Button("Guardar");
+   private Button                   close        = new Button("Cancelar");
+   private TreeGridSelector<E, HasValue.ValueChangeEvent<E>> permissionSelector;
 
    @Autowired
    public AbstractPermissionView(Class<E> beanType, PermissionService<E> service, CurrentUser currentUser, String name)
@@ -48,7 +49,8 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
       role                = null;
       this.currentUser    = currentUser;
       permissionPresenter = new PermissionPresenter<>(service, currentUser, this);
-
+      setWidthFull();
+      
       roleSelector.getElement().setAttribute("colspan", "2");
       roleSelector.setLabel("Rol");
       roleSelector.setDataProvider(ThothSession.getTenantRoles());
@@ -60,10 +62,11 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
       roleSelector.setPageSize(20);
       add( roleSelector);
       
+      permissionLayout   = new VerticalLayout();
+      permissionLayout.setVisible(false);
       permissionSelector = new TreeGridSelector<>(service, Grid.SelectionMode.MULTI, name);
       permissionSelector.getElement().setAttribute("colspan", "4");
       permissionSelector.init( permissionPresenter.loadGrants(role));
-      permissionSelector.setVisible(false);
 
       FormLayout form = new FormLayout(permissionSelector);
       form.setResponsiveSteps(
@@ -72,6 +75,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
             new ResponsiveStep("30em", 3),
             new ResponsiveStep("30em", 4)
             );
+      permissionLayout.add(form);
       
       HorizontalLayout actions = new HorizontalLayout();
       actions.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
@@ -85,6 +89,8 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
 
       actions.add(close,save);
       setupEventListeners(permissionPresenter);
+      permissionLayout.add(actions);
+      add(permissionLayout);
 
    }//AbstractPermissionView constructor
 
@@ -101,7 +107,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
       {
          role = event.getValue();
          permissionSelector.init( permissionPresenter.loadGrants(role));
-         permissionSelector.setVisible(true);
+         permissionLayout.setVisible(true);
       });
       
       save.addClickListener (event -> fireEvent(new GrantRevokeEvent<>(this, permissionSelector.getValues(), role)));

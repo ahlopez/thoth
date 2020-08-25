@@ -89,7 +89,7 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
    @ManyToOne
    protected Role            roleOwner;  // Role that owns this object
 
-   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
    @OrderColumn
    @JoinColumn
    @BatchSize(size = 20)
@@ -104,14 +104,15 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
       buildCode();
    }//ObjectToProtect
 
-   public ObjectToProtect( String name)
+   public ObjectToProtect( String name, ObjectToProtect owner)
    {
       super();
       if ( TextUtil.isEmpty(name))
          throw new IllegalArgumentException("Nombre del objeto no puede ser nulo ni vacío");
 
-      this.name = name;
       init();
+      this.name  = name;
+      this.owner = owner;
       buildCode();
    }//ObjectToProtect
 
@@ -187,18 +188,18 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
       s.append(" ObjectToProtect{"+ super.toString())
        .append(" name["+ name+ "]")
        .append(" category["+ category+ "]")
-       .append(" owner["+ (owner.getName() == null? "--": owner.getName())+ "]")
-       .append(" userOwner["+ (userOwner == null? "-NO-": userOwner.getCode())+ "]")
-       .append(" roleOwner["+ (roleOwner == null? "-NO-": roleOwner.getCode())+ "]}\n\tAcl{");
+       .append(" owner["+     (owner     == null? "---": owner.getCode())+ "]")
+       .append(" userOwner["+ (userOwner == null? "---": userOwner.getCode())+ "]")
+       .append(" roleOwner["+ (roleOwner == null? "---": roleOwner.getCode())+ "]}\n\tAcl{");
 
       int i = 1;
       for( Role r: acl)
       {
-         s.append((i % 10 == 0? "\n": " "))
+         s.append((i % 10 == 0? "\n\t   ": " "))
           .append(r.getCode());
          i++;
       }
-      s.append("\n\t}\n");
+      s.append("\n\t   }\n");
 
       return s.toString();
    }//toString
