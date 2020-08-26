@@ -55,7 +55,7 @@ public class Office extends BaseEntity implements NeedsProtection, Comparable<Of
 
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
    @OrderColumn
-   @JoinColumn
+   @JoinColumn(name="office_id")
    @BatchSize(size = 20)
    protected Set<Role>       acl;   // Access control list   
 

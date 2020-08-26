@@ -50,6 +50,7 @@ import com.f.thoth.backend.data.security.SingleUser;
          name = DocType.FULL,
          attributeNodes = {
                @NamedAttributeNode("tenant"),
+               @NamedAttributeNode("id"),
                @NamedAttributeNode("name"),
                @NamedAttributeNode("category"),
                @NamedAttributeNode("userOwner"),
@@ -98,7 +99,7 @@ public class DocType extends BaseEntity implements NeedsProtection, Comparable<D
 
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
    @OrderColumn
-   @JoinColumn
+   @JoinColumn(name="doctype_id")
    @BatchSize(size = 20)
    protected Set<Role>       acl;   // Access control list
    

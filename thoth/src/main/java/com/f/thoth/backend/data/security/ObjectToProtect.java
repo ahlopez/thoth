@@ -51,6 +51,7 @@ import com.f.thoth.ui.utils.Constant;
    @NamedEntityGraph(
          name = ObjectToProtect.FULL,
          attributeNodes = {
+            @NamedAttributeNode("id"),
             @NamedAttributeNode("tenant"),
             @NamedAttributeNode("code"),
             @NamedAttributeNode("name"),
@@ -73,15 +74,15 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
    @NotEmpty (message = "{evidentia.name.required}")
    @Size(max = 255)
    @Column(unique = true)
-   protected String          name;    // Object name
+   protected String          name;       // Object name
 
    @NotNull     (message= "{evidentia.category.required}")
    @Min(value=0, message= "{evidentia.category.minvalue}")
    @Max(value=5, message= "{evidentia.category.maxvalue}")
-   protected Integer         category; // Security category
+   protected Integer         category;   // Security category
 
    @ManyToOne
-   protected ObjectToProtect owner;    // Object group to which this object belongs
+   protected ObjectToProtect owner;      // Object group to which this object belongs
 
    @ManyToOne
    protected SingleUser      userOwner;  // User that owns this object
@@ -91,9 +92,9 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
 
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
    @OrderColumn
-   @JoinColumn
+   @JoinColumn(name= "object_id")
    @BatchSize(size = 20)
-   protected Set<Role>       acl;   // Access control list
+   protected Set<Role>       acl;        // Access control list
 
    // -------------- Constructors -------------
    public ObjectToProtect()
@@ -223,11 +224,11 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
    @Override public boolean isOwnedBy( SingleUser user) { return userOwner != null && user != null && userOwner.equals(user);}
 
    @Override public boolean isOwnedBy( Role role) { return roleOwner != null && role != null && roleOwner.equals(role);}
-   
+
    @Override public boolean admits( Role role) { return acl.contains(role); }
-   
+
    @Override public void grant( Role role) { acl.add(role);}
-   
+
    @Override public void revoke( Role role) { acl.remove(role);}
 
 }//ObjectToProtect

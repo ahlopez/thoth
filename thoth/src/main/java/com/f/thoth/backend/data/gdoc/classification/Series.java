@@ -55,7 +55,7 @@ public class Series extends BaseEntity implements NeedsProtection, Comparable<Se
    
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
    @OrderColumn
-   @JoinColumn
+   @JoinColumn(name="series_id")
    @BatchSize(size = 20)
    protected Set<Role>       acl;   // Access control list
 

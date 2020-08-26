@@ -347,7 +347,10 @@ implements HasValue<E, T>
          result.clear();
 
       if ( selectionMode != Grid.SelectionMode.NONE)
+      {
+         treeGrid.select(value);
          result.add(value);
+      }
 
    }//setValue
    

@@ -55,7 +55,7 @@ public class Clazz extends BaseEntity implements NeedsProtection, Comparable<Cla
 
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
    @OrderColumn
-   @JoinColumn
+   @JoinColumn(name="class_id")
    @BatchSize(size = 20)
    protected Set<Role>       acl;   // Access control list
 

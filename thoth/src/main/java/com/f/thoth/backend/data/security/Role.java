@@ -65,13 +65,13 @@ public class Role extends BaseEntity implements Comparable<Role>
    @Override
    public boolean equals(Object o)
    {
-		if (this == o)
-			return true;
+      if (this == o)
+         return true;
 
-		if (!(o instanceof Role )) 
-			return false;
+      if (!(o instanceof Role ))
+         return false;
 
-		Role that = (Role) o;
+      Role that = (Role) o;
         return this.id != null && this.id.equals(that.id);
 
    }// equals
@@ -87,10 +87,10 @@ public class Role extends BaseEntity implements Comparable<Role>
    {
       return this.equals(that)?  0 :
          that ==  null        ?  1 :
-         this.code == null  && that.code == null?  0 :   
+         this.code == null  && that.code == null?  0 :
          this.code != null  && that.code == null?  1 :
-         this.code == null  && that.code != null? -1 :   
-         this.code.compareTo(that.code);     
+         this.code == null  && that.code != null? -1 :
+         this.code.compareTo(that.code);
 
    }// compareTo
 

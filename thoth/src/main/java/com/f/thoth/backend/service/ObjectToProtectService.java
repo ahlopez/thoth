@@ -113,21 +113,29 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
    {
       newGrants.forEach( grant-> 
       {
-         Optional<ObjectToProtect> optionalGrant= objectToProtectRepository.findById(grant.getId());
-         if ( optionalGrant.isPresent())
+         ObjectToProtect x = null;
+         Optional<ObjectToProtect> optObject= objectToProtectRepository.findById(grant.getId());
+         if ( optObject.isPresent())
          {
-            ObjectToProtect object = optionalGrant.get();
+            ObjectToProtect object = optObject.get();
             object.grant(role);
             objectToProtectRepository.saveAndFlush(object);
+            optObject= objectToProtectRepository.findById(object.getId());
+            if ( optObject.isPresent())
+            {
+               x  = optObject.get();       
+               System.out.println(x.toString());
+            }
          }
       });
+      List<ObjectToProtect> g = findGrants(role);
       
       newRevokes.forEach( revoke->
       {
-         Optional<ObjectToProtect> optionalRevoke= objectToProtectRepository.findById(revoke.getId());
-         if ( optionalRevoke.isPresent())
+         Optional<ObjectToProtect> optObject= objectToProtectRepository.findById(revoke.getId());
+         if ( optObject.isPresent())
          {
-            ObjectToProtect object = optionalRevoke.get();
+            ObjectToProtect object = optObject.get();
             object.revoke(role);
             objectToProtectRepository.saveAndFlush(object);
          }

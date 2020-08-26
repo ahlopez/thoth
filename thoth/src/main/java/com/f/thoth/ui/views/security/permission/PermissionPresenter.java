@@ -55,7 +55,7 @@ public class PermissionPresenter<E>  implements HasLogger
       oldGrants.addAll(loadGrants(role));
       
       Set<E> newGrants  = new TreeSet<>();
-      oldGrants.forEach (object -> {if( !grants.contains(object)) newGrants.add(object);});
+      grants.forEach (object -> {if( !oldGrants.contains(object)) newGrants.add(object);});
       
       Set<E> newRevokes = new TreeSet<>();
       oldGrants.forEach (object -> {if( !grants.contains(object)) newRevokes.add(object);});
