@@ -9,7 +9,7 @@ import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.service.PermissionService;
-import com.f.thoth.ui.components.TreeGridSelector;
+import com.f.thoth.ui.components.AbstractHierarchicalSelector;
 import com.f.thoth.ui.utils.TemplateUtil;
 import com.f.thoth.ui.views.HasNotifications;
 import com.vaadin.flow.component.ComponentEvent;
@@ -41,7 +41,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
    private ComboBox<Role>           roleSelector = new ComboBox<>(); 
    private Button                   save         = new Button("Guardar");
    private Button                   close        = new Button("Cancelar");
-   private TreeGridSelector<E, HasValue.ValueChangeEvent<E>> permissionSelector;
+   private AbstractHierarchicalSelector<E, HasValue.ValueChangeEvent<E>> permissionSelector;
 
    @Autowired
    public AbstractPermissionView(Class<E> beanType, PermissionService<E> service, CurrentUser currentUser, String name)
@@ -64,7 +64,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
       
       permissionLayout   = new VerticalLayout();
       permissionLayout.setVisible(false);
-      permissionSelector = new TreeGridSelector<>(service, Grid.SelectionMode.MULTI, name);
+      permissionSelector = new AbstractHierarchicalSelector<>(service, Grid.SelectionMode.MULTI, name);
       permissionSelector.getElement().setAttribute("colspan", "4");
       permissionSelector.init( permissionPresenter.loadGrants(role));
 
@@ -110,12 +110,15 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
          permissionLayout.setVisible(true);
       });
       
-      save.addClickListener (event -> fireEvent(new GrantRevokeEvent<>(this, permissionSelector.getValues(), role)));
+      save.addClickListener (event -> 
+      {
+         fireEvent(new GrantRevokeEvent<>(this, permissionSelector.getValues(), role));
+         clear();
+      });
       close.addClickListener(event -> fireEvent(new CloseEvent<>(this)));
       
       addListener(GrantRevokeEvent.class, this::saveGrants); 
-      //addListener(CloseEvent.class, e -> closeEditor());
-      addListener(CloseEvent.class, this::close);
+      addListener(CloseEvent.class,       this::close);
 
    }//setupEventListeners
    
@@ -146,7 +149,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
    private void clear()
    {
       roleSelector.clear();
-      permissionSelector.clear();
+      permissionSelector.resetSelector();
       permissionLayout.setVisible(false);      
    }//clear
 
