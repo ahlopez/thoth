@@ -1,6 +1,6 @@
 package com.f.thoth.backend.data.gdoc.classification;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Objects;
 import java.util.Set;
 
@@ -21,6 +21,7 @@ import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.security.NeedsProtection;
+import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
 import com.f.thoth.ui.utils.FormattingUtils;
@@ -46,9 +47,9 @@ public class Series extends BaseEntity implements NeedsProtection, Comparable<Se
    protected Series     parent;
 
    @NotNull(message = "{evidentia.dateopened.required}")
-   protected LocalDateTime dateOpened;
+   protected LocalDate  dateOpened;
 
-   protected LocalDateTime dateClosed;
+   protected LocalDate  dateClosed;
 
    @NotNull(message = "{remun.status.required}")
    protected RetentionSchedule retentionSchedule;
@@ -57,7 +58,7 @@ public class Series extends BaseEntity implements NeedsProtection, Comparable<Se
    @OrderColumn
    @JoinColumn(name="series_id")
    @BatchSize(size = 20)
-   protected Set<Role>       acl;   // Access control list
+   protected Set<Permission>       acl;   // Access control list
 
    // ------------- Constructors ------------------
    public Series()
@@ -68,7 +69,7 @@ public class Series extends BaseEntity implements NeedsProtection, Comparable<Se
 
 
    public Series( String name, Schema schema, Integer category, Role roleOwner, Series parent,
-                 LocalDateTime dateOpened, LocalDateTime dateClosed, RetentionSchedule retentionSchedule)
+                 LocalDate dateOpened, LocalDate dateClosed, RetentionSchedule retentionSchedule)
    {
       super();
 
@@ -79,7 +80,7 @@ public class Series extends BaseEntity implements NeedsProtection, Comparable<Se
          throw new IllegalArgumentException("Esquema de metadatos no puede ser nulo");
 
       if ( category < 0 || category > 5)
-         throw new IllegalArgumentException("Categor�a de seguridad inv�lida");
+         throw new IllegalArgumentException("Categoría de seguridad inválida");
 
       if (dateOpened ==  null || dateClosed == null || dateOpened.isAfter(dateClosed))
          throw new IllegalArgumentException("Fechas de apertura["+ dateOpened+ "] y de cierre["+ dateClosed+ "] inconsistentes");
@@ -131,17 +132,17 @@ public class Series extends BaseEntity implements NeedsProtection, Comparable<Se
    public Series            getParent() { return parent;}
    public void              setParent(Series parent) { this.parent = parent;}
 
-   public LocalDateTime     getDateOpened() { return dateOpened;}
-   public void              setDateOpened( LocalDateTime dateOpened) { this.dateOpened = dateOpened;}
+   public LocalDate         getDateOpened() { return dateOpened;}
+   public void              setDateOpened( LocalDate dateOpened) { this.dateOpened = dateOpened;}
 
-   public LocalDateTime     getDateClosed() { return dateClosed;}
-   public void              setDateClosed( LocalDateTime dateClosed){ this.dateClosed = dateClosed;}
+   public LocalDate         getDateClosed() { return dateClosed;}
+   public void              setDateClosed( LocalDate dateClosed){ this.dateClosed = dateClosed;}
 
    public RetentionSchedule getRetentionSchedule() { return retentionSchedule;}
    public void              setRetentionSchedule( RetentionSchedule retentionSchedule){ this.retentionSchedule= retentionSchedule;}
 
-   public Set<Role>       getAcl() {return acl;}
-   public void            setAcl(Set<Role> acl) {this.acl = acl;}
+   public Set<Permission>       getAcl() {return acl;}
+   public void            setAcl(Set<Permission> acl) {this.acl = acl;}
 
    // --------------- Object methods ---------------------
 
@@ -197,7 +198,7 @@ public class Series extends BaseEntity implements NeedsProtection, Comparable<Se
 
    public boolean isOpen()
    {
-      LocalDateTime now = LocalDateTime.now();
+      LocalDate now = LocalDate.now();
       return now.compareTo(dateOpened) >= 0 && now.compareTo(dateClosed) <= 0;
    }//isOpen
 
@@ -208,12 +209,20 @@ public class Series extends BaseEntity implements NeedsProtection, Comparable<Se
    @Override public boolean isOwnedBy( SingleUser user) { return false;}
 
    @Override public boolean isOwnedBy( Role role){ return roleOwner != null && roleOwner.equals(role); }
-   
-   @Override public boolean admits( Role role) { return acl.contains(role); }
-   
-   @Override public void grant( Role role) { acl.add(role);}
-   
-   @Override public void revoke( Role role) { acl.remove(role);}
+
+   @Override public boolean admits( Role role)
+   { 
+      for( Permission p: acl)
+      {
+         if ( p.grants( role, this) )
+            return true;
+      }
+      return false; 
+   }
+
+   @Override public void grant( Permission permission) { acl.add(permission);}
+
+   @Override public void revoke( Permission permission) { acl.remove(permission);}
 
 
 }//Series

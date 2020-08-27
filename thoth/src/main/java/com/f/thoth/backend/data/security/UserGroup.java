@@ -87,6 +87,7 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>, Hierarc
     @Override public String      getCode()   { return super.getCode();}
     @Override public String      getName()   { return name;}
     @Override public UserGroup   getOwner()  { return owner;}
+    @Override public String      getKey()    { return super.getCode();}
 
 
    // --------------- Object ------------------

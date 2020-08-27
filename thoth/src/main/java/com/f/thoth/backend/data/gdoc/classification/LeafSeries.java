@@ -1,6 +1,6 @@
 package com.f.thoth.backend.data.gdoc.classification;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import javax.persistence.Entity;
 import javax.persistence.Index;
@@ -26,7 +26,7 @@ public class LeafSeries extends Series
    }
 
    public LeafSeries( String name, Schema schema, Integer category, Role roleOwner, Series parent,
-                 LocalDateTime dateOpened, LocalDateTime dateClosed, RetentionSchedule retentionSchedule)
+                 LocalDate dateOpened, LocalDate dateClosed, RetentionSchedule retentionSchedule)
    {
       super( name, schema, category, roleOwner, parent, dateOpened, dateClosed, retentionSchedule);
    }//LeafSeries

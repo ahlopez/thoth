@@ -6,5 +6,6 @@ public interface HierarchicalEntity<T>
    public String  getCode();
    public String  getName();
    public T       getOwner();
+   public String  getKey();
 
 }//HierarchicalEntity

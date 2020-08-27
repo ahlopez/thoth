@@ -12,9 +12,11 @@ import com.f.thoth.app.security.SecurityConfiguration;
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.gdoc.metadata.DocType;
 import com.f.thoth.backend.data.security.ObjectToProtect;
+import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
+import com.f.thoth.backend.repositories.PermissionRepository;
 import com.f.thoth.backend.repositories.RoleRepository;
 import com.f.thoth.backend.repositories.TenantRepository;
 import com.f.thoth.backend.repositories.UserRepository;
@@ -36,7 +38,8 @@ import com.f.thoth.ui.MainView;
             UserService.class,
             TenantService.class,
             ObjectToProtect.class,
-            Role.class
+            Role.class,
+            Permission.class
          },
            exclude = ErrorMvcAutoConfiguration.class
       )
@@ -46,7 +49,8 @@ import com.f.thoth.ui.MainView;
             UserRepository.class,
             ObjectToProtectRepository.class,
             TenantRepository.class,
-            RoleRepository.class
+            RoleRepository.class,
+            PermissionRepository.class
          }
       )
 @EntityScan(
@@ -55,6 +59,7 @@ import com.f.thoth.ui.MainView;
            Tenant.class,
            Role.class,
            ObjectToProtect.class,
+           Permission.class,
            DocType.class
          }
       )

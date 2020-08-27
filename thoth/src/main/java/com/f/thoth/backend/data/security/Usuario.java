@@ -55,7 +55,7 @@ public abstract class Usuario extends BaseEntity
    @NotEmpty(message = "{evidentia.name.required}")
    @NotBlank(message = "{evidentia.name.required}")
    @Size(min = 1, max = 255, message="{evidentia.name.min.max.length}")
-   protected String name;         // user first name
+   protected String name;              // user first name
 
    protected boolean locked;           // is the user locked?
 

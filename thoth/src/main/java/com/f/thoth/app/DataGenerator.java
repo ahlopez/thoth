@@ -25,6 +25,7 @@ import com.f.thoth.backend.data.entity.PickupLocation;
 import com.f.thoth.backend.data.entity.Product;
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.security.ObjectToProtect;
+import com.f.thoth.backend.data.security.SingleUser;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
@@ -88,7 +89,8 @@ public class DataGenerator implements HasLogger {
    @SuppressWarnings("unused")
    @PostConstruct
    public void loadData() {
-      if (userRepository.count() != 0L) {
+      if (userRepository.count() != 0L) 
+      {
          getLogger().info("Using existing database");
          return;
       }
@@ -97,7 +99,7 @@ public class DataGenerator implements HasLogger {
 
       getLogger().info("... generating tenants");
       ThothSession session = new ThothSession(tenantService);
-      Tenant tenant1 = createTenant(tenantRepository, "FCONSULTORES");
+      Tenant tenant1 = createTenant(tenantRepository, "FCN");
       ThothSession.setTenant(tenant1);
 
       Tenant tenant2 = createTenant(tenantRepository,"SEI");
@@ -114,10 +116,10 @@ public class DataGenerator implements HasLogger {
       tenant1.addRole(role4);
       tenant1.addRole(role5);
 
-      com.f.thoth.backend.data.security.Role role6 = createRole(tenant2, "CEO");
-      com.f.thoth.backend.data.security.Role role7 = createRole(tenant2, "Admin2");
-      com.f.thoth.backend.data.security.Role role8 = createRole(tenant2, "CFO");
-      com.f.thoth.backend.data.security.Role role9 = createRole(tenant2, "CIO");
+      com.f.thoth.backend.data.security.Role role6  = createRole(tenant2, "CEO");
+      com.f.thoth.backend.data.security.Role role7  = createRole(tenant2, "Admin2");
+      com.f.thoth.backend.data.security.Role role8  = createRole(tenant2, "CFO");
+      com.f.thoth.backend.data.security.Role role9  = createRole(tenant2, "CIO");
       com.f.thoth.backend.data.security.Role role10 = createRole(tenant2, "COO");
 
       tenant2.addRole(role6);
@@ -508,8 +510,11 @@ public class DataGenerator implements HasLogger {
 
    private User createAdmin(UserRepository userRepository, PasswordEncoder passwordEncoder)
    {
-      return userRepository.save(
+      User admin =  userRepository.save(
             createUser("admin@vaadin.com", "Göran", "Rich", passwordEncoder.encode("admin"), Role.ADMIN, true));
+      ThothSession.setUser(admin);
+      return admin;
+
    }//createAdmin
 
    private void createDeletableUsers(UserRepository userRepository, PasswordEncoder passwordEncoder)

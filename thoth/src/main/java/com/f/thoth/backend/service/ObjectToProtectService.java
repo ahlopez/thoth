@@ -1,6 +1,5 @@
 package com.f.thoth.backend.service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -14,21 +13,25 @@ import org.springframework.stereotype.Service;
 
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.security.ObjectToProtect;
+import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
+import com.f.thoth.backend.repositories.PermissionRepository;
 
 @Service
 public class ObjectToProtectService implements FilterableCrudService<ObjectToProtect>, PermissionService<ObjectToProtect>
 {
 
    private final ObjectToProtectRepository objectToProtectRepository;
+   private final PermissionRepository      permissionRepository;
 
    @Autowired
-   public ObjectToProtectService(ObjectToProtectRepository objectToProtectRepository)
+   public ObjectToProtectService(ObjectToProtectRepository objectToProtectRepository, PermissionRepository permissionRepository)
    {
       this.objectToProtectRepository = objectToProtectRepository;
+      this.permissionRepository      = permissionRepository;
    }
 
    @Override
@@ -78,13 +81,6 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
    public ObjectToProtect save(User currentUser, ObjectToProtect entity)
    {
       try {
-         // return objectToProtectRepository.saveAndFlush(entity);
-         Optional<ObjectToProtect> opt2 = objectToProtectRepository.findById( entity.getId());
-         if ( opt2.isPresent())
-         {
-            ObjectToProtect obj2 = opt2.get();
-            System.out.println(obj2.toString());
-         }
          return FilterableCrudService.super.save(currentUser, entity);
       } catch (DataIntegrityViolationException e) {
          throw new UserFriendlyDataException("Ya hay un Objeto con esa llave. Por favor escoja una llave única para el objeto");
@@ -100,66 +96,74 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
 
    @Override public List<ObjectToProtect> findByParent  ( ObjectToProtect owner) { return objectToProtectRepository.findByParent  (owner); }
    @Override public int                   countByParent ( ObjectToProtect owner) { return objectToProtectRepository.countByParent (owner); }
-   @Override public boolean               hasChildren   ( ObjectToProtect object) { return objectToProtectRepository.countByChildren(object) > 0; }
+   @Override public boolean               hasChildren   ( ObjectToProtect object){ return objectToProtectRepository.countByChildren(object) > 0; }
 
    @Override public List<ObjectToProtect> findByNameLikeIgnoreCase (Tenant tenant, String name) { return objectToProtectRepository.findByNameLikeIgnoreCase (tenant, name); }
    @Override public long                  countByNameLikeIgnoreCase(Tenant tenant, String name) { return objectToProtectRepository.countByNameLikeIgnoreCase(tenant, name); }
 
    //  --------  Permission handling ---------------------
 
-   @Override public List<ObjectToProtect> findGrants( Role role){ return objectToProtectRepository.findGrants(role); }
-
-   public void grantRevoke( User currentUser, Role role, Set<ObjectToProtect> newGrants, Set<ObjectToProtect> newRevokes)
+   @Override public List<Permission> findGrants( Role role)
+   { 
+      List<ObjectToProtect> objects = objectToProtectRepository.findObjectsGranted(role);
+      return  permissionRepository.findByObjects(objects);
+   }
+   
+   @Override public List<ObjectToProtect> findObjectsGranted( Role role)
    {
-      newGrants.forEach( grant-> 
-      {
-         ObjectToProtect x = null;
-         Optional<ObjectToProtect> optObject= objectToProtectRepository.findById(grant.getId());
-         if ( optObject.isPresent())
-         {
-            ObjectToProtect object = optObject.get();
-            object.grant(role);
-            objectToProtectRepository.saveAndFlush(object);
-            optObject= objectToProtectRepository.findById(object.getId());
-            if ( optObject.isPresent())
-            {
-               x  = optObject.get();       
-               System.out.println(x.toString());
-            }
-         }
-      });
-      List<ObjectToProtect> g = findGrants(role);
-      
-      newRevokes.forEach( revoke->
-      {
-         Optional<ObjectToProtect> optObject= objectToProtectRepository.findById(revoke.getId());
-         if ( optObject.isPresent())
-         {
-            ObjectToProtect object = optObject.get();
-            object.revoke(role);
-            objectToProtectRepository.saveAndFlush(object);
-         }
-      });
+      return objectToProtectRepository.findObjectsGranted(role);
+   }
+
+   public void grantRevoke( User currentUser, Role role, Set<Permission> newGrants, Set<Permission> newRevokes)
+   {
+      grant ( currentUser, role, newGrants);
+      revoke( currentUser, role, newRevokes);
+
    }//grantRevoke
    
-   public void grant(User currentUser, Role role, Collection<ObjectToProtect>newGrants)
+   public void grant( User currentUser, Role role, Set<Permission> newGrants)
    {
-      newGrants.forEach( objectToProtect->  
+      newGrants.forEach( newGrant-> 
       {
-         objectToProtect.grant(role);
-         save(currentUser, objectToProtect);
+         List<ObjectToProtect> allObj;
+         allObj = objectToProtectRepository.findAll();
+         Optional<ObjectToProtect> optObject= objectToProtectRepository.findById(newGrant.getObjectToProtect().getId());
+         if ( optObject.isPresent())
+         {
+            permissionRepository.saveAndFlush(newGrant);
+            ObjectToProtect object = optObject.get();
+            object.grant(newGrant);
+            allObj = objectToProtectRepository.findAll();
+            objectToProtectRepository.saveAndFlush(object);
+            allObj = objectToProtectRepository.findAll();
+            List<Permission> allGrants = permissionRepository.findAll();
+            int x = 1;
+        }
       });
    }//grant
 
-
-   public void revoke(User currentUser, Role role, Collection<ObjectToProtect> revokedGrants)
+   
+   public void revoke( User currentUser, Role role, Set<Permission> newRevokes)
    {
-      revokedGrants.forEach( objectToProtect->  
+      newRevokes.forEach( newRevoke-> 
       {
-         objectToProtect.revoke(role);
-         save(currentUser, objectToProtect);
+         List<ObjectToProtect> allObj;
+         allObj = objectToProtectRepository.findAll();
+         Optional<ObjectToProtect> optObject= objectToProtectRepository.findById(newRevoke.getObjectToProtect().getId());
+         if ( optObject.isPresent())
+         {
+            ObjectToProtect object = optObject.get();
+            object.revoke(newRevoke);
+            allObj = objectToProtectRepository.findAll();
+            objectToProtectRepository.saveAndFlush(object);
+            permissionRepository.delete(newRevoke);
+            allObj = objectToProtectRepository.findAll();
+            List<Permission> allGrants = permissionRepository.findAll();
+            int x = 1;
+        }
       });
-   }//revoke
+
+   }//grant
 
 
 }//ObjectToProtectService

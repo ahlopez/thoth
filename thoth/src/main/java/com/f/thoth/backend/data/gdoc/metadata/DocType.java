@@ -27,6 +27,7 @@ import org.hibernate.annotations.BatchSize;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.security.NeedsProtection;
+import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
 
@@ -101,7 +102,7 @@ public class DocType extends BaseEntity implements NeedsProtection, Comparable<D
    @OrderColumn
    @JoinColumn(name="doctype_id")
    @BatchSize(size = 20)
-   protected Set<Role>       acl;   // Access control list
+   protected Set<Permission>       acl;   // Access control list
    
    
 
@@ -190,8 +191,8 @@ public class DocType extends BaseEntity implements NeedsProtection, Comparable<D
    public Set<DocType> getChildren(){ return children;}
    public void         setChildren( Set<DocType> children){ this.children = children;}
 
-   public Set<Role>       getAcl() {return acl;}
-   public void            setAcl(Set<Role> acl) {this.acl = acl;}
+   public Set<Permission>  getAcl() {return acl;}
+   public void             setAcl(Set<Permission> acl) {this.acl = acl;}
 
    // --------------- Object methods ---------------------
 
@@ -263,12 +264,20 @@ public class DocType extends BaseEntity implements NeedsProtection, Comparable<D
    @Override public boolean isOwnedBy( SingleUser user) { return userOwner != null && userOwner.equals(user);}
 
    @Override public boolean isOwnedBy( Role role) { return roleOwner != null && roleOwner.equals(role);}
-   
-   @Override public boolean admits( Role role) { return acl.contains(role); }
-   
-   @Override public void grant( Role role) { acl.add(role);}
-   
-   @Override public void revoke( Role role) { acl.remove(role);}
+
+   @Override public boolean admits( Role role)
+   { 
+      for( Permission p: acl)
+      {
+         if ( p.grants( role, this) )
+            return true;
+      }
+      return false; 
+   }
+
+   @Override public void grant( Permission permission) { acl.add(permission);}
+
+   @Override public void revoke( Permission permission) { acl.remove(permission);}
 
 
 

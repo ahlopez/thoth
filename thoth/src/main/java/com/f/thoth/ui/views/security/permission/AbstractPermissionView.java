@@ -19,6 +19,7 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
@@ -39,6 +40,8 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
    
    private VerticalLayout           permissionLayout;
    private ComboBox<Role>           roleSelector = new ComboBox<>(); 
+   private DatePicker               permissionFrom;
+   private DatePicker               permissionTo;
    private Button                   save         = new Button("Guardar");
    private Button                   close        = new Button("Cancelar");
    private AbstractHierarchicalSelector<E, HasValue.ValueChangeEvent<E>> permissionSelector;
@@ -64,18 +67,24 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
       
       permissionLayout   = new VerticalLayout();
       permissionLayout.setVisible(false);
+      
+      permissionFrom = new DatePicker();
+      permissionTo   = new DatePicker();
+      HorizontalLayout periodLayout = new HorizontalLayout();
+      periodLayout.add(permissionFrom, permissionTo);
+      
       permissionSelector = new AbstractHierarchicalSelector<>(service, Grid.SelectionMode.MULTI, name);
       permissionSelector.getElement().setAttribute("colspan", "4");
       permissionSelector.init( permissionPresenter.loadGrants(role));
 
-      FormLayout form = new FormLayout(permissionSelector);
-      form.setResponsiveSteps(
+      FormLayout permissionForm = new FormLayout(permissionSelector);
+      permissionForm.setResponsiveSteps(
             new ResponsiveStep("30em", 1),
             new ResponsiveStep("30em", 2),
             new ResponsiveStep("30em", 3),
             new ResponsiveStep("30em", 4)
             );
-      permissionLayout.add(form);
+      permissionLayout.add(periodLayout, permissionForm);
       
       HorizontalLayout actions = new HorizontalLayout();
       actions.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
@@ -112,7 +121,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
       
       save.addClickListener (event -> 
       {
-         fireEvent(new GrantRevokeEvent<>(this, permissionSelector.getValues(), role));
+         fireEvent(new GrantRevokeEvent<>(this, permissionSelector.getValues(), role, permissionFrom.getValue(), permissionTo.getValue()));
          clear();
       });
       close.addClickListener(event -> fireEvent(new CloseEvent<>(this)));
@@ -135,7 +144,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
    
    private void saveGrants( GrantRevokeEvent<E> event)
    {
-      permissionPresenter.grantRevoke( event.getGrants(), event.getRole(), currentUser);
+      permissionPresenter.grantRevoke( event.getGrants(), event.getRole(), event.getFrom(), event.getTo(), currentUser);
       clear();
       
    }//saveGrants

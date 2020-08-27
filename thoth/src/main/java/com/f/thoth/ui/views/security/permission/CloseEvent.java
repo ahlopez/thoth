@@ -6,6 +6,6 @@ public class CloseEvent<E extends HierarchicalEntity<E>> extends PermissionEvent
 {
    protected CloseEvent(AbstractPermissionView<E> source) 
    { 
-      super(source, null); 
+      super(source, null, null, null); 
    }
 }//CloseEvent

@@ -1,6 +1,6 @@
 package com.f.thoth.backend.data.gdoc.classification;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
@@ -44,7 +44,7 @@ public class BranchClass extends Clazz
    }
 
    public BranchClass( String name, Schema schema, Integer category, Role roleOwner, Clazz parent,
-                     LocalDateTime dateOpened, LocalDateTime dateClosed, RetentionSchedule retentionSchedule)
+                     LocalDate dateOpened, LocalDate dateClosed, RetentionSchedule retentionSchedule)
    {
       super( name, schema, category, roleOwner, parent, dateOpened, dateClosed, retentionSchedule);
       subClasses = new TreeSet<>();

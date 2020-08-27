@@ -1,6 +1,6 @@
 package com.f.thoth.backend.data.security;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 import javax.persistence.Entity;
 import javax.persistence.Index;
@@ -11,6 +11,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
+import com.f.thoth.backend.data.entity.User;
 
 /**
  * Representa un permiso de acceso a un objeto que requiere protección
@@ -25,43 +26,41 @@ public class Permission extends BaseEntity implements Comparable<Permission>
 
    @NotNull (message = "{evidentia.object.required}")
    @ManyToOne
-   public ObjectToProtect objectToProtect;
+   public ObjectToProtect objectToProtect;                  // TODO:  Revisar como cambiar el tipo a NeedsProtection
 
    @NotNull(message = "{evidentia.date.required}")
-   private LocalDateTime fromDate;
+   private LocalDate     fromDate;
 
    @NotNull(message = "{evidentia.date.required}")
-   private LocalDateTime toDate;
+   private LocalDate     toDate;
 
    @NotNull(message = "{evidentia.user.required}")
    @ManyToOne
-   private SingleUser  grantedBy;
+   private User  grantedBy;
 
    // ------------- Constructors ------------------
    public Permission()
    {
       super();
+      this.grantedBy = ThothSession.getCurrentUser();
       buildCode();
    }
 
-   public Permission( Integer category, Role role, ObjectToProtect objectToProtect,
-         LocalDateTime fromDate, LocalDateTime toDate, SingleUser grantedBy)
+   public Permission( Role role, ObjectToProtect objectToProtect, LocalDate fromDate, LocalDate toDate)
    {
       super();
-      if (category < 0 || category > 5)
-         throw new IllegalArgumentException("Categoría["+ category+ "] inválida");
-
+      
       if (role == null)
          throw new IllegalArgumentException("Rol a quien se concede el permiso no puede ser nulo");
 
       if (objectToProtect == null)
          throw new IllegalArgumentException("Objeto del permiso no puede ser nulo");
 
-      this.role     = role;
-      this.fromDate = fromDate;
-      this.toDate   = toDate;
-      this.grantedBy= grantedBy;
+      this.role              = role;
+      this.fromDate          = fromDate;
+      this.toDate            = toDate;
       this.objectToProtect   = objectToProtect;
+      this.grantedBy         = ThothSession.getCurrentUser();
       buildCode();
    }//Permission
 
@@ -74,9 +73,9 @@ public class Permission extends BaseEntity implements Comparable<Permission>
 
    @Override protected void buildCode()
    {
-      this.code = (tenant == null? "[Tenant]" : tenant.getCode())+ ">"+
+      this.code = (tenant == null? "[Tenant]" : tenant.getCode())+ "[PRM]>"+
                   (role ==  null? "[role]": role.getCode())+ ":"+ 
-    		      (objectToProtect == null? "[object]" : objectToProtect.getCode());
+    		         (objectToProtect == null? "[object]" : objectToProtect.getKey());
    }//buildCode
 
    // -------------- Getters & Setters ----------------
@@ -84,14 +83,14 @@ public class Permission extends BaseEntity implements Comparable<Permission>
    public Role            getRole() { return role;}
    public void            setRole(Role role) { this.role = role;}
 
-   public LocalDateTime   getFromDate() { return fromDate; }
-   public void            setFromDate(LocalDateTime fromDate) { this.fromDate = fromDate; }
+   public LocalDate       getFromDate() { return fromDate; }
+   public void            setFromDate(LocalDate fromDate) { this.fromDate = fromDate; }
 
-   public LocalDateTime   getToDate() { return toDate; }
-   public void            setToDate(LocalDateTime toDate) { this.toDate = toDate; }
+   public LocalDate       getToDate() { return toDate; }
+   public void            setToDate(LocalDate toDate) { this.toDate = toDate; }
 
-   public SingleUser      getGrantedBy() { return grantedBy;}
-   public void            setGrantedBy( SingleUser grantedBy){ this.grantedBy = grantedBy;}
+   public User            getGrantedBy() { return grantedBy;}
+   public void            setGrantedBy( User grantedBy){ this.grantedBy = grantedBy;}
 
    public ObjectToProtect getObjectToProtect() { return objectToProtect;}
    public void            setObjectToProtect( ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect;}
@@ -107,7 +106,7 @@ public class Permission extends BaseEntity implements Comparable<Permission>
 		if (!(o instanceof Permission )) 
 			return false;
 
-		Permission that = (Permission) o;
+		 Permission that = (Permission) o;
        return this.id != null && this.id.equals(that.id);
 
    }// equals
@@ -135,8 +134,13 @@ public class Permission extends BaseEntity implements Comparable<Permission>
 
    public boolean isCurrent()
    {
-      LocalDateTime now = LocalDateTime.now();
+      LocalDate now = LocalDate.now();
       return now.compareTo(fromDate) >= 0 && now.compareTo(toDate) <= 0;
    }//isCurrent
+   
+   public boolean grants( Role role, NeedsProtection object)
+   {
+      return this.role.equals(role) && this.objectToProtect.getKey().equals(object.getKey()) && isCurrent();
+   }
 
 }//Permission

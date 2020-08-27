@@ -1,5 +1,6 @@
 package com.f.thoth.ui.views.security.permission;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -9,11 +10,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.f.thoth.app.HasLogger;
 import com.f.thoth.app.security.CurrentUser;
+import com.f.thoth.backend.data.entity.HierarchicalEntity;
+import com.f.thoth.backend.data.security.ObjectToProtect;
+import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.service.PermissionService;
 import com.f.thoth.ui.views.HasNotifications;
 
-public class PermissionPresenter<E>  implements HasLogger
+public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements HasLogger
 {
    /*
    public enum Message
@@ -28,42 +32,81 @@ public class PermissionPresenter<E>  implements HasLogger
        private String text() { return msg;}
 
    }//Message
-   */
+    */
 
    private final PermissionService<E>     service;
-  // private final CurrentUser            currentUser;
-  // private final HasNotifications       view;
+   // private final CurrentUser              currentUser;
+   // private final HasNotifications       view;
 
    @Autowired
    public PermissionPresenter(PermissionService<E> service, CurrentUser currentUser, HasNotifications view)
    {
       this.service     = service;
-   //   this.currentUser = currentUser;
-   //   this.view        = view;
+      //   this.currentUser = currentUser;
+      //   this.view        = view;
 
    }//PermissionPresenter
-   
+
    public List<E> loadGrants( Role role )
    {  
-      List<E> oldGrants = service.findGrants(role);
-      return oldGrants;
+      return service.findObjectsGranted(role);
    }//loadGrants
-
-   public void grantRevoke( Collection<E> grants, Role role, CurrentUser currentUser )
+   
+   public void grantRevoke( Collection<E> objectsGranted, Role role, LocalDate fromDate, LocalDate toDate, CurrentUser currentUser )
    {
-      Set<E> oldGrants  = new TreeSet<>();
-      oldGrants.addAll(loadGrants(role));
-      
-      Set<E> newGrants  = new TreeSet<>();
-      grants.forEach (object -> {if( !oldGrants.contains(object)) newGrants.add(object);});
-      
-      Set<E> newRevokes = new TreeSet<>();
-      oldGrants.forEach (object -> {if( !grants.contains(object)) newRevokes.add(object);});
-      
+      List<Permission> oldGrants  = service.findGrants(role);
+
+      Set<Permission> newGrants  = getNewGrants ( objectsGranted, oldGrants, role, fromDate, toDate);
+      Set<Permission> newRevokes = getNewRevokes( objectsGranted, oldGrants, role, fromDate, toDate);
       service.grantRevoke(currentUser.getUser(), role, newGrants, newRevokes);
-      
 
    }//grantRevoke
+
+   
+   private Set<Permission> getNewGrants( Collection<E> objectsGranted, List<Permission> oldGrants, Role role, LocalDate fromDate, LocalDate toDate)
+   {
+      Set<Permission> newGrants  = new TreeSet<>();
+      objectsGranted.forEach (obj -> 
+      {  
+         boolean nuevo= true;
+         for (Permission oGrant: oldGrants)
+         {
+            if ( oGrant.objectToProtect.getKey().equals( obj.getKey()))
+            {
+               nuevo = false;
+               break;
+            }
+         }
+         if (nuevo)
+            newGrants.add(  new Permission(role, (ObjectToProtect)obj, fromDate, toDate));        
+      });
+      
+      return newGrants;
+      
+   }//getNewGrants
+
+   private Set<Permission> getNewRevokes( Collection<E> objectsGranted, List<Permission> oldGrants, Role role, LocalDate fromDate, LocalDate toDate)
+   {
+      Set<Permission> newRevokes = new TreeSet<>();
+      oldGrants.forEach (oldPermit -> 
+      {  
+         boolean still= false;
+         for (E  obj: objectsGranted)
+         {
+            if ( oldPermit.getObjectToProtect().getKey().equals(obj.getKey()))
+            {
+               still = true;
+               break;
+            }
+         }
+         if (!still)
+            newRevokes.add(  new Permission(role, oldPermit.getObjectToProtect(), fromDate, toDate));        
+      });
+      
+      return newRevokes;
+      
+   }//getNewRevokes
+  
 
    /*
    private boolean executeOperation(Runnable operation)
@@ -89,7 +132,7 @@ public class PermissionPresenter<E>  implements HasLogger
       }
       return false;
    }//executeOperation
-  
+
 
 
    private void consumeError(Exception e, String message, boolean isPersistent)

@@ -8,8 +8,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
@@ -91,9 +89,8 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
    protected Role            roleOwner;  // Role that owns this object
 
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-   @JoinColumn(name="object_id")
    @BatchSize(size = 20)
-   protected Set<Role>       acl;        // Access control list
+   protected Set<Permission>  acl;       // Access control list
 
    // -------------- Constructors -------------
    public ObjectToProtect()
@@ -136,8 +133,8 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
 
    @Override public void buildCode()
    {
-      this.code = (tenant == null? "[Tenant]": tenant.getCode())+
-            ">"+
+      this.code = (tenant == null? "[Tenant]": tenant.getCode())+ 
+            "[OTP]>"+
             (name == null? "[name]" : name);
    }//buildCode
 
@@ -156,8 +153,8 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
    public Integer         getCategory() {return category;}
    public void            setCategory(Integer category) {this.category = category;}
 
-   public Set<Role>       getAcl() {return acl;}
-   public void            setAcl(Set<Role> acl) {this.acl = acl;}
+   public Set<Permission> getAcl() {return acl;}
+   public void            setAcl( Set<Permission> acl) {this.acl = acl;}
 
    // Implements HierarchicalEntity
    @Override public Long            getId()     { return super.getId();}
@@ -193,10 +190,10 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
        .append(" roleOwner["+ (roleOwner == null? "---": roleOwner.getCode())+ "]}\n\tAcl{");
 
       int i = 1;
-      for( Role r: acl)
+      for( Permission p: acl)
       {
-         s.append((i % 10 == 0? "\n\t   ": " "))
-          .append(r.getCode());
+         s.append((i % 10 == 0? "\n\t   ": ", "))
+          .append(p.getRole().getCode());
          i++;
       }
       s.append("\n\t   }\n");
@@ -224,10 +221,18 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
 
    @Override public boolean isOwnedBy( Role role) { return roleOwner != null && role != null && roleOwner.equals(role);}
 
-   @Override public boolean admits( Role role) { return acl.contains(role); }
+   @Override public boolean admits( Role role)
+   { 
+      for( Permission p: acl)
+      {
+         if ( p.grants( role, this) )
+            return true;
+      }
+      return false; 
+   }
 
-   @Override public void grant( Role role) { acl.add(role);}
+   @Override public void grant( Permission permission) { acl.add(permission);}
 
-   @Override public void revoke( Role role) { acl.remove(role);}
+   @Override public void revoke( Permission permission) { acl.remove(permission);}
 
 }//ObjectToProtect
