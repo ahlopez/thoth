@@ -9,12 +9,12 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
 import javax.persistence.NamedEntityGraphs;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -91,8 +91,7 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
    protected Role            roleOwner;  // Role that owns this object
 
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-   @OrderColumn
-   @JoinColumn(name= "object_id")
+   @JoinColumn(name="object_id")
    @BatchSize(size = 20)
    protected Set<Role>       acl;        // Access control list
 

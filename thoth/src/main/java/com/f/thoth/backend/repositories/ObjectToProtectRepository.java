@@ -51,8 +51,14 @@ public interface ObjectToProtectRepository extends JpaRepository<ObjectToProtect
    long countByNameLikeIgnoreCase(Tenant tenant, String name);
 
    //   ----------- ACL handling ----------------
-   @EntityGraph(value = ObjectToProtect.FULL, type = EntityGraphType.LOAD)
-   @Query("SELECT o FROM ObjectToProtect o join fetch o.acl a WHERE  a = ?1")
+   @EntityGraph(value = ObjectToProtect.FULL, type = EntityGraphType.FETCH)
+   @Query("SELECT o FROM ObjectToProtect o JOIN o.acl a WHERE a = ?1")
    List<ObjectToProtect> findGrants( Role role);
+   /*
+   SELECT e1 from Entity1 as e1 
+   where exists
+   (select e2 from Entity2 as e2 join e2.e3 as ent3
+   where ent3.id=e1.id and e2.name='Test')
+   */
    
 }//ObjectToProtectRepository
