@@ -11,8 +11,6 @@ import com.f.thoth.backend.service.TenantService;
 import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.server.VaadinSession;
 
-import net.bytebuddy.asm.Advice.This;
-
 public class ThothSession
 {
    private static TenantService tenantService;	

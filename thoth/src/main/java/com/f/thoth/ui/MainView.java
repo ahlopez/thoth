@@ -65,7 +65,7 @@ public class MainView extends AppLayout
       confirmDialog.setCancelButtonTheme ("raised tertiary");
       createHeader();
       createDrawer();
-      this.setDrawerOpened(true);
+      this.setDrawerOpened(false);
 
       menu = createMenuTabs();
 

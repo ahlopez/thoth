@@ -1,30 +1,26 @@
 package com.f.thoth.ui.views.security.permission;
 
-import java.time.LocalDate;
-
 import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.security.Role;
+import com.f.thoth.ui.components.Period;
 import com.vaadin.flow.component.ComponentEvent;
 
 public abstract class PermissionEvent<E extends HierarchicalEntity<E>>  extends ComponentEvent<AbstractPermissionView<E>> 
 {
    private Role      role;
-   private LocalDate from;
-   private LocalDate to;
+   private Period    period;
    
-   protected PermissionEvent( AbstractPermissionView<E> source, Role role, LocalDate from, LocalDate to) 
+   protected PermissionEvent( AbstractPermissionView<E> source, Role role, Period period) 
    { 
       super(source, false);
-      this.role = role;
-      this.from = from;
-      this.to   = to;
+      this.role   = role;
+      this.period = period;
       
    }//PermissionEvent consructor
    
    // ------------------- Getters & Setters ---------------
    public Role getRole()      { return role;}
-   public LocalDate getFrom() { return from;}
-   public LocalDate getTo()   { return to;}
+   public Period getPeriod()  { return period;}
 
 }//PermitFormEvent
 

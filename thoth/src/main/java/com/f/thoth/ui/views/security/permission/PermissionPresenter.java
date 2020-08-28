@@ -1,6 +1,5 @@
 package com.f.thoth.ui.views.security.permission;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -11,10 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.f.thoth.app.HasLogger;
 import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.entity.HierarchicalEntity;
+import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.service.PermissionService;
+import com.f.thoth.ui.components.Period;
 import com.f.thoth.ui.views.HasNotifications;
 
 public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements HasLogger
@@ -35,15 +36,15 @@ public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements Ha
     */
 
    private final PermissionService<E>     service;
-   // private final CurrentUser              currentUser;
-   // private final HasNotifications       view;
+   private final User                     currentUser;
+   //private final HasNotifications       view;
 
    @Autowired
    public PermissionPresenter(PermissionService<E> service, CurrentUser currentUser, HasNotifications view)
    {
       this.service     = service;
-      //   this.currentUser = currentUser;
-      //   this.view        = view;
+      this.currentUser = currentUser.getUser();
+      //this.view        = view;
 
    }//PermissionPresenter
 
@@ -52,18 +53,18 @@ public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements Ha
       return service.findObjectsGranted(role);
    }//loadGrants
    
-   public void grantRevoke( Collection<E> objectsGranted, Role role, LocalDate fromDate, LocalDate toDate, CurrentUser currentUser )
+   public void grantRevoke( Collection<E> objectsGranted, Role role, Period period )
    {
       List<Permission> oldGrants  = service.findGrants(role);
 
-      Set<Permission> newGrants  = getNewGrants ( objectsGranted, oldGrants, role, fromDate, toDate);
-      Set<Permission> newRevokes = getNewRevokes( objectsGranted, oldGrants, role, fromDate, toDate);
-      service.grantRevoke(currentUser.getUser(), role, newGrants, newRevokes);
+      Set<Permission> newGrants  = getNewGrants ( objectsGranted, oldGrants, role, period);
+      Set<Permission> newRevokes = getNewRevokes( objectsGranted, oldGrants, role, period);
+      service.grantRevoke(currentUser, role, newGrants, newRevokes);
 
    }//grantRevoke
 
    
-   private Set<Permission> getNewGrants( Collection<E> objectsGranted, List<Permission> oldGrants, Role role, LocalDate fromDate, LocalDate toDate)
+   private Set<Permission> getNewGrants( Collection<E> objectsGranted, List<Permission> oldGrants, Role role, Period period)
    {
       Set<Permission> newGrants  = new TreeSet<>();
       objectsGranted.forEach (obj -> 
@@ -78,14 +79,14 @@ public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements Ha
             }
          }
          if (nuevo)
-            newGrants.add(  new Permission(role, (ObjectToProtect)obj, fromDate, toDate));        
+            newGrants.add(  new Permission(role, (ObjectToProtect)obj, period.getFromDate(), period.getToDate()));        
       });
       
       return newGrants;
       
    }//getNewGrants
 
-   private Set<Permission> getNewRevokes( Collection<E> objectsGranted, List<Permission> oldGrants, Role role, LocalDate fromDate, LocalDate toDate)
+   private Set<Permission> getNewRevokes( Collection<E> objectsGranted, List<Permission> oldGrants, Role role, Period period)
    {
       Set<Permission> newRevokes = new TreeSet<>();
       oldGrants.forEach (oldPermit -> 
@@ -100,7 +101,7 @@ public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements Ha
             }
          }
          if (!still)
-            newRevokes.add(  new Permission(role, oldPermit.getObjectToProtect(), fromDate, toDate));        
+            newRevokes.add(  new Permission(role, oldPermit.getObjectToProtect(), period.getFromDate(), period.getToDate()));        
       });
       
       return newRevokes;

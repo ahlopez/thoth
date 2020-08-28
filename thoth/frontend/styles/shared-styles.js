@@ -308,6 +308,30 @@ $_documentContainer.innerHTML = `<dom-module id="bakery-app-layout-theme" theme-
         flex: auto;
         height: 100%;
       }
+
+      <!-- ........... Evidentia ........... -->
+
+      /* List view */
+      .list-view .content {
+         display: flex; ?
+      }
+      .list-view .selector-grid {
+         flex: 2; ?
+      }
+      .list-view .item-form {
+         flex: 1;
+         padding: var(--lumo-space-m); ?
+      }
+      .list-view .message-form {
+         flex: 1;
+         padding: var(--lumo-space-m); ?
+      }
+      @media all and (max-width: 1100px) { ?
+         .list-view.editing .toolbar,
+         .list-view.editing .selector-grid {
+            display: none;
+         }
+      }
     </style>
   </template>
 </dom-module>
@@ -327,21 +351,21 @@ $_documentContainer.innerHTML = `<dom-module id="bakery-app-layout-theme" theme-
     .v-loading-indicator,
     .v-system-error,
     .v-reconnect-dialog {
-    	position: absolute;
-    	left: 0;
-    	top: 0;
-    	border: none;
-    	z-index: 10000;
-    	pointer-events: none;
+      position: absolute;
+      left: 0;
+      top: 0;
+      border: none;
+      z-index: 10000;
+      pointer-events: none;
     }
 
     .v-system-error,
     .v-reconnect-dialog {
-    	display: flex;
-    	right: 0;
-    	bottom: 0;
-    	background: var(--lumo-shade-40pct);
-    	flex-direction: column;
+      display: flex;
+      right: 0;
+      bottom: 0;
+      background: var(--lumo-shade-40pct);
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       align-content: center;
@@ -350,44 +374,44 @@ $_documentContainer.innerHTML = `<dom-module id="bakery-app-layout-theme" theme-
     .v-system-error .caption,
     .v-system-error .message,
     .v-reconnect-dialog .text {
-    	width: 30em;
-    	max-width: 100%;
-    	padding: var(--lumo-space-xl);
-    	background: var(--lumo-base-color);
-    	border-radius: 4px;
-    	text-align: center;
+      width: 30em;
+      max-width: 100%;
+      padding: var(--lumo-space-xl);
+      background: var(--lumo-base-color);
+      border-radius: 4px;
+      text-align: center;
     }
 
     .v-system-error .caption {
-    	padding-bottom: var(--lumo-space-s);
-    	border-bottom-left-radius: 0;
-    	border-bottom-right-radius: 0;
+      padding-bottom: var(--lumo-space-s);
+      border-bottom-left-radius: 0;
+      border-bottom-right-radius: 0;
     }
 
     .v-system-error .message {
-    	pointer-events: all;
-    	padding-top: var(--lumo-space-s);
-    	border-top-left-radius: 0;
-    	border-top-right-radius: 0;
-    	color: grey;
+      pointer-events: all;
+      padding-top: var(--lumo-space-s);
+      border-top-left-radius: 0;
+      border-top-right-radius: 0;
+      color: grey;
     }
 
     .v-loading-indicator {
-    	position: fixed !important;
-    	width: 50%;
-    	opacity: 0.6;
-    	height: 4px;
-    	background: var(--lumo-primary-color);
-    	transition: none;
-    	animation: v-progress-start 1000ms 200ms both;
+      position: fixed !important;
+      width: 50%;
+      opacity: 0.6;
+      height: 4px;
+      background: var(--lumo-primary-color);
+      transition: none;
+      animation: v-progress-start 1000ms 200ms both;
     }
 
     .v-loading-indicator[style*="none"] {
-    	display: block !important;
-    	width: 100% !important;
-    	opacity: 0;
-    	transition: opacity 500ms 300ms, width 300ms;
-    	animation: none;
+      display: block !important;
+      width: 100% !important;
+      opacity: 0;
+      transition: opacity 500ms 300ms, width 300ms;
+      animation: none;
     }
 
     vaadin-app-layout vaadin-tab {
@@ -425,5 +449,7 @@ $_documentContainer.innerHTML = `<dom-module id="bakery-app-layout-theme" theme-
     }
   </style>
 </custom-style>`;
+
+
 
 document.head.appendChild($_documentContainer.content);

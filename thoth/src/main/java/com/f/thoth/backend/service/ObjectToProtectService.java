@@ -125,19 +125,13 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
    {
       newGrants.forEach( newGrant-> 
       {
-         List<ObjectToProtect> allObj;
-         allObj = objectToProtectRepository.findAll();
          Optional<ObjectToProtect> optObject= objectToProtectRepository.findById(newGrant.getObjectToProtect().getId());
          if ( optObject.isPresent())
          {
             permissionRepository.saveAndFlush(newGrant);
             ObjectToProtect object = optObject.get();
             object.grant(newGrant);
-            allObj = objectToProtectRepository.findAll();
             objectToProtectRepository.saveAndFlush(object);
-            allObj = objectToProtectRepository.findAll();
-            List<Permission> allGrants = permissionRepository.findAll();
-            int x = 1;
         }
       });
    }//grant
@@ -147,19 +141,13 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
    {
       newRevokes.forEach( newRevoke-> 
       {
-         List<ObjectToProtect> allObj;
-         allObj = objectToProtectRepository.findAll();
          Optional<ObjectToProtect> optObject= objectToProtectRepository.findById(newRevoke.getObjectToProtect().getId());
          if ( optObject.isPresent())
          {
             ObjectToProtect object = optObject.get();
             object.revoke(newRevoke);
-            allObj = objectToProtectRepository.findAll();
             objectToProtectRepository.saveAndFlush(object);
             permissionRepository.delete(newRevoke);
-            allObj = objectToProtectRepository.findAll();
-            List<Permission> allGrants = permissionRepository.findAll();
-            int x = 1;
         }
       });
 
