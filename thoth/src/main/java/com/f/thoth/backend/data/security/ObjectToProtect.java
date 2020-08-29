@@ -201,16 +201,20 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
       return s.toString();
    }//toString
 
-   @Override public int compareTo(ObjectToProtect that)
+
+   @Override
+   public int compareTo(ObjectToProtect that)
    {
       return this.equals(that)?  0 :
-         that ==  null    ?  1 :
-         this.code == null  && that.code == null?  0 :
-         this.code != null  && that.code == null?  1 :
-         this.code == null  && that.code != null? -1 :
-         this.code.compareTo(that.code);
+             that == null?       1 :
+             getCompareKey(this).compareTo(getCompareKey(that)); 
 
-   }//compareTo
+   }// compareTo
+   
+   private String getCompareKey( ObjectToProtect object)
+   {
+      return ( object.owner == null? "": getCompareKey(object.owner))+ ":"+ object.getCode();      
+   }
 
    // -----------------  Logic ----------------
    @Override public String  getKey() { return code;}

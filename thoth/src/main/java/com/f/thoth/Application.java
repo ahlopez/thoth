@@ -20,6 +20,7 @@ import com.f.thoth.backend.repositories.PermissionRepository;
 import com.f.thoth.backend.repositories.RoleRepository;
 import com.f.thoth.backend.repositories.TenantRepository;
 import com.f.thoth.backend.repositories.UserRepository;
+import com.f.thoth.backend.service.ObjectToProtectService;
 import com.f.thoth.backend.service.TenantService;
 import com.f.thoth.backend.service.UserService;
 import com.f.thoth.ui.MainView;
@@ -36,6 +37,7 @@ import com.f.thoth.ui.MainView;
             MainView.class,
             Application.class,
             UserService.class,
+            ObjectToProtectService.class,
             TenantService.class,
             ObjectToProtect.class,
             Role.class,

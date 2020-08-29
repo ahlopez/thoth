@@ -119,13 +119,16 @@ public class UserGroup extends Usuario implements Comparable<UserGroup>, Hierarc
    public int compareTo(UserGroup that)
    {
       return this.equals(that)?  0 :
-             that ==  null    ?  1 :
-             this.code == null  && that.code == null?  0 :
-             this.code != null  && that.code == null?  1 :
-             this.code == null  && that.code != null? -1 :
-             this.code.compareTo(that.code);
+             that == null?       1 :
+             getCompareKey(this).compareTo(getCompareKey(that)); 
 
    }// compareTo
+   
+   private String getCompareKey( UserGroup group)
+   {
+      return ( group.owner == null? "": getCompareKey(group.owner))+ ":"+ group.getCode();      
+   }
+
 
 
    // --------------- Logic ---------------------

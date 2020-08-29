@@ -17,12 +17,6 @@
    max-width: 1100px;
    flex: 3; ?
 }
-.list-view .selector .selector-tree {
-   flex: 2; ?
-}
-.list-view .selector .selector-grid {
-   flex: 3; ?
-}
 
 .list-view .item-form {
    flex: 1;
@@ -32,6 +26,26 @@
    flex: 1;
    padding: var(--lumo-space-m); ?
 }
+
+/* Hierarchical selector */
+.selector-tree {
+   flex: 1; ?
+}
+.selector-grid {
+   flex: 1; ?
+}
+
+/*  Notification */
+.notifier-error{
+   background-color: Beige;
+   color: Crimson
+}
+.notifier-accept{
+   background-color: Beige;
+   color: RoyalBlue
+}
+
+/* Media */
 @media all and (max-width: 1100px) { ?
    .list-view.editing .toolbar,
    .list-view.editing .selector-grid {

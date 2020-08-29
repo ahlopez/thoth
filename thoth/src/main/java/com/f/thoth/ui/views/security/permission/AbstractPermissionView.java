@@ -13,6 +13,7 @@ import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.service.PermissionService;
 import com.f.thoth.ui.components.AbstractHierarchicalSelector;
+import com.f.thoth.ui.components.Notifier;
 import com.f.thoth.ui.components.Period;
 import com.f.thoth.ui.utils.TemplateUtil;
 import com.f.thoth.ui.views.HasNotifications;
@@ -31,7 +32,6 @@ import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -247,20 +247,18 @@ implements HasNotifications
           fireEvent(new GrantRevokeEvent<>(this, permissionSelector.getValues(), role, permissionPeriod));
        } catch (ValidationException e) 
        {
-          Notification.show("Período inválido "+  
-                             TextUtil.formatDate(permissionPeriod.getFromDate())+ " : "+
-                             TextUtil.formatDate(permissionPeriod.getToDate())+ "]",
-                             -1, Notification.Position.BOTTOM_START ); 
+          Notifier.error( "Período inválido "+  
+                TextUtil.formatDate(permissionPeriod.getFromDate())+ " : "+
+                TextUtil.formatDate(permissionPeriod.getToDate())+ "]");
           clear();
-          //e.printStackTrace();
        }
    }//validateAndSave   
    
 
    private void saveGrants( GrantRevokeEvent<E> event)
    {
-      permissionPresenter.grantRevoke( event.getGrants(), event.getRole(), event.getPeriod());
-      Notification.show("Permisos del rol "+ role.getName()+ " actualizados", 4000, Notification.Position.BOTTOM_START);
+      permissionPresenter.grantRevoke( event.getGrants(), event.getRole(), event.getPeriod()); 
+      Notifier.accept("Permisos del rol "+ role.getName()+ " actualizados");
       clear();
 
    }//saveGrants
