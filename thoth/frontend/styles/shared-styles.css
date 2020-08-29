@@ -10,12 +10,20 @@
 .list-view .left-section {
    flex: 1;
 }
-.list-view .selector {
-   flex: 2; ?
-}
 .list-view .right-section {
    flex: 1;
 }
+.list-view .selector {
+   max-width: 1100px;
+   flex: 3; ?
+}
+.list-view .selector .selector-tree {
+   flex: 2; ?
+}
+.list-view .selector .selector-grid {
+   flex: 3; ?
+}
+
 .list-view .item-form {
    flex: 1;
    padding: var(--lumo-space-m); ?

@@ -81,6 +81,7 @@ implements HasValue<E, T>
    private TreeGrid<T> buildSelector( HorizontalLayout layout)
    {
       TreeGrid<T>tGrid = new TreeGrid<>();
+      tGrid.addClassName("selector-tree");
       tGrid.setWidthFull();
       tGrid.addHierarchyColumn(T::getName).setHeader("Nombre");
       tGrid.setSelectionMode(selectionMode);
@@ -129,6 +130,7 @@ implements HasValue<E, T>
    private Grid<T> buildSearchGrid(TreeGrid<T> tGrid)
    {
       Grid<T> sGrid = new Grid<>();
+      sGrid.addClassName("selector-grid");
       sGrid.setVisible(false);
       sGrid.setWidthFull();
       sGrid.addColumn(T::getName).setHeader("Nombre").setFlexGrow(50);

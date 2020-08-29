@@ -2,6 +2,8 @@ package com.f.thoth.ui.views.security.permission;
 
 import static com.f.thoth.ui.dataproviders.DataProviderUtil.createItemLabelGenerator;
 
+import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.f.thoth.app.security.CurrentUser;
@@ -81,21 +83,24 @@ implements HasNotifications
 
       leftSection         = new VerticalLayout();
       leftSection.addClassName  ("left-section");
-      leftSection.add(new Label ("Message Area"));
+      leftSection.add(new Label (" "));
 
       rightSection        = new VerticalLayout();
       rightSection.addClassName ("right-section");
-      rightSection.add(new Label("Item Area"));
+      rightSection.add(new Label(" "));
 
       content             = new VerticalLayout();
       content.addClassName      ("selector");
-      content.setWidthFull();
+      content.setSizeFull();
 
       roleSelector        = setupRoleSelector();
       permissionLayout    = setupPermissionSelector(service, currentUser, name);
       content.add(roleSelector, permissionLayout);     
 
-      add( new HorizontalLayout(leftSection, content, rightSection));
+      HorizontalLayout panel=  new HorizontalLayout(leftSection, content, rightSection);
+      panel.setSizeFull();
+      add( panel);
+      
       setupEventListeners(permissionPresenter);
 
    }//AbstractPermissionView constructor
@@ -129,6 +134,7 @@ implements HasNotifications
    {
       permissionLayout   = new VerticalLayout();
       permissionLayout.setVisible(false);
+      permissionLayout.setSizeFull();
 
       setupPeriod();
       setupSelector(service, currentUser, name);     
@@ -142,7 +148,7 @@ implements HasNotifications
    {
 
       HorizontalLayout periodLayout = new HorizontalLayout();
-      periodLayout.setWidthFull();
+      //periodLayout.setWidthFull();
 
       permissionFrom = new DatePicker("Válidos desde");
       permissionFrom.setRequired(true);
@@ -165,9 +171,14 @@ implements HasNotifications
 
       binder.forField(permissionFrom)
             .asRequired()
+            .withValidator( fromDate -> 
+            {
+               LocalDate toDate = permissionTo.getValue();
+               return toDate != null && fromDate.equals(toDate) || fromDate.isBefore(toDate);
+            }, "Fecha final debe ser igual o posterior a fecha inicial")
             .bind("fromDate");
 
-      binder.forField(permissionFrom)
+      binder.forField(permissionTo)
             .asRequired()
             .withValidator( toDate -> toDate.equals(permissionFrom.getValue()) || toDate.isAfter(permissionFrom.getValue()), 
                        "Fecha final debe ser igual o posterior a fecha inicial")
@@ -239,7 +250,7 @@ implements HasNotifications
           Notification.show("Período inválido "+  
                              TextUtil.formatDate(permissionPeriod.getFromDate())+ " : "+
                              TextUtil.formatDate(permissionPeriod.getToDate())+ "]",
-                             0, Notification.Position.BOTTOM_START ); 
+                             -1, Notification.Position.BOTTOM_START ); 
           clear();
           //e.printStackTrace();
        }
@@ -249,7 +260,7 @@ implements HasNotifications
    private void saveGrants( GrantRevokeEvent<E> event)
    {
       permissionPresenter.grantRevoke( event.getGrants(), event.getRole(), event.getPeriod());
-      Notification.show("Permisos del rol "+ role.getName()+ " actualizados", 4, Notification.Position.BOTTOM_START);
+      Notification.show("Permisos del rol "+ role.getName()+ " actualizados", 4000, Notification.Position.BOTTOM_START);
       clear();
 
    }//saveGrants
