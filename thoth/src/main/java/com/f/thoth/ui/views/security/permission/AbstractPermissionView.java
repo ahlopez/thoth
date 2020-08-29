@@ -89,7 +89,7 @@ implements HasNotifications
 
       content             = new VerticalLayout();
       content.addClassName      ("selector");
-      content.setSizeFull();
+      content.setWidthFull();
 
       roleSelector        = setupRoleSelector();
       permissionLayout    = setupPermissionSelector(service, currentUser, name);

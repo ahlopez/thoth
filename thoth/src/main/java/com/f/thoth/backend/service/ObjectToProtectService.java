@@ -145,9 +145,10 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
          if ( optObject.isPresent())
          {
             ObjectToProtect object = optObject.get();
-            object.revoke(newRevoke);
+            Permission toRevoke = permissionRepository.findByRoleObject(newRevoke.getRole(),newRevoke.getObjectToProtect());
+            object.revoke(toRevoke);
             objectToProtectRepository.saveAndFlush(object);
-            permissionRepository.delete(newRevoke);
+            permissionRepository.delete(toRevoke);
         }
       });
 

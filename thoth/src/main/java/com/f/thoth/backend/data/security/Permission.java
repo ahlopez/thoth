@@ -115,7 +115,7 @@ public class Permission extends BaseEntity implements Comparable<Permission>
    public int hashCode() { return id == null? 11: id.hashCode(); }
 
    @Override
-   public String toString() { return "Permission{ role["+ role.getName()+ "] object["+ objectToProtect.toString()+ "] from["+  fromDate+ "] to["+ toDate+ "] grantedBy["+ grantedBy.getEmail()+ "]}";}
+   public String toString() { return "Permission{ "+ super.toString()+ " role["+ role.getName()+ "]\n\t object["+ objectToProtect.toString()+ "]\n\t from["+  fromDate+ "] to["+ toDate+ "] grantedBy["+ grantedBy.getEmail()+ "]}";}
 
    @Override
    public int compareTo(Permission that)
