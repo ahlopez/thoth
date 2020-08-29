@@ -1,8 +1,11 @@
 package com.f.thoth.backend.data.entity.util;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,7 +17,9 @@ public class TextUtil
    /*
     *  sf   -   Formato simple para edicion de fechas
     */
+   private static final Locale APP_LOCALE = Locale.US;
    private static final SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+   private static final DateTimeFormatter FULL_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy", APP_LOCALE);
 
     /**
      * Decide si el texto presentado es nulo, o vacio
@@ -141,6 +146,16 @@ public class TextUtil
          GregorianCalendar theDate = new GregorianCalendar(year, month, day);
          return    sf.format(theDate.getTime());
 
+    }//formatDate
+    
+    /**
+     * Obtiene la fecha formateada dd.mm.yyyy
+     * @param date Fecha a formatear
+     * @return String fecha en formato dd.mm.yyyy
+     */
+    public static String formatDate( LocalDate date)
+    {
+        return date == null? null: date.format(FULL_DATE_FORMATTER);
     }//formatDate
 
     /**

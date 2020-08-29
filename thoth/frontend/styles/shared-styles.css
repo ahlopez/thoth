@@ -1,0 +1,32 @@
+/* ........... Evidentia ........... */
+
+/* List view */
+.list-view .content {
+   display: flex; ?
+}
+.list-view .selector-grid {
+   flex: 2; ?
+}
+.list-view .left-section {
+   flex: 1;
+}
+.list-view .selector {
+   flex: 2;
+}
+.list-view .right-section {
+   flex: 1;
+}
+.list-view .item-form {
+   flex: 1;
+   padding: var(--lumo-space-m); ?
+}
+.list-view .message-form {
+   flex: 1;
+   padding: var(--lumo-space-m); ?
+}
+@media all and (max-width: 1100px) { ?
+   .list-view.editing .toolbar,
+   .list-view.editing .selector-grid {
+      display: none;
+   }
+}

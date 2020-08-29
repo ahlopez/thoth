@@ -6,12 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.entity.HierarchicalEntity;
+import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.service.PermissionService;
 import com.f.thoth.ui.components.AbstractHierarchicalSelector;
 import com.f.thoth.ui.components.Period;
-import com.f.thoth.ui.utils.FormattingUtils;
 import com.f.thoth.ui.utils.TemplateUtil;
 import com.f.thoth.ui.views.HasNotifications;
 import com.vaadin.flow.component.ComponentEvent;
@@ -35,6 +35,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.shared.Registration;
 
 /**
@@ -57,6 +58,8 @@ implements HasNotifications
    private ComboBox<Role>           roleSelector; 
    private DatePicker               permissionFrom;
    private DatePicker               permissionTo;
+   private Period                   permissionPeriod; 
+   private Binder<Period>           binder;
    private Button                   save         = new Button("Guardar");
    private Button                   close        = new Button("Cancelar");
    private AbstractHierarchicalSelector<E, HasValue.ValueChangeEvent<E>> permissionSelector;
@@ -93,7 +96,7 @@ implements HasNotifications
       content.add(roleSelector, permissionLayout);     
 
       add( new HorizontalLayout(leftSection, content, rightSection));
-
+      setupEventListeners(permissionPresenter);
 
    }//AbstractPermissionView constructor
 
@@ -109,6 +112,14 @@ implements HasNotifications
       roleSelector.setClearButtonVisible(true);
       roleSelector.setAllowCustomValue(true);
       roleSelector.setPageSize(20);
+      
+      roleSelector.addValueChangeListener((event)-> 
+      {
+         role = event.getValue();
+         permissionSelector.init( permissionPresenter.loadGrants(role));
+         permissionLayout.setVisible(true);
+      });
+
 
       return roleSelector;
 
@@ -131,6 +142,7 @@ implements HasNotifications
    {
 
       HorizontalLayout periodLayout = new HorizontalLayout();
+      periodLayout.setWidthFull();
 
       permissionFrom = new DatePicker("Válidos desde");
       permissionFrom.setRequired(true);
@@ -148,18 +160,18 @@ implements HasNotifications
       periodLayout.add(periodForm);
       permissionLayout.add(periodLayout);
 
-      Period permissionPeriod = new Period();
-      Binder<Period> binder = new BeanValidationBinder<>(Period.class);
+      permissionPeriod = new Period();
+      binder = new BeanValidationBinder<>(Period.class);
 
       binder.forField(permissionFrom)
-      .asRequired()
-      .bind("fromDate");
+            .asRequired()
+            .bind("fromDate");
 
       binder.forField(permissionFrom)
-      .asRequired()
-      .withValidator( toDate -> toDate.equals(permissionFrom.getValue()) || toDate.isAfter(permissionFrom.getValue()), 
-            "Fecha final debe ser igual o posterior a fecha inicial")
-      .bind("toDate");
+            .asRequired()
+            .withValidator( toDate -> toDate.equals(permissionFrom.getValue()) || toDate.isAfter(permissionFrom.getValue()), 
+                       "Fecha final debe ser igual o posterior a fecha inicial")
+            .bind("toDate");
 
       binder.readBean(permissionPeriod);
    }//setupPeriod
@@ -179,51 +191,30 @@ implements HasNotifications
       actions.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
       actions.setWidth("100%");
 
-      save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-      save.addClickShortcut(Key.ENTER);
-
       close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);      
       close.addClickShortcut(Key.ESCAPE);
-
-      actions.add(close,save);
-      setupEventListeners(permissionPresenter);
-      permissionLayout.add(actions);
-
-   }//setupActions
-
-
-   protected void setupEventListeners( PermissionPresenter<E> permissionPresenter)
-   {
-      // Consumer<ObjectToProtect> onSuccess = entity -> navigateToEntity(null);
-      // Consumer<ObjectToProtect> onFail    = entity -> {throw new RuntimeException("La operación no pudo ser ejecutada."); };
-
-      roleSelector.addValueChangeListener((event)-> 
-      {
-         role = event.getValue();
-         permissionSelector.init( permissionPresenter.loadGrants(role));
-         permissionLayout.setVisible(true);
-      });
-
-      save.addClickListener (event -> 
-      {
-         Period period = new Period(permissionFrom.getValue(),permissionTo.getValue());
-         if (period.isValid())
-         {
-            fireEvent(new GrantRevokeEvent<>(this, permissionSelector.getValues(), role, period));
-            Notification.show("Permisos del rol "+ role.getName()+ " actualizados", 4, Notification.Position.BOTTOM_START);
-            clear();
-         }else {
-            Notification.show("Período inválido ", 0, Notification.Position.BOTTOM_START); /*+ 
-                  period.getFromDate().format(FormattingUtils.FULL_DATE_FORMATTER)+ " : "+
-                  period.getToDate().format(FormattingUtils.FULL_DATE_FORMATTER)+ "]");*/
-         }
-      });
       close.addClickListener(event -> fireEvent(new CloseEvent<>(this)));
 
+      save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+      save.addClickShortcut(Key.ENTER);
+      save.addClickListener(event -> validateAndSave());
+      
+      binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
+      
+      actions.add(close,save);
+      permissionLayout.add(actions);
+
+      
+   }//setupActions
+
+   
+   protected void setupEventListeners( PermissionPresenter<E> permissionPresenter)
+   {
       addListener(GrantRevokeEvent.class, this::saveGrants); 
       addListener(CloseEvent.class,       this::close);
 
    }//setupEventListeners
+
 
    public <T extends ComponentEvent<?>> Registration addListener(Class<T> eventType, ComponentEventListener<T> listener) 
    { 
@@ -235,10 +226,30 @@ implements HasNotifications
    {
       getUI().ifPresent(ui -> ui.navigate(TemplateUtil.generateLocation(getBasePage(), id)));
    }//navigateToEntity
+   
+
+   private void validateAndSave() 
+   {
+       try 
+       {
+          binder.writeBean(permissionPeriod); 
+          fireEvent(new GrantRevokeEvent<>(this, permissionSelector.getValues(), role, permissionPeriod));
+       } catch (ValidationException e) 
+       {
+          Notification.show("Período inválido "+  
+                             TextUtil.formatDate(permissionPeriod.getFromDate())+ " : "+
+                             TextUtil.formatDate(permissionPeriod.getToDate())+ "]",
+                             0, Notification.Position.BOTTOM_START ); 
+          clear();
+          //e.printStackTrace();
+       }
+   }//validateAndSave   
+   
 
    private void saveGrants( GrantRevokeEvent<E> event)
    {
       permissionPresenter.grantRevoke( event.getGrants(), event.getRole(), event.getPeriod());
+      Notification.show("Permisos del rol "+ role.getName()+ " actualizados", 4, Notification.Position.BOTTOM_START);
       clear();
 
    }//saveGrants
