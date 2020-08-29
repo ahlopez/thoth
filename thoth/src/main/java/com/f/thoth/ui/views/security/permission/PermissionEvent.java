@@ -22,7 +22,7 @@ public abstract class PermissionEvent<E extends HierarchicalEntity<E>>  extends 
    public Role getRole()      { return role;}
    public Period getPeriod()  { return period;}
 
-}//PermitFormEvent
+}//PermissionEvent
 
 
 
