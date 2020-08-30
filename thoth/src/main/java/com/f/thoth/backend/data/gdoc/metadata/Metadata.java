@@ -19,8 +19,8 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
  * Representa la definicion de un metadato
  */
 @Entity
-@Table(name = "METADATA", indexes = { @Index(columnList = "code") })
-public class Metadata extends BaseEntity implements Comparable<Metadata>
+@Table(name = "METADATA", indexes = { @Index(columnList = "code")})
+public class Metadata extends BaseEntity implements  Comparable<Metadata>
 {
    @NotBlank(message = "{evidentia.name.required}")
    @NotNull (message = "{evidentia.name.required}")
@@ -43,26 +43,38 @@ public class Metadata extends BaseEntity implements Comparable<Metadata>
    public Metadata()
    {
       super();
+      reset("", Type.STRING, false, true, "");
+      buildCode();
    }
 
-   public Metadata( String name, Type type, boolean required, boolean editable)
+   public Metadata( String name, Type type, boolean required, boolean editable, String range)
    {
       super();
+      reset(name, type, required, editable, range);
+   }//Metadata
+   
+   public void reset(String name, Type type, boolean required, boolean editable, String range)
+   {
       if ( TextUtil.isEmpty(name))
          throw new IllegalArgumentException("Nombre del metadato no puede ser nulo ni vacío");
 
       if ( type == null)
          throw new IllegalArgumentException("Tipo del metadato no puede ser nulo");
 
+      
       this.name     = name;
       this.type     = type;
       this.required = required;
       this.editable = editable;
+      this.range    = range;
       buildCode();
+      
+   }//init
 
-   }//Metadata
-
-   @Override protected void buildCode() { this.code = tenant.getCode()+ ":M:"+ this.name;}
+   @Override protected void buildCode() 
+   { 
+      this.code = (tenant == null? "[tenant]": tenant.getCode())+ "[MET]>"+ (name==null? "[name]": this.name);
+   }
 
    // -------------- Getters & Setters ----------------
 
@@ -84,6 +96,26 @@ public class Metadata extends BaseEntity implements Comparable<Metadata>
 
    public String  getRange(){ return range;}
    public void    setRange(String range) { this.range = range;}
+   
+   // --------------- Builder---------------------
+   
+   public interface Exporter
+   {
+      public void initExport();
+      public void export(String name, Type type, boolean required, boolean editable, String range);
+      public void endExport();
+      public Object getProduct();
+      
+   }//Exporter
+   
+   public Object export( Metadata.Exporter exporter)
+   {
+      exporter.initExport();
+      exporter.export(name, type, required, editable, range);
+      exporter.endExport();
+      return exporter.getProduct();
+      
+   }//export
 
    // --------------- Object methods ---------------------
 

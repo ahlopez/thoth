@@ -46,8 +46,8 @@ import com.vaadin.flow.shared.Registration;
 @JsModule ("./styles/shared-styles.js")
 @CssImport("./styles/shared-styles.css")
 public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E>> 
-extends    VerticalLayout 
-implements HasNotifications
+                extends    VerticalLayout 
+                implements HasNotifications
 {
    private PermissionPresenter<E>   permissionPresenter;
    private Role                     role;

@@ -19,10 +19,10 @@ public class DateTimeRange implements Range<LocalDateTime>
    public DateTimeRange( LocalDateTime minTime, LocalDateTime maxTime)
    {
       if (minTime ==  null || maxTime == null)
-         throw new IllegalArgumentException("Valores m�nimo y m�ximo del rango no pueden ser nulos");
+         throw new IllegalArgumentException("Valores mínimo y máximo del rango no pueden ser nulos");
 
       if ( minTime.isAfter( maxTime))
-         throw new IllegalArgumentException("Fecha-hora m�nima no puede ser mayor que Fecha-hora m�xima");
+         throw new IllegalArgumentException("Fecha-hora mínima no puede ser mayor que Fecha-hora máxima");
 
       this.minTime   = minTime;
       this.maxTime   = maxTime;

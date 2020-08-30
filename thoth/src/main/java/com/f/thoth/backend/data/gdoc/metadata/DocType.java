@@ -239,7 +239,18 @@ public class DocType extends BaseEntity implements NeedsProtection, Comparable<D
       for(DocType child: children)
          s.append( child.name).append(" ");
 
-      s.append( "]}");
+      s.append( "]\n\t acl[");
+      
+      int i = 1;
+      for( Permission p: acl)
+      {
+         s.append((i % 10 == 0? "\n\t   ": ", "))
+          .append(p.getRole().getCode());
+         i++;
+      }
+      
+      s.append("\n\t    ]}\n");
+
       return s.toString();
 
    }//toString

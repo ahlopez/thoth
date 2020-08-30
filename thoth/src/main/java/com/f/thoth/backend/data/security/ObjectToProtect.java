@@ -192,7 +192,7 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
       int i = 1;
       for( Permission p: acl)
       {
-         s.append((i % 10 == 0? "\n\t   ": ", "))
+         s.append((i % 10 == 0? "\n\t   ": " "))
           .append(p.getRole().getCode());
          i++;
       }

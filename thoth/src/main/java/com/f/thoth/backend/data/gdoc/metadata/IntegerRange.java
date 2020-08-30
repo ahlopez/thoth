@@ -19,10 +19,10 @@ public class IntegerRange implements Range<BigInteger>
    public IntegerRange( BigInteger minValue, BigInteger maxValue)
    {
       if (minValue ==  null || maxValue == null)
-         throw new IllegalArgumentException("Valores minimo y maximo del rango no pueden ser nulos");
+         throw new IllegalArgumentException("Valores mínimo y máximo del rango no pueden ser nulos");
 
       if ( minValue.compareTo( maxValue) > 0)
-         throw new IllegalArgumentException("Valor m�nimo no puede ser mayor que valor m�ximo");
+         throw new IllegalArgumentException("Valor mínimo no puede ser mayor que valor máximo");
 
       this.minValue   = minValue;
       this.maxValue   = maxValue;

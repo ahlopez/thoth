@@ -30,6 +30,6 @@ public abstract class BaseEntity extends AbstractEntity
 
 	@Override public int hashCode() { return super.hashCode();}
 
-	@Override public String toString() { return super.toString()+ " tenant["+ tenant.getName()+ "]";}
+	@Override public String toString() { return super.toString()+ " tenant["+ tenant==null?"[tenant]": tenant.getName()+ "]";}
 
 }//BaseEntity

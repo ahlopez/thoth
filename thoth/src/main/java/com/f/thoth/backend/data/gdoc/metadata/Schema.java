@@ -8,11 +8,13 @@ import java.util.TreeSet;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -25,6 +27,7 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
  * Representa un esquema de metadatos
  */
 @Entity
+@Table(name = "SCHEMA", indexes = { @Index(columnList = "code")})
 public class Schema extends BaseEntity implements Comparable<Schema>
 {
    @NotBlank(message = "{evidentia.name.required}")
@@ -79,6 +82,27 @@ public class Schema extends BaseEntity implements Comparable<Schema>
 
    public Set<Metadata>  getFields() { return fields;}
    public void           setFields( Set<Metadata> fields){ this.fields = fields;}
+   
+   // --------------- Builders ---------------------
+   
+   public interface Exporter
+   {
+      public void initExport();
+      public void exportName(String name);
+      public void exportField(Metadata field);
+      public void endExport();
+      public Object getProduct();
+      
+   }//Exporter
+   
+   public Object export( Schema.Exporter exporter)
+   {
+      exporter.initExport();
+      exporter.exportName( name);
+      fields.forEach( field-> exporter.exportField(field));
+      exporter.endExport();
+      return exporter.getProduct();
+   }//export
 
 
    // --------------- Object methods ---------------------

@@ -19,10 +19,10 @@ public class DecimalRange implements Range<BigDecimal>
    public DecimalRange( BigDecimal minValue, BigDecimal maxValue)
    {
       if (minValue ==  null || maxValue == null)
-         throw new IllegalArgumentException("Valores m�nimo y m�ximo del rango no pueden ser nulos");
+         throw new IllegalArgumentException("Valores mínimo y máximo del rango no pueden ser nulos");
 
       if ( minValue.compareTo( maxValue) > 0)
-         throw new IllegalArgumentException("Valor m�nimo no puede ser mayor que valor m�ximo");
+         throw new IllegalArgumentException("Valor mínimo no puede ser mayor que valor máximo");
 
       this.minValue   = minValue;
       this.maxValue   = maxValue;

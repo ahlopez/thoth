@@ -22,10 +22,10 @@ public class StringRange implements Range<String>
    public StringRange( int minLength, int maxLength, boolean canBeEmpty)
    {
       if ( minLength > maxLength)
-         throw new IllegalArgumentException("Longitud minimma no puede ser mayor que longitud maxima");
+         throw new IllegalArgumentException("Longitud mínimma no puede ser mayor que longitud máxima");
 
       if ( minLength < 0 || maxLength > MAX_LENGTH)
-         throw new IllegalArgumentException("Longitud m�nima o m�xima inv�lidas");
+         throw new IllegalArgumentException("Longitud mínima o máxima inválidas");
 
       this.minLength   = minLength;
       this.maxLength   = maxLength;
