@@ -28,9 +28,12 @@ public class SchemaValues extends BaseEntity implements SchemaValuesImporter
    public SchemaValues( SchemaValues.ImporterDirector importerDirector)
    {
       values = new ArrayList<>();
-      importerDirector.dirija( this);      
+      importerDirector.dirija( this);  
+      buildCode();
    }//SchemaValues
    
+
+   @Override public void buildCode(){ this.code = (tenant == null? "[Tenant]": tenant.getCode())+ "[SCM]"+ (id == null? "---": id);}
    
    // ------------------------   Getters && Setters ----------------------------
    public Schema getSchema() { return schema; }
