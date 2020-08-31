@@ -15,8 +15,8 @@ public interface PermissionService<T> extends HierarchicalService<T>
    
    public void grantRevoke( User currentUser, Role role, Set<Permission>newGrants, Set<Permission>newRevokes);
    
-   public void grant ( User currentUser, Role role, Set<Permission> grants);
+   public void grant      ( User currentUser, Role role, Set<Permission> grants);
    
-   public void revoke( User currentUser, Role role, Set<Permission> revokes);
+   public void revoke     ( User currentUser, Role role, Set<Permission> revokes);
    
 }//PermissionService

@@ -11,7 +11,6 @@ import com.f.thoth.app.HasLogger;
 import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.User;
-import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.service.PermissionService;
@@ -72,14 +71,14 @@ public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements Ha
          boolean nuevo= true;
          for (Permission oGrant: oldGrants)
          {
-            if ( oGrant.objectToProtect.getKey().equals( obj.getKey()))
+            if ( oGrant.objectToProtect.equals( obj.getKey()))
             {
                nuevo = false;
                break;
             }
          }
          if (nuevo)
-            newGrants.add(  new Permission(role, (ObjectToProtect)obj, period.getFromDate(), period.getToDate()));        
+            newGrants.add(  new Permission(role, obj.getKey(), period.getFromDate(), period.getToDate()));        
       });
       
       return newGrants;
@@ -94,7 +93,7 @@ public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements Ha
          boolean still= false;
          for (E  obj: objectsGranted)
          {
-            if ( oldPermit.getObjectToProtect().getKey().equals(obj.getKey()))
+            if ( oldPermit.getObjectToProtect().equals(obj.getKey()))
             {
                still = true;
                break;

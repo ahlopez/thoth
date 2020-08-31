@@ -25,8 +25,7 @@ public class Permission extends BaseEntity implements Comparable<Permission>
    private Role          role;
 
    @NotNull (message = "{evidentia.object.required}")
-   @ManyToOne
-   public ObjectToProtect objectToProtect;                  // TODO:  Revisar como cambiar el tipo a NeedsProtection
+   public String        objectToProtect;            
 
    @NotNull(message = "{evidentia.date.required}")
    private LocalDate     fromDate;
@@ -46,7 +45,7 @@ public class Permission extends BaseEntity implements Comparable<Permission>
       buildCode();
    }
 
-   public Permission( Role role, ObjectToProtect objectToProtect, LocalDate fromDate, LocalDate toDate)
+   public Permission( Role role, String objectToProtect, LocalDate fromDate, LocalDate toDate)
    {
       super();
       
@@ -75,10 +74,19 @@ public class Permission extends BaseEntity implements Comparable<Permission>
    {
       this.code = (tenant == null? "[Tenant]" : tenant.getCode())+ "[PRM]>"+
                   (role ==  null? "[role]": role.getCode())+ ":"+ 
-    		         (objectToProtect == null? "[object]" : objectToProtect.getKey());
+    		         (objectToProtect == null? "[object]" : objectToProtect);
    }//buildCode
 
    // -------------- Getters & Setters ----------------
+   
+   public Long getObjectId( )
+   {
+      if( objectToProtect == null)
+         return Long.MIN_VALUE;
+      
+      Long id = Long.valueOf(objectToProtect.substring(objectToProtect.indexOf(']')+1));
+      return id;
+   }//getId
 
    public Role            getRole() { return role;}
    public void            setRole(Role role) { this.role = role;}
@@ -92,8 +100,8 @@ public class Permission extends BaseEntity implements Comparable<Permission>
    public User            getGrantedBy() { return grantedBy;}
    public void            setGrantedBy( User grantedBy){ this.grantedBy = grantedBy;}
 
-   public ObjectToProtect getObjectToProtect() { return objectToProtect;}
-   public void            setObjectToProtect( ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect;}
+   public String          getObjectToProtect() { return objectToProtect;}
+   public void            setObjectToProtect( String objectToProtect) { this.objectToProtect = objectToProtect;}
 
    // --------------- Object methods ---------------------
 
@@ -140,7 +148,7 @@ public class Permission extends BaseEntity implements Comparable<Permission>
    
    public boolean grants( Role role, NeedsProtection object)
    {
-      return this.role.equals(role) && this.objectToProtect.getKey().equals(object.getKey()) && isCurrent();
+      return this.role.equals(role) && this.objectToProtect.equals(object.getKey()) && isCurrent();
    }
 
 }//Permission

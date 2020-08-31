@@ -139,7 +139,7 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
    }//buildCode
 
    // ----------------- Getters & Setters ----------------
-
+   
    public void            setName(String name) { this.name = name;}
 
    public void            setOwner(ObjectToProtect owner) {this.owner = owner;}
@@ -217,7 +217,7 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
    }
 
    // -----------------  Logic ----------------
-   @Override public String  getKey() { return code;}
+   @Override public String  getKey() { return "[OTP]"+ id;}
 
    @Override public boolean canBeAccessedBy(Integer userCategory) { return userCategory != null && category.compareTo(userCategory) <= 0;}
 

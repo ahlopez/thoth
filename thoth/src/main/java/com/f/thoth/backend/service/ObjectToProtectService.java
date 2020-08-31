@@ -24,11 +24,11 @@ import com.f.thoth.backend.repositories.PermissionRepository;
 public class ObjectToProtectService implements FilterableCrudService<ObjectToProtect>, PermissionService<ObjectToProtect>
 {
 
-   private final ObjectToProtectRepository objectToProtectRepository;
-   private final PermissionRepository      permissionRepository;
+   private final ObjectToProtectRepository               objectToProtectRepository;
+   private final PermissionRepository<ObjectToProtect>   permissionRepository;
 
    @Autowired
-   public ObjectToProtectService(ObjectToProtectRepository objectToProtectRepository, PermissionRepository permissionRepository)
+   public ObjectToProtectService(ObjectToProtectRepository objectToProtectRepository, PermissionRepository<ObjectToProtect> permissionRepository)
    {
       this.objectToProtectRepository = objectToProtectRepository;
       this.permissionRepository      = permissionRepository;
@@ -125,7 +125,7 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
    {
       newGrants.forEach( newGrant-> 
       {
-         Optional<ObjectToProtect> optObject= objectToProtectRepository.findById(newGrant.getObjectToProtect().getId());
+         Optional<ObjectToProtect> optObject= objectToProtectRepository.findById(newGrant.getObjectId());
          if ( optObject.isPresent())
          {
             permissionRepository.saveAndFlush(newGrant);
@@ -141,7 +141,7 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
    {
       newRevokes.forEach( newRevoke-> 
       {
-         Optional<ObjectToProtect> optObject= objectToProtectRepository.findById(newRevoke.getObjectToProtect().getId());
+         Optional<ObjectToProtect> optObject= objectToProtectRepository.findById(newRevoke.getObjectId());
          if ( optObject.isPresent())
          {
             ObjectToProtect object = optObject.get();

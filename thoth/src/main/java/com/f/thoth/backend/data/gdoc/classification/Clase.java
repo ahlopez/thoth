@@ -12,6 +12,7 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.security.ObjectToProtect;
@@ -48,7 +49,7 @@ import com.f.thoth.backend.data.security.ObjectToProtect;
 @Entity
 @Table(name = "OBJECT_TO_PROTECT", indexes = { @Index(columnList = "code") })
 
-public class Clase extends ObjectToProtect
+public class Clase extends ObjectToProtect implements HierarchicalEntity<ObjectToProtect>
 {
    public static final String BRIEF = "Clase.brief";
    public static final String FULL  = "Clase.full";
@@ -168,6 +169,19 @@ public class Clase extends ObjectToProtect
 
       return s.toString();
    }//toString
+
+   // --------------- NeedsProtection ------------------------------
+   @Override public String getKey() { return "[CLS]"+id; }
+   
+   public static Long getId( String key)
+   {
+      if( key == null)
+         return Long.MIN_VALUE;
+      
+      Long id = Long.valueOf(key.substring(key.indexOf(']')+1));
+      return id;
+   }//getId
+
 
    // --------------- Logic ------------------------------
 
