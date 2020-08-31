@@ -17,6 +17,7 @@ import com.f.thoth.ui.views.admin.users.SingleUserView;
 import com.f.thoth.ui.views.admin.users.UserGroupView;
 import com.f.thoth.ui.views.admin.users.UsersView;
 import com.f.thoth.ui.views.dashboard.DashboardView;
+import com.f.thoth.ui.views.security.permission.AccessPermissionView;
 import com.f.thoth.ui.views.security.permission.ExecutePermissionView;
 import com.f.thoth.ui.views.storefront.StorefrontView;
 import com.vaadin.flow.component.Component;
@@ -149,7 +150,7 @@ public class MainView extends AppLayout
          securityMenu.addItem(createRoute(VaadinIcon.CHECK_CIRCLE, Constant.TITLE_PERMISOS_EJECUCION, ExecutePermissionView.class));
 
       if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         securityMenu.addItem(createRoute(VaadinIcon.CHECK_SQUARE, Constant.TITLE_PERMISOS_ACCESO,ObjectToProtectView.class));
+         securityMenu.addItem(createRoute(VaadinIcon.CHECK_SQUARE, Constant.TITLE_PERMISOS_ACCESO,AccessPermissionView.class));
 
       if ( securityMenu.getItems().size() > 0)
          mainMenu.add(security);

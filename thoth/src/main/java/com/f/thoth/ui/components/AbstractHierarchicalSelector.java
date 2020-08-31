@@ -114,7 +114,7 @@ implements HasValue<E, T>
          SelectionEvent, to get the selected value or values.
          Example: Using addSelectionListener to get all selected
          items.
-         61Grid<Person> grid = new Grid<>();
+         Grid<Person> grid = new Grid<>();
          // switch to multiselect mode
          grid.setSelectionMode(SelectionMode.MULTI);
          grid.addSelectionListener(event ->
@@ -130,11 +130,11 @@ implements HasValue<E, T>
    private Grid<T> buildSearchGrid(TreeGrid<T> tGrid)
    {
       Grid<T> sGrid = new Grid<>();
-      sGrid.addClassName("selector-grid");
+      sGrid.addClassName("selector-list");
       sGrid.setVisible(false);
       sGrid.setWidthFull();
       sGrid.addColumn(T::getName).setHeader("Nombre").setFlexGrow(50);
-      sGrid.addColumn(T::getCode).setHeader("ID").setFlexGrow(50);
+      //sGrid.addColumn(T::getCode).setHeader("ID").setFlexGrow(50);
       sGrid.setSelectionMode(selectionMode);
       addValueChangeListener(sGrid, tGrid);
 

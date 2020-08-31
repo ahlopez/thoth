@@ -155,7 +155,10 @@ public class TextUtil
      */
     public static String formatDate( LocalDate date)
     {
-        return date == null? null: date.format(FULL_DATE_FORMATTER);
+        return date == null? "---": 
+               date.equals(LocalDate.MAX)? "-MAX-":
+               date.equals(LocalDate.MIN)? "-MIN-":
+               date.format(FULL_DATE_FORMATTER);
     }//formatDate
 
     /**

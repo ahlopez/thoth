@@ -43,7 +43,7 @@ public class Metadata extends BaseEntity implements  Comparable<Metadata>
    public Metadata()
    {
       super();
-      reset("", Type.STRING, false, true, "");
+      reset("[metadato]", Type.STRING, false, true, "");
       buildCode();
    }
 
@@ -62,7 +62,7 @@ public class Metadata extends BaseEntity implements  Comparable<Metadata>
          throw new IllegalArgumentException("Tipo del metadato no puede ser nulo");
 
       
-      this.name     = name;
+      this.name     = TextUtil.nameTidy(name);
       this.type     = type;
       this.required = required;
       this.editable = editable;

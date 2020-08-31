@@ -30,7 +30,7 @@ import com.vaadin.flow.component.dependency.JsModule;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -77,10 +77,6 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
       addClassName("list-view");
       setSizeFull();
 
-      H2 title =  new H2(name);
-      title.setWidthFull();
-      add(title);
-
       leftSection         = new VerticalLayout();
       leftSection.addClassName  ("left-section");
       leftSection.add(new Label (" "));
@@ -93,9 +89,9 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
       content.addClassName      ("selector");
       content.setSizeFull();
 
-      roleSelector        = setupRoleSelector();
-      permissionLayout    = setupPermissionSelector(service, currentUser, name);
-      content.add(roleSelector, permissionLayout);     
+      HorizontalLayout roleLayout = setupRoleSelector(name);
+      permissionLayout            = setupPermissionSelector(service, currentUser, name);
+      content.add(roleLayout, permissionLayout);     
 
       HorizontalLayout panel=  new HorizontalLayout(leftSection, content, rightSection);
       panel.setSizeFull();
@@ -105,10 +101,10 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
 
    }//AbstractPermissionView constructor
 
-   private ComboBox<Role> setupRoleSelector()
+   private HorizontalLayout setupRoleSelector(String name)
    {
+      HorizontalLayout roleLayout = new HorizontalLayout();
       ComboBox<Role> roleSelector = new ComboBox<>();
-      roleSelector.getElement().setAttribute("colspan", "2");
       roleSelector.setLabel("Rol");
       roleSelector.setDataProvider(ThothSession.getTenantRoles());
       roleSelector.setItemLabelGenerator(createItemLabelGenerator(Role::getName));
@@ -125,8 +121,8 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
          permissionLayout.setVisible(true);
       });
 
-
-      return roleSelector;
+      roleLayout.add(new H3(name), roleSelector);
+      return roleLayout;
 
    }//setupRoleSelector
 

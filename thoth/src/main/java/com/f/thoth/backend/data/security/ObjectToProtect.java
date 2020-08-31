@@ -88,7 +88,7 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
    @ManyToOne
    protected Role            roleOwner;  // Role that owns this object
 
-   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
    @BatchSize(size = 20)
    protected Set<Permission>  acl;       // Access control list
 
@@ -108,7 +108,7 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
          throw new IllegalArgumentException("Nombre del objeto no puede ser nulo ni vacío");
 
       init();
-      this.name  = name;
+      this.name  = TextUtil.nameTidy(name);
       this.owner = owner;
       buildCode();
    }//ObjectToProtect
@@ -131,7 +131,7 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
       buildCode();
    }//prepareData
 
-   @Override public void buildCode()
+   @Override protected void buildCode()
    {
       this.code = (tenant == null? "[Tenant]": tenant.getCode())+ 
             "[OTP]>"+
