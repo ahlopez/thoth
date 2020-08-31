@@ -116,8 +116,8 @@ public class Clazz extends BaseEntity implements NeedsProtection, Comparable<Cla
 
    @Override protected void buildCode()
    {
-      this.code =   parent != null? parent.code + "-"+ name :
-                   (tenant == null? "[Tenant]" : tenant.getCode())+ ">"+ (name == null? "[name]" : name);
+      this.code =   parent != null? parent.code + ">"+ name :
+                   (tenant == null? "[Tenant]" : tenant.getCode())+  "[CLS]>"+ (name == null? "[name]" : name);
    }//buildCode
 
    // -------------- Getters & Setters ----------------

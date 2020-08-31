@@ -3,7 +3,6 @@ package com.f.thoth.backend.data.gdoc.classification;
 import java.time.LocalDate;
 
 import javax.persistence.Entity;
-import javax.persistence.Index;
 import javax.persistence.Table;
 
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
@@ -13,7 +12,7 @@ import com.f.thoth.backend.data.security.Role;
  * Representa una hoja de la estructura jer�rquica de series documentales
  */
 @Entity
-@Table(name = "LEAF_SERIES", indexes = { @Index(columnList = "code") })
+@Table(name = "LEAF_SERIES")
 public class LeafSeries extends Series
 {
    public static final String BRIEF = "LeafSeries.brief";

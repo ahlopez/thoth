@@ -49,7 +49,7 @@ public class Retencion extends BaseEntity implements Comparable<Retencion>
       buildCode();
    }//Retencion
 
-   @Override protected void buildCode() { this.code = (tenant == null? "[Tenant]": tenant.getCode())+ ">"+ retId;}
+   @Override protected void buildCode() { this.code = (tenant == null? "[Tenant]": tenant.getCode())+ "[RET]>"+ retId;}
 
    // -------------- Getters & Setters ----------------
 

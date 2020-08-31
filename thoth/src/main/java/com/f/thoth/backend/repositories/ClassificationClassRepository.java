@@ -16,16 +16,16 @@ import com.f.thoth.backend.data.security.Tenant;
 
 public interface ClassificationClassRepository extends JpaRepository<ClassificationClass, Long>
 {
-   @Query("SELECT o FROM ClassificationClass o where o.tenant=?1")
+   @Query("SELECT c FROM ClassificationClass c where c.tenant=?1")
    Page<ClassificationClass> findBy(Tenant tenant, Pageable page);
 
-   @Query("SELECT o FROM ClassificationClass o where o.tenant=?1")
+   @Query("SELECT c FROM ClassificationClass c where c.tenant=?1")
    List<ClassificationClass> findAll(Tenant tenant);
 
-   @Query("SELECT count(o) FROM ClassificationClass o where o.tenant=?1")
+   @Query("SELECT count(c) FROM ClassificationClass c where c.tenant=?1")
    long countAll(Tenant tenant);
 
-   @Query("SELECT o FROM ClassificationClass o where o.tenant=?1 and o.name like ?2")
+   @Query("SELECT c FROM ClassificationClass c where c.tenant= ?1 and c.objectToProtect.name like ?2")
    Page<ClassificationClass> findByNameLikeIgnoreCase(Tenant tenant, String name, Pageable page);
    
 
@@ -34,25 +34,25 @@ public interface ClassificationClassRepository extends JpaRepository<Classificat
    Optional<ClassificationClass> findById(Long id);
 
    @EntityGraph(value = ClassificationClass.BRIEF, type = EntityGraphType.FETCH)
-   @Query("SELECT o FROM ClassificationClass o WHERE (o.owner is null and ?1 is null) or (o.owner=?1)")
+   @Query("SELECT c FROM ClassificationClass c WHERE (c.owner is null and ?1 is null) or (c.owner=?1)")
    List<ClassificationClass> findByParent( ClassificationClass parent);
 
-   @Query("SELECT count(o) FROM ClassificationClass o WHERE (o.owner is null and ?1 is null) or (o.owner=?1)")
+   @Query("SELECT count(c) FROM ClassificationClass c WHERE (c.owner is null and ?1 is null) or (c.owner=?1)")
    int countByParent( ClassificationClass parent);
 
-   @Query("SELECT count(o) FROM ClassificationClass o WHERE (o.owner is null and ?1 is null) or (o.owner=?1)")
+   @Query("SELECT count(c) FROM ClassificationClass c WHERE (c.owner is null and ?1 is null) or (c.owner=?1)")
    int countByChildren(ClassificationClass group);
 
    @EntityGraph(value = ClassificationClass.BRIEF, type = EntityGraphType.FETCH)
-   @Query("SELECT o FROM ClassificationClass o WHERE o.tenant=?1 and lower(o.name) like lower(concat('%', ?2,'%'))")
+   @Query("SELECT c FROM ClassificationClass c WHERE c.tenant=?1 and lower(c.objectToProtect.name) like lower(concat('%', ?2,'%'))")
    List<ClassificationClass> findByNameLikeIgnoreCase(Tenant tenant, String name);
 
-   @Query("SELECT count(o) FROM ClassificationClass o WHERE o.tenant=?1 and lower(o.name) like lower(concat('%', ?2,'%'))")
+   @Query("SELECT count(c) FROM ClassificationClass c WHERE c.tenant=?1 and lower(c.objectToProtect.name) like lower(concat('%', ?2,'%'))")
    long countByNameLikeIgnoreCase(Tenant tenant, String name);
 
    //   ----------- ACL handling ----------------
    @EntityGraph(value = ClassificationClass.FULL, type = EntityGraphType.LOAD)
-   @Query("SELECT DISTINCT c FROM ClassificationClass c, Permission p  WHERE p.objectToProtect = c.objectToProtect.getKey() and p.role = ?1")
+   @Query("SELECT DISTINCT c FROM ClassificationClass c, Permission p  WHERE c.objectToProtect.getKey() = p.objectToProtect and p.role = ?1")
    List<ClassificationClass> findClasesGranted( Role role);  
 
 }//ClaseRepository

@@ -115,8 +115,8 @@ public class Office extends BaseEntity implements NeedsProtection, Comparable<Of
 
    @Override protected void buildCode()
    {
-      this.code =   parent != null? parent.code + "-"+ name :
-                   (tenant == null? "[Tenant]" : tenant.getCode())+ ">"+ (name == null? "[name]" : name);
+      this.code =   parent != null? parent.code + ">"+ name :
+                   (tenant == null? "[Tenant]" : tenant.getCode())+ "[OFI]>"+ (name == null? "[name]" : name);
    }//buildCode
 
    // -------------- Getters & Setters ----------------

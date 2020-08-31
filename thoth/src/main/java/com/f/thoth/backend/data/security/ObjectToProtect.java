@@ -96,7 +96,7 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
    public ObjectToProtect()
    {
       super();
-      name = "";
+      name = "[name]";
       init();
       buildCode();
    }//ObjectToProtect
@@ -105,7 +105,7 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
    {
       super();
       if ( TextUtil.isEmpty(name))
-         throw new IllegalArgumentException("Nombre del objeto no puede ser nulo ni vacío");
+         name= "[name]";
 
       init();
       this.name  = TextUtil.nameTidy(name);

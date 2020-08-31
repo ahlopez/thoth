@@ -8,7 +8,6 @@ import java.util.TreeSet;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
@@ -23,7 +22,7 @@ import com.f.thoth.backend.data.security.Role;
  * Representa una hoja de la estructura jer�rquica de oficinas productoras
  */
 @Entity
-@Table(name = "LEAF_OFFICE", indexes = { @Index(columnList = "code") })
+@Table(name = "LEAF_OFFICE")
 public class LeafOffice extends Office
 {
    public static final String BRIEF = "LeafOffice.brief";

@@ -84,7 +84,7 @@ public class RetentionSchedule extends BaseEntity implements Comparable<Retentio
 
    @Override protected void buildCode()
    {
-      this.code =  (tenant == null? "[Tenant]" : tenant.getCode())+ ">"+
+      this.code =  (tenant == null? "[Tenant]" : tenant.getCode())+ "[SCH]>"+
                    (name == null? "[name]": name);
    }//buildCode
 

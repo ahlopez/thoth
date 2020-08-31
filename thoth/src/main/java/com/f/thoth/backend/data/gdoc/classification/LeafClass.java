@@ -8,7 +8,6 @@ import java.util.TreeSet;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
@@ -24,7 +23,7 @@ import com.f.thoth.backend.data.security.Role;
  * Representa una hoja del �rbol de clasificaci�n
  */
 @Entity
-@Table(name = "LEAF_CLASS", indexes = { @Index(columnList = "code") })
+@Table(name = "LEAF_CLASS")
 public class LeafClass extends Clazz
 {
 

@@ -1,7 +1,6 @@
 package com.f.thoth.backend.data.gdoc.metadata;
 
 import javax.persistence.Entity;
-import javax.persistence.Index;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
@@ -9,7 +8,7 @@ import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.gdoc.metadata.vaadin.SchemaValuesImporter;
 
 @Entity
-@Table(name = "SCHEMA_VALUES", indexes = { @Index(columnList = "code")})
+@Table(name = "SCHEMA_VALUES")
 public class SchemaValues extends BaseEntity implements SchemaValuesImporter
 {
    @ManyToOne

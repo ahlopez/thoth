@@ -84,7 +84,7 @@ public class Series extends BaseEntity implements NeedsProtection, Comparable<Se
       super();
 
       if ( !TextUtil.isValidName( name))
-         throw new IllegalArgumentException("Nombre["+ name+ "] es inv�lido");
+         throw new IllegalArgumentException("Nombre["+ name+ "] es inválido");
 
       if ( schema == null)
          throw new IllegalArgumentException("Esquema de metadatos no puede ser nulo");
@@ -117,8 +117,8 @@ public class Series extends BaseEntity implements NeedsProtection, Comparable<Se
 
    @Override protected void buildCode()
    {
-      this.code =   parent != null? parent.code + "-"+ name :
-                   (tenant == null? "[Tenant]" : tenant.getCode())+ ">"+ (name == null? "[name]" : name);
+      this.code =   parent != null? parent.code + ">"+ name :
+                   (tenant == null? "[Tenant]" : tenant.getCode())+ "[SER]>"+ (name == null? "[name]" : name);
    }//buildCode
 
    // -------------- Getters & Setters ----------------

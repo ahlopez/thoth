@@ -7,6 +7,7 @@ import java.util.TreeSet;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -28,6 +29,7 @@ public class LeafExpediente extends Expediente
    public Expediente    parent;          // Expediente padre
 
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+   @JoinColumn
    @BatchSize(size = 20)
    public Set<DocType>  admissibleTypes;
 

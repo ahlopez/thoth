@@ -4,8 +4,16 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
+
+import org.hibernate.annotations.BatchSize;
 
 import com.f.thoth.backend.data.gdoc.document.Document;
 import com.f.thoth.backend.data.gdoc.metadata.DocType;
@@ -17,8 +25,15 @@ import com.f.thoth.backend.data.gdoc.metadata.DocType;
 @Table(name = "VOLUME_EXPEDIENTE")
 public class Volume extends Expediente
 {
+   @ManyToOne
    public Expediente    parent;
+   
+   @Transient
    public Set<Document> documents;
+
+   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+   @JoinColumn
+   @BatchSize(size = 20)
    public Set<DocType > admissibleTypes;
 
    public Volume()

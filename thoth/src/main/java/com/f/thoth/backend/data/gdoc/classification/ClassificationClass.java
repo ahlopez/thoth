@@ -31,6 +31,15 @@ import com.f.thoth.backend.data.security.SingleUser;
  * Representa un objeto que requiere protección
  */
 
+/*
+ * @NamedEntityGraph(name = "graph.module.projects.contractors",
+        attributeNodes = @NamedAttributeNode(value = "projects", subgraph = "projects.contractors"),
+        subgraphs = @NamedSubgraph(name = "projects.contractors",
+                attributeNodes = @NamedAttributeNode(value = "contractors")))
+
+ */
+
+
 @NamedEntityGraphs({
    @NamedEntityGraph(
          name = ClassificationClass.BRIEF,
@@ -38,10 +47,7 @@ import com.f.thoth.backend.data.security.SingleUser;
             @NamedAttributeNode("tenant"),
             @NamedAttributeNode("code"),
             @NamedAttributeNode("owner"),
-            @NamedAttributeNode(value="name",      subgraph="brief"),
-            @NamedAttributeNode(value="category",  subgraph="brief"),
-            @NamedAttributeNode(value="userOwner", subgraph="brief"),
-            @NamedAttributeNode(value="roleOwner", subgraph="brief")
+            @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF)
          },
          subgraphs = @NamedSubgraph(name = ObjectToProtect.BRIEF, 
                attributeNodes = {
@@ -57,12 +63,8 @@ import com.f.thoth.backend.data.security.SingleUser;
                @NamedAttributeNode("tenant"),
                @NamedAttributeNode("code"),
                @NamedAttributeNode("owner"),
-               @NamedAttributeNode(value="name",               subgraph="full"),
-               @NamedAttributeNode(value="category",           subgraph="full"),
-               @NamedAttributeNode(value="userOwner",          subgraph="full"),
-               @NamedAttributeNode(value="roleOwner",          subgraph="full"),
-               @NamedAttributeNode(value="retentionSchedule",  subgraph="full"),
-               @NamedAttributeNode(value="acl",                subgraph="full")
+               @NamedAttributeNode("retentionSchedule"),
+               @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)
             },
             subgraphs = @NamedSubgraph(name = ObjectToProtect.FULL, 
                   attributeNodes = {
@@ -70,7 +72,6 @@ import com.f.thoth.backend.data.security.SingleUser;
                     @NamedAttributeNode("category"),
                     @NamedAttributeNode("userOwner"),
                     @NamedAttributeNode("roleOwner"),
-                    @NamedAttributeNode("retentionSchedule"),
                     @NamedAttributeNode("acl")
                   })
             )
@@ -86,6 +87,8 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
    @NotNull(message = "{evidentia.objectToProtect.required") 
    @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true)
    ObjectToProtect  objectToProtect;
+   
+   // Considerar guardar aquí la llave del objectToProtect
    
    @NotNull(message = "{evidentia.level.required") 
    protected Integer    level;
@@ -104,7 +107,7 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
    protected RetentionSchedule retentionSchedule;
 
    @ManyToOne
-   protected ClassificationClass owner;      // Object group to which this object belongs
+   protected ClassificationClass owner;      //  ClassificationClass to which this ClassificationClass belongs
 
    // ------------- Constructors ------------------
    public ClassificationClass()
