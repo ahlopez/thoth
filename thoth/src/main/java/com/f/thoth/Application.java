@@ -12,7 +12,12 @@ import com.f.thoth.app.security.SecurityConfiguration;
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.gdoc.classification.ClassificationClass;
 import com.f.thoth.backend.data.gdoc.expediente.Expediente;
+import com.f.thoth.backend.data.gdoc.expediente.FileIndex;
+import com.f.thoth.backend.data.gdoc.expediente.IndexEntry;
 import com.f.thoth.backend.data.gdoc.metadata.DocType;
+import com.f.thoth.backend.data.gdoc.metadata.Metadata;
+import com.f.thoth.backend.data.gdoc.metadata.Schema;
+import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
@@ -47,7 +52,13 @@ import com.f.thoth.ui.MainView;
             ObjectToProtect.class,
             Role.class,
             Permission.class,
-            Expediente.class
+            Expediente.class,
+            FileIndex.class,
+            IndexEntry.class,
+            Schema.class,
+            SchemaValues.class,
+            Metadata.class,
+            DocType.class
          },
            exclude = ErrorMvcAutoConfiguration.class
       )
@@ -71,6 +82,11 @@ import com.f.thoth.ui.MainView;
            ClassificationClass.class,
            Permission.class,
            Expediente.class,
+           FileIndex.class,
+           IndexEntry.class,
+           Schema.class,
+           SchemaValues.class,
+           Metadata.class,
            DocType.class
          }
       )

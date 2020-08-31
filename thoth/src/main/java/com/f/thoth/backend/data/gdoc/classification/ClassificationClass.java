@@ -82,7 +82,7 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
    public static final String FULL  = "ClassificationClass.full";
 
    @NotNull(message = "{evidentia.objectToProtect.required") 
-   @OneToOne(fetch = FetchType.EAGER)
+   @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true)
    ObjectToProtect  objectToProtect;
    
    @NotNull(message = "{evidentia.level.required") 

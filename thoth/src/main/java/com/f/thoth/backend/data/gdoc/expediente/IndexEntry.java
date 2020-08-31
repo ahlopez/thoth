@@ -1,78 +1,93 @@
 package com.f.thoth.backend.data.gdoc.expediente;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
+import javax.persistence.Entity;
+import javax.persistence.Index;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
+
+import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
+import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
+import com.f.thoth.backend.data.security.SingleUser;
 
 /**
  * Representa una entrada de un indice de expedientes
  */
-public class IndexEntry implements Comparable<IndexEntry>
+@Entity
+@Table(name = "INDEX_ENTRY", indexes = { @Index(columnList = "code") })
+public class IndexEntry extends BaseEntity implements Comparable<IndexEntry>
 {
-   private String entryType;
-   private String id;
-   private String expediente;
-   private String user;
-   private String date;
-   private String action;
-   private String reference;
+   public enum Action { ADD, COPY, TRANSFER, REMOVE}
+   
+   @NotNull     (message= "{evidentia.action.required}")
+   private Action entryType;
+   
+   @ManyToOne
+   private FileIndex     index;
+   
+   @ManyToOne
+   private SchemaValues  attributes;
+   
+   @ManyToOne
+   private FileIndex     expediente;
+   
+   @ManyToOne
+   private SingleUser    user;
+   
+   private LocalDate     date;
+   
+   private String        reference;
 
 
    // TODO: Considerar implementar esto con Metadatos
    //--------------- Constructors --------------------
    public IndexEntry()
    {
+      buildCode();
    }
 
-   public IndexEntry(String entryType, String id, String expediente, String user, String date, String action, String reference)
+   public IndexEntry(Action entryType, FileIndex expediente, SingleUser user, LocalDate date, String reference)
    {
-      if( TextUtil.isEmpty(entryType))
-         throw new IllegalArgumentException("Tipo de entrada del índice no puede ser nula ni vacio");
+      if( entryType == null)
+         throw new IllegalArgumentException("Tipo de entrada del índice no puede ser nula");
 
-      if( TextUtil.isEmpty(id))
-         throw new IllegalArgumentException("Id de la entrada del índice no puede ser nulo ni vacio");
+      if( expediente == null)
+         throw new IllegalArgumentException("Expediente del índice no puede ser nulo");
 
-      if( TextUtil.isEmpty(expediente))
-         throw new IllegalArgumentException("Id del expediente del índice no puede ser nulo ni vacio");
-
-      if( TextUtil.isEmpty(date))
-         throw new IllegalArgumentException("Fecha de la entrada del índice no puede ser nula ni vacía");
-
-      if( TextUtil.isEmpty(action))
-         throw new IllegalArgumentException("Accion registrada en la entrada del indice no puede ser nula ni vacía");
+      if( date == null)
+         throw new IllegalArgumentException("Fecha de la entrada del índice no puede ser nula");
 
       this.entryType = entryType;
-      this.id        = id;
       this.expediente= expediente;
       this.user      = user;
       this.date      = date;
-      this.action    = action;
       this.reference = reference;
+      
+      buildCode();
 
    }//IndexEntry
+   
+   @Override public void buildCode() { this.code = (tenant == null? "[Tenant]": tenant.getCode())+ "[IXE]"+ (id == null? "---": id.toString());}
 
    // ------------------ Getters & Setters ----------------------------
 
-   public String getEntryType() { return entryType; }
-   public void setEntryType(String entryType) { this.entryType = entryType; }
+   public Action           getEntryType() { return entryType; }
+   public void             setEntryType(Action entryType) { this.entryType = entryType; }
 
-   public String getId() { return id;}
-   public void setId(String id) {this.id = id;}
+   public FileIndex        getExpediente() {  return expediente;}
+   public void             setExpediente(FileIndex expediente) {this.expediente = expediente;}
 
-   public String getExpediente() {  return expediente;}
-   public void setExpediente(String expediente) {this.expediente = expediente;}
+   public SingleUser       getUser() {return user;}
+   public void             setUser(SingleUser user) {this.user = user;}
 
-   public String getUser() {return user;}
-   public void setUser(String user) {this.user = user;}
+   public LocalDate        getDate() {return date;}
+   public void             setDate(LocalDate date) {this.date = date;}
 
-   public String getDate() {return date;}
-   public void setDate(String date) {this.date = date;}
-
-   public String getAction() {return action;}
-   public void setAction(String action) {this.action = action;}
-
-   public String getReference() {return reference;}
-   public void setReference(String reference) {this.reference = reference;}
+   public String           getReference() {return reference;}
+   public void             setReference(String reference) {this.reference = reference;}
 
    // -------------------------- Object ----------------------------
 
@@ -100,11 +115,10 @@ public class IndexEntry implements Comparable<IndexEntry>
       s.append("IndexEntry{")
        .append(" tipo["+ entryType+ "]")
        .append(" id["+ id+ "]")
-       .append(" expediente["+ expediente+ "]")
-       .append(" usuario["+ user+ "]")
-       .append(" fecha["+ date+ "]")
-       .append(" accion["+ action+ "]")
-       .append(" referencia["+ reference+ "]");
+       .append(" expediente["+ expediente.getCode()+ "]")
+       .append(" usuario["+ user.getCode()+ "]")
+       .append(" fecha["+ TextUtil.formatDate(date)+ "]")
+       .append(" referencia["+ reference+ "]}");
 
       return s.toString();
 
@@ -118,10 +132,7 @@ public class IndexEntry implements Comparable<IndexEntry>
       if ( other == null)
          return 1;
 
-      LocalDateTime fecha1 = LocalDateTime.parse(date);
-      LocalDateTime fecha2 = LocalDateTime.parse(other.date);
-
-      int dateOrder = fecha1.compareTo(fecha2);
+      int dateOrder = this.date.compareTo(other.date);
       if (dateOrder != 0)
          return dateOrder;
 

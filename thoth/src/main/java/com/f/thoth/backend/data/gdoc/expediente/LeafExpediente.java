@@ -5,7 +5,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.persistence.Entity;
-import javax.persistence.Index;
 import javax.persistence.Table;
 
 import com.f.thoth.backend.data.gdoc.document.Document;
@@ -15,7 +14,7 @@ import com.f.thoth.backend.data.gdoc.metadata.DocType;
  * Representa un sub-Expediente hoja
  */
 @Entity
-@Table(name = "LEAF_EXPEDIENTE", indexes = { @Index(columnList = "code") })
+@Table(name = "LEAF_EXPEDIENTE")
 public class LeafExpediente extends Expediente
 {
    public Expediente    parent;

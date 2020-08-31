@@ -4,15 +4,24 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.Index;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.BatchSize;
+
 @Entity
-@Table(name = "BRANCH_EXPEDIENTE", indexes = { @Index(columnList = "code") })
+@Table(name = "BRANCH_EXPEDIENTE")
 public class BranchExpediente extends Expediente
 {
    public Expediente      parent;
+
+   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+   @JoinColumn(name="expediente_id")
+   @BatchSize(size = 20)
    public Set<Expediente> subExpedientes;
 
    // --------------- Constructors --------------------
@@ -20,7 +29,6 @@ public class BranchExpediente extends Expediente
    {
       super();
       subExpedientes = new TreeSet<>();
-      buildCode();
    }
 
    public BranchExpediente (Set<Expediente> subExpedientes)
@@ -30,7 +38,6 @@ public class BranchExpediente extends Expediente
          throw new IllegalArgumentException("Conjunto de subExpedientes no puede ser nulo ni vacio");
 
       this.subExpedientes = subExpedientes;
-      buildCode();
    }//BranchExpediente
 
    // ---------------- Getters & Setters ---------------

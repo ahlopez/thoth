@@ -3,11 +3,21 @@ package com.f.thoth.backend.data.gdoc.metadata;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Entity;
+import javax.persistence.Index;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.gdoc.metadata.vaadin.SchemaValuesImporter;
 
-public class SchemaValues implements SchemaValuesImporter
+@Entity
+@Table(name = "SCHEMA_VALUES", indexes = { @Index(columnList = "code")})
+public class SchemaValues extends BaseEntity implements SchemaValuesImporter
 {
+   @ManyToOne
    private Schema       schema;
+   
    private List<String> values;
    
    public SchemaValues()

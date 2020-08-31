@@ -6,15 +6,17 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.Index;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.BatchSize;
 
-import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.gdoc.metadata.DocType;
 import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.Permission;
@@ -22,25 +24,41 @@ import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
-import com.f.thoth.backend.data.security.Usuario;
 import com.f.thoth.ui.utils.FormattingUtils;
 
 /**
  * Representa un expediente documental
  */
 @Entity
-@Table(name = "EXPEDIENTE", indexes = { @Index(columnList = "code") })
-public abstract class Expediente extends BaseEntity implements NeedsProtection, Comparable<Expediente>
+@Table(name = "EXPEDIENTE")
+public abstract class Expediente implements NeedsProtection, Comparable<Expediente>
 {
-   private Tenant        tenant;
+   @Id
    private String        id;
+   
+   @ManyToOne
+   private Tenant        tenant;
+   
+   @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true)
    private FileIndex     index;
+   
+   @ManyToOne
    private DocType       attributes;
-   private Usuario       userOwner;
+   
+   @ManyToOne
+   private SingleUser    userOwner;
+   
+   @ManyToOne
    private Role          roleOwner;
+   
+   @NotNull(message = "{evidentia.category.required") 
    private Integer       category;
+   
+   @NotNull(message = "{evidentia.dateopened.required}")
    private LocalDateTime openingDate;
+   
    private LocalDateTime closingDate;
+   
    private boolean       open;
    
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
@@ -67,8 +85,8 @@ public abstract class Expediente extends BaseEntity implements NeedsProtection, 
    public DocType getAttributes() {return attributes;}
    public void setAttributes(DocType attributes) {this.attributes = attributes;}
 
-   public Usuario getUserOwner() {return userOwner;}
-   public void setUserOwner(Usuario userOwner) {this.userOwner = userOwner;}
+   public SingleUser getUserOwner() {return userOwner;}
+   public void setUserOwner(SingleUser userOwner) {this.userOwner = userOwner;}
 
    public Role getRoleOwner() {return roleOwner;}
    public void setRoleOwner(Role roleOwner) {this.roleOwner = roleOwner;}

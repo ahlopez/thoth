@@ -5,7 +5,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.persistence.Entity;
-import javax.persistence.Index;
 import javax.persistence.Table;
 
 import com.f.thoth.backend.data.gdoc.document.Document;
@@ -15,7 +14,7 @@ import com.f.thoth.backend.data.gdoc.metadata.DocType;
  * Representa un volumen documental (segun Moreq)
  */
 @Entity
-@Table(name = "VOLUME_EXPEDIENTE", indexes = { @Index(columnList = "code") })
+@Table(name = "VOLUME_EXPEDIENTE")
 public class Volume extends Expediente
 {
    public Expediente    parent;
