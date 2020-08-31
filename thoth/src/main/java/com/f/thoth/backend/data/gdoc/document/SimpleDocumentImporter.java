@@ -3,6 +3,7 @@ package com.f.thoth.backend.data.gdoc.document;
 import java.time.LocalDateTime;
 
 import com.f.thoth.backend.data.gdoc.metadata.DocType;
+import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 
 /**
  * Define una familia de Builder de importacion de Documentos Simples
@@ -16,7 +17,7 @@ public interface SimpleDocumentImporter
 
    public void    setDocType( DocType docType);
 
-   public void    setMetaValues( MetaValues metaValues);
+   public void    setMetaValues( SchemaValues metaValues);
 
    public void    setRecord( boolean record);
 

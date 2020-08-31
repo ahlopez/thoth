@@ -1,8 +1,5 @@
 package com.f.thoth.backend.data.gdoc.metadata;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.persistence.Entity;
 import javax.persistence.Index;
 import javax.persistence.ManyToOne;
@@ -16,18 +13,18 @@ import com.f.thoth.backend.data.gdoc.metadata.vaadin.SchemaValuesImporter;
 public class SchemaValues extends BaseEntity implements SchemaValuesImporter
 {
    @ManyToOne
-   private Schema       schema;
+   private Schema    schema;
    
-   private List<String> values;
+   private String    values;
    
    public SchemaValues()
    {     
-      values = new ArrayList<>();
+      values = "";
    }
    
    public SchemaValues( SchemaValues.ImporterDirector importerDirector)
    {
-      values = new ArrayList<>();
+      values = "";
       importerDirector.dirija( this);  
       buildCode();
    }//SchemaValues
@@ -39,9 +36,9 @@ public class SchemaValues extends BaseEntity implements SchemaValuesImporter
    public Schema getSchema() { return schema; }
    @Override public void setSchema(Schema schema) { this.schema = schema; }
 
-   public List<String>   getValues() { return values; }
-   public void           setValues(List<String> values) { this.values = values; }
-   @Override public void addValue( String value) {  this.values.add( value); }
+   public String   getValues() { return values; }
+   public void     setValues(String values) { this.values = values; }
+   @Override public void addValue( String value) {  this.values = this.values+ ";"+ value; }
    
    // ------------------------   Builders ----------------------------
    
@@ -49,7 +46,7 @@ public class SchemaValues extends BaseEntity implements SchemaValuesImporter
    {
       public void initExport();
       public void exportSchema( Schema schema);
-      public void exportValue( String value);
+      public void exportValues( String values);
       public void endExport();
       public Object getProduct();
    }//Exporter
@@ -58,7 +55,7 @@ public class SchemaValues extends BaseEntity implements SchemaValuesImporter
    {
       exporter.initExport();
       exporter.exportSchema(schema);
-      values.forEach( value-> exporter.exportValue(value));
+      exporter.exportValues(values);
       exporter.endExport();
       return exporter.getProduct();
    }//export

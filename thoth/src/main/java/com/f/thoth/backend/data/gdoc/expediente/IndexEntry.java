@@ -3,6 +3,8 @@ package com.f.thoth.backend.data.gdoc.expediente;
 import java.time.LocalDate;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Index;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -23,6 +25,7 @@ public class IndexEntry extends BaseEntity implements Comparable<IndexEntry>
    public enum Action { ADD, COPY, TRANSFER, REMOVE}
    
    @NotNull     (message= "{evidentia.action.required}")
+   @Enumerated(EnumType.STRING)
    private Action entryType;
    
    @ManyToOne

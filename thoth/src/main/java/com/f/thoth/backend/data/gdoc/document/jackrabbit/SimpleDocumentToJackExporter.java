@@ -1,8 +1,6 @@
 package com.f.thoth.backend.data.gdoc.document.jackrabbit;
 
 import java.time.LocalDateTime;
-import java.util.Iterator;
-import java.util.Map;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
@@ -14,7 +12,7 @@ import com.f.thoth.backend.data.gdoc.document.Content;
 import com.f.thoth.backend.data.gdoc.document.Publicity;
 import com.f.thoth.backend.data.gdoc.document.SimpleDocument;
 import com.f.thoth.backend.data.gdoc.metadata.DocType;
-import com.f.thoth.backend.data.gdoc.metadata.Value;
+import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.ui.utils.FormattingUtils;
 
@@ -77,8 +75,9 @@ public class SimpleDocumentToJackExporter implements SimpleDocument.Exporter
 
    }//exportBasic
 
-   @Override public void   exportMeta ( Iterator<Map.Entry<String,Value<?>>> metaIter)
+   @Override public void   exportMeta ( SchemaValues values)
    {
+      /*
       try {
          while( metaIter.hasNext())
          {
@@ -90,6 +89,7 @@ public class SimpleDocumentToJackExporter implements SimpleDocument.Exporter
          e.printStackTrace();
          throw new IllegalStateException("No pudo guardar las propiedades del documento simple. Razon\n"+ e.getMessage());
       }
+      */
 
    }//exportMeta
 

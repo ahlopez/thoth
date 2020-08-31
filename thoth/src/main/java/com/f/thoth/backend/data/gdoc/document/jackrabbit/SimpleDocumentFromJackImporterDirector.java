@@ -1,22 +1,11 @@
 package com.f.thoth.backend.data.gdoc.document.jackrabbit;
 
-import java.time.LocalDateTime;
-
 import javax.jcr.Node;
-import javax.jcr.Property;
-import javax.jcr.PropertyIterator;
 import javax.jcr.Session;
 
 import com.f.thoth.backend.data.gdoc.document.Content;
-import com.f.thoth.backend.data.gdoc.document.MetaValues;
-import com.f.thoth.backend.data.gdoc.document.Publicity;
 import com.f.thoth.backend.data.gdoc.document.SimpleDocument;
 import com.f.thoth.backend.data.gdoc.document.SimpleDocumentImporter;
-import com.f.thoth.backend.data.gdoc.metadata.DocType;
-import com.f.thoth.backend.data.gdoc.metadata.ImmutableValue;
-import com.f.thoth.backend.data.gdoc.metadata.Type;
-import com.f.thoth.backend.data.gdoc.metadata.Value;
-import com.f.thoth.backend.data.security.ThothSession;
 
 /**
  * Director del builder de importacion de un documento simple
@@ -72,6 +61,7 @@ public class SimpleDocumentFromJackImporterDirector implements SimpleDocument.Im
 
    private void loadMetadata(Node node)
    {
+      /*
       try {
          MetaValues vals = new MetaValues();
          for (PropertyIterator propertyIter = node.getProperties(); propertyIter.hasNext(); )
@@ -117,7 +107,7 @@ public class SimpleDocumentFromJackImporterDirector implements SimpleDocument.Im
          e.printStackTrace();
          throw new IllegalStateException("No pudo cargar los metadatos del documento simple. Razon\n");
       }
-
+      */
    }//loadMetadata
 
 

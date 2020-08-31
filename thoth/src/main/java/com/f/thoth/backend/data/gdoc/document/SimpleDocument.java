@@ -2,31 +2,36 @@ package com.f.thoth.backend.data.gdoc.document;
 
 import java.time.LocalDateTime;
 import java.util.Iterator;
-import java.util.Map;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.DocType;
 import com.f.thoth.backend.data.gdoc.metadata.Metadata;
-import com.f.thoth.backend.data.gdoc.metadata.Value;
+import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.ui.utils.FormattingUtils;
 
 /**
  * Representa un documento simple
  */
+@Entity
+@Table(name = "SIMPLE_DOCUMENT")
 public class SimpleDocument implements Document, SimpleDocumentImporter
 {
    @NotBlank(message = "{evidentia.id.required}")
    @NotNull (message = "{evidentia.id.required}")
+   @Id
    private String        id;
 
    @NotNull (message = "{evidentia.type.required}")
    private DocType       docType;
 
    @NotNull (message = "{evidentia.metadata.required}")
-   private MetaValues    metaValues;
+   private SchemaValues    metaValues;
 
    private boolean       record;
    private Publicity     publicity;
@@ -86,8 +91,8 @@ public class SimpleDocument implements Document, SimpleDocumentImporter
    public DocType         getDocType() { return docType;}
    @Override public void  setDocType( DocType docType) { this.docType = docType;}
 
-   public MetaValues      getMetaValues() { return metaValues;}
-   @Override public void  setMetaValues( MetaValues metaValues) { this.metaValues = metaValues;}
+   public SchemaValues    getMetaValues() { return metaValues;}
+   @Override public void  setMetaValues( SchemaValues metaValues) { this.metaValues = metaValues;}
 
    public boolean         getRecord() { return record;}
    @Override public void  setRecord( boolean record) { this.record = record;}
@@ -159,7 +164,7 @@ public class SimpleDocument implements Document, SimpleDocumentImporter
 
       public void   exportBasic (String id, DocType docType, boolean isRecord, Publicity publicity, LocalDateTime endClassification);
 
-      public void   exportMeta ( Iterator<Map.Entry<String,Value<?>>> metaIterator);
+      public void   exportMeta ( SchemaValues values);
 
       public void   exportContent( Content content);
 
@@ -174,7 +179,7 @@ public class SimpleDocument implements Document, SimpleDocumentImporter
    {
       exporter.initExport();
       exporter.exportBasic( id, docType, record, publicity, endClassification);
-      exporter.exportMeta( metaValues.iterator());
+      exporter.exportMeta( metaValues);
       exporter.exportContent( content);
       exporter.endExport();
 

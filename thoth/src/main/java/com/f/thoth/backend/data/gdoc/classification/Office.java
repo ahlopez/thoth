@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
@@ -42,13 +43,16 @@ public class Office extends BaseEntity implements NeedsProtection, Comparable<Of
    protected String     name;
 
    @NotNull(message = "{evidentia.schema.required}")
+   @ManyToOne
    protected Schema     schema;
 
    @NotNull (message = "{evidentia.category.required}")
    protected Integer    category;
 
+   @ManyToOne
    protected Role       roleOwner;
 
+   @ManyToOne
    protected Office     parent;
 
    @NotNull(message = "{evidentia.dateopened.required}")
@@ -57,6 +61,7 @@ public class Office extends BaseEntity implements NeedsProtection, Comparable<Of
    protected LocalDate  dateClosed;
 
    @NotNull(message = "{remun.status.required}")
+   @ManyToOne
    public RetentionSchedule retentionSchedule;
 
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)

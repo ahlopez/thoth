@@ -11,6 +11,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import com.f.thoth.app.security.SecurityConfiguration;
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.gdoc.classification.ClassificationClass;
+import com.f.thoth.backend.data.gdoc.classification.Retencion;
+import com.f.thoth.backend.data.gdoc.classification.RetentionSchedule;
 import com.f.thoth.backend.data.gdoc.expediente.Expediente;
 import com.f.thoth.backend.data.gdoc.expediente.FileIndex;
 import com.f.thoth.backend.data.gdoc.expediente.IndexEntry;
@@ -58,7 +60,9 @@ import com.f.thoth.ui.MainView;
             Schema.class,
             SchemaValues.class,
             Metadata.class,
-            DocType.class
+            DocType.class,
+            Retencion.class,
+            RetentionSchedule.class
          },
            exclude = ErrorMvcAutoConfiguration.class
       )
@@ -87,7 +91,9 @@ import com.f.thoth.ui.MainView;
            Schema.class,
            SchemaValues.class,
            Metadata.class,
-           DocType.class
+           DocType.class,
+           Retencion.class,
+           RetentionSchedule.class,
          }
       )
 public class Application extends SpringBootServletInitializer

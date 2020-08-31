@@ -57,11 +57,12 @@ import com.f.thoth.backend.data.security.SingleUser;
                @NamedAttributeNode("tenant"),
                @NamedAttributeNode("code"),
                @NamedAttributeNode("owner"),
-               @NamedAttributeNode(value="name",      subgraph="full"),
-               @NamedAttributeNode(value="category",  subgraph="full"),
-               @NamedAttributeNode(value="userOwner", subgraph="full"),
-               @NamedAttributeNode(value="roleOwner", subgraph="full"),
-               @NamedAttributeNode(value="acl",       subgraph="full")
+               @NamedAttributeNode(value="name",               subgraph="full"),
+               @NamedAttributeNode(value="category",           subgraph="full"),
+               @NamedAttributeNode(value="userOwner",          subgraph="full"),
+               @NamedAttributeNode(value="roleOwner",          subgraph="full"),
+               @NamedAttributeNode(value="retentionSchedule",  subgraph="full"),
+               @NamedAttributeNode(value="acl",                subgraph="full")
             },
             subgraphs = @NamedSubgraph(name = ObjectToProtect.FULL, 
                   attributeNodes = {
@@ -69,6 +70,7 @@ import com.f.thoth.backend.data.security.SingleUser;
                     @NamedAttributeNode("category"),
                     @NamedAttributeNode("userOwner"),
                     @NamedAttributeNode("roleOwner"),
+                    @NamedAttributeNode("retentionSchedule"),
                     @NamedAttributeNode("acl")
                   })
             )
@@ -89,6 +91,7 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
    protected Integer    level;
    
    @NotNull(message = "{evidentia.schema.required}")
+   @ManyToOne
    protected Schema     schema;
 
    @NotNull(message = "{evidentia.dateopened.required}")
@@ -97,6 +100,7 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
    protected LocalDate  dateClosed;
 
    @NotNull(message = "{remun.status.required}")
+   @ManyToOne
    protected RetentionSchedule retentionSchedule;
 
    @ManyToOne

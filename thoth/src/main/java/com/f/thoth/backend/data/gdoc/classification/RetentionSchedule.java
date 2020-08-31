@@ -2,9 +2,10 @@ package com.f.thoth.backend.data.gdoc.classification;
 
 import java.util.Objects;
 
+import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.Index;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -20,7 +21,8 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
  * (Tabla de retencion documental, o tambien
  *  Calendario de conservacion)
  */
-@Table(name = "RETENTION_SCHEDULE", indexes = { @Index(columnList = "code") })
+@Entity
+@Table(name = "RETENTION_SCHEDULE")
 public class RetentionSchedule extends BaseEntity implements Comparable<RetentionSchedule>
 {
    @NotBlank(message = "{evidentia.name.required}")
@@ -29,6 +31,7 @@ public class RetentionSchedule extends BaseEntity implements Comparable<Retentio
    private String              name;
 
    @NotNull (message = "{evidentia.retention.required}")
+   @ManyToOne
    private Retencion           retention;
 
    @NotNull(message = "{evidentia.disposition.required}")

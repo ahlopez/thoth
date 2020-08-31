@@ -3,6 +3,7 @@ package com.f.thoth.backend.data.gdoc.document;
 import java.time.LocalDateTime;
 
 import com.f.thoth.backend.data.gdoc.metadata.DocType;
+import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 
 
 /**
@@ -17,7 +18,7 @@ public interface CompositeDocumentImporter
 
    public void    setDocType( DocType docType);
 
-   public void    setMetaValues( MetaValues metaValues);
+   public void    setMetaValues( SchemaValues metaValues);
 
    public void    setRecord( boolean record);
 

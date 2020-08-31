@@ -3,7 +3,6 @@ package com.f.thoth.backend.data.gdoc.classification;
 import java.util.Objects;
 
 import javax.persistence.Entity;
-import javax.persistence.Index;
 import javax.persistence.Table;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
@@ -14,7 +13,7 @@ import com.f.thoth.backend.data.entity.BaseEntity;
  * de archivo
  */
 @Entity
-@Table(name = "RETENCION", indexes = { @Index(columnList = "code") })
+@Table(name = "RETENCION")
 public class Retencion extends BaseEntity implements Comparable<Retencion>
 {
    private static int retSequence = 0;
