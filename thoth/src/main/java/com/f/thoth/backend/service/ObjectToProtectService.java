@@ -24,11 +24,11 @@ import com.f.thoth.backend.repositories.PermissionRepository;
 public class ObjectToProtectService implements FilterableCrudService<ObjectToProtect>, PermissionService<ObjectToProtect>
 {
 
-   private final ObjectToProtectRepository               objectToProtectRepository;
-   private final PermissionRepository<ObjectToProtect>   permissionRepository;
+   private final ObjectToProtectRepository  objectToProtectRepository;
+   private final PermissionRepository       permissionRepository;
 
    @Autowired
-   public ObjectToProtectService(ObjectToProtectRepository objectToProtectRepository, PermissionRepository<ObjectToProtect> permissionRepository)
+   public ObjectToProtectService(ObjectToProtectRepository objectToProtectRepository, PermissionRepository permissionRepository)
    {
       this.objectToProtectRepository = objectToProtectRepository;
       this.permissionRepository      = permissionRepository;
@@ -121,7 +121,7 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
 
    }//grantRevoke
    
-   public void grant( User currentUser, Role role, Set<Permission> newGrants)
+   @Override public void grant( User currentUser, Role role, Set<Permission> newGrants)
    {
       newGrants.forEach( newGrant-> 
       {
@@ -137,7 +137,7 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
    }//grant
 
    
-   public void revoke( User currentUser, Role role, Set<Permission> newRevokes)
+   @Override public void revoke( User currentUser, Role role, Set<Permission> newRevokes)
    {
       newRevokes.forEach( newRevoke-> 
       {

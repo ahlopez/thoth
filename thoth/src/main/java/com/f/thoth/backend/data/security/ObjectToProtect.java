@@ -137,10 +137,23 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
             "[OTP]>"+
             (name == null? "[name]" : name);
    }//buildCode
+   
+   public String isValid()
+   {
+      StringBuilder msg = new StringBuilder();
+      
+      if ( category < 0 || category > 5)
+         msg.append("Categoría de seguridad inválida");
+      
+      if ( !TextUtil.isValidName(name))
+         msg.append("Nombre["+ name+ "] es inválido"); 
+      
+      return msg.toString();
+   }//isValid
 
    // ----------------- Getters & Setters ----------------
    
-   public void            setName(String name) { this.name = name;}
+   public void            setName(String name) { this.name = (name != null ? name.trim() : "Anonima");}
 
    public void            setOwner(ObjectToProtect owner) {this.owner = owner;}
 
@@ -158,9 +171,14 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
 
    // Implements HierarchicalEntity
    @Override public Long            getId()     { return super.getId();}
-   @Override public String          getCode()   { return super.getCode();}
    @Override public String          getName()   { return name;}
    @Override public ObjectToProtect getOwner()  { return owner;}
+   @Override public String          getCode()   { return (tenant == null? "[tenant]": tenant.getCode())+"[OTP]"+ getOwnerCode()+ ">"+  name;}
+   
+   public String getOwnerCode()
+   {
+      return owner == null ? "" : owner.getOwnerCode()+ ">"+ name; 
+   }//getOwnerCode
 
    // ---------------------- Object -----------------------
 

@@ -5,12 +5,15 @@ import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -29,6 +32,8 @@ import com.f.thoth.ui.utils.FormattingUtils;
 /**
  * Representa una oficina productora de documentos
  */
+@Entity
+@Table(name = "OFFICE", indexes = { @Index(columnList = "code") })
 public class Office extends BaseEntity implements NeedsProtection, Comparable<Office>
 {
    @NotBlank(message = "{evidentia.name.required}")

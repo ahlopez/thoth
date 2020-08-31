@@ -4,14 +4,17 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
-import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
+import javax.persistence.Table;
 
 import org.hibernate.annotations.BatchSize;
 
+import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.gdoc.metadata.DocType;
 import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.Permission;
@@ -25,8 +28,9 @@ import com.f.thoth.ui.utils.FormattingUtils;
 /**
  * Representa un expediente documental
  */
-@MappedSuperclass
-public abstract class Expediente implements NeedsProtection, Comparable<Expediente>
+@Entity
+@Table(name = "EXPEDIENTE", indexes = { @Index(columnList = "code") })
+public abstract class Expediente extends BaseEntity implements NeedsProtection, Comparable<Expediente>
 {
    private Tenant        tenant;
    private String        id;
@@ -56,9 +60,6 @@ public abstract class Expediente implements NeedsProtection, Comparable<Expedien
 
    public Tenant getTenant() { return tenant; }
    //public void setTenant(Tenant tenant) {this.tenant = tenant;}
-
-   public String getId() {return id;}
-   public void setId(String id) {this.id = id;}
 
    public FileIndex getIndex() {return index;}
    public void setIndex(FileIndex index) {this.index = index;}

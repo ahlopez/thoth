@@ -5,12 +5,15 @@ import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -29,6 +32,8 @@ import com.f.thoth.ui.utils.FormattingUtils;
 /**
  * Representa una clase del esquema de clasificacion
  */
+@Entity
+@Table(name = "CLAZZ", indexes = { @Index(columnList = "code") })
 public class Clazz extends BaseEntity implements NeedsProtection, Comparable<Clazz>
 {
    @NotBlank(message = "{evidentia.name.required}")

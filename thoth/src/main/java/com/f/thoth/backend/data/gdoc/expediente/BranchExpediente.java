@@ -4,7 +4,12 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.persistence.Entity;
+import javax.persistence.Index;
+import javax.persistence.Table;
 
+@Entity
+@Table(name = "BRANCH_EXPEDIENTE", indexes = { @Index(columnList = "code") })
 public class BranchExpediente extends Expediente
 {
    public Expediente      parent;
@@ -15,6 +20,7 @@ public class BranchExpediente extends Expediente
    {
       super();
       subExpedientes = new TreeSet<>();
+      buildCode();
    }
 
    public BranchExpediente (Set<Expediente> subExpedientes)
@@ -24,6 +30,7 @@ public class BranchExpediente extends Expediente
          throw new IllegalArgumentException("Conjunto de subExpedientes no puede ser nulo ni vacio");
 
       this.subExpedientes = subExpedientes;
+      buildCode();
    }//BranchExpediente
 
    // ---------------- Getters & Setters ---------------

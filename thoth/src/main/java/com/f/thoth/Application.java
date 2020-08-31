@@ -10,16 +10,20 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import com.f.thoth.app.security.SecurityConfiguration;
 import com.f.thoth.backend.data.entity.User;
+import com.f.thoth.backend.data.gdoc.classification.ClassificationClass;
+import com.f.thoth.backend.data.gdoc.expediente.Expediente;
 import com.f.thoth.backend.data.gdoc.metadata.DocType;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
+import com.f.thoth.backend.repositories.ClassificationClassRepository;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
 import com.f.thoth.backend.repositories.RoleRepository;
 import com.f.thoth.backend.repositories.TenantRepository;
 import com.f.thoth.backend.repositories.UserRepository;
+import com.f.thoth.backend.service.ClassificationClassService;
 import com.f.thoth.backend.service.ObjectToProtectService;
 import com.f.thoth.backend.service.TenantService;
 import com.f.thoth.backend.service.UserService;
@@ -38,10 +42,12 @@ import com.f.thoth.ui.MainView;
             Application.class,
             UserService.class,
             ObjectToProtectService.class,
+            ClassificationClassService.class,
             TenantService.class,
             ObjectToProtect.class,
             Role.class,
-            Permission.class
+            Permission.class,
+            Expediente.class
          },
            exclude = ErrorMvcAutoConfiguration.class
       )
@@ -52,7 +58,8 @@ import com.f.thoth.ui.MainView;
             ObjectToProtectRepository.class,
             TenantRepository.class,
             RoleRepository.class,
-            PermissionRepository.class
+            PermissionRepository.class,
+            ClassificationClassRepository.class
          }
       )
 @EntityScan(
@@ -61,7 +68,9 @@ import com.f.thoth.ui.MainView;
            Tenant.class,
            Role.class,
            ObjectToProtect.class,
+           ClassificationClass.class,
            Permission.class,
+           Expediente.class,
            DocType.class
          }
       )

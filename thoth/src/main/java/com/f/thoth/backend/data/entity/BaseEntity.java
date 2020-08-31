@@ -22,6 +22,8 @@ public abstract class BaseEntity extends AbstractEntity
 
 	public Tenant  getTenant() { return tenant;}
 	public void    setTenant( Tenant tenant) { this.tenant = tenant;}  
+	
+	@Override public String getCode() { return (tenant == null? "[Tenant]": tenant.getCode())+">"+ getCode();}
 
 	@Override public boolean equals( Object other)
 	{
