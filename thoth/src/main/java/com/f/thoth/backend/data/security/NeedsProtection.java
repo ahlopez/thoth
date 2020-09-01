@@ -7,6 +7,8 @@ public interface NeedsProtection
 {
 
    public String  getKey();
+   
+   public ObjectToProtect getObjectToProtect();
 
    public boolean canBeAccessedBy(Integer userCategory);
 

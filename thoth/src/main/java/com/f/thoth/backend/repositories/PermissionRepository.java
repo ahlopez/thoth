@@ -15,6 +15,6 @@ public interface PermissionRepository extends JpaRepository<Permission, Long>
    List<Permission>findByObjects(List<ObjectToProtect>objects);
    
    @Query("SELECT DISTINCT p FROM Permission p WHERE p.objectToProtect = ?2 AND p.role = ?1")
-   Permission findByRoleObject(Role role, String objectToProtect);
+   Permission findByRoleObject(Role role, ObjectToProtect objectToProtect);
 
 }//PermissionRepository

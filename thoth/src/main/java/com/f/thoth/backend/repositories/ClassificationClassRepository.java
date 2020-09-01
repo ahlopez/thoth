@@ -52,7 +52,7 @@ public interface ClassificationClassRepository extends JpaRepository<Classificat
 
    //   ----------- ACL handling ----------------
    @EntityGraph(value = ClassificationClass.FULL, type = EntityGraphType.LOAD)
-   @Query("SELECT DISTINCT c FROM ClassificationClass c, Permission p  WHERE c.objectKey = p.objectToProtect and p.role = ?1")
+   @Query("SELECT DISTINCT c FROM ClassificationClass c, Permission p  WHERE c.objectToProtect = p.objectToProtect and p.role = ?1")
    List<ClassificationClass> findClasesGranted( Role role);  
 
 }//ClaseRepository

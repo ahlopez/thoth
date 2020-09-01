@@ -25,7 +25,7 @@ public class Permission extends BaseEntity implements Comparable<Permission>
    private Role          role;
 
    @NotNull (message = "{evidentia.object.required}")
-   public String        objectToProtect;            
+   public ObjectToProtect  objectToProtect;            
 
    @NotNull(message = "{evidentia.date.required}")
    private LocalDate     fromDate;
@@ -45,7 +45,7 @@ public class Permission extends BaseEntity implements Comparable<Permission>
       buildCode();
    }
 
-   public Permission( Role role, String objectToProtect, LocalDate fromDate, LocalDate toDate)
+   public Permission( Role role, ObjectToProtect objectToProtect, LocalDate fromDate, LocalDate toDate)
    {
       super();
       
@@ -78,15 +78,6 @@ public class Permission extends BaseEntity implements Comparable<Permission>
    }//buildCode
 
    // -------------- Getters & Setters ----------------
-   
-   public Long getObjectId( )
-   {
-      if( objectToProtect == null)
-         return Long.MIN_VALUE;
-      
-      Long id = Long.valueOf(objectToProtect.substring(objectToProtect.indexOf(']')+1));
-      return id;
-   }//getId
 
    public Role            getRole() { return role;}
    public void            setRole(Role role) { this.role = role;}
@@ -100,8 +91,8 @@ public class Permission extends BaseEntity implements Comparable<Permission>
    public User            getGrantedBy() { return grantedBy;}
    public void            setGrantedBy( User grantedBy){ this.grantedBy = grantedBy;}
 
-   public String          getObjectToProtect() { return objectToProtect;}
-   public void            setObjectToProtect( String objectToProtect) { this.objectToProtect = objectToProtect;}
+   public ObjectToProtect getObjectToProtect() { return objectToProtect;}
+   public void            setObjectToProtect( ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect;}
 
    // --------------- Object methods ---------------------
 
@@ -135,7 +126,6 @@ public class Permission extends BaseEntity implements Comparable<Permission>
          this.code == null  && that.code != null? -1 :   
          this.code.compareTo(that.code);
       
-
    }// compareTo
 
    // --------------- Logic ---------------------
@@ -146,9 +136,9 @@ public class Permission extends BaseEntity implements Comparable<Permission>
       return now.compareTo(fromDate) >= 0 && now.compareTo(toDate) <= 0;
    }//isCurrent
    
-   public boolean grants( Role role, NeedsProtection object)
+   public boolean grants( Role role, NeedsProtection objectInNeed)
    {
-      return this.role.equals(role) && this.objectToProtect.equals(object.getKey()) && isCurrent();
+      return this.role.equals(role) && this.objectToProtect.equals(objectInNeed.getObjectToProtect()) && isCurrent();
    }
 
 }//Permission

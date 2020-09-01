@@ -236,6 +236,8 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
 
    // -----------------  Logic ----------------
    @Override public String  getKey() { return "[OTP]"+ id;}
+   
+   @Override public ObjectToProtect getObjectToProtect() { return this;}
 
    @Override public boolean canBeAccessedBy(Integer userCategory) { return userCategory != null && category.compareTo(userCategory) <= 0;}
 

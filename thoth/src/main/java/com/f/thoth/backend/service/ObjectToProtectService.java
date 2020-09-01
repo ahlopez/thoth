@@ -92,7 +92,7 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
    //  ----- implements HierarchicalService ------
    @Override public List<ObjectToProtect> findAll() { return objectToProtectRepository.findAll(ThothSession.getCurrentTenant()); }
 
-   @Override public Optional<ObjectToProtect> findById(Long id)              { return objectToProtectRepository.findById( id);}
+   @Override public Optional<ObjectToProtect> findById(Long id)                  { return objectToProtectRepository.findById( id);}
 
    @Override public List<ObjectToProtect> findByParent  ( ObjectToProtect owner) { return objectToProtectRepository.findByParent  (owner); }
    @Override public int                   countByParent ( ObjectToProtect owner) { return objectToProtectRepository.countByParent (owner); }
@@ -125,7 +125,7 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
    {
       newGrants.forEach( newGrant-> 
       {
-         Optional<ObjectToProtect> optObject= objectToProtectRepository.findById(newGrant.getObjectId());
+         Optional<ObjectToProtect> optObject= objectToProtectRepository.findById(newGrant.getObjectToProtect().getId());
          if ( optObject.isPresent())
          {
             permissionRepository.saveAndFlush(newGrant);
@@ -141,7 +141,7 @@ public class ObjectToProtectService implements FilterableCrudService<ObjectToPro
    {
       newRevokes.forEach( newRevoke-> 
       {
-         Optional<ObjectToProtect> optObject= objectToProtectRepository.findById(newRevoke.getObjectId());
+         Optional<ObjectToProtect> optObject= objectToProtectRepository.findById(newRevoke.getObjectToProtect().getId());
          if ( optObject.isPresent())
          {
             ObjectToProtect object = optObject.get();

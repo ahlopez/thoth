@@ -83,7 +83,6 @@ public class ClassificationClassService implements FilterableCrudService<Classif
    {
       try {
          objectToProtectRepository.save( entity.getObjectToProtect());
-         entity.setObjectKey( entity.getObjectToProtect().getKey());
          return FilterableCrudService.super.save(currentUser, entity);
       } catch (DataIntegrityViolationException e) {
          throw new UserFriendlyDataException("Ya hay una Clase con esa llave. Por favor escoja una llave única para la clase");
@@ -132,13 +131,13 @@ public class ClassificationClassService implements FilterableCrudService<Classif
    {
       newGrants.forEach( newGrant-> 
       {
-         Optional<ClassificationClass> optClass= claseRepository.findById(newGrant.getObjectId());
-         if ( optClass.isPresent())
+         Optional<ObjectToProtect> optObjectOfClass= objectToProtectRepository.findById(newGrant.getObjectToProtect().getId());
+         if ( optObjectOfClass.isPresent())
          {
             permissionRepository.saveAndFlush(newGrant);
-            ClassificationClass clase = optClass.get();
-            clase.grant(newGrant);
-            claseRepository.saveAndFlush(clase);
+            ObjectToProtect objectOfClass = optObjectOfClass.get();
+            objectOfClass.grant(newGrant);
+            objectToProtectRepository.saveAndFlush(objectOfClass);
         }
       });
    }//grant
@@ -148,13 +147,13 @@ public class ClassificationClassService implements FilterableCrudService<Classif
    {
       newRevokes.forEach( newRevoke-> 
       {
-         Optional<ClassificationClass> optClass= claseRepository.findById(newRevoke.getObjectId());
-         if ( optClass.isPresent())
+         Optional<ObjectToProtect> optObjectOfClass= objectToProtectRepository.findById(newRevoke.getObjectToProtect().getId());
+         if ( optObjectOfClass.isPresent())
          {
-            ClassificationClass clase = optClass.get();
+            ObjectToProtect objectOfClass = optObjectOfClass.get();
             Permission toRevoke = permissionRepository.findByRoleObject(newRevoke.getRole(),newRevoke.getObjectToProtect());
-            clase.revoke(toRevoke);
-            claseRepository.saveAndFlush(clase);
+            objectOfClass.revoke(toRevoke);
+            objectToProtectRepository.saveAndFlush(objectOfClass);
             permissionRepository.delete(toRevoke);
         }
       });
