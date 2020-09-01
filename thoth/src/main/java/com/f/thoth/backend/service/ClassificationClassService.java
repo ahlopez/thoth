@@ -20,6 +20,7 @@ import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.ClassificationClassRepository;
+import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
 
 @Service
@@ -27,12 +28,16 @@ public class ClassificationClassService implements FilterableCrudService<Classif
 {
    private final ClassificationClassRepository  claseRepository;
    private final PermissionRepository           permissionRepository;
+   private final ObjectToProtectRepository      objectToProtectRepository;
 
    @Autowired
-   public ClassificationClassService(ClassificationClassRepository claseRepository, PermissionRepository permissionRepository)
+   public ClassificationClassService(ClassificationClassRepository claseRepository, 
+                                     PermissionRepository permissionRepository,
+                                     ObjectToProtectRepository objectToProtectRepository)
    {
-      this.claseRepository       = claseRepository;
-      this.permissionRepository  = permissionRepository;
+      this.claseRepository           = claseRepository;
+      this.permissionRepository      = permissionRepository;
+      this.objectToProtectRepository = objectToProtectRepository;
    }
 
    @Override public Page<ClassificationClass> findAnyMatching(Optional<String> filter, Pageable pageable)
@@ -77,6 +82,8 @@ public class ClassificationClassService implements FilterableCrudService<Classif
    @Override public ClassificationClass save(User currentUser, ClassificationClass entity)
    {
       try {
+         objectToProtectRepository.save( entity.getObjectToProtect());
+         entity.setObjectKey( entity.getObjectToProtect().getKey());
          return FilterableCrudService.super.save(currentUser, entity);
       } catch (DataIntegrityViolationException e) {
          throw new UserFriendlyDataException("Ya hay una Clase con esa llave. Por favor escoja una llave única para la clase");

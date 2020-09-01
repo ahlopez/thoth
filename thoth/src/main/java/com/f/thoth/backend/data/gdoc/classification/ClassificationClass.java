@@ -86,10 +86,10 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
 
    @NotNull(message = "{evidentia.objectToProtect.required") 
    @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true)
-   ObjectToProtect  objectToProtect;
+   protected ObjectToProtect  objectToProtect;
    
-   // Considerar guardar aquí la llave del objectToProtect
-   
+   protected String    objectKey;                // LLave del objeto a proteger anterior
+
    @NotNull(message = "{evidentia.level.required") 
    protected Integer    level;
    
@@ -175,6 +175,9 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
 
    public ObjectToProtect getObjectToProtect(){ return objectToProtect;}
    public void setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect; }
+   
+   public String getObjectKey(){ return objectKey; }
+   public void setObjectKey(String objectKey){ this.objectKey = objectKey; }
 
    public void setOwner(ClassificationClass owner){ this.owner = owner; }
 
