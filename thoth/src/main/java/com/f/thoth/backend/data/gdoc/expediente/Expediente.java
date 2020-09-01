@@ -19,6 +19,7 @@ import org.hibernate.annotations.BatchSize;
 
 import com.f.thoth.backend.data.gdoc.metadata.DocType;
 import com.f.thoth.backend.data.security.NeedsProtection;
+import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
@@ -34,7 +35,11 @@ import com.f.thoth.ui.utils.FormattingUtils;
 public abstract class Expediente implements NeedsProtection, Comparable<Expediente>
 {
    @Id
-   private String        id;
+   private String        id;   
+
+   @NotNull(message = "{evidentia.objectToProtect.required") 
+   @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true)
+   protected ObjectToProtect  objectToProtect;
    
    @ManyToOne
    private Tenant        tenant;
@@ -81,6 +86,9 @@ public abstract class Expediente implements NeedsProtection, Comparable<Expedien
 
    public FileIndex getIndex() {return index;}
    public void setIndex(FileIndex index) {this.index = index;}
+
+   @Override public ObjectToProtect getObjectToProtect(){ return objectToProtect;}
+   public void setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect; }
 
    public DocType getAttributes() {return attributes;}
    public void setAttributes(DocType attributes) {this.attributes = attributes;}

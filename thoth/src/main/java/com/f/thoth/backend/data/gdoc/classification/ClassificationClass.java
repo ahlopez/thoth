@@ -171,7 +171,7 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
 
    // -------------- Getters & Setters ----------------
 
-   public ObjectToProtect getObjectToProtect(){ return objectToProtect;}
+   @Override public ObjectToProtect getObjectToProtect(){ return objectToProtect;}
    public void setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect; }
 
    public void setOwner(ClassificationClass owner){ this.owner = owner; }

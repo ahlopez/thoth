@@ -15,6 +15,7 @@ import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
 import javax.persistence.NamedEntityGraphs;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -27,6 +28,7 @@ import org.hibernate.annotations.BatchSize;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.security.NeedsProtection;
+import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
@@ -73,6 +75,10 @@ public class DocType extends BaseEntity implements NeedsProtection, Comparable<D
    @NotNull (message = "{evidentia.name.required}")
    @Size(min= 2, max = 50, message= "{evidentia.name.length}")
    protected String      name;
+
+   @NotNull(message = "{evidentia.objectToProtect.required") 
+   @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true)
+   protected ObjectToProtect  objectToProtect;
 
    @ManyToOne
    @NotNull (message = "{evidentia.schema.required}")
@@ -169,6 +175,9 @@ public class DocType extends BaseEntity implements NeedsProtection, Comparable<D
       this.name = name;
       buildCode();
    }//setName
+
+   @Override public ObjectToProtect getObjectToProtect(){ return objectToProtect;}
+   public void setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect; }
 
    public Schema      getSchema() { return schema;}
    public void        setSchema( Schema schema){ this.schema = schema;}

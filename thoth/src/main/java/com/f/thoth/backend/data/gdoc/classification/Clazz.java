@@ -11,6 +11,7 @@ import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
@@ -25,6 +26,7 @@ import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.security.NeedsProtection;
+import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
@@ -41,6 +43,10 @@ public class Clazz extends BaseEntity implements NeedsProtection, Comparable<Cla
    @NotNull (message = "{evidentia.name.required}")
    @Size(min= 2, max = 50, message= "{evidentia.name.length}")
    protected String     name;
+
+   @NotNull(message = "{evidentia.objectToProtect.required") 
+   @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true)
+   protected ObjectToProtect  objectToProtect;
 
    @NotNull(message = "{evidentia.schema.required}")
    @ManyToOne
@@ -128,6 +134,9 @@ public class Clazz extends BaseEntity implements NeedsProtection, Comparable<Cla
       this.name = name;
       buildCode();
    }
+
+   @Override public ObjectToProtect getObjectToProtect(){ return objectToProtect;}
+   public void setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect; }
 
    public Schema     getSchema(){ return this.schema;}
    public void       setSchema( Schema schema){ this.schema = schema;}
