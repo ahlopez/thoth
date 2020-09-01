@@ -25,6 +25,7 @@ public class Permission extends BaseEntity implements Comparable<Permission>
    private Role          role;
 
    @NotNull (message = "{evidentia.object.required}")
+   @ManyToOne
    public ObjectToProtect  objectToProtect;            
 
    @NotNull(message = "{evidentia.date.required}")
