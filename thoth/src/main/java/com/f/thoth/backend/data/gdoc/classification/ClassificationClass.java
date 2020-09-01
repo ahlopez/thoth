@@ -19,7 +19,6 @@ import javax.validation.constraints.NotNull;
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
-import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
@@ -63,7 +62,7 @@ import com.f.thoth.backend.data.security.SingleUser;
                @NamedAttributeNode("tenant"),
                @NamedAttributeNode("code"),
                @NamedAttributeNode("owner"),
-               @NamedAttributeNode("retentionSchedule"),
+            //   @NamedAttributeNode("retentionSchedule"),
                @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)
             },
             subgraphs = @NamedSubgraph(name = ObjectToProtect.FULL, 
@@ -91,19 +90,23 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
    @NotNull(message = "{evidentia.level.required") 
    protected Integer    level;
    
+   /*
    @NotNull(message = "{evidentia.schema.required}")
    @ManyToOne
    protected Schema     schema;
+   */
 
    @NotNull(message = "{evidentia.dateopened.required}")
    protected LocalDate  dateOpened;
 
    protected LocalDate  dateClosed;
 
-   @NotNull(message = "{remun.status.required}")
+   /*
+   @NotNull(message = "{evidentia.retention.required}")
    @ManyToOne
    protected RetentionSchedule retentionSchedule;
-
+   */
+   
    @ManyToOne
    protected ClassificationClass owner;      //  ClassificationClass to which this ClassificationClass belongs
 
@@ -112,14 +115,14 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
    {
       super();
       init();
-      objectToProtect = new ObjectToProtect("",null);
+      objectToProtect = new ObjectToProtect("",null, ObjectToProtect.Type.CLASSIFICATION);
       buildCode();
    }
 
    public ClassificationClass( Integer level, String name, ClassificationClass owner)
    {
       init();
-      objectToProtect = new ObjectToProtect(name, null);
+      objectToProtect = new ObjectToProtect(name, null, ObjectToProtect.Type.CLASSIFICATION);
       this.level      = level;
       this.owner      = owner;
       buildCode();
@@ -129,10 +132,10 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
    {
       LocalDate now          = LocalDate.now();
       this.level             = 0;
-      this.schema            = null;
+     // this.schema          = null;
       this.dateOpened        = now;
       this.dateClosed        = LocalDate.MAX;
-      this.retentionSchedule = null;
+     // this.retentionSchedule = null;
       this.owner             = null;
       
    }//init
@@ -179,8 +182,10 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
    public Integer    getLevel(){ return level;}
    public void       setLevel(Integer level){ this.level = level;}
 
+   /*
    public Schema     getSchema(){ return this.schema;}
    public void       setSchema( Schema schema){ this.schema = schema;}
+   */
 
    public LocalDate  getDateOpened() { return dateOpened;}
    public void       setDateOpened( LocalDate dateOpened) { this.dateOpened = dateOpened;}
@@ -188,8 +193,10 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
    public LocalDate  getDateClosed() { return dateClosed;}
    public void       setDateClosed( LocalDate dateClosed){ this.dateClosed = dateClosed;}
 
+   /*
    public RetentionSchedule getRetentionSchedule() { return retentionSchedule;}
    public void              setRetentionSchedule( RetentionSchedule retentionSchedule) {this.retentionSchedule = retentionSchedule;}
+   */
    
    // --------------- implements HierarchicalEntity<ClassificationClass>
    @Override public Long                getId()   { return super.getId();}
@@ -225,10 +232,10 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
       StringBuilder s = new StringBuilder();
       s.append( "ClassificationClass{").
         append( " level["+ level+ "]").
-        append( " schema["+ schema.getCode()+ "]").
+       // append( " schema["+ schema.getCode()+ "]").
         append( " dateOpened["+ TextUtil.formatDate(dateOpened)+ "]").
         append( " dateClosed["+ TextUtil.formatDate(dateClosed)+ "]").
-        append( " retentionSchedule["+ retentionSchedule == null? "---" :  retentionSchedule.getCode()+ "]").
+       // append( " retentionSchedule["+ retentionSchedule == null? "---" :  retentionSchedule.getCode()+ "]").
         append( super.toString()).
         append("\n     }\n");
 

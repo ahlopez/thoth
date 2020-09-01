@@ -6,6 +6,8 @@ import java.util.TreeSet;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.ManyToOne;
@@ -66,6 +68,8 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
 {
    public static final String BRIEF = "ObjectToProtect.brief";
    public static final String FULL  = "ObjectToProtect.full";
+   
+   public enum Type {  OPERATION, CLASSIFICATION}
 
    @NotNull  (message = "{evidentia.name.required}")
    @NotBlank (message = "{evidentia.name.required}")
@@ -73,6 +77,10 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
    @Size(max = 255)
    @Column(unique = true)
    protected String          name;       // Object name
+
+   @NotNull  (message = "{evidentia.object_type.required}")
+   @Enumerated(EnumType.STRING)
+   protected ObjectToProtect.Type objectType;
 
    @NotNull     (message= "{evidentia.category.required}")
    @Min(value=0, message= "{evidentia.category.minvalue}")
@@ -101,15 +109,16 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
       buildCode();
    }//ObjectToProtect
 
-   public ObjectToProtect( String name, ObjectToProtect owner)
+   public ObjectToProtect( String name, ObjectToProtect owner, ObjectToProtect.Type objectType)
    {
       super();
       if ( TextUtil.isEmpty(name))
          name= "[name]";
 
       init();
-      this.name  = TextUtil.nameTidy(name);
-      this.owner = owner;
+      this.name       = TextUtil.nameTidy(name);
+      this.owner      = owner;
+      this.objectType = objectType;
       buildCode();
    }//ObjectToProtect
 

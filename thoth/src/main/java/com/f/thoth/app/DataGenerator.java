@@ -24,9 +24,11 @@ import com.f.thoth.backend.data.entity.OrderItem;
 import com.f.thoth.backend.data.entity.PickupLocation;
 import com.f.thoth.backend.data.entity.Product;
 import com.f.thoth.backend.data.entity.User;
+import com.f.thoth.backend.data.gdoc.classification.ClassificationClass;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.repositories.ClassificationClassRepository;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 import com.f.thoth.backend.repositories.OrderRepository;
 import com.f.thoth.backend.repositories.PickupLocationRepository;
@@ -55,15 +57,16 @@ public class DataGenerator implements HasLogger {
 
    private final Random random = new Random(1L);
 
-   private TenantService             tenantService;
-   private TenantRepository          tenantRepository;
-   private RoleRepository            roleRepository;
-   private OrderRepository           orderRepository;
-   private UserRepository            userRepository;
-   private ProductRepository         productRepository;
-   private ObjectToProtectRepository objectToProtectRepository;
-   private PickupLocationRepository  pickupLocationRepository;
-   private PasswordEncoder           passwordEncoder;
+   private TenantService                 tenantService;
+   private TenantRepository              tenantRepository;
+   private RoleRepository                roleRepository;
+   private OrderRepository               orderRepository;
+   private UserRepository                userRepository;
+   private ProductRepository             productRepository;
+   private ObjectToProtectRepository     objectToProtectRepository;
+   private PickupLocationRepository      pickupLocationRepository;
+   private PasswordEncoder               passwordEncoder;
+   private ClassificationClassRepository claseRepository;
 
    private int itemSequence = 0;
 
@@ -71,6 +74,7 @@ public class DataGenerator implements HasLogger {
    public DataGenerator(TenantService tenantService, OrderRepository orderRepository, UserRepository userRepository,
          ProductRepository productRepository, PickupLocationRepository pickupLocationRepository,
          TenantRepository tenantRepository, RoleRepository roleRepository, ObjectToProtectRepository objectToProtectRepository,
+         ClassificationClassRepository claseRepository,
          PasswordEncoder passwordEncoder)
    {
       this.tenantService             = tenantService;
@@ -81,6 +85,7 @@ public class DataGenerator implements HasLogger {
       this.tenantRepository          = tenantRepository;
       this.roleRepository            = roleRepository;
       this.objectToProtectRepository = objectToProtectRepository;
+      this.claseRepository           = claseRepository;
       this.passwordEncoder           = passwordEncoder;
 
    }//DataGenerator
@@ -88,7 +93,7 @@ public class DataGenerator implements HasLogger {
    @SuppressWarnings("unused")
    @PostConstruct
    public void loadData() {
-      if (userRepository.count() != 0L) 
+      if (userRepository.count() != 0L)
       {
          getLogger().info("Using existing database");
          return;
@@ -193,6 +198,343 @@ public class DataGenerator implements HasLogger {
       ObjectToProtect obj63 = createObject( tenant1,       Constant.TITLE_DEVOLUCION                        , obj61);  // Retorno de expediente
       ObjectToProtect obj64 = createObject( tenant1,    Constant.TITLE_INDICES_ARCHIVO                      , obj56);  // Indice de archivo
 
+      ClassificationClass clase001 = createClass( tenant1, Constant.TITLE_SEDE_CORPORATIVA                                , 0, null);      //   Sede Corporativa
+      ClassificationClass clase002 = createClass( tenant1,   Constant.TITLE_CRP_OFICINA_GERENCIA_GENERAL                  , 1, clase001);  //   Corporativa, Gerencia_general
+      ClassificationClass clase003 = createClass( tenant1,     Constant.TITLE_CRP_SERIE_ACTAS                             , 2, clase002);  //   Corporativa, Actas
+      ClassificationClass clase004 = createClass( tenant1,       Constant.TITLE_CRP_SUBSERIE_ACTAS_JUNTA_DIRECTIVA        , 3, clase003);  //   Corporativa, Actas_junta_directiva
+      ClassificationClass clase005 = createClass( tenant1,       Constant.TITLE_CRP_SUBSERIE_ACTAS_COMITE_GERENCIA        , 3, clase003);  //   Corporativa, Actas_comit�_gerencia
+      ClassificationClass clase006 = createClass( tenant1,       Constant.TITLE_CRP_SUBSERIE_ACTAS_COMITE_FINANCIERO      , 3, clase003);  //   Corporativa, Actas_comit�_financiero
+      ClassificationClass clase007 = createClass( tenant1,       Constant.TITLE_CRP_SUBSERIE_ACTAS_COMITE_ADMINISTRATIVO  , 3, clase003);  //   Corporativa, Actas_comit�_administrativo
+      ClassificationClass clase008 = createClass( tenant1,       Constant.TITLE_CRP_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase003);  //   Corporativa, Actas_comit�_operaciones
+      ClassificationClass clase010 = createClass( tenant1,     Constant.TITLE_CRP_SERIE_PLANES                            , 2, clase001);  //   Corporativa, Planes
+      ClassificationClass clase011 = createClass( tenant1,       Constant.TITLE_CRP_SUBSERIE_PLAN_OPERATIVO               , 3, clase010);  //   Corporativa, Plan_operativo
+      ClassificationClass clase012 = createClass( tenant1,       Constant.TITLE_CRP_SUBSERIE_PLAN_FINANCIERO              , 3, clase010);  //   Corporativa, Plan_financiero
+      ClassificationClass clase013 = createClass( tenant1,       Constant.TITLE_CRP_SUBSERIE_PRESUPUESTO                  , 3, clase010);  //   Corporativa, Presupuesto
+      ClassificationClass clase014 = createClass( tenant1,   Constant.TITLE_CRP_OFICINA_OPERACIONES                       , 1, clase001);  //   Corporativa, Subgerencia de Operaciones
+      ClassificationClass clase015 = createClass( tenant1,     Constant.TITLE_CRP_SERIE_ACTAS_OPERACIONES                 , 3, clase014);  //   Corporativa, Actas Operaciones
+      ClassificationClass clase016 = createClass( tenant1,        Constant.TITLE_CRP_SUBSERIE_OPER_CTAS_COMITE_CALIDAD    , 3, clase015);  //   Corporativa, Actas Comit� calidad
+      ClassificationClass clase017 = createClass( tenant1,        Constant.TITLE_CRP_SUBSERIE_OPER_CTAS_COMITE_PLANEACION , 3, clase015);  //   Corporativa, Actas Comit� planeaci�n
+      ClassificationClass clase018 = createClass( tenant1,     Constant.TITLE_CRP_SERIE_CONTRATOS                         , 2, clase014);  //   Corporativa, Contratos
+      ClassificationClass clase019 = createClass( tenant1,        Constant.TITLE_CRP_SUBSERIE_OPER_CONTRATOS_OPERACION    , 3, clase018);  //   Corporativa, Contratos de Operaci�n
+      ClassificationClass clase020 = createClass( tenant1,        Constant.TITLE_CRP_SUBSERIE_OPER_CONTRATOS_INVERSION    , 3, clase018);  //   Corporativa, Contratos de Inversi�n
+      ClassificationClass clase021 = createClass( tenant1,   Constant.TITLE_CRP_OFICINA_FINANCIERA                        , 1, clase001);  //   Corporativa, Subgerencia Financiera
+      ClassificationClass clase022 = createClass( tenant1,     Constant.TITLE_CRP_SERIE_PRESUPUESTO                       , 2, clase021);  //   Corporativa, Presupuesto
+      ClassificationClass clase023 = createClass( tenant1,        Constant.TITLE_CRP_SUBSERIE_FIN_PLANEACION_PPTAL        , 3, clase022);  //   Corporativa, Planeaci�n Presupuestal
+      ClassificationClass clase024 = createClass( tenant1,        Constant.TITLE_CRP_SUBSERIE_FIN_EJECUCION_PPTAL         , 3, clase022);  //   Corporativa, Ejecuci�n Presupuestal
+      ClassificationClass clase025 = createClass( tenant1,     Constant.TITLE_CRP_SERIE_TESORERIA                         , 2, clase021);  //   Corporativa, Tesorer�a
+      ClassificationClass clase026 = createClass( tenant1,        Constant.TITLE_CRP_SUBSERIE_FIN_PAGADURIA               , 3, clase025);  //   Corporativa, Pagadur�a
+      ClassificationClass clase027 = createClass( tenant1,        Constant.TITLE_CRP_SUBSERIE_FIN_INVERSIONES             , 3, clase025);  //   Corporativa, Inversiones
+      ClassificationClass clase028 = createClass( tenant1,     Constant.TITLE_CRP_SERIE_CONTABILIDAD                      , 2, clase021);  //   Corporativa, Contabilidad
+      ClassificationClass clase029 = createClass( tenant1,        Constant.TITLE_CRP_SUBSERIE_FIN_ESTADOS_FINANCIEROS     , 3, clase028);  //   Corporativa, Estados Financieros
+      ClassificationClass clase030 = createClass( tenant1,        Constant.TITLE_CRP_SUBSERIE_FIN_LIBROS_CONTABLES        , 3, clase028);  //   Corporativa, Libros contables
+      ClassificationClass clase031 = createClass( tenant1,   Constant.TITLE_CRP_OFICINA_PERSONAL                          , 1, clase001);  //   Corporativa, Subgerencia de Personal
+      ClassificationClass clase032 = createClass( tenant1,     Constant.TITLE_CRP_SERIE_HOJAS_DE_VIDA                     , 2, clase031);  //   Corporativa, Hojas de vida
+      ClassificationClass clase033 = createClass( tenant1,        Constant.TITLE_CRP_SUBSERIE_PER_CANDIDATOS              , 3, clase032);  //   Corporativa, Candidatos de personal
+      ClassificationClass clase034 = createClass( tenant1,        Constant.TITLE_CRP_SUBSERIE_PER_PERSONAL_ACTIVO         , 3, clase032);  //   Corporativa, Personal activo
+      ClassificationClass clase035 = createClass( tenant1,        Constant.TITLE_CRP_SUBSERIE_PER_PENSIONADOS             , 3, clase032);  //   Corporativa, Pensionados
+      ClassificationClass clase036 = createClass( tenant1,     Constant.TITLE_CRP_SERIE_SANCIONES                         , 2, clase031);  //   Corporativa, Sanciones de personal
+      ClassificationClass clase037 = createClass( tenant1,        Constant.TITLE_CRP_SUBSERIE_PER_INVESTIGACIONES         , 3, clase036);  //   Corporativa, Investigaciones disciplinarias
+      ClassificationClass clase038 = createClass( tenant1,        Constant.TITLE_CRP_SUBSERIE_PER_FALLOS_DE_PERSONAL      , 3, clase036);  //   Corporativa, Fallos de personal
+      ClassificationClass clase039 = createClass( tenant1,     Constant.TITLE_CRP_SERIE_EVALUACIONES                      , 2, clase031);  //   Corporativa, Evaluaciones de personal
+      ClassificationClass clase040 = createClass( tenant1,        Constant.TITLE_CRP_SUBSERIE_PER_DESEMPENO               , 3, clase039);  //   Corporativa, Evaluaciones de desempe�o
+      ClassificationClass clase041 = createClass( tenant1,   Constant.TITLE_CRP_OFICINA_JURIDICA                          , 1, clase001);  //   Corporativa, Subgerencia Jur�dica
+      ClassificationClass clase042 = createClass( tenant1,     Constant.TITLE_CRP_SERIE_PROCESOS                          , 2, clase041);  //   Corporativa, Procesos jur�dicos
+      ClassificationClass clase043 = createClass( tenant1,        Constant.TITLE_CRP_SUBSERIE_JUR_DEMANDAS                , 3, clase042);  //   Corporativa, Demandas en curso
+      ClassificationClass clase044 = createClass( tenant1,        Constant.TITLE_CRP_SUBSERIE_JUR_FALLOS_JUDICIALES       , 3, clase042);  //   Corporativa, Demandas en curso
+      ClassificationClass clase045 = createClass( tenant1,   Constant.TITLE_CRP_OFICINA_ADMINISTRACION                    , 1, clase001);  //   Corporativa, Subgerencia Administrativa
+      ClassificationClass clase046 = createClass( tenant1,     Constant.TITLE_CRP_SERIE_ACTIVOS_FIJOS                     , 2, clase045);  //   Corporativa, Activos fijos
+      ClassificationClass clase047 = createClass( tenant1,        Constant.TITLE_CRP_SUBSERIE_ADM_EDIFICACIONES           , 3, clase046);  //   Corporativa, Edificaciones
+      ClassificationClass clase048 = createClass( tenant1,        Constant.TITLE_CRP_SUBSERIE_ADM_SERVICIOS               , 3, clase046);  //   Corporativa, Servicios p�blicos
+      ClassificationClass clase049 = createClass( tenant1, Constant.TITLE_SEDE_BOGOTA                                     , 0, null);      //   Sede Bogot�
+      ClassificationClass clase050 = createClass( tenant1,   Constant.TITLE_BOG_OFICINA_SUBGERENCIA                       , 1, clase001);  //   Gerencia Bogot�
+      ClassificationClass clase051 = createClass( tenant1,     Constant.TITLE_BOG_SERIE_ACTAS                             , 2, clase050);  //   Bogot�, Actas
+      ClassificationClass clase052 = createClass( tenant1,       Constant.TITLE_BOG_SUBSERIE_ACTAS_JUNTA_DIRECTIVA        , 3, clase051);  //   Bogot�, Actas_junta_directiva
+      ClassificationClass clase053 = createClass( tenant1,       Constant.TITLE_BOG_SUBSERIE_ACTAS_COMITE_GERENCIA        , 3, clase051);  //   Bogot�, Actas_comit�_gerencia
+      ClassificationClass clase054 = createClass( tenant1,       Constant.TITLE_BOG_SUBSERIE_ACTAS_COMITE_FINANCIERO      , 3, clase051);  //   Bogot�, Actas_comit�_financiero
+      ClassificationClass clase055 = createClass( tenant1,       Constant.TITLE_BOG_SUBSERIE_ACTAS_COMITE_ADMINISTRATIVO  , 3, clase051);  //   Bogot�, Actas_comit�_administrativo
+      ClassificationClass clase056 = createClass( tenant1,       Constant.TITLE_BOG_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase051);  //   Bogot�, Actas_comit�_operaciones
+      ClassificationClass clase057 = createClass( tenant1,       Constant.TITLE_BOG_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase051);  //   Bogot�, Actas_comit�_operaciones
+      ClassificationClass clase058 = createClass( tenant1,     Constant.TITLE_BOG_SERIE_PLANES                            , 2, clase050);  //   Bogot�, Planes
+      ClassificationClass clase059 = createClass( tenant1,       Constant.TITLE_BOG_SUBSERIE_PLAN_OPERATIVO               , 3, clase058);  //   Bogot�, Plan_operativo
+      ClassificationClass clase060 = createClass( tenant1,       Constant.TITLE_BOG_SUBSERIE_PLAN_FINANCIERO              , 3, clase058);  //   Bogot�, Plan_financiero
+      ClassificationClass clase061 = createClass( tenant1,       Constant.TITLE_BOG_SUBSERIE_PRESUPUESTO                  , 3, clase058);  //   Bogot�, Presupuesto
+      ClassificationClass clase062 = createClass( tenant1,   Constant.TITLE_BOG_OFICINA_OPERACIONES                       , 1, clase001);  //   Bogot�, Subgerencia de Operaciones
+      ClassificationClass clase063 = createClass( tenant1,     Constant.TITLE_BOG_SERIE_ACTAS_OPERACIONES                 , 2, clase062);  //   Bogot�, Actas Operaciones
+      ClassificationClass clase064 = createClass( tenant1,        Constant.TITLE_BOG_SUBSERIE_OPER_CTAS_COMITE_CALIDAD    , 3, clase063);  //   Bogot�, Actas Comit� calidad
+      ClassificationClass clase065 = createClass( tenant1,        Constant.TITLE_BOG_SUBSERIE_OPER_CTAS_COMITE_PLANEACION , 3, clase063);  //   Bogot�, Actas Comit� planeaci�n
+      ClassificationClass clase066 = createClass( tenant1,     Constant.TITLE_BOG_SERIE_CONTRATOS                         , 2, clase062);  //   Bogot�, Contratos
+      ClassificationClass clase067 = createClass( tenant1,        Constant.TITLE_BOG_SUBSERIE_OPER_CONTRATOS_OPERACION    , 3, clase066);  //   Bogot�, Contratos de Operaci�n
+      ClassificationClass clase068 = createClass( tenant1,        Constant.TITLE_BOG_SUBSERIE_OPER_CONTRATOS_INVERSION    , 3, clase066);  //   Bogot�, Contratos de Inversi�n
+      ClassificationClass clase069 = createClass( tenant1,   Constant.TITLE_BOG_OFICINA_FINANCIERA                        , 1, clase001);  //   Bogot�, Subgerencia Financiera
+      ClassificationClass clase070 = createClass( tenant1,     Constant.TITLE_BOG_SERIE_PRESUPUESTO                       , 2, clase069);  //   Bogot�, Presupuesto
+      ClassificationClass clase071 = createClass( tenant1,        Constant.TITLE_BOG_SUBSERIE_FIN_PLANEACION_PPTAL        , 3, clase070);  //   Bogot�, Planeaci�n Presupuestal
+      ClassificationClass clase072 = createClass( tenant1,        Constant.TITLE_BOG_SUBSERIE_FIN_EJECUCION_PPTAL         , 3, clase070);  //   Bogot�, Ejecuci�n Presupuestal
+      ClassificationClass clase073 = createClass( tenant1,     Constant.TITLE_BOG_SERIE_TESORERIA                         , 2, clase069);  //   Bogot�, Tesorer�a
+      ClassificationClass clase074 = createClass( tenant1,        Constant.TITLE_BOG_SUBSERIE_FIN_PAGADURIA               , 3, clase073);  //   Bogot�, Pagadur�a
+      ClassificationClass clase075 = createClass( tenant1,        Constant.TITLE_BOG_SUBSERIE_FIN_INVERSIONES             , 3, clase073);  //   Bogot�, Inversiones
+      ClassificationClass clase076 = createClass( tenant1,     Constant.TITLE_BOG_SERIE_CONTABILIDAD                      , 2, clase069);  //   Bogot�, Contabilidad
+      ClassificationClass clase077 = createClass( tenant1,        Constant.TITLE_BOG_SUBSERIE_FIN_ESTADOS_FINANCIEROS     , 3, clase076);  //   Bogot�, Estados Financieros
+      ClassificationClass clase078 = createClass( tenant1,        Constant.TITLE_BOG_SUBSERIE_FIN_LIBROS_CONTABLES        , 3, clase076);  //   Bogot�, Libros contables
+      ClassificationClass clase079 = createClass( tenant1,   Constant.TITLE_BOG_OFICINA_PERSONAL                          , 1, clase001);  //   Bogot�, Subgerencia de Personal
+      ClassificationClass clase080 = createClass( tenant1,     Constant.TITLE_BOG_SERIE_HOJAS_DE_VIDA                     , 2, clase079);  //   Bogot�, Hojas de vida
+      ClassificationClass clase081 = createClass( tenant1,        Constant.TITLE_BOG_SUBSERIE_PER_CANDIDATOS              , 3, clase080);  //   Bogot�, Candidatos de personal
+      ClassificationClass clase082 = createClass( tenant1,        Constant.TITLE_BOG_SUBSERIE_PER_PERSONAL_ACTIVO         , 3, clase080);  //   Bogot�, Personal activo
+      ClassificationClass clase083 = createClass( tenant1,        Constant.TITLE_BOG_SUBSERIE_PER_PENSIONADOS             , 3, clase080);  //   Bogot�, Pensionados
+      ClassificationClass clase084 = createClass( tenant1,     Constant.TITLE_BOG_SERIE_SANCIONES                         , 2, clase079);  //   Bogot�, Sanciones de personal
+      ClassificationClass clase085 = createClass( tenant1,        Constant.TITLE_BOG_SUBSERIE_PER_INVESTIGACIONES         , 3, clase084);  //   Bogot�, Investigaciones disciplinarias
+      ClassificationClass clase086 = createClass( tenant1,        Constant.TITLE_BOG_SUBSERIE_PER_FALLOS_DE_PERSONAL      , 3, clase084);  //   Bogot�, Fallos de personal
+      ClassificationClass clase087 = createClass( tenant1,     Constant.TITLE_BOG_SERIE_EVALUACIONES                      , 2, clase079);  //   Bogot�, Evaluaciones de personal
+      ClassificationClass clase088 = createClass( tenant1,        Constant.TITLE_BOG_SUBSERIE_PER_DESEMPENO               , 3, clase087);  //   Bogot�, Evaluaciones de desempe�o
+      ClassificationClass clase089 = createClass( tenant1,   Constant.TITLE_BOG_OFICINA_JURIDICA                          , 1, clase001);  //   Bogot�, Subgerencia Jur�dica
+      ClassificationClass clase090 = createClass( tenant1,     Constant.TITLE_BOG_SERIE_PROCESOS                          , 2, clase089);  //   Bogot�, Procesos jur�dicos
+      ClassificationClass clase091 = createClass( tenant1,        Constant.TITLE_BOG_SUBSERIE_JUR_DEMANDAS                , 3, clase090);  //   Bogot�, Demandas en curso
+      ClassificationClass clase092 = createClass( tenant1,        Constant.TITLE_BOG_SUBSERIE_JUR_FALLOS_JUDICIALES       , 3, clase090);  //   Bogot�, Demandas en curso
+      ClassificationClass clase093 = createClass( tenant1,   Constant.TITLE_BOG_OFICINA_ADMINISTRACION                    , 1, clase001);  //   Bogot�, Subgerencia Administrativa
+      ClassificationClass clase094 = createClass( tenant1,     Constant.TITLE_BOG_SERIE_ACTIVOS_FIJOS                     , 2, clase093);  //   Bogot�, Activos fijos
+      ClassificationClass clase095 = createClass( tenant1,        Constant.TITLE_BOG_SUBSERIE_ADM_EDIFICACIONES           , 3, clase094);  //   Bogot�, Edificaciones
+      ClassificationClass clase096 = createClass( tenant1,        Constant.TITLE_BOG_SUBSERIE_ADM_SERVICIOS               , 3, clase094);  //   Bogot�, Servicios p�blicos
+      ClassificationClass clase097 = createClass( tenant1, Constant.TITLE_SEDE_MEDELLIN                                   , 0, null);      //   Sede Medell�n
+      ClassificationClass clase098 = createClass( tenant1,   Constant.TITLE_MED_OFICINA_SUBGERENCIA                       , 1, clase001);  //   Gerencia Medell�n
+      ClassificationClass clase099 = createClass( tenant1,     Constant.TITLE_MED_SERIE_ACTAS                             , 2, clase098);  //   Medell�n, Actas
+      ClassificationClass clase100 = createClass( tenant1,       Constant.TITLE_MED_SUBSERIE_ACTAS_JUNTA_DIRECTIVA        , 3, clase099);  //   Medell�n, Actas_junta_directiva
+      ClassificationClass clase101 = createClass( tenant1,       Constant.TITLE_MED_SUBSERIE_ACTAS_COMITE_GERENCIA        , 3, clase099);  //   Medell�n, Actas_comit�_gerencia
+      ClassificationClass clase102 = createClass( tenant1,       Constant.TITLE_MED_SUBSERIE_ACTAS_COMITE_FINANCIERO      , 3, clase099);  //   Medell�n, Actas_comit�_financiero
+      ClassificationClass clase103 = createClass( tenant1,       Constant.TITLE_MED_SUBSERIE_ACTAS_COMITE_ADMINISTRATIVO  , 3, clase099);  //   Medell�n, Actas_comit�_administrativo
+      ClassificationClass clase104 = createClass( tenant1,       Constant.TITLE_MED_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase099);  //   Medell�n, Actas_comit�_operaciones
+      ClassificationClass clase105 = createClass( tenant1,       Constant.TITLE_MED_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase099);  //   Medell�n, Actas_comit�_operaciones
+      ClassificationClass clase106 = createClass( tenant1,     Constant.TITLE_MED_SERIE_PLANES                            , 2, clase098);  //   Medell�n, Planes
+      ClassificationClass clase107 = createClass( tenant1,       Constant.TITLE_MED_SUBSERIE_PLAN_OPERATIVO               , 3, clase106);  //   Medell�n, Plan_operativo
+      ClassificationClass clase108 = createClass( tenant1,       Constant.TITLE_MED_SUBSERIE_PLAN_FINANCIERO              , 3, clase106);  //   Medell�n, Plan_financiero
+      ClassificationClass clase109 = createClass( tenant1,       Constant.TITLE_MED_SUBSERIE_PRESUPUESTO                  , 3, clase106);  //   Medell�n, Presupuesto
+      ClassificationClass clase110 = createClass( tenant1,   Constant.TITLE_MED_OFICINA_OPERACIONES                       , 1, clase001);  //   Medell�n, Subgerencia de Operaciones
+      ClassificationClass clase111 = createClass( tenant1,     Constant.TITLE_MED_SERIE_ACTAS_OPERACIONES                 , 2, clase110);  //   Medell�n, Actas Operaciones
+      ClassificationClass clase112 = createClass( tenant1,        Constant.TITLE_MED_SUBSERIE_OPER_CTAS_COMITE_CALIDAD    , 3, clase111);  //   Medell�n, Actas Comit� calidad
+      ClassificationClass clase113 = createClass( tenant1,        Constant.TITLE_MED_SUBSERIE_OPER_CTAS_COMITE_PLANEACION , 3, clase111);  //   Medell�n, Actas Comit� planeaci�n
+      ClassificationClass clase114 = createClass( tenant1,     Constant.TITLE_MED_SERIE_CONTRATOS                         , 2, clase110);  //   Medell�n, Contratos
+      ClassificationClass clase115 = createClass( tenant1,        Constant.TITLE_MED_SUBSERIE_OPER_CONTRATOS_OPERACION    , 3, clase114);  //   Medell�n, Contratos de Operaci�n
+      ClassificationClass clase116 = createClass( tenant1,        Constant.TITLE_MED_SUBSERIE_OPER_CONTRATOS_INVERSION    , 3, clase114);  //   Medell�n, Contratos de Inversi�n
+      ClassificationClass clase117 = createClass( tenant1,   Constant.TITLE_MED_OFICINA_FINANCIERA                        , 1, clase001);  //   Medell�n, Subgerencia Financiera
+      ClassificationClass clase118 = createClass( tenant1,     Constant.TITLE_MED_SERIE_PRESUPUESTO                       , 2, clase117);  //   Medell�n, Presupuesto
+      ClassificationClass clase119 = createClass( tenant1,        Constant.TITLE_MED_SUBSERIE_FIN_PLANEACION_PPTAL        , 3, clase118);  //   Medell�n, Planeaci�n Presupuestal
+      ClassificationClass clase120 = createClass( tenant1,        Constant.TITLE_MED_SUBSERIE_FIN_EJECUCION_PPTAL         , 3, clase118);  //   Medell�n, Ejecuci�n Presupuestal
+      ClassificationClass clase121 = createClass( tenant1,     Constant.TITLE_MED_SERIE_TESORERIA                         , 2, clase117);  //   Medell�n, Tesorer�a
+      ClassificationClass clase122 = createClass( tenant1,        Constant.TITLE_MED_SUBSERIE_FIN_PAGADURIA               , 3, clase121);  //   Medell�n, Pagadur�a
+      ClassificationClass clase123 = createClass( tenant1,        Constant.TITLE_MED_SUBSERIE_FIN_INVERSIONES             , 3, clase121);  //   Medell�n, Inversiones
+      ClassificationClass clase124 = createClass( tenant1,     Constant.TITLE_MED_SERIE_CONTABILIDAD                      , 2, clase117);  //   Medell�n, Contabilidad
+      ClassificationClass clase125 = createClass( tenant1,        Constant.TITLE_MED_SUBSERIE_FIN_ESTADOS_FINANCIEROS     , 3, clase124);  //   Medell�n, Estados Financieros
+      ClassificationClass clase126 = createClass( tenant1,        Constant.TITLE_MED_SUBSERIE_FIN_LIBROS_CONTABLES        , 3, clase124);  //   Medell�n, Libros contables
+      ClassificationClass clase127 = createClass( tenant1,   Constant.TITLE_MED_OFICINA_PERSONAL                          , 1, clase001);  //   Medell�n, Subgerencia de Personal
+      ClassificationClass clase128 = createClass( tenant1,     Constant.TITLE_MED_SERIE_HOJAS_DE_VIDA                     , 2, clase127);  //   Medell�n, Hojas de vida
+      ClassificationClass clase129 = createClass( tenant1,        Constant.TITLE_MED_SUBSERIE_PER_CANDIDATOS              , 3, clase128);  //   Medell�n, Candidatos de personal
+      ClassificationClass clase130 = createClass( tenant1,        Constant.TITLE_MED_SUBSERIE_PER_PERSONAL_ACTIVO         , 3, clase128);  //   Medell�n, Personal activo
+      ClassificationClass clase131 = createClass( tenant1,        Constant.TITLE_MED_SUBSERIE_PER_PENSIONADOS             , 3, clase128);  //   Medell�n, Pensionados
+      ClassificationClass clase132 = createClass( tenant1,     Constant.TITLE_MED_SERIE_SANCIONES                         , 2, clase127);  //   Medell�n, Sanciones de personal
+      ClassificationClass clase133 = createClass( tenant1,        Constant.TITLE_MED_SUBSERIE_PER_INVESTIGACIONES         , 3, clase132);  //   Medell�n, Investigaciones disciplinarias
+      ClassificationClass clase134 = createClass( tenant1,        Constant.TITLE_MED_SUBSERIE_PER_FALLOS_DE_PERSONAL      , 3, clase132);  //   Medell�n, Fallos de personal
+      ClassificationClass clase135 = createClass( tenant1,     Constant.TITLE_MED_SERIE_EVALUACIONES                      , 2, clase127);  //   Medell�n, Evaluaciones de personal
+      ClassificationClass clase136 = createClass( tenant1,        Constant.TITLE_MED_SUBSERIE_PER_DESEMPENO               , 3, clase135);  //   Medell�n, Evaluaciones de desempe�o
+      ClassificationClass clase137 = createClass( tenant1,   Constant.TITLE_MED_OFICINA_JURIDICA                          , 1, clase001);  //   Medell�n, Subgerencia Jur�dica
+      ClassificationClass clase138 = createClass( tenant1,     Constant.TITLE_MED_SERIE_PROCESOS                          , 2, clase137);  //   Medell�n, Procesos jur�dicos
+      ClassificationClass clase139 = createClass( tenant1,        Constant.TITLE_MED_SUBSERIE_JUR_DEMANDAS                , 3, clase138);  //   Medell�n, Demandas en curso
+      ClassificationClass clase140 = createClass( tenant1,        Constant.TITLE_MED_SUBSERIE_JUR_FALLOS_JUDICIALES       , 3, clase138);  //   Medell�n, Demandas en curso
+      ClassificationClass clase141 = createClass( tenant1,   Constant.TITLE_MED_OFICINA_ADMINISTRACION                    , 1, clase001);  //   Medell�n, Subgerencia Administrativa
+      ClassificationClass clase142 = createClass( tenant1,     Constant.TITLE_MED_SERIE_ACTIVOS_FIJOS                     , 2, clase141);  //   Medell�n, Activos fijos
+      ClassificationClass clase143 = createClass( tenant1,        Constant.TITLE_MED_SUBSERIE_ADM_EDIFICACIONES           , 3, clase142);  //   Medell�n, Edificaciones
+      ClassificationClass clase144 = createClass( tenant1,        Constant.TITLE_MED_SUBSERIE_ADM_SERVICIOS               , 3, clase142);  //   Medell�n, Servicios p�blicos
+      ClassificationClass clase145 = createClass( tenant1, Constant.TITLE_SEDE_CALI                                       , 0, null);      //   Sede Cali
+      ClassificationClass clase146 = createClass( tenant1,   Constant.TITLE_CAL_OFICINA_SUBGERENCIA                       , 1, clase001);  //   Gerencia Cali
+      ClassificationClass clase147 = createClass( tenant1,     Constant.TITLE_CAL_SERIE_ACTAS                             , 2, clase146);  //   Cali, Actas
+      ClassificationClass clase148 = createClass( tenant1,       Constant.TITLE_CAL_SUBSERIE_ACTAS_JUNTA_DIRECTIVA        , 3, clase147);  //   Cali, Actas_junta_directiva
+      ClassificationClass clase149 = createClass( tenant1,       Constant.TITLE_CAL_SUBSERIE_ACTAS_COMITE_GERENCIA        , 3, clase147);  //   Cali, Actas_comit�_gerencia
+      ClassificationClass clase150 = createClass( tenant1,       Constant.TITLE_CAL_SUBSERIE_ACTAS_COMITE_FINANCIERO      , 3, clase147);  //   Cali, Actas_comit�_financiero
+      ClassificationClass clase151 = createClass( tenant1,       Constant.TITLE_CAL_SUBSERIE_ACTAS_COMITE_ADMINISTRATIVO  , 3, clase147);  //   Cali, Actas_comit�_administrativo
+      ClassificationClass clase152 = createClass( tenant1,       Constant.TITLE_CAL_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase147);  //   Cali, Actas_comit�_operaciones
+      ClassificationClass clase153 = createClass( tenant1,       Constant.TITLE_CAL_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase147);  //   Cali, Actas_comit�_operaciones
+      ClassificationClass clase154 = createClass( tenant1,     Constant.TITLE_CAL_SERIE_PLANES                            , 2, clase146);  //   Cali, Planes
+      ClassificationClass clase155 = createClass( tenant1,       Constant.TITLE_CAL_SUBSERIE_PLAN_OPERATIVO               , 3, clase154);  //   Cali, Plan_operativo
+      ClassificationClass clase156 = createClass( tenant1,       Constant.TITLE_CAL_SUBSERIE_PLAN_FINANCIERO              , 3, clase154);  //   Cali, Plan_financiero
+      ClassificationClass clase157 = createClass( tenant1,       Constant.TITLE_CAL_SUBSERIE_PRESUPUESTO                  , 3, clase154);  //   Cali, Presupuesto
+      ClassificationClass clase158 = createClass( tenant1,   Constant.TITLE_CAL_OFICINA_OPERACIONES                       , 1, clase001);  //   Cali, Subgerencia de Operaciones
+      ClassificationClass clase159 = createClass( tenant1,     Constant.TITLE_CAL_SERIE_ACTAS_OPERACIONES                 , 2, clase158);  //   Cali, Actas Operaciones
+      ClassificationClass clase160 = createClass( tenant1,        Constant.TITLE_CAL_SUBSERIE_OPER_CTAS_COMITE_CALIDAD    , 3, clase159);  //   Cali, Actas Comit� calidad
+      ClassificationClass clase161 = createClass( tenant1,        Constant.TITLE_CAL_SUBSERIE_OPER_CTAS_COMITE_PLANEACION , 3, clase159);  //   Cali, Actas Comit� planeaci�n
+      ClassificationClass clase162 = createClass( tenant1,     Constant.TITLE_CAL_SERIE_CONTRATOS                         , 2, clase158);  //   Cali, Contratos
+      ClassificationClass clase163 = createClass( tenant1,        Constant.TITLE_CAL_SUBSERIE_OPER_CONTRATOS_OPERACION    , 3, clase162);  //   Cali, Contratos de Operaci�n
+      ClassificationClass clase164 = createClass( tenant1,        Constant.TITLE_CAL_SUBSERIE_OPER_CONTRATOS_INVERSION    , 3, clase162);  //   Cali, Contratos de Inversi�n
+      ClassificationClass clase165 = createClass( tenant1,   Constant.TITLE_CAL_OFICINA_FINANCIERA                        , 1, clase001);  //   Cali, Subgerencia Financiera
+      ClassificationClass clase166 = createClass( tenant1,     Constant.TITLE_CAL_SERIE_PRESUPUESTO                       , 2, clase165);  //   Cali, Presupuesto
+      ClassificationClass clase167 = createClass( tenant1,        Constant.TITLE_CAL_SUBSERIE_FIN_PLANEACION_PPTAL        , 3, clase166);  //   Cali, Planeaci�n Presupuestal
+      ClassificationClass clase168 = createClass( tenant1,        Constant.TITLE_CAL_SUBSERIE_FIN_EJECUCION_PPTAL         , 3, clase166);  //   Cali, Ejecuci�n Presupuestal
+      ClassificationClass clase169 = createClass( tenant1,     Constant.TITLE_CAL_SERIE_TESORERIA                         , 2, clase165);  //   Cali, Tesorer�a
+      ClassificationClass clase170 = createClass( tenant1,        Constant.TITLE_CAL_SUBSERIE_FIN_PAGADURIA               , 3, clase169);  //   Cali, Pagadur�a
+      ClassificationClass clase171 = createClass( tenant1,        Constant.TITLE_CAL_SUBSERIE_FIN_INVERSIONES             , 3, clase169);  //   Cali, Inversiones
+      ClassificationClass clase172 = createClass( tenant1,     Constant.TITLE_CAL_SERIE_CONTABILIDAD                      , 2, clase165);  //   Cali, Contabilidad
+      ClassificationClass clase173 = createClass( tenant1,        Constant.TITLE_CAL_SUBSERIE_FIN_ESTADOS_FINANCIEROS     , 3, clase172);  //   Cali, Estados Financieros
+      ClassificationClass clase174 = createClass( tenant1,        Constant.TITLE_CAL_SUBSERIE_FIN_LIBROS_CONTABLES        , 3, clase172);  //   Cali, Libros contables
+      ClassificationClass clase175 = createClass( tenant1,   Constant.TITLE_CAL_OFICINA_PERSONAL                          , 1, clase001);  //   Cali, Subgerencia de Personal
+      ClassificationClass clase176 = createClass( tenant1,     Constant.TITLE_CAL_SERIE_HOJAS_DE_VIDA                     , 2, clase175);  //   Cali, Hojas de vida
+      ClassificationClass clase177 = createClass( tenant1,        Constant.TITLE_CAL_SUBSERIE_PER_CANDIDATOS              , 3, clase176);  //   Cali, Candidatos de personal
+      ClassificationClass clase178 = createClass( tenant1,        Constant.TITLE_CAL_SUBSERIE_PER_PERSONAL_ACTIVO         , 3, clase176);  //   Cali, Personal activo
+      ClassificationClass clase179 = createClass( tenant1,        Constant.TITLE_CAL_SUBSERIE_PER_PENSIONADOS             , 3, clase176);  //   Cali, Pensionados
+      ClassificationClass clase180 = createClass( tenant1,     Constant.TITLE_CAL_SERIE_SANCIONES                         , 2, clase175);  //   Cali, Sanciones de personal
+      ClassificationClass clase181 = createClass( tenant1,        Constant.TITLE_CAL_SUBSERIE_PER_INVESTIGACIONES         , 3, clase180);  //   Cali, Investigaciones disciplinarias
+      ClassificationClass clase182 = createClass( tenant1,        Constant.TITLE_CAL_SUBSERIE_PER_FALLOS_DE_PERSONAL      , 3, clase180);  //   Cali, Fallos de personal
+      ClassificationClass clase183 = createClass( tenant1,     Constant.TITLE_CAL_SERIE_EVALUACIONES                      , 2, clase175);  //   Cali, Evaluaciones de personal
+      ClassificationClass clase184 = createClass( tenant1,        Constant.TITLE_CAL_SUBSERIE_PER_DESEMPENO               , 3, clase183);  //   Cali, Evaluaciones de desempe�o
+      ClassificationClass clase185 = createClass( tenant1,   Constant.TITLE_CAL_OFICINA_JURIDICA                          , 1, clase001);  //   Cali, Subgerencia Jur�dica
+      ClassificationClass clase186 = createClass( tenant1,     Constant.TITLE_CAL_SERIE_PROCESOS                          , 2, clase185);  //   Cali, Procesos jur�dicos
+      ClassificationClass clase187 = createClass( tenant1,        Constant.TITLE_CAL_SUBSERIE_JUR_DEMANDAS                , 3, clase186);  //   Cali, Demandas en curso
+      ClassificationClass clase188 = createClass( tenant1,        Constant.TITLE_CAL_SUBSERIE_JUR_FALLOS_JUDICIALES       , 3, clase186);  //   Cali, Demandas en curso
+      ClassificationClass clase189 = createClass( tenant1,   Constant.TITLE_CAL_OFICINA_ADMINISTRACION                    , 1, clase001);  //   Cali, Subgerencia Administrativa
+      ClassificationClass clase190 = createClass( tenant1,     Constant.TITLE_CAL_SERIE_ACTIVOS_FIJOS                     , 2, clase189);  //   Cali, Activos fijos
+      ClassificationClass clase191 = createClass( tenant1,        Constant.TITLE_CAL_SUBSERIE_ADM_EDIFICACIONES           , 3, clase190);  //   Cali, Edificaciones
+      ClassificationClass clase192 = createClass( tenant1,        Constant.TITLE_CAL_SUBSERIE_ADM_SERVICIOS               , 3, clase190);  //   Cali, Servicios p�blicos
+      ClassificationClass clase193 = createClass( tenant1, Constant.TITLE_SEDE_BARRANQUILLA                               , 3, null);      //   Sede Barranquilla
+      ClassificationClass clase194 = createClass( tenant1,   Constant.TITLE_BAQ_OFICINA_SUBGERENCIA                       , 1, clase001);  //   Gerencia Barranquilla
+      ClassificationClass clase195 = createClass( tenant1,     Constant.TITLE_BAQ_SERIE_ACTAS                             , 2, clase194);  //   Barranquilla, Actas
+      ClassificationClass clase196 = createClass( tenant1,       Constant.TITLE_BAQ_SUBSERIE_ACTAS_JUNTA_DIRECTIVA        , 3, clase195);  //   Barranquilla, Actas_junta_directiva
+      ClassificationClass clase197 = createClass( tenant1,       Constant.TITLE_BAQ_SUBSERIE_ACTAS_COMITE_GERENCIA        , 3, clase195);  //   Barranquilla, Actas_comit�_gerencia
+      ClassificationClass clase198 = createClass( tenant1,       Constant.TITLE_BAQ_SUBSERIE_ACTAS_COMITE_FINANCIERO      , 3, clase195);  //   Barranquilla, Actas_comit�_financiero
+      ClassificationClass clase199 = createClass( tenant1,       Constant.TITLE_BAQ_SUBSERIE_ACTAS_COMITE_ADMINISTRATIVO  , 3, clase195);  //   Barranquilla, Actas_comit�_administrativo
+      ClassificationClass clase200 = createClass( tenant1,       Constant.TITLE_BAQ_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase195);  //   Barranquilla, Actas_comit�_operaciones
+      ClassificationClass clase201 = createClass( tenant1,       Constant.TITLE_BAQ_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase195);  //   Barranquilla, Actas_comit�_operaciones
+      ClassificationClass clase202 = createClass( tenant1,     Constant.TITLE_BAQ_SERIE_PLANES                            , 2, clase194);  //   Barranquilla, Planes
+      ClassificationClass clase203 = createClass( tenant1,       Constant.TITLE_BAQ_SUBSERIE_PLAN_OPERATIVO               , 3, clase202);  //   Barranquilla, Plan_operativo
+      ClassificationClass clase204 = createClass( tenant1,       Constant.TITLE_BAQ_SUBSERIE_PLAN_FINANCIERO              , 3, clase202);  //   Barranquilla, Plan_financiero
+      ClassificationClass clase205 = createClass( tenant1,       Constant.TITLE_BAQ_SUBSERIE_PRESUPUESTO                  , 3, clase202);  //   Barranquilla, Presupuesto
+      ClassificationClass clase206 = createClass( tenant1,   Constant.TITLE_BAQ_OFICINA_OPERACIONES                       , 1, clase001);  //   Barranquilla, Subgerencia de Operaciones
+      ClassificationClass clase207 = createClass( tenant1,     Constant.TITLE_BAQ_SERIE_ACTAS_OPERACIONES                 , 2, clase206);  //   Barranquilla, Actas Operaciones
+      ClassificationClass clase208 = createClass( tenant1,        Constant.TITLE_BAQ_SUBSERIE_OPER_CTAS_COMITE_CALIDAD    , 3, clase207);  //   Barranquilla, Actas Comit� calidad
+      ClassificationClass clase209 = createClass( tenant1,        Constant.TITLE_BAQ_SUBSERIE_OPER_CTAS_COMITE_PLANEACION , 3, clase207);  //   Barranquilla, Actas Comit� planeaci�n
+      ClassificationClass clase210 = createClass( tenant1,     Constant.TITLE_BAQ_SERIE_CONTRATOS                         , 2, clase206);  //   Barranquilla, Contratos
+      ClassificationClass clase211 = createClass( tenant1,        Constant.TITLE_BAQ_SUBSERIE_OPER_CONTRATOS_OPERACION    , 3, clase210);  //   Barranquilla, Contratos de Operaci�n
+      ClassificationClass clase212 = createClass( tenant1,        Constant.TITLE_BAQ_SUBSERIE_OPER_CONTRATOS_INVERSION    , 3, clase210);  //   Barranquilla, Contratos de Inversi�n
+      ClassificationClass clase213 = createClass( tenant1,   Constant.TITLE_BAQ_OFICINA_FINANCIERA                        , 1, clase001);  //   Barranquilla, Subgerencia Financiera
+      ClassificationClass clase214 = createClass( tenant1,     Constant.TITLE_BAQ_SERIE_PRESUPUESTO                       , 2, clase213);  //   Barranquilla, Presupuesto
+      ClassificationClass clase215 = createClass( tenant1,        Constant.TITLE_BAQ_SUBSERIE_FIN_PLANEACION_PPTAL        , 3, clase214);  //   Barranquilla, Planeaci�n Presupuestal
+      ClassificationClass clase216 = createClass( tenant1,        Constant.TITLE_BAQ_SUBSERIE_FIN_EJECUCION_PPTAL         , 3, clase214);  //   Barranquilla, Ejecuci�n Presupuestal
+      ClassificationClass clase217 = createClass( tenant1,     Constant.TITLE_BAQ_SERIE_TESORERIA                         , 2, clase213);  //   Barranquilla, Tesorer�a
+      ClassificationClass clase218 = createClass( tenant1,        Constant.TITLE_BAQ_SUBSERIE_FIN_PAGADURIA               , 3, clase217);  //   Barranquilla, Pagadur�a
+      ClassificationClass clase219 = createClass( tenant1,        Constant.TITLE_BAQ_SUBSERIE_FIN_INVERSIONES             , 3, clase217);  //   Barranquilla, Inversiones
+      ClassificationClass clase220 = createClass( tenant1,     Constant.TITLE_BAQ_SERIE_CONTABILIDAD                      , 2, clase213);  //   Barranquilla, Contabilidad
+      ClassificationClass clase221 = createClass( tenant1,        Constant.TITLE_BAQ_SUBSERIE_FIN_ESTADOS_FINANCIEROS     , 3, clase220);  //   Barranquilla, Estados Financieros
+      ClassificationClass clase222 = createClass( tenant1,        Constant.TITLE_BAQ_SUBSERIE_FIN_LIBROS_CONTABLES        , 3, clase220);  //   Barranquilla, Libros contables
+      ClassificationClass clase223 = createClass( tenant1,   Constant.TITLE_BAQ_OFICINA_PERSONAL                          , 1, clase001);  //   Barranquilla, Subgerencia de Personal
+      ClassificationClass clase224 = createClass( tenant1,     Constant.TITLE_BAQ_SERIE_HOJAS_DE_VIDA                     , 2, clase223);  //   Barranquilla, Hojas de vida
+      ClassificationClass clase225 = createClass( tenant1,        Constant.TITLE_BAQ_SUBSERIE_PER_CANDIDATOS              , 3, clase224);  //   Barranquilla, Candidatos de personal
+      ClassificationClass clase226 = createClass( tenant1,        Constant.TITLE_BAQ_SUBSERIE_PER_PERSONAL_ACTIVO         , 3, clase224);  //   Barranquilla, Personal activo
+      ClassificationClass clase227 = createClass( tenant1,        Constant.TITLE_BAQ_SUBSERIE_PER_PENSIONADOS             , 3, clase224);  //   Barranquilla, Pensionados
+      ClassificationClass clase228 = createClass( tenant1,     Constant.TITLE_BAQ_SERIE_SANCIONES                         , 2, clase223);  //   Barranquilla, Sanciones de personal
+      ClassificationClass clase229 = createClass( tenant1,        Constant.TITLE_BAQ_SUBSERIE_PER_INVESTIGACIONES         , 3, clase228);  //   Barranquilla, Investigaciones disciplinarias
+      ClassificationClass clase230 = createClass( tenant1,        Constant.TITLE_BAQ_SUBSERIE_PER_FALLOS_DE_PERSONAL      , 3, clase228);  //   Barranquilla, Fallos de personal
+      ClassificationClass clase231 = createClass( tenant1,     Constant.TITLE_BAQ_SERIE_EVALUACIONES                      , 2, clase223);  //   Barranquilla, Evaluaciones de personal
+      ClassificationClass clase232 = createClass( tenant1,        Constant.TITLE_BAQ_SUBSERIE_PER_DESEMPENO               , 3, clase231);  //   Barranquilla, Evaluaciones de desempe�o
+      ClassificationClass clase233 = createClass( tenant1,   Constant.TITLE_BAQ_OFICINA_JURIDICA                          , 1, clase001);  //   Barranquilla, Subgerencia Jur�dica
+      ClassificationClass clase234 = createClass( tenant1,     Constant.TITLE_BAQ_SERIE_PROCESOS                          , 2, clase233);  //   Barranquilla, Procesos jur�dicos
+      ClassificationClass clase235 = createClass( tenant1,        Constant.TITLE_BAQ_SUBSERIE_JUR_DEMANDAS                , 3, clase234);  //   Barranquilla, Demandas en curso
+      ClassificationClass clase236 = createClass( tenant1,        Constant.TITLE_BAQ_SUBSERIE_JUR_FALLOS_JUDICIALES       , 3, clase234);  //   Barranquilla, Demandas en curso
+      ClassificationClass clase237 = createClass( tenant1,   Constant.TITLE_BAQ_OFICINA_ADMINISTRACION                    , 1, clase001);  //   Barranquilla, Subgerencia Administrativa
+      ClassificationClass clase238 = createClass( tenant1,     Constant.TITLE_BAQ_SERIE_ACTIVOS_FIJOS                     , 2, clase237);  //   Barranquilla, Activos fijos
+      ClassificationClass clase239 = createClass( tenant1,        Constant.TITLE_BAQ_SUBSERIE_ADM_EDIFICACIONES           , 3, clase238);  //   Barranquilla, Edificaciones
+      ClassificationClass clase240 = createClass( tenant1,        Constant.TITLE_BAQ_SUBSERIE_ADM_SERVICIOS               , 3, clase238);  //   Barranquilla, Servicios p�blicos
+      ClassificationClass clase241 = createClass( tenant1, Constant.TITLE_SEDE_BUCARAMANGA                                , 3, null);      //   Sede Bucaramanga
+      ClassificationClass clase242 = createClass( tenant1,   Constant.TITLE_BUC_OFICINA_SUBGERENCIA                       , 1, clase001);  //   Gerencia Bucaramanga
+      ClassificationClass clase243 = createClass( tenant1,     Constant.TITLE_BUC_SERIE_ACTAS                             , 2, clase242);  //   Bucaramanga, Actas
+      ClassificationClass clase244 = createClass( tenant1,       Constant.TITLE_BUC_SUBSERIE_ACTAS_JUNTA_DIRECTIVA        , 3, clase243);  //   Bucaramanga, Actas_junta_directiva
+      ClassificationClass clase245 = createClass( tenant1,       Constant.TITLE_BUC_SUBSERIE_ACTAS_COMITE_GERENCIA        , 3, clase243);  //   Bucaramanga, Actas_comit�_gerencia
+      ClassificationClass clase246 = createClass( tenant1,       Constant.TITLE_BUC_SUBSERIE_ACTAS_COMITE_FINANCIERO      , 3, clase243);  //   Bucaramanga, Actas_comit�_financiero
+      ClassificationClass clase247 = createClass( tenant1,       Constant.TITLE_BUC_SUBSERIE_ACTAS_COMITE_ADMINISTRATIVO  , 3, clase243);  //   Bucaramanga, Actas_comit�_administrativo
+      ClassificationClass clase248 = createClass( tenant1,       Constant.TITLE_BUC_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase243);  //   Bucaramanga, Actas_comit�_operaciones
+      ClassificationClass clase249 = createClass( tenant1,       Constant.TITLE_BUC_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase243);  //   Bucaramanga, Actas_comit�_operaciones
+      ClassificationClass clase250 = createClass( tenant1,     Constant.TITLE_BUC_SERIE_PLANES                            , 2, clase242);  //   Bucaramanga, Planes
+      ClassificationClass clase251 = createClass( tenant1,       Constant.TITLE_BUC_SUBSERIE_PLAN_OPERATIVO               , 3, clase250);  //   Bucaramanga, Plan_operativo
+      ClassificationClass clase252 = createClass( tenant1,       Constant.TITLE_BUC_SUBSERIE_PLAN_FINANCIERO              , 3, clase250);  //   Bucaramanga, Plan_financiero
+      ClassificationClass clase253 = createClass( tenant1,       Constant.TITLE_BUC_SUBSERIE_PRESUPUESTO                  , 3, clase250);  //   Bucaramanga, Presupuesto
+      ClassificationClass clase254 = createClass( tenant1,   Constant.TITLE_BUC_OFICINA_OPERACIONES                       , 1, clase001);  //   Bucaramanga, Subgerencia de Operaciones
+      ClassificationClass clase255 = createClass( tenant1,     Constant.TITLE_BUC_SERIE_ACTAS_OPERACIONES                 , 2, clase254);  //   Bucaramanga, Actas Operaciones
+      ClassificationClass clase256 = createClass( tenant1,        Constant.TITLE_BUC_SUBSERIE_OPER_CTAS_COMITE_CALIDAD    , 3, clase255);  //   Bucaramanga, Actas Comit� calidad
+      ClassificationClass clase257 = createClass( tenant1,        Constant.TITLE_BUC_SUBSERIE_OPER_CTAS_COMITE_PLANEACION , 3, clase255);  //   Bucaramanga, Actas Comit� planeaci�n
+      ClassificationClass clase258 = createClass( tenant1,     Constant.TITLE_BUC_SERIE_CONTRATOS                         , 2, clase254);  //   Bucaramanga, Contratos
+      ClassificationClass clase259 = createClass( tenant1,        Constant.TITLE_BUC_SUBSERIE_OPER_CONTRATOS_OPERACION    , 3, clase258);  //   Bucaramanga, Contratos de Operaci�n
+      ClassificationClass clase260 = createClass( tenant1,        Constant.TITLE_BUC_SUBSERIE_OPER_CONTRATOS_INVERSION    , 3, clase258);  //   Bucaramanga, Contratos de Inversi�n
+      ClassificationClass clase261 = createClass( tenant1,   Constant.TITLE_BUC_OFICINA_FINANCIERA                        , 1, clase001);  //   Bucaramanga, Subgerencia Financiera
+      ClassificationClass clase262 = createClass( tenant1,     Constant.TITLE_BUC_SERIE_PRESUPUESTO                       , 2, clase261);  //   Bucaramanga, Presupuesto
+      ClassificationClass clase263 = createClass( tenant1,        Constant.TITLE_BUC_SUBSERIE_FIN_PLANEACION_PPTAL        , 3, clase262);  //   Bucaramanga, Planeaci�n Presupuestal
+      ClassificationClass clase264 = createClass( tenant1,        Constant.TITLE_BUC_SUBSERIE_FIN_EJECUCION_PPTAL         , 3, clase262);  //   Bucaramanga, Ejecuci�n Presupuestal
+      ClassificationClass clase265 = createClass( tenant1,     Constant.TITLE_BUC_SERIE_TESORERIA                         , 2, clase261);  //   Bucaramanga, Tesorer�a
+      ClassificationClass clase266 = createClass( tenant1,        Constant.TITLE_BUC_SUBSERIE_FIN_PAGADURIA               , 3, clase265);  //   Bucaramanga, Pagadur�a
+      ClassificationClass clase267 = createClass( tenant1,        Constant.TITLE_BUC_SUBSERIE_FIN_INVERSIONES             , 3, clase265);  //   Bucaramanga, Inversiones
+      ClassificationClass clase268 = createClass( tenant1,     Constant.TITLE_BUC_SERIE_CONTABILIDAD                      , 2, clase261);  //   Bucaramanga, Contabilidad
+      ClassificationClass clase269 = createClass( tenant1,        Constant.TITLE_BUC_SUBSERIE_FIN_ESTADOS_FINANCIEROS     , 3, clase268);  //   Bucaramanga, Estados Financieros
+      ClassificationClass clase270 = createClass( tenant1,        Constant.TITLE_BUC_SUBSERIE_FIN_LIBROS_CONTABLES        , 3, clase268);  //   Bucaramanga, Libros contables
+      ClassificationClass clase271 = createClass( tenant1,   Constant.TITLE_BUC_OFICINA_PERSONAL                          , 1, clase001);  //   Bucaramanga, Subgerencia de Personal
+      ClassificationClass clase272 = createClass( tenant1,     Constant.TITLE_BUC_SERIE_HOJAS_DE_VIDA                     , 2, clase271);  //   Bucaramanga, Hojas de vida
+      ClassificationClass clase273 = createClass( tenant1,        Constant.TITLE_BUC_SUBSERIE_PER_CANDIDATOS              , 3, clase272);  //   Bucaramanga, Candidatos de personal
+      ClassificationClass clase274 = createClass( tenant1,        Constant.TITLE_BUC_SUBSERIE_PER_PERSONAL_ACTIVO         , 3, clase272);  //   Bucaramanga, Personal activo
+      ClassificationClass clase275 = createClass( tenant1,        Constant.TITLE_BUC_SUBSERIE_PER_PENSIONADOS             , 3, clase272);  //   Bucaramanga, Pensionados
+      ClassificationClass clase276 = createClass( tenant1,     Constant.TITLE_BUC_SERIE_SANCIONES                         , 2, clase271);  //   Bucaramanga, Sanciones de personal
+      ClassificationClass clase277 = createClass( tenant1,        Constant.TITLE_BUC_SUBSERIE_PER_INVESTIGACIONES         , 3, clase276);  //   Bucaramanga, Investigaciones disciplinarias
+      ClassificationClass clase278 = createClass( tenant1,        Constant.TITLE_BUC_SUBSERIE_PER_FALLOS_DE_PERSONAL      , 3, clase276);  //   Bucaramanga, Fallos de personal
+      ClassificationClass clase279 = createClass( tenant1,     Constant.TITLE_BUC_SERIE_EVALUACIONES                      , 2, clase271);  //   Bucaramanga, Evaluaciones de personal
+      ClassificationClass clase280 = createClass( tenant1,        Constant.TITLE_BUC_SUBSERIE_PER_DESEMPENO               , 3, clase279);  //   Bucaramanga, Evaluaciones de desempe�o
+      ClassificationClass clase281 = createClass( tenant1,   Constant.TITLE_BUC_OFICINA_JURIDICA                          , 1, clase001);  //   Bucaramanga, Subgerencia Jur�dica
+      ClassificationClass clase282 = createClass( tenant1,     Constant.TITLE_BUC_SERIE_PROCESOS                          , 2, clase281);  //   Bucaramanga, Procesos jur�dicos
+      ClassificationClass clase283 = createClass( tenant1,        Constant.TITLE_BUC_SUBSERIE_JUR_DEMANDAS                , 3, clase282);  //   Bucaramanga, Demandas en curso
+      ClassificationClass clase284 = createClass( tenant1,        Constant.TITLE_BUC_SUBSERIE_JUR_FALLOS_JUDICIALES       , 3, clase282);  //   Bucaramanga, Demandas en curso
+      ClassificationClass clase285 = createClass( tenant1,   Constant.TITLE_BUC_OFICINA_ADMINISTRACION                    , 1, clase001);  //   Bucaramanga, Subgerencia Administrativa
+      ClassificationClass clase286 = createClass( tenant1,     Constant.TITLE_BUC_SERIE_ACTIVOS_FIJOS                     , 2, clase285);  //   Bucaramanga, Activos fijos
+      ClassificationClass clase287 = createClass( tenant1,        Constant.TITLE_BUC_SUBSERIE_ADM_EDIFICACIONES           , 3, clase286);  //   Bucaramanga, Edificaciones
+      ClassificationClass clase288 = createClass( tenant1,        Constant.TITLE_BUC_SUBSERIE_ADM_SERVICIOS               , 3, clase286);  //   Bucaramanga, Servicios p�blicos
+      ClassificationClass clase289 = createClass( tenant1, Constant.TITLE_SEDE_CARTAGENA                                  , 3, null);      //   Sede Cartagena
+      ClassificationClass clase290 = createClass( tenant1,   Constant.TITLE_CTG_OFICINA_SUBGERENCIA                       , 1, clase001);  //   Gerencia Cartagena
+      ClassificationClass clase291 = createClass( tenant1,     Constant.TITLE_CTG_SERIE__ACTAS                            , 2, clase290);  //   Cartagena, Actas
+      ClassificationClass clase292 = createClass( tenant1,       Constant.TITLE_CTG_SUBSERIE_ACTAS_JUNTA_DIRECTIVA        , 3, clase291);  //   Cartagena, Actas_junta_directiva
+      ClassificationClass clase293 = createClass( tenant1,       Constant.TITLE_CTG_SUBSERIE_ACTAS_COMITE_GERENCIA        , 3, clase291);  //   Cartagena, Actas_comit�_gerencia
+      ClassificationClass clase294 = createClass( tenant1,       Constant.TITLE_CTG_SUBSERIE_ACTAS_COMITE_FINANCIERO      , 3, clase291);  //   Cartagena, Actas_comit�_financiero
+      ClassificationClass clase295 = createClass( tenant1,       Constant.TITLE_CTG_SUBSERIE_ACTAS_COMITE_ADMINISTRATIVO  , 3, clase291);  //   Cartagena, Actas_comit�_administrativo
+      ClassificationClass clase296 = createClass( tenant1,       Constant.TITLE_CTG_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase291);  //   Cartagena, Actas_comit�_operaciones
+      ClassificationClass clase297 = createClass( tenant1,       Constant.TITLE_CTG_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase291);  //   Cartagena, Actas_comit�_operaciones
+      ClassificationClass clase298 = createClass( tenant1,     Constant.TITLE_CTG_SERIE_PLANES                            , 2, clase290);  //   Cartagena, Planes
+      ClassificationClass clase299 = createClass( tenant1,       Constant.TITLE_CTG_SUBSERIE_PLAN_OPERATIVO               , 3, clase298);  //   Cartagena, Plan_operativo
+      ClassificationClass clase300 = createClass( tenant1,       Constant.TITLE_CTG_SUBSERIE_PLAN_FINANCIERO              , 3, clase298);  //   Cartagena, Plan_financiero
+      ClassificationClass clase301 = createClass( tenant1,       Constant.TITLE_CTG_SUBSERIE_PRESUPUESTO                  , 3, clase298);  //   Cartagena, Presupuesto
+      ClassificationClass clase302 = createClass( tenant1,   Constant.TITLE_CTG_OFICINA_OPERACIONES                       , 1, clase001);  //   Cartagena, Subgerencia de Operaciones
+      ClassificationClass clase303 = createClass( tenant1,     Constant.TITLE_CTG_SERIE_ACTAS_OPERACIONES                 , 2, clase302);  //   Cartagena, Actas Operaciones
+      ClassificationClass clase304 = createClass( tenant1,        Constant.TITLE_CTG_SUBSERIE_OPER_CTAS_COMITE_CALIDAD    , 3, clase303);  //   Cartagena, Actas Comit� calidad
+      ClassificationClass clase305 = createClass( tenant1,        Constant.TITLE_CTG_SUBSERIE_OPER_CTAS_COMITE_PLANEACION , 3, clase303);  //   Cartagena, Actas Comit� planeaci�n
+      ClassificationClass clase306 = createClass( tenant1,     Constant.TITLE_CTG_SERIE_CONTRATOS                         , 2, clase302);  //   Cartagena, Contratos
+      ClassificationClass clase307 = createClass( tenant1,        Constant.TITLE_CTG_SUBSERIE_OPER_CONTRATOS_OPERACION    , 3, clase306);  //   Cartagena, Contratos de Operaci�n
+      ClassificationClass clase308 = createClass( tenant1,        Constant.TITLE_CTG_SUBSERIE_OPER_CONTRATOS_INVERSION    , 3, clase306);  //   Cartagena, Contratos de Inversi�n
+      ClassificationClass clase309 = createClass( tenant1,   Constant.TITLE_CTG_OFICINA_FINANCIERA                        , 1, clase001);  //   Cartagena, Subgerencia Financiera
+      ClassificationClass clase310 = createClass( tenant1,     Constant.TITLE_CTG_SERIE_PRESUPUESTO                       , 2, clase309);  //   Cartagena, Presupuesto
+      ClassificationClass clase311 = createClass( tenant1,        Constant.TITLE_CTG_SUBSERIE_FIN_PLANEACION_PPTAL        , 3, clase310);  //   Cartagena, Planeaci�n Presupuestal
+      ClassificationClass clase312 = createClass( tenant1,        Constant.TITLE_CTG_SUBSERIE_FIN_EJECUCION_PPTAL         , 3, clase310);  //   Cartagena, Ejecuci�n Presupuestal
+      ClassificationClass clase313 = createClass( tenant1,     Constant.TITLE_CTG_SERIE_TESORERIA                         , 2, clase309);  //   Cartagena, Tesorer�a
+      ClassificationClass clase314 = createClass( tenant1,        Constant.TITLE_CTG_SUBSERIE_FIN_PAGADURIA               , 3, clase313);  //   Cartagena, Pagadur�a
+      ClassificationClass clase315 = createClass( tenant1,        Constant.TITLE_CTG_SUBSERIE_FIN_INVERSIONES             , 3, clase313);  //   Cartagena, Inversiones
+      ClassificationClass clase316 = createClass( tenant1,     Constant.TITLE_CTG_SERIE_CONTABILIDAD                      , 2, clase309);  //   Cartagena, Contabilidad
+      ClassificationClass clase317 = createClass( tenant1,        Constant.TITLE_CTG_SUBSERIE_FIN_ESTADOS_FINANCIEROS     , 3, clase316);  //   Cartagena, Estados Financieros
+      ClassificationClass clase318 = createClass( tenant1,        Constant.TITLE_CTG_SUBSERIE_FIN_LIBROS_CONTABLES        , 3, clase316);  //   Cartagena, Libros contables
+      ClassificationClass clase319 = createClass( tenant1,   Constant.TITLE_CTG_OFICINA_PERSONAL                          , 1, clase001);  //   Cartagena, Subgerencia de Personal
+      ClassificationClass clase320 = createClass( tenant1,     Constant.TITLE_CTG_SERIE_HOJAS_DE_VIDA                     , 2, clase319);  //   Cartagena, Hojas de vida
+      ClassificationClass clase321 = createClass( tenant1,        Constant.TITLE_CTG_SUBSERIE_PER_CANDIDATOS              , 3, clase320);  //   Cartagena, Candidatos de personal
+      ClassificationClass clase322 = createClass( tenant1,        Constant.TITLE_CTG_SUBSERIE_PER_PERSONAL_ACTIVO         , 3, clase320);  //   Cartagena, Personal activo
+      ClassificationClass clase323 = createClass( tenant1,        Constant.TITLE_CTG_SUBSERIE_PER_PENSIONADOS             , 3, clase320);  //   Cartagena, Pensionados
+      ClassificationClass clase324 = createClass( tenant1,     Constant.TITLE_CTG_SERIE_SANCIONES                         , 2, clase319);  //   Cartagena, Sanciones de personal
+      ClassificationClass clase325 = createClass( tenant1,        Constant.TITLE_CTG_SUBSERIE_PER_INVESTIGACIONES         , 3, clase324);  //   Cartagena, Investigaciones disciplinarias
+      ClassificationClass clase326 = createClass( tenant1,        Constant.TITLE_CTG_SUBSERIE_PER_FALLOS_DE_PERSONAL      , 3, clase324);  //   Cartagena, Fallos de personal
+      ClassificationClass clase327 = createClass( tenant1,     Constant.TITLE_CTG_SERIE_EVALUACIONES                      , 2, clase319);  //   Cartagena, Evaluaciones de personal
+      ClassificationClass clase328 = createClass( tenant1,        Constant.TITLE_CTG_SUBSERIE_PER_DESEMPENO               , 3, clase327);  //   Cartagena, Evaluaciones de desempe�o
+      ClassificationClass clase329 = createClass( tenant1,   Constant.TITLE_CTG_OFICINA_JURIDICA                          , 1, clase001);  //   Cartagena, Subgerencia Jur�dica
+      ClassificationClass clase330 = createClass( tenant1,     Constant.TITLE_CTG_SERIE_PROCESOS                          , 2, clase329);  //   Cartagena, Procesos jur�dicos
+      ClassificationClass clase331 = createClass( tenant1,        Constant.TITLE_CTG_SUBSERIE_JUR_DEMANDAS                , 3, clase330);  //   Cartagena, Demandas en curso
+      ClassificationClass clase332 = createClass( tenant1,        Constant.TITLE_CTG_SUBSERIE_JUR_FALLOS_JUDICIALES       , 3, clase330);  //   Cartagena, Demandas en curso
+      ClassificationClass clase333 = createClass( tenant1,   Constant.TITLE_CTG_OFICINA_ADMINISTRACION                    , 1, clase001);  //   Cartagena, Subgerencia Administrativa
+      ClassificationClass clase334 = createClass( tenant1,     Constant.TITLE_CTG_SERIE_ACTIVOS_FIJOS                     , 2, clase333);  //   Cartagena, Activos fijos
+      ClassificationClass clase335 = createClass( tenant1,        Constant.TITLE_CTG_SUBSERIE_ADM_EDIFICACIONES           , 3, clase334);  //   Cartagena, Edificaciones
+      ClassificationClass clase336 = createClass( tenant1,        Constant.TITLE_CTG_SUBSERIE_ADM_SERVICIOS               , 3, clase334);  //   Cartagena, Servicios p�blicos
+
+
       getLogger().info("... generating users");
       User baker = createBaker(userRepository, passwordEncoder);
       User barista = createBarista(userRepository, passwordEncoder);
@@ -218,11 +560,25 @@ public class DataGenerator implements HasLogger {
 
    private ObjectToProtect createObject( Tenant tenant, String name, ObjectToProtect owner)
    {
-      ObjectToProtect obj = new ObjectToProtect( name, owner);
+      ObjectToProtect obj = new ObjectToProtect( name, owner, ObjectToProtect.Type.OPERATION);
       obj.setTenant(tenant);
       ObjectToProtect savedObject = objectToProtectRepository.saveAndFlush(obj);
       return savedObject;
    }//createObject
+   
+
+   private ClassificationClass createClass( Tenant tenant,  String name, int level, ClassificationClass parent)
+   {
+      ClassificationClass classificationClass = new ClassificationClass(level, name, parent);
+      classificationClass.setTenant(tenant);    
+      ObjectToProtect associatedObject = classificationClass.getObjectToProtect();
+      associatedObject.setTenant(tenant);
+      objectToProtectRepository.saveAndFlush(associatedObject);
+      claseRepository.saveAndFlush(classificationClass);
+      return classificationClass;
+   }//createClass
+   
+   
 
    private Tenant createTenant(TenantRepository tenantRepository, String name)
    {
