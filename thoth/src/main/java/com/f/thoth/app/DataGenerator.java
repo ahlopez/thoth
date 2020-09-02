@@ -25,11 +25,15 @@ import com.f.thoth.backend.data.entity.PickupLocation;
 import com.f.thoth.backend.data.entity.Product;
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.gdoc.classification.ClassificationClass;
+import com.f.thoth.backend.data.gdoc.classification.ClassificationLevel;
+import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.security.ObjectToProtect;
+import com.f.thoth.backend.data.security.Operation;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.ClassificationClassRepository;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
+import com.f.thoth.backend.repositories.OperationRepository;
 import com.f.thoth.backend.repositories.OrderRepository;
 import com.f.thoth.backend.repositories.PickupLocationRepository;
 import com.f.thoth.backend.repositories.ProductRepository;
@@ -64,17 +68,16 @@ public class DataGenerator implements HasLogger {
    private UserRepository                userRepository;
    private ProductRepository             productRepository;
    private ObjectToProtectRepository     objectToProtectRepository;
+   private OperationRepository           operationRepository;
    private PickupLocationRepository      pickupLocationRepository;
    private PasswordEncoder               passwordEncoder;
    private ClassificationClassRepository claseRepository;
 
-   private int itemSequence = 0;
-
    @Autowired
    public DataGenerator(TenantService tenantService, OrderRepository orderRepository, UserRepository userRepository,
          ProductRepository productRepository, PickupLocationRepository pickupLocationRepository,
-         TenantRepository tenantRepository, RoleRepository roleRepository, ObjectToProtectRepository objectToProtectRepository,
-         ClassificationClassRepository claseRepository,
+         TenantRepository tenantRepository, RoleRepository roleRepository, OperationRepository operationRepository,
+         ClassificationClassRepository claseRepository, ObjectToProtectRepository objectToProtectRepository,
          PasswordEncoder passwordEncoder)
    {
       this.tenantService             = tenantService;
@@ -85,6 +88,7 @@ public class DataGenerator implements HasLogger {
       this.tenantRepository          = tenantRepository;
       this.roleRepository            = roleRepository;
       this.objectToProtectRepository = objectToProtectRepository;
+      this.operationRepository       = operationRepository;
       this.claseRepository           = claseRepository;
       this.passwordEncoder           = passwordEncoder;
 
@@ -133,70 +137,70 @@ public class DataGenerator implements HasLogger {
       tenant2.addRole(role10);
 
       getLogger().info("... generating Objects to protect" );
-      ObjectToProtect obj01 = createObject( tenant1, Constant.TITLE_CLIENTES                                , null );  // Clientes
-      ObjectToProtect obj02 = createObject( tenant1,    Constant.TITLE_TENANTS                              , obj01);  // Fondo
-      ObjectToProtect obj03 = createObject( tenant1, Constant.TITLE_SEGURIDAD                               , null );  // Seguridad
-      ObjectToProtect obj04 = createObject( tenant1,    Constant.TITLE_OBJETOS                              , obj03);  // Operaciones
-      ObjectToProtect obj05 = createObject( tenant1,    Constant.TITLE_INFORMACION                          , obj03);  // Informacion
-      ObjectToProtect obj06 = createObject( tenant1,    Constant.TITLE_ROLES                                , obj03);  // Roles
-      ObjectToProtect obj07 = createObject( tenant1,    Constant.TITLE_PERMISOS_EJECUCION                   , obj03);  // Permisos de ejecucion
-      ObjectToProtect obj08 = createObject( tenant1,    Constant.TITLE_PERMISOS_ACCESO                      , obj03);  // Permisos de acceso
-      ObjectToProtect obj09 = createObject( tenant1, Constant.TITLE_ADMINISTRACION                          , null );  // Administracion
-      ObjectToProtect obj10 = createObject( tenant1,    Constant.TITLE_PARAMETROS                           , obj09);  // Parametros
-      ObjectToProtect obj11 = createObject( tenant1,    Constant.TITLE_USUARIOS                             , obj09);  // Usuarios
-      ObjectToProtect obj12 = createObject( tenant1,    Constant.TITLE_GRUPOS_USUARIOS                      , obj09);  // Grupos de usuarios
-      ObjectToProtect obj13 = createObject( tenant1, Constant.TITLE_CLASIFICACION                           , null );  // Clasificacion
-      ObjectToProtect obj14 = createObject( tenant1,    Constant.TITLE_FONDOS                               , obj13);  // Fondos
-      ObjectToProtect obj15 = createObject( tenant1,    Constant.TITLE_OFICINAS                             , obj13);  // Oficinas
-      ObjectToProtect obj16 = createObject( tenant1,    Constant.TITLE_SERIES                               , obj13);  // Series
-      ObjectToProtect obj17 = createObject( tenant1,    Constant.TITLE_SUBSERIES                            , obj13);  // Subseries
-      ObjectToProtect obj18 = createObject( tenant1,    Constant.TITLE_TIPOS_DOCUMENTALES                   , obj13);  // Tipos documentales
-      ObjectToProtect obj19 = createObject( tenant1, Constant.TITLE_ADMIN_EXPEDIENTES                       , null );  // Gestion expedientes
-      ObjectToProtect obj20 = createObject( tenant1,    Constant.TITLE_EXPEDIENTES                          , obj19);  // Expedientes mayores
-      ObjectToProtect obj21 = createObject( tenant1,    Constant.TITLE_SUBEXPEDIENTES                       , obj19);  // Sub-expedientes
-      ObjectToProtect obj22 = createObject( tenant1,    Constant.TITLE_VOLUMENES                            , obj19);  // Volumenes
-      ObjectToProtect obj23 = createObject( tenant1,    Constant.TITLE_INDICE                               , obj19);  // Indice de expedientes
-      ObjectToProtect obj24 = createObject( tenant1,    Constant.TITLE_EXPORTACION                          , obj19);  // Exportacion de expedientes
-      ObjectToProtect obj25 = createObject( tenant1,    Constant.TITLE_IMPORTACION                          , obj19);  // Importacion de expedientes
-      ObjectToProtect obj26 = createObject( tenant1,    Constant.TITLE_COPIA_DOCUMENTOS                     , obj19);  // Copia documento a otro expediente
-      ObjectToProtect obj27 = createObject( tenant1,    Constant.TITLE_TRANSER_DOCUMENTOS                   , obj19);  // Transferencia de documento a otro expediente
-      ObjectToProtect obj28 = createObject( tenant1, Constant.TITLE_TRAMITE                                 , null );  // Tramite de documentos
-      ObjectToProtect obj29 = createObject( tenant1,    Constant.TITLE_BANDEJA                              , obj28);  // Bandeja personal
-      ObjectToProtect obj30 = createObject( tenant1,    Constant.TITLE_CLASIFICACION_DOCUMENTOS             , obj28);  // Clasificacion de documento
-      ObjectToProtect obj31 = createObject( tenant1,    Constant.TITLE_RETORNO                              , obj28);  // Devolucion de documento
-      ObjectToProtect obj32 = createObject( tenant1,    Constant.TITLE_RE_ENVIO                             , obj28);  // Re-envio de documento
-      ObjectToProtect obj33 = createObject( tenant1,    Constant.TITLE_BORRADORES                           , obj28);  // Carga borrador de documento
-      ObjectToProtect obj34 = createObject( tenant1,    Constant.TITLE_FIRMA                                , obj28);  // Firma de documento
-      ObjectToProtect obj35 = createObject( tenant1,    Constant.TITLE_ENVIO                                , obj28);  // Ordena envio de documento
-      ObjectToProtect obj36 = createObject( tenant1, Constant.TITLE_RECEPCION                               , null );  // Recepcion de documentos
-      ObjectToProtect obj37 = createObject( tenant1,    Constant.TITLE_RECEPCION_DOCUMENTOS                 , obj36);  // Recepcion en ventanilla
-      ObjectToProtect obj38 = createObject( tenant1,    Constant.TITLE_RECEPCION_E_MAIL                     , obj36);  // Recepcion correo electronico
-      ObjectToProtect obj39 = createObject( tenant1,    Constant.TITLE_DIGITALIZACION                       , obj36);  // Digitalizacion
-      ObjectToProtect obj40 = createObject( tenant1,    Constant.TITLE_DIRECCIONAMIENTO                     , obj36);  // Enrutamiento de documentos
-      ObjectToProtect obj41 = createObject( tenant1, Constant.TITLE_CORRESPONDENCIA_EXTERNA                 , null );  // Envio de documentos
-      ObjectToProtect obj42 = createObject( tenant1,    Constant.TITLE_REGISTRO_ENVIOS                      , obj41);  // Consolidacion envoos externos
-      ObjectToProtect obj43 = createObject( tenant1,    Constant.TITLE_ENVIO_EXTERNO                        , obj41);  // Envia correspondencia externa
-      ObjectToProtect obj44 = createObject( tenant1,    Constant.TITLE_CONFIRMACION_ENVIO                   , obj41);  // Confirmacion de recepcion
-      ObjectToProtect obj45 = createObject( tenant1, Constant.TITLE_CONSULTA                                , null );  // Consulta
-      ObjectToProtect obj46 = createObject( tenant1,    Constant.TITLE_DOCUMENTOS                           , obj45);  // Consulta de documentos
-      ObjectToProtect obj47 = createObject( tenant1,       Constant.TITLE_CONSULTA_LIBRE                    , obj46);  // Consulta libre documentos
-      ObjectToProtect obj48 = createObject( tenant1,       Constant.TITLE_CONSULTA_METADATOS                , obj46);  // Consulta documentos segun metadatos
-      ObjectToProtect obj49 = createObject( tenant1,    Constant.TITLE_CONSULTA_EXPEDIENTES                 , obj45);  // Consulta de expedientes
-      ObjectToProtect obj50 = createObject( tenant1,       Constant.TITLE_CONSULTA_EXPEDIENTES_LIBRE        , obj49);  // Consulta de expedientes segun texto libre
-      ObjectToProtect obj51 = createObject( tenant1,       Constant.TITLE_CONSULTA_EXPEDIENTES_METADATOS    , obj49);  // Consulta de expedientes segun metadatos
-      ObjectToProtect obj52 = createObject( tenant1,       Constant.TITLE_CONSULTA_EXPEDIENTES_CLASIFICACION, obj49);  // Consulta de expedientes segun clasificacion
-      ObjectToProtect obj53 = createObject( tenant1, Constant.TITLE_PROCESOS                                , null );  // Procesos
-      ObjectToProtect obj54 = createObject( tenant1,    Constant.TITLE_EJECUCION_PROCESO                    , obj53);  // Ejecucion de proceso
-      ObjectToProtect obj55 = createObject( tenant1,    Constant.TITLE_DEFINICION_PROCESO                   , obj53);  // Definicion de proceso
-      ObjectToProtect obj56 = createObject( tenant1, Constant.TITLE_ARCHIVO                                 , null );  // Archivo
-      ObjectToProtect obj57 = createObject( tenant1,    Constant.TITLE_LOCALES                              , obj56);  // Locales
-      ObjectToProtect obj58 = createObject( tenant1,    Constant.TITLE_TRANSFERENCIA                        , obj56);  // Preparacion de transferencia
-      ObjectToProtect obj59 = createObject( tenant1,    Constant.TITLE_RECIBO_TRANSFERENCIA                 , obj56);  // Recepcion de transferencia
-      ObjectToProtect obj60 = createObject( tenant1,    Constant.TITLE_LOCALIZACION                         , obj56);  // Localizacion de documentos
-      ObjectToProtect obj61 = createObject( tenant1,    Constant.TITLE_PRESTAMO                             , obj56);  // Prestamos
-      ObjectToProtect obj62 = createObject( tenant1,       Constant.TITLE_PRESTAMO_EXPEDIENTE               , obj61);  // Prestamo de expedientes
-      ObjectToProtect obj63 = createObject( tenant1,       Constant.TITLE_DEVOLUCION                        , obj61);  // Retorno de expediente
-      ObjectToProtect obj64 = createObject( tenant1,    Constant.TITLE_INDICES_ARCHIVO                      , obj56);  // Indice de archivo
+      Operation obj01 = createOperation( tenant1, Constant.TITLE_CLIENTES                                , null );  // Clientes
+      Operation obj02 = createOperation( tenant1,    Constant.TITLE_TENANTS                              , obj01);  // Fondo
+      Operation obj03 = createOperation( tenant1, Constant.TITLE_SEGURIDAD                               , null );  // Seguridad
+      Operation obj04 = createOperation( tenant1,    Constant.TITLE_OPERATIONS                           , obj03);  // Operaciones
+      Operation obj05 = createOperation( tenant1,    Constant.TITLE_INFORMACION                          , obj03);  // Informacion
+      Operation obj06 = createOperation( tenant1,    Constant.TITLE_ROLES                                , obj03);  // Roles
+      Operation obj07 = createOperation( tenant1,    Constant.TITLE_PERMISOS_EJECUCION                   , obj03);  // Permisos de ejecucion
+      Operation obj08 = createOperation( tenant1,    Constant.TITLE_PERMISOS_ACCESO                      , obj03);  // Permisos de acceso
+      Operation obj09 = createOperation( tenant1, Constant.TITLE_ADMINISTRACION                          , null );  // Administracion
+      Operation obj10 = createOperation( tenant1,    Constant.TITLE_PARAMETROS                           , obj09);  // Parametros
+      Operation obj11 = createOperation( tenant1,    Constant.TITLE_USUARIOS                             , obj09);  // Usuarios
+      Operation obj12 = createOperation( tenant1,    Constant.TITLE_GRUPOS_USUARIOS                      , obj09);  // Grupos de usuarios
+      Operation obj13 = createOperation( tenant1, Constant.TITLE_CLASIFICACION                           , null );  // Clasificacion
+      Operation obj14 = createOperation( tenant1,    Constant.TITLE_FONDOS                               , obj13);  // Fondos
+      Operation obj15 = createOperation( tenant1,    Constant.TITLE_OFICINAS                             , obj13);  // Oficinas
+      Operation obj16 = createOperation( tenant1,    Constant.TITLE_SERIES                               , obj13);  // Series
+      Operation obj17 = createOperation( tenant1,    Constant.TITLE_SUBSERIES                            , obj13);  // Subseries
+      Operation obj18 = createOperation( tenant1,    Constant.TITLE_TIPOS_DOCUMENTALES                   , obj13);  // Tipos documentales
+      Operation obj19 = createOperation( tenant1, Constant.TITLE_ADMIN_EXPEDIENTES                       , null );  // Gestion expedientes
+      Operation obj20 = createOperation( tenant1,    Constant.TITLE_EXPEDIENTES                          , obj19);  // Expedientes mayores
+      Operation obj21 = createOperation( tenant1,    Constant.TITLE_SUBEXPEDIENTES                       , obj19);  // Sub-expedientes
+      Operation obj22 = createOperation( tenant1,    Constant.TITLE_VOLUMENES                            , obj19);  // Volumenes
+      Operation obj23 = createOperation( tenant1,    Constant.TITLE_INDICE                               , obj19);  // Indice de expedientes
+      Operation obj24 = createOperation( tenant1,    Constant.TITLE_EXPORTACION                          , obj19);  // Exportacion de expedientes
+      Operation obj25 = createOperation( tenant1,    Constant.TITLE_IMPORTACION                          , obj19);  // Importacion de expedientes
+      Operation obj26 = createOperation( tenant1,    Constant.TITLE_COPIA_DOCUMENTOS                     , obj19);  // Copia documento a otro expediente
+      Operation obj27 = createOperation( tenant1,    Constant.TITLE_TRANSER_DOCUMENTOS                   , obj19);  // Transferencia de documento a otro expediente
+      Operation obj28 = createOperation( tenant1, Constant.TITLE_TRAMITE                                 , null );  // Tramite de documentos
+      Operation obj29 = createOperation( tenant1,    Constant.TITLE_BANDEJA                              , obj28);  // Bandeja personal
+      Operation obj30 = createOperation( tenant1,    Constant.TITLE_CLASIFICACION_DOCUMENTOS             , obj28);  // Clasificacion de documento
+      Operation obj31 = createOperation( tenant1,    Constant.TITLE_RETORNO                              , obj28);  // Devolucion de documento
+      Operation obj32 = createOperation( tenant1,    Constant.TITLE_RE_ENVIO                             , obj28);  // Re-envio de documento
+      Operation obj33 = createOperation( tenant1,    Constant.TITLE_BORRADORES                           , obj28);  // Carga borrador de documento
+      Operation obj34 = createOperation( tenant1,    Constant.TITLE_FIRMA                                , obj28);  // Firma de documento
+      Operation obj35 = createOperation( tenant1,    Constant.TITLE_ENVIO                                , obj28);  // Ordena envio de documento
+      Operation obj36 = createOperation( tenant1, Constant.TITLE_RECEPCION                               , null );  // Recepcion de documentos
+      Operation obj37 = createOperation( tenant1,    Constant.TITLE_RECEPCION_DOCUMENTOS                 , obj36);  // Recepcion en ventanilla
+      Operation obj38 = createOperation( tenant1,    Constant.TITLE_RECEPCION_E_MAIL                     , obj36);  // Recepcion correo electronico
+      Operation obj39 = createOperation( tenant1,    Constant.TITLE_DIGITALIZACION                       , obj36);  // Digitalizacion
+      Operation obj40 = createOperation( tenant1,    Constant.TITLE_DIRECCIONAMIENTO                     , obj36);  // Enrutamiento de documentos
+      Operation obj41 = createOperation( tenant1, Constant.TITLE_CORRESPONDENCIA_EXTERNA                 , null );  // Envio de documentos
+      Operation obj42 = createOperation( tenant1,    Constant.TITLE_REGISTRO_ENVIOS                      , obj41);  // Consolidacion envoos externos
+      Operation obj43 = createOperation( tenant1,    Constant.TITLE_ENVIO_EXTERNO                        , obj41);  // Envia correspondencia externa
+      Operation obj44 = createOperation( tenant1,    Constant.TITLE_CONFIRMACION_ENVIO                   , obj41);  // Confirmacion de recepcion
+      Operation obj45 = createOperation( tenant1, Constant.TITLE_CONSULTA                                , null );  // Consulta
+      Operation obj46 = createOperation( tenant1,    Constant.TITLE_DOCUMENTOS                           , obj45);  // Consulta de documentos
+      Operation obj47 = createOperation( tenant1,       Constant.TITLE_CONSULTA_LIBRE                    , obj46);  // Consulta libre documentos
+      Operation obj48 = createOperation( tenant1,       Constant.TITLE_CONSULTA_METADATOS                , obj46);  // Consulta documentos segun metadatos
+      Operation obj49 = createOperation( tenant1,    Constant.TITLE_CONSULTA_EXPEDIENTES                 , obj45);  // Consulta de expedientes
+      Operation obj50 = createOperation( tenant1,       Constant.TITLE_CONSULTA_EXPEDIENTES_LIBRE        , obj49);  // Consulta de expedientes segun texto libre
+      Operation obj51 = createOperation( tenant1,       Constant.TITLE_CONSULTA_EXPEDIENTES_METADATOS    , obj49);  // Consulta de expedientes segun metadatos
+      Operation obj52 = createOperation( tenant1,       Constant.TITLE_CONSULTA_EXPEDIENTES_CLASIFICACION, obj49);  // Consulta de expedientes segun clasificacion
+      Operation obj53 = createOperation( tenant1, Constant.TITLE_PROCESOS                                , null );  // Procesos
+      Operation obj54 = createOperation( tenant1,    Constant.TITLE_EJECUCION_PROCESO                    , obj53);  // Ejecucion de proceso
+      Operation obj55 = createOperation( tenant1,    Constant.TITLE_DEFINICION_PROCESO                   , obj53);  // Definicion de proceso
+      Operation obj56 = createOperation( tenant1, Constant.TITLE_ARCHIVO                                 , null );  // Archivo
+      Operation obj57 = createOperation( tenant1,    Constant.TITLE_LOCALES                              , obj56);  // Locales
+      Operation obj58 = createOperation( tenant1,    Constant.TITLE_TRANSFERENCIA                        , obj56);  // Preparacion de transferencia
+      Operation obj59 = createOperation( tenant1,    Constant.TITLE_RECIBO_TRANSFERENCIA                 , obj56);  // Recepcion de transferencia
+      Operation obj60 = createOperation( tenant1,    Constant.TITLE_LOCALIZACION                         , obj56);  // Localizacion de documentos
+      Operation obj61 = createOperation( tenant1,    Constant.TITLE_PRESTAMO                             , obj56);  // Prestamos
+      Operation obj62 = createOperation( tenant1,       Constant.TITLE_PRESTAMO_EXPEDIENTE               , obj61);  // Prestamo de expedientes
+      Operation obj63 = createOperation( tenant1,       Constant.TITLE_DEVOLUCION                        , obj61);  // Retorno de expediente
+      Operation obj64 = createOperation( tenant1,    Constant.TITLE_INDICES_ARCHIVO                      , obj56);  // Indice de archivo
 
       ClassificationClass clase001 = createClass( tenant1, Constant.TITLE_SEDE_CORPORATIVA                                , 0, null);      //   Sede Corporativa
       ClassificationClass clase002 = createClass( tenant1,   Constant.TITLE_CRP_OFICINA_GERENCIA_GENERAL                  , 1, clase001);  //   Corporativa, Gerencia_general
@@ -558,21 +562,23 @@ public class DataGenerator implements HasLogger {
 
    }//loadData
 
-   private ObjectToProtect createObject( Tenant tenant, String name, ObjectToProtect owner)
+   private Operation createOperation( Tenant tenant, String name, Operation owner)
    {
-      ObjectToProtect obj = new ObjectToProtect( name, owner, ObjectToProtect.Type.OPERATION);
-      obj.setTenant(tenant);
-      ObjectToProtect savedObject = objectToProtectRepository.saveAndFlush(obj);
-      return savedObject;
+      Operation operation = new Operation( name, new ObjectToProtect(), owner);
+      operation.setTenant(tenant);
+      objectToProtectRepository.saveAndFlush( operation.getObjectToProtect());
+      Operation savedOperation = operationRepository.saveAndFlush(operation);
+      return savedOperation;
    }//createObject
    
 
    private ClassificationClass createClass( Tenant tenant,  String name, int level, ClassificationClass parent)
    {
-      ClassificationClass classificationClass = new ClassificationClass(level, name, parent);
+      ClassificationClass classificationClass = 
+            new ClassificationClass( new ClassificationLevel(level, Schema.EMPTY), name, parent, new ObjectToProtect());
+      
       classificationClass.setTenant(tenant);    
       ObjectToProtect associatedObject = classificationClass.getObjectToProtect();
-      associatedObject.setTenant(tenant);
       objectToProtectRepository.saveAndFlush(associatedObject);
       claseRepository.saveAndFlush(classificationClass);
       return classificationClass;
@@ -610,7 +616,6 @@ public class DataGenerator implements HasLogger {
       String first = getRandom(FIRST_NAME);
       String last = getRandom(LAST_NAME);
       customer.setFullName(first + " " + last);
-      customer.setCode( ""+ (++itemSequence));
       customer.setPhoneNumber(getRandomPhone());
       if (random.nextInt(10) == 0) {
          customer.setDetails("Very important customer");
@@ -658,7 +663,6 @@ public class DataGenerator implements HasLogger {
       fillCustomer(order.getCustomer());
       order.setPickupLocation(pickupLocationSupplier.get());
       order.setDueDate(dueDate);
-      order.setCode( ""+ (++itemSequence));
       order.setDueTime(getRandomDueTime());
       order.changeState(barista, getRandomState(order.getDueDate()));
 
@@ -666,7 +670,6 @@ public class DataGenerator implements HasLogger {
       List<OrderItem> items = new ArrayList<>();
       for (int i = 0; i <= itemCount; i++) {
          OrderItem item = new OrderItem();
-         item.setCode(""+ (++itemSequence));
          Product product;
          do {
             product = productSupplier.get();
@@ -806,7 +809,6 @@ public class DataGenerator implements HasLogger {
    {
       PickupLocation store = new PickupLocation();
       store.setName(name);
-      store.setCode( name);
       return store;
    }//createPickupLocation
 
@@ -816,7 +818,6 @@ public class DataGenerator implements HasLogger {
       for (int i = 0; i < numberOfItems; i++) {
          Product product = new Product();
          product.setName(getRandomProductName()+i);
-         product.setCode(product.getName());
          double doublePrice = 2.0 + random.nextDouble() * 100.0;
          product.setPrice((int) (doublePrice * 100.0));
          products.add(productsRepo.save(product));
@@ -884,7 +885,6 @@ public class DataGenerator implements HasLogger {
    {
       User user = new User();
       user.setEmail(email);
-      user.setCode(email);
       user.setFirstName(firstName);
       user.setLastName(lastName);
       user.setPasswordHash(passwordHash);

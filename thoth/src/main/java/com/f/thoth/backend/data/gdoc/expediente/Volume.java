@@ -26,7 +26,7 @@ import com.f.thoth.backend.data.gdoc.metadata.DocType;
 public class Volume extends Expediente
 {
    @ManyToOne
-   public Expediente    parent;
+   public BranchExpediente    parent;
    
    @Transient
    public Set<Document> documents;
@@ -44,7 +44,7 @@ public class Volume extends Expediente
    }//Volume
 
 
-   public Volume( Set<Document> documents, Set<DocType> admissibleTypes, Expediente parent)
+   public Volume( Set<Document> documents, Set<DocType> admissibleTypes, BranchExpediente parent)
    {
       super();
       if ( admissibleTypes == null || admissibleTypes.size() == 0)
@@ -58,8 +58,8 @@ public class Volume extends Expediente
    // ------------------ Getters & Setters ----------------------
 
 
-   public Expediente getParent() {return parent;}
-   public void setParent(Expediente parent) {this.parent = parent;}
+   public BranchExpediente getParent() {return parent;}
+   public void setParent(BranchExpediente parent) {this.parent = parent;}
 
    public Set<Document> getDocuments() {return documents;}
    public void setDocuments(Set<Document> documents) {   this.documents = documents;}

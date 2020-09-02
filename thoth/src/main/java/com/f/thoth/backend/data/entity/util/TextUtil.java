@@ -223,7 +223,7 @@ public class TextUtil
       if ( source == null)
          return false;
 
-      return source.matches("([a-z][a-zA-Z0-9_-]){1,255}");
+      return source.matches("[a-zA-Z]([a-zA-Z0-9_-]){1,255}");
 
     }//isValidName
 

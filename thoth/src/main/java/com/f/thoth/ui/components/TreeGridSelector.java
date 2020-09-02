@@ -102,7 +102,6 @@ public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValu
       sGrid.setVisible(false);
       sGrid.setWidthFull();
       sGrid.addColumn(T::getName).setHeader("Nombre").setFlexGrow(50);
-      sGrid.addColumn(T::getCode).setHeader("ID").setFlexGrow(50);
       sGrid.setSelectionMode(selectionMode);
       addValueChangeListener(sGrid, tGrid);
 

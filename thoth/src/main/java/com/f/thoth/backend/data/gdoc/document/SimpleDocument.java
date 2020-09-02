@@ -1,7 +1,6 @@
 package com.f.thoth.backend.data.gdoc.document;
 
 import java.time.LocalDateTime;
-import java.util.Iterator;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -11,7 +10,6 @@ import javax.validation.constraints.NotNull;
 
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.DocType;
-import com.f.thoth.backend.data.gdoc.metadata.Metadata;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.ui.utils.FormattingUtils;
 
@@ -246,8 +244,6 @@ public class SimpleDocument implements Document, SimpleDocumentImporter
    }//isClassified
 
    @Override public boolean isRecord()    { return record;}
-
-   @Override public  Iterator<Metadata> metaIterator() { return docType.iterator();}
 
    public  boolean requiresContent() { return docType.isRequiresContent(); }
 

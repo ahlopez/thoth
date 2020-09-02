@@ -12,6 +12,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
 import javax.persistence.NamedEntityGraphs;
+import javax.persistence.NamedSubgraph;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
@@ -35,30 +36,58 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
    @NamedEntityGraph(
          name = SingleUser.BRIEF,
          attributeNodes = {
-               @NamedAttributeNode("tenant"),
-               @NamedAttributeNode("name"),
-               @NamedAttributeNode("lastName"),
-               @NamedAttributeNode("email"),
-               @NamedAttributeNode("fromDate"),
-               @NamedAttributeNode("toDate"),
-               @NamedAttributeNode("locked")
-         }),
+            @NamedAttributeNode("tenant"),
+            @NamedAttributeNode("code"),
+            @NamedAttributeNode("name"),
+            @NamedAttributeNode("lastName"),
+            @NamedAttributeNode("email"),
+            @NamedAttributeNode("passwordHash"),
+            @NamedAttributeNode("userCategory"),
+            @NamedAttributeNode("owner"),
+            @NamedAttributeNode("fromDate"),
+            @NamedAttributeNode("toDate"),
+            @NamedAttributeNode("locked"),
+            @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF)
+         },
+         subgraphs = @NamedSubgraph(name = ObjectToProtect.BRIEF,
+               attributeNodes = {
+                 @NamedAttributeNode("category"),
+                 @NamedAttributeNode("userOwner"),
+                 @NamedAttributeNode("roleOwner"),
+                 @NamedAttributeNode("restrictedTo")
+               })
+         ),
    @NamedEntityGraph(
          name = SingleUser.FULL,
          attributeNodes = {
                @NamedAttributeNode("tenant"),
+               @NamedAttributeNode("code"),
                @NamedAttributeNode("name"),
                @NamedAttributeNode("lastName"),
                @NamedAttributeNode("email"),
+               @NamedAttributeNode("passwordHash"),
+               @NamedAttributeNode("userCategory"),
+               @NamedAttributeNode("owner"),
                @NamedAttributeNode("fromDate"),
                @NamedAttributeNode("toDate"),
                @NamedAttributeNode("locked"),
                @NamedAttributeNode("roles"),
-               @NamedAttributeNode("groups")
-         }) })
+               @NamedAttributeNode("groups"),
+               @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)
+            },
+            subgraphs = @NamedSubgraph(name = ObjectToProtect.FULL,
+                  attributeNodes = {
+                    @NamedAttributeNode("category"),
+                    @NamedAttributeNode("userOwner"),
+                    @NamedAttributeNode("roleOwner"),
+                    @NamedAttributeNode("restrictedTo"),
+                    @NamedAttributeNode("acl")
+                  })
+            )
+         })
 @Entity
 @Table(name = "SINGLE_USER", indexes = { @Index(columnList = "email"), @Index(columnList = "lastName, name") })
-public class SingleUser extends Usuario implements Comparable<SingleUser>
+public class SingleUser extends Usuario
 {
 
    public static final String BRIEF = "SingleUser.brief";
@@ -173,18 +202,6 @@ public class SingleUser extends Usuario implements Comparable<SingleUser>
    @Override
    public String toString() { return "SingleUser{" + super.toString() + " lastName[" + lastName + "] email[" + email + "]}";}
 
-   @Override
-   public int compareTo(SingleUser that)
-   {
-      return this.equals(that)?  0 :
-         that ==  null        ?  1 :
-         this.code == null  && that.code == null?  0 :   
-         this.code != null  && that.code == null?  1 :
-         this.code == null  && that.code != null? -1 :   
-         this.code.compareTo(that.code);     
-
-   }// compareTo
-
 
    // --------------- Logic ---------------------
 
@@ -195,7 +212,7 @@ public class SingleUser extends Usuario implements Comparable<SingleUser>
       if ( object.isOwnedBy( this))
          return true;
 
-      if ( ! object.canBeAccessedBy( this.category))
+      if ( ! object.canBeAccessedBy( this.userCategory))
          return false;
 
       for ( Role r : roles)

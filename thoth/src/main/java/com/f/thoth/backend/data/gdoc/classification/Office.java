@@ -1,28 +1,19 @@
 package com.f.thoth.backend.data.gdoc.classification;
 
 import java.time.LocalDate;
-import java.util.Objects;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.Index;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
-import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
-import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.hibernate.annotations.BatchSize;
-
 import com.f.thoth.backend.data.entity.BaseEntity;
+import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.security.NeedsProtection;
@@ -30,15 +21,18 @@ import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
+import com.f.thoth.backend.data.security.UserGroup;
 import com.f.thoth.ui.utils.FormattingUtils;
 
 /**
  * Representa una oficina productora de documentos
  */
-@Entity
-@Table(name = "OFFICE", indexes = { @Index(columnList = "code") })
-public class Office extends BaseEntity implements NeedsProtection, Comparable<Office>
+@MappedSuperclass
+public class Office extends BaseEntity implements NeedsProtection, HierarchicalEntity<Office>, Comparable<Office>
 {
+   public static final String BRIEF = "Office.brief";
+   public static final String FULL  = "Office.full";
+   
    @NotBlank(message = "{evidentia.name.required}")
    @NotNull (message = "{evidentia.name.required}")
    @Size(min= 2, max = 50, message= "{evidentia.name.length}")
@@ -47,34 +41,24 @@ public class Office extends BaseEntity implements NeedsProtection, Comparable<Of
    @NotNull(message = "{evidentia.objectToProtect.required") 
    @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true)
    protected ObjectToProtect  objectToProtect;
+   
+   @ManyToOne
+   protected BranchOffice  owner;
 
    @NotNull(message = "{evidentia.schema.required}")
    @ManyToOne
    protected Schema     schema;
-
-   @NotNull (message = "{evidentia.category.required}")
-   protected Integer    category;
-
-   @ManyToOne
-   protected Role       roleOwner;
-
-   @ManyToOne
-   protected Office     parent;
 
    @NotNull(message = "{evidentia.dateopened.required}")
    protected LocalDate  dateOpened;
 
    protected LocalDate  dateClosed;
 
+   /*
    @NotNull(message = "{remun.status.required}")
    @ManyToOne
    public RetentionSchedule retentionSchedule;
-
-   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-   @OrderColumn
-   @JoinColumn(name="office_id")
-   @BatchSize(size = 20)
-   protected Set<Permission>   acl;   // Access control list   
+   */
 
    // ------------- Constructors ------------------
    public Office()
@@ -83,8 +67,7 @@ public class Office extends BaseEntity implements NeedsProtection, Comparable<Of
       buildCode();
    }
 
-   public Office( String name, Schema schema, Integer category, Role roleOwner, Office parent,
-                 LocalDate dateOpened, LocalDate dateClosed, RetentionSchedule retentionSchedule)
+   public Office( String name, Schema schema, BranchOffice owner, LocalDate dateOpened, LocalDate dateClosed) //, RetentionSchedule retentionSchedule)
    {
       super();
 
@@ -94,20 +77,20 @@ public class Office extends BaseEntity implements NeedsProtection, Comparable<Of
       if ( schema == null)
          throw new IllegalArgumentException("Esquema de metadatos no puede ser nulo");
 
-      if ( category < 0 || category > 5)
-         throw new IllegalArgumentException("Categoria de seguridad invalida");
+      /*
+      if ( retentionSchedule == null)
+         throw new IllegalArgumentException("Reglas de retención no pueden ser nulas");
+      */
 
       if (dateOpened ==  null || dateClosed == null || dateOpened.isAfter(dateClosed))
          throw new IllegalArgumentException("Fechas de apertura["+ dateOpened+ "] y de cierre["+ dateClosed+ "] inconsistentes");
 
       this.name              = TextUtil.nameTidy(name);
       this.schema            = schema;
-      this.category          = category;
-      this.roleOwner         = roleOwner;
-      this.parent            = parent;
+      this.owner             = owner;
       this.dateOpened        = dateOpened;
       this.dateClosed        = dateClosed;
-      this.retentionSchedule = retentionSchedule;
+     // this.retentionSchedule = retentionSchedule;
       buildCode();
    }//Office
 
@@ -115,93 +98,90 @@ public class Office extends BaseEntity implements NeedsProtection, Comparable<Of
    @PreUpdate
    public void prepareData()
    {
-      this.name =  name != null ? name.trim() : "Anonima";
+      this.name =  name != null ?TextUtil.nameTidy(name) : "[Oficina]";
       buildCode();
    }
 
    @Override protected void buildCode()
    {
-      this.code =   parent != null? parent.code + ">"+ name :
-                   (tenant == null? "[Tenant]" : tenant.getCode())+ "[OFI]>"+ (name == null? "[name]" : name);
+      this.code = (tenant == null? "[tenant]": tenant.getCode())+"[OFI]"+ getOwnerCode()+ ">"+ (name == null? "[name]" : name);
    }//buildCode
+   
+   protected String getOwnerCode(){ return owner == null ? "" : owner.getOwnerCode()+ ":"+ name; }
 
    // -------------- Getters & Setters ----------------
 
-   public String     getName(){ return name;}
-   public void       setName( String name)
-   {
-      this.name = name;
-      buildCode();
-   }//setName
+   public void       setName( String name) { this.name = name;}
 
-   @Override public ObjectToProtect getObjectToProtect(){ return objectToProtect;}
-   public void setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect; }
+   public void       setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect; }
+
+   public void       setOwner(BranchOffice owner) { this.owner = owner;}
 
    public Schema     getSchema(){ return this.schema;}
    public void       setSchema( Schema schema){ this.schema = schema;}
-
-   public Integer    getCategory() { return category;}
-   public void       setCategory( Integer category){ this.category = category;}
-
-   public Role       getRoleOwner() { return roleOwner;}
-   public void       setRoleOwner( Role roleOwner) { this.roleOwner = roleOwner;}
-
-   public Office     getParent() { return parent;}
-   public void       setParent(Office parent) { this.parent = parent;}
 
    public LocalDate  getDateOpened() { return dateOpened;}
    public void       setDateOpened( LocalDate dateOpened) { this.dateOpened = dateOpened;}
 
    public LocalDate  getDateClosed() { return dateClosed;}
    public void       setDateClosed( LocalDate dateClosed){ this.dateClosed = dateClosed;}
-
+/*
    public RetentionSchedule getRetentionSchedule() { return retentionSchedule;}
    public void              setRetentionSchedule( RetentionSchedule retentionSchedule){ this.retentionSchedule= retentionSchedule;}
+*/
 
-   public Set<Permission>   getAcl() {return acl;}
-   public void              setAcl(Set<Permission> acl) {this.acl = acl;}
 
+   // --------------------------- Implements HierarchicalEntity ---------------------------------------
+   @Override public String      getName()   { return name;}
+   
+   @Override public Office      getOwner()  { return owner;}
+
+   // -----------------  Implements NeedsProtection ----------------
+   
+   @Override public ObjectToProtect getObjectToProtect()                  { return objectToProtect;}
+   
+   @Override public boolean         canBeAccessedBy(Integer userCategory) { return objectToProtect.canBeAccessedBy(userCategory);}
+   
+   @Override public boolean         isOwnedBy( SingleUser user)           { return objectToProtect.isOwnedBy(user);}
+   
+   @Override public boolean         isOwnedBy( Role role)                 { return objectToProtect.isOwnedBy(role);}
+   
+   @Override public boolean         isRestrictedTo( UserGroup userGroup)  { return objectToProtect.isRestrictedTo(userGroup);}
+   
+   @Override public boolean         admits( Role role)                    { return objectToProtect.admits(role);}
+   
+   @Override public void            grant( Permission permission)         { objectToProtect.grant(permission);}
+   
+   @Override public void            revoke( Permission permission)        { objectToProtect.revoke(permission);}
+   
    // --------------- Object methods ---------------------
 
-   @Override
-   public boolean equals(Object o)
+   @Override public boolean equals( Object o)
    {
       if (this == o)
          return true;
 
-      if (o == null || getClass() != o.getClass())
-         return false;
-
-      if (!super.equals(o))
+      if (!(o instanceof Office ))
          return false;
 
       Office that = (Office) o;
+      return this.id != null && this.id.equals(that.id);
 
-      return  this.tenant.equals(that.tenant) && this.code.equals(that.code) &&
-              ((this.parent == null   && that.parent == null) || (this.parent != null && this.parent.equals(that.parent)));
+   }//equals
 
-
-   }// equals
-
-   @Override
-   public int hashCode()
-   {
-      return Objects.hash( tenant, code);
-   }
+   @Override public int hashCode() { return id == null? 7: id.hashCode();}
 
    @Override
    public String toString()
    {
       StringBuilder s = new StringBuilder();
-      s.append( super.toString()).append("\n\t\t").
+      s.append( "{"+ super.toString()).append("\n\t\t").
         append( " name["+ name+ "]").
-        append( " category["+ category+ "]").
         append( " schema["+ schema.getCode()+ "]").
-        append( " roleOwner["+ (roleOwner == null? "-NO-" : roleOwner.getCode())+ "]\n\t\t").append("\n\t\t").
-        append( " parent["+ parent == null? "-NO-" : parent.getCode()+ "]").
+        append( " owner["+ owner == null? "-NO-" : owner.getCode()+ "]").
         append( " dateOpened["+ dateOpened.format( FormattingUtils.FULL_DATE_FORMATTER)+ "]").
-        append( " dateClosed["+ dateClosed.format( FormattingUtils.FULL_DATE_FORMATTER)+ "]").
-        append( " retentionSchedule["+ retentionSchedule.getCode()+"]");
+        append( " dateClosed["+ dateClosed.format( FormattingUtils.FULL_DATE_FORMATTER)+ "]}\n}");
+     //   append( " retentionSchedule["+ retentionSchedule.getCode()+"]");
 
       return s.toString();
    }//toString
@@ -219,28 +199,6 @@ public class Office extends BaseEntity implements NeedsProtection, Comparable<Of
       LocalDate now = LocalDate.now();
       return now.compareTo(dateOpened) >= 0 && now.compareTo(dateClosed) <= 0;
    }//isOpen
-
-   @Override public String getKey() { return code;}
-
-   @Override public boolean canBeAccessedBy (Integer userCategory) { return this.category != null && userCategory != null && this.category.compareTo( userCategory) <= 0; }
-
-   @Override public boolean isOwnedBy( SingleUser user) { return false;}
-
-   @Override public boolean isOwnedBy( Role role){ return roleOwner != null && roleOwner.equals(role); }
-
-   @Override public boolean admits( Role role)
-   { 
-      for( Permission p: acl)
-      {
-         if ( p.grants( role, this) )
-            return true;
-      }
-      return false; 
-   }
-
-   @Override public void grant( Permission permission) { acl.add(permission);}
-
-   @Override public void revoke( Permission permission) { acl.remove(permission);}
    
 
 }//Office

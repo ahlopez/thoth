@@ -1,5 +1,8 @@
-package com.f.thoth.backend.data.gdoc.metadata;
+package com.f.thoth.backend.data.security;
 
+import java.util.Set;
+
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
@@ -13,32 +16,26 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
-import com.f.thoth.backend.data.security.NeedsProtection;
-import com.f.thoth.backend.data.security.ObjectToProtect;
-import com.f.thoth.backend.data.security.Permission;
-import com.f.thoth.backend.data.security.Role;
-import com.f.thoth.backend.data.security.SingleUser;
-import com.f.thoth.backend.data.security.UserGroup;
 
 /**
- * Representa un tipo documental
+ * Representa una operacion que puede ser ejecutada
  */
+
 @NamedEntityGraphs({
    @NamedEntityGraph(
-         name = DocType.BRIEF,
+         name = Operation.BRIEF,
          attributeNodes = {
-               @NamedAttributeNode("tenant"),
-               @NamedAttributeNode("code"),
-               @NamedAttributeNode("name"),
-               @NamedAttributeNode("owner"),
-               @NamedAttributeNode("schema"),
-               @NamedAttributeNode("requiresContent"),
+            @NamedAttributeNode("tenant"),
+            @NamedAttributeNode("code"),
+            @NamedAttributeNode("name"),
+            @NamedAttributeNode("owner"),
             @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF)
          },
          subgraphs = @NamedSubgraph(name = ObjectToProtect.BRIEF,
@@ -50,14 +47,12 @@ import com.f.thoth.backend.data.security.UserGroup;
                })
          ),
    @NamedEntityGraph(
-         name = DocType.FULL,
+         name = Operation.FULL,
          attributeNodes = {
                @NamedAttributeNode("tenant"),
                @NamedAttributeNode("code"),
                @NamedAttributeNode("name"),
                @NamedAttributeNode("owner"),
-               @NamedAttributeNode("schema"),
-               @NamedAttributeNode("requiresContent"),
                @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)
             },
             subgraphs = @NamedSubgraph(name = ObjectToProtect.FULL,
@@ -71,67 +66,58 @@ import com.f.thoth.backend.data.security.UserGroup;
             )
          })
 @Entity
-@Table(name = "DOC_TYPE", indexes = { @Index(columnList = "code") })
-public class DocType extends BaseEntity implements NeedsProtection, HierarchicalEntity<DocType>, Comparable<DocType>
+@Table(name = "OPERATION", indexes = { @Index(columnList = "code") })
+public class Operation extends BaseEntity implements NeedsProtection, HierarchicalEntity<Operation>, Comparable<Operation>
 {
-   public static final String BRIEF = "DocType.brief";
-   public static final String FULL  = "DocType.full";
+   public static final String BRIEF = "Operation.brief";
+   public static final String FULL  = "Operation.full";
 
-   @NotBlank(message = "{evidentia.name.required}")
-   @NotNull (message = "{evidentia.name.required}")
-   @Size(min= 2, max = 50, message= "{evidentia.name.length}")
-   protected String           name;
+   @NotNull  (message = "{evidentia.name.required}")
+   @NotBlank (message = "{evidentia.name.required}")
+   @NotEmpty (message = "{evidentia.name.required}")
+   @Size(max = 255)
+   @Column(unique = true)
+   protected String          name;       // Operation name
+
+   @ManyToOne
+   protected Operation       owner;      // Operation group to which this operation belongs
 
    @NotNull(message = "{evidentia.objectToProtect.required")
    @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true)
-   protected ObjectToProtect  objectToProtect;
+   protected ObjectToProtect  objectToProtect;  // Associated security object
 
-   @ManyToOne
-   protected DocType          owner;
-
-   @ManyToOne
-   @NotNull (message = "{evidentia.schema.required}")
-   protected Schema           schema;
-
-   protected boolean          requiresContent;
-
-
-
-   // ------------- Constructors ------------------
-   public DocType()
+   // --------------------- Construccion -------------------------
+   public Operation()
    {
       super();
+      objectToProtect = new ObjectToProtect();
       name = "[name]";
       init();
       buildCode();
-   }// DocType constructor
+   }//Operation constructor
 
-   public DocType( String name, Schema schema, DocType owner, boolean requiresContent)
+   public Operation( String name, ObjectToProtect objectToProtect, Operation owner)
    {
-      if( TextUtil.isEmpty(name))
-         throw new IllegalArgumentException( "Nombre["+ name+ "] del tipo documental es invalido");
+      super();
 
-      if(schema == null)
-         throw new IllegalArgumentException( "El esquema de metadatos del tipo documental no puede ser nulo");
+      if ( !TextUtil.isValidName(name))
+         throw new IllegalArgumentException("Nombre["+ name+ "] es invalido");
 
-      if( !this.tenant.contains( owner))
-         throw new IllegalArgumentException( "El tipo padre debe definirse antes que el tipo hijo");
+      if ( objectToProtect == null )
+         throw new IllegalArgumentException( "Objeto a proteger asociado a la operacion no puede ser nulo");
 
-      this.name     = name;
-      this.owner    = owner;
-      this.schema   = schema;
-      this.requiresContent = requiresContent;
+      init();
+      this.name             = TextUtil.nameTidy(name);
+      this.owner            = owner;
+      this.objectToProtect = objectToProtect;
       buildCode();
-
-   }//DocType
+   }//Operation constructor
 
    private void init()
    {
-      this.name     = "[name]";
-      this.owner    = null;
-      this.schema   = Schema.EMPTY;
-      this.requiresContent = false;
+      owner     = null;
    }//init
+
 
    @PrePersist
    @PreUpdate
@@ -139,51 +125,66 @@ public class DocType extends BaseEntity implements NeedsProtection, Hierarchical
    {
       this.name     =  TextUtil.nameTidy(name).toLowerCase();
       buildCode();
-   }
+   }//prepareData
 
    @Override protected void buildCode()
    {
-      this.code = (tenant == null? "[tenant]": tenant.getCode())+"[TYP]"+ getOwnerCode()+ ">"+ (name == null? "[name]" : name);
+      this.code = (tenant == null? "[tenant]": tenant.getCode())+"[EXE]"+ getOwnerCode()+ ">"+ (name == null? "[name]" : name);
    }//buildCode
 
+   public String isValid()
+   {
+      StringBuilder msg = new StringBuilder();
+      if ( !TextUtil.isValidName(name))
+         msg.append("Nombre de la Operation["+ name+ "] es inválido\n");
 
-   // -------------- Getters & Setters ----------------
+      return msg.toString();
+   }//isValid
 
-   public void        setName( String name) { this.name = name;}
+   // ------------------------ Getters && Setters ---------------------------
 
-   public void        setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect; }
+   public void                  setName(String name)      { this.name  = (name != null ? name.trim() : "Anonima");}
+   public void                  setOwner(Operation owner) { this.owner = owner;}
+   public void                  setObjectToProtect( ObjectToProtect objectToProtect) {this.objectToProtect = objectToProtect;}
 
-   public void        setOwner(DocType owner) { this.owner = owner;}
+   public Integer               getCategory() {return objectToProtect.getCategory();}
+   public void                  setCategory(Integer category) {objectToProtect.setCategory(category);}
 
-   public Schema      getSchema() { return schema;}
-   public void        setSchema( Schema schema){ this.schema = schema;}
+   public SingleUser            getUserOwner() {return objectToProtect.getUserOwner();}
+   public void                  setUserOwner(SingleUser userOwner) {objectToProtect.setUserOwner(userOwner);}
 
-   public boolean     isRequiresContent() { return requiresContent;}
-   public void        setRequiresContent( boolean requiresContent){ this.requiresContent = requiresContent;}
+   public Role                  getRoleOwner() {return objectToProtect.getRoleOwner();}
+   public void                  setRoleOwner(Role roleOwner) {objectToProtect.setRoleOwner(roleOwner);}
+
+   public UserGroup             getRestrictedTo() {return objectToProtect.getRestrictedTo();}
+   public void                  setRestrictedTo(UserGroup restrictedTo) {objectToProtect.setRestrictedTo(restrictedTo);}
+
+   public Set<Permission>       getAcl() {return objectToProtect.getAcl();}
+   public void                  setAcl( Set<Permission> acl) {objectToProtect.setAcl(acl);}
 
    // --------------------------- Implements HierarchicalEntity ---------------------------------------
    @Override public String      getName()   { return name;}
-
-   @Override public DocType     getOwner()  { return owner;}
-
+   
+   @Override public Operation   getOwner()  { return owner;}
+   
    private String getOwnerCode(){ return owner == null ? "" : owner.getOwnerCode()+ ":"+ name; }
 
    // -----------------  Implements NeedsProtection ----------------
-
+   
    @Override public ObjectToProtect getObjectToProtect()                  { return objectToProtect;}
-
+   
    @Override public boolean         canBeAccessedBy(Integer userCategory) { return objectToProtect.canBeAccessedBy(userCategory);}
-
+   
    @Override public boolean         isOwnedBy( SingleUser user)           { return objectToProtect.isOwnedBy(user);}
-
+   
    @Override public boolean         isOwnedBy( Role role)                 { return objectToProtect.isOwnedBy(role);}
-
+   
    @Override public boolean         isRestrictedTo( UserGroup userGroup)  { return objectToProtect.isRestrictedTo(userGroup);}
-
+   
    @Override public boolean         admits( Role role)                    { return objectToProtect.admits(role);}
-
+   
    @Override public void            grant( Permission permission)         { objectToProtect.grant(permission);}
-
+   
    @Override public void            revoke( Permission permission)        { objectToProtect.revoke(permission);}
 
    // ---------------------- Object -----------------------
@@ -193,34 +194,28 @@ public class DocType extends BaseEntity implements NeedsProtection, Hierarchical
       if (this == o)
          return true;
 
-      if (!(o instanceof DocType ))
+      if (!(o instanceof ObjectToProtect ))
          return false;
 
-      DocType that = (DocType) o;
+      Operation that = (Operation) o;
       return this.id != null && this.id.equals(that.id);
 
    }//equals
 
    @Override public int hashCode() { return id == null? 7: id.hashCode();}
 
-
-   @Override
-   public String toString()
+   @Override public String toString()
    {
       StringBuilder s = new StringBuilder();
-      s.append( "DocType{").
-      append( super.toString()).append("\n\t\t").
-      append( " name["+ name+ "]").
-      append( " owner["+ owner == null? "---" : owner.getCode()+ "]").
-      append( " requiresContent["+ requiresContent+ "]").
-      append( " schema["+ schema.toString()+ "]").append("\n\t\t").
-      append( " {"+ objectToProtect.toString()+ "}}\n");
+      s.append(" Operacion{"+ super.toString())
+       .append(" name["+ name+ "]")
+       .append(" owner["+ (owner     == null? "---": owner.getCode()))
+       .append(" [").append(objectToProtect.toString()).append("]}\n");
 
       return s.toString();
-
    }//toString
 
-   @Override  public int compareTo(DocType that)
+   @Override  public int compareTo(Operation that)
    {
       return this.equals(that)?  0 :
              that == null?       1 :
@@ -228,5 +223,4 @@ public class DocType extends BaseEntity implements NeedsProtection, Hierarchical
 
    }// compareTo
 
-
-}//DocType
+}//Operation

@@ -72,7 +72,7 @@ public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements Ha
          boolean nuevo= true;
          for (Permission oGrant: oldGrants)
          {
-            if ( oGrant.objectToProtect.equals( obj))
+            if ( oGrant.objectToProtect.equals( obj.getObjectToProtect()))
             {
                nuevo = false;
                break;
@@ -94,7 +94,7 @@ public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements Ha
          boolean still= false;
          for (E  obj: objectsGranted)
          {
-            if ( oldPermit.getObjectToProtect().equals(obj))
+            if ( oldPermit.getObjectToProtect().equals(obj.getObjectToProtect()))
             {
                still = true;
                break;

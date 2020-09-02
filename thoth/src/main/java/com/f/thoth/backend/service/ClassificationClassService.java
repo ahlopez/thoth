@@ -131,14 +131,12 @@ public class ClassificationClassService implements FilterableCrudService<Classif
    {
       newGrants.forEach( newGrant-> 
       {
-         Optional<ObjectToProtect> optObjectOfClass= objectToProtectRepository.findById(newGrant.getObjectToProtect().getId());
-         if ( optObjectOfClass.isPresent())
-         {
+         ObjectToProtect objectOfClass= newGrant.getObjectToProtect();
+         if ( !newGrant.isPersisted())
             permissionRepository.saveAndFlush(newGrant);
-            ObjectToProtect objectOfClass = optObjectOfClass.get();
-            objectOfClass.grant(newGrant);
-            objectToProtectRepository.saveAndFlush(objectOfClass);
-        }
+         
+         objectOfClass.grant(newGrant);
+         objectToProtectRepository.saveAndFlush(objectOfClass);
       });
    }//grant
 
@@ -147,15 +145,14 @@ public class ClassificationClassService implements FilterableCrudService<Classif
    {
       newRevokes.forEach( newRevoke-> 
       {
-         Optional<ObjectToProtect> optObjectOfClass= objectToProtectRepository.findById(newRevoke.getObjectToProtect().getId());
-         if ( optObjectOfClass.isPresent())
+         ObjectToProtect objectOfClass= newRevoke.getObjectToProtect();
+         Permission toRevoke = permissionRepository.findByRoleObject(newRevoke.getRole(),objectOfClass);
+         if ( toRevoke != null)
          {
-            ObjectToProtect objectOfClass = optObjectOfClass.get();
-            Permission toRevoke = permissionRepository.findByRoleObject(newRevoke.getRole(),newRevoke.getObjectToProtect());
             objectOfClass.revoke(toRevoke);
             objectToProtectRepository.saveAndFlush(objectOfClass);
             permissionRepository.delete(toRevoke);
-        }
+         }
       });
 
    }//grant

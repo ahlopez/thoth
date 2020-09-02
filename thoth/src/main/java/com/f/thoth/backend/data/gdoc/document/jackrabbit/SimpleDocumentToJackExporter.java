@@ -98,7 +98,7 @@ public class SimpleDocumentToJackExporter implements SimpleDocument.Exporter
       try {
          Node fileHolder = node.addNode(content.getName());
          fileHolder.addMixin("mix:versionable");
-         fileHolder.setProperty("jcr:createdBy", ThothSession.getCurrentUser().getCode());
+         fileHolder.setProperty("jcr:createdBy", ThothSession.getCurrentUser().getEmail());
          fileHolder.setProperty("jcr:nodeType", "file_node");
          fileHolder.setProperty("size", content.getSize());
 

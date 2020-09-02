@@ -40,6 +40,8 @@ public class Schema extends BaseEntity implements Comparable<Schema>
    @JoinColumn
    @BatchSize(size = 30)
    private Set<Metadata>  fields;
+   
+   public static final Schema EMPTY = new Schema("EMPTY", new TreeSet<>());
 
 
    // ------------- Constructors ------------------
@@ -53,7 +55,7 @@ public class Schema extends BaseEntity implements Comparable<Schema>
       if( !TextUtil.isValidName(name))
          throw new IllegalArgumentException("Nombre inválido");
 
-      if(fields == null || fields.size() == 0)
+      if(fields == null )
          throw new IllegalArgumentException("Conjunto de metadatos del esquema no puede ser nulo ni vacío");
 
       this.name   = name;

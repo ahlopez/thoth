@@ -1,7 +1,7 @@
 package com.f.thoth.ui.views.admin.objects;
 
 import static com.f.thoth.ui.dataproviders.DataProviderUtil.createItemLabelGenerator;
-import static com.f.thoth.ui.utils.Constant.PAGE_OBJECT_TO_PROTECT;
+import static com.f.thoth.ui.utils.Constant.PAGE_OPERATIONS;
 
 import java.util.function.Consumer;
 
@@ -10,11 +10,11 @@ import org.springframework.security.access.annotation.Secured;
 
 import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.entity.util.TextUtil;
-import com.f.thoth.backend.data.security.ObjectToProtect;
+import com.f.thoth.backend.data.security.Operation;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
 import com.f.thoth.backend.data.security.ThothSession;
-import com.f.thoth.backend.service.ObjectToProtectService;
+import com.f.thoth.backend.service.OperationService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.components.TreeGridSelector;
 import com.f.thoth.ui.crud.AbstractEvidentiaCrudView;
@@ -34,39 +34,39 @@ import com.vaadin.flow.data.converter.StringToIntegerConverter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-@Route(value = PAGE_OBJECT_TO_PROTECT, layout = MainView.class)
-@PageTitle(Constant.TITLE_OBJECT_TO_PROTECT)
+@Route(value = PAGE_OPERATIONS, layout = MainView.class)
+@PageTitle(Constant.TITLE_OPERATIONS)
 @Secured(com.f.thoth.backend.data.Role.ADMIN)
-public class ObjectToProtectView extends AbstractEvidentiaCrudView<ObjectToProtect>
+public class OperationView extends AbstractEvidentiaCrudView<Operation>
 {
    private static final Converter<String, String>  STRING_CONVERTER  = new StringToString("");
    private static final Converter<String, Integer> CATEGORY_CONVERTER= new StringToIntegerConverter( Constant.DEFAULT_CATEGORY, "Número inválido");
 
-   private static TreeGridSelector<ObjectToProtect, HasValue.ValueChangeEvent<ObjectToProtect>> parentObject;
+   private static TreeGridSelector<Operation, HasValue.ValueChangeEvent<Operation>> parentObject;
 
    @Autowired
-   public ObjectToProtectView(ObjectToProtectService service, CurrentUser currentUser)
+   public OperationView(OperationService service, CurrentUser currentUser)
    {
-      super(ObjectToProtect.class, service, new Grid<>(), createForm(service), currentUser);
+      super(Operation.class, service, new Grid<>(), createForm(service), currentUser);
    }
 
    @Override
-   protected void setupGrid(Grid<ObjectToProtect> grid)
+   protected void setupGrid(Grid<Operation> grid)
    {
-      grid.addColumn(object -> object.getName()).setHeader("LLave").setFlexGrow(30);
-      grid.addColumn(object -> object.getOwner()    == null? "---" : object.getOwner().getName())     .setHeader("Grupo Objetos").setFlexGrow(20);
-      grid.addColumn(object -> object.getCategory() == null? "0"   : object.getCategory().toString()) .setHeader("Categoría")    .setFlexGrow(5);
-      grid.addColumn(object -> object.getUserOwner()== null? "---" : object.getUserOwner().getEmail()).setHeader("Usuario dueño").setFlexGrow(30);
-      grid.addColumn(object -> object.getRoleOwner()== null? "---" : object.getRoleOwner().getName()) .setHeader("Rol dueño")    .setFlexGrow(15);
+      grid.addColumn(operation -> operation.getName()).setHeader("LLave").setFlexGrow(30);
+      grid.addColumn(operation -> operation.getOwner()    == null? "---" : operation.getOwner().getName())     .setHeader("Grupo Operaciones").setFlexGrow(20);
+      grid.addColumn(operation -> operation.getCategory() == null? "0"   : operation.getCategory().toString()) .setHeader("Categoría")    .setFlexGrow(5);
+      grid.addColumn(operation -> operation.getUserOwner()== null? "---" : operation.getUserOwner().getEmail()).setHeader("Usuario dueño").setFlexGrow(30);
+      grid.addColumn(operation -> operation.getRoleOwner()== null? "---" : operation.getRoleOwner().getName()) .setHeader("Rol dueño")    .setFlexGrow(15);
 
    }//setupGrid
 
    @Override
-   protected String getBasePage() { return PAGE_OBJECT_TO_PROTECT;}
+   protected String getBasePage() { return PAGE_OPERATIONS;}
 
-   private static BinderCrudEditor<ObjectToProtect> createForm(ObjectToProtectService service)
+   private static BinderCrudEditor<Operation> createForm(OperationService service)
    {
-      TextField name = new TextField("LLave del objeto");
+      TextField name = new TextField("Operación");
       name.setRequired(true);
       name.setValue("--llave--");
       name.setRequiredIndicatorVisible(true);
@@ -108,7 +108,7 @@ public class ObjectToProtectView extends AbstractEvidentiaCrudView<ObjectToProte
              new ResponsiveStep("30em", 3),
              new ResponsiveStep("30em", 4));
 
-      BeanValidationBinder<ObjectToProtect> binder = new BeanValidationBinder<>(ObjectToProtect.class);
+      BeanValidationBinder<Operation> binder = new BeanValidationBinder<>(Operation.class);
 
       binder.forField(name)
             .withConverter(STRING_CONVERTER)
@@ -128,14 +128,14 @@ public class ObjectToProtectView extends AbstractEvidentiaCrudView<ObjectToProte
       binder.forField(parentObject)
             .bind("owner");
 
-      return new BinderCrudEditor<ObjectToProtect>(binder, form);
+      return new BinderCrudEditor<Operation>(binder, form);
 
    }//BinderCrudEditor
 
-   protected void setupCrudEventListeners(CrudEntityPresenter<ObjectToProtect> entityPresenter)
+   protected void setupCrudEventListeners(CrudEntityPresenter<Operation> entityPresenter)
    {
-      Consumer<ObjectToProtect> onSuccess = entity -> navigateToEntity(null);
-      Consumer<ObjectToProtect> onFail = entity ->
+      Consumer<Operation> onSuccess = entity -> navigateToEntity(null);
+      Consumer<Operation> onFail = entity ->
       {
          throw new RuntimeException("La operación no pudo ser ejecutada.");
       };
@@ -144,7 +144,7 @@ public class ObjectToProtectView extends AbstractEvidentiaCrudView<ObjectToProte
       addCancelListener(e -> navigateToEntity(null));
       addSaveListener(e ->
       {
-         ObjectToProtect newObject = e.getItem();
+         Operation newObject = e.getItem();
          entityPresenter.save(newObject, onSuccess, onFail);
          parentObject.refresh();
       });

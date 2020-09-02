@@ -137,9 +137,9 @@ public class Permission extends BaseEntity implements Comparable<Permission>
       return now.compareTo(fromDate) >= 0 && now.compareTo(toDate) <= 0;
    }//isCurrent
    
-   public boolean grants( Role role, NeedsProtection objectInNeed)
+   public boolean grants( Role role, ObjectToProtect objectWanted)
    {
-      return this.role.equals(role) && this.objectToProtect.equals(objectInNeed.getObjectToProtect()) && isCurrent();
+      return this.role.equals(role) && this.objectToProtect.equals(objectWanted) && isCurrent();
    }
 
 }//Permission

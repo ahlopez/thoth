@@ -68,6 +68,12 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 	@Column(unique = true)
 	private String       name;
 
+   @NotNull (message = "{evidentia.code.required}")
+   @NotEmpty(message = "{evidentia.code.required}")
+   @Size(max = 255, message="{evidentia.code.maxlength}")
+   @Column(unique = true)
+   protected String code;
+
 	@NotEmpty(message = "{evidentia.email.required}")
 	@Email
 	@Size(min=3, max = 255, message="{evidentia.email.length}")
@@ -129,19 +135,18 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 	{
 		super();
 		init();
-		buildCode();
 	}
 
-	public Tenant( String name)
+	public Tenant( String name, String code)
 	{
 		super();
 
 		if ( !TextUtil.isValidName(name))
 			throw new IllegalArgumentException("Nombre["+ name+ "] es inválido");
 
+      init();
 		this.name = TextUtil.nameTidy(name);
-		init();
-		buildCode();
+		this.code = (code == null? name : code.toUpperCase());
 	}//Tenant
 
 	
@@ -154,14 +159,16 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 	}//prepareData
 
 
-	@Override protected void buildCode(){ this.code = (name == null? "[name]" : name);}
+	protected void buildCode(){ this.code = (name == null? "[name]" : name);}
 
 	private void init()
 	{
 		LocalDate now = LocalDate.now();
 
 		administrator= "";
-		fromDate     = now;
+		name         = "[name]";
+		code         = "[COD]";
+		fromDate     = now;  
 		toDate       = now.plusYears(1);
 		roles        = new TreeSet<>();
 		singleUsers  = new TreeSet<>();

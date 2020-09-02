@@ -8,8 +8,6 @@ import javax.validation.constraints.Size;
 
 @Entity
 public class OrderItem extends AbstractEntity {
-
-   private static int orderSequence = 0;
    
    @ManyToOne
    @NotNull(message = "{bakery.pickup.product.required}")
@@ -52,9 +50,6 @@ public class OrderItem extends AbstractEntity {
    
    public OrderItem()
    {
-	   buildCode();
    }
-   
-   @Override protected void buildCode() { this.code = ""+ (++orderSequence);}
    
 }//OrderItem

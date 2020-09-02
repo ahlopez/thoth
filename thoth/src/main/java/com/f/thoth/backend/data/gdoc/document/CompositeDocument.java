@@ -18,7 +18,6 @@ import org.hibernate.annotations.BatchSize;
 
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.DocType;
-import com.f.thoth.backend.data.gdoc.metadata.Metadata;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.ui.utils.FormattingUtils;
 
@@ -261,8 +260,6 @@ public class CompositeDocument implements Document, CompositeDocumentImporter
    }//isClassified
 
    @Override public boolean isRecord()    { return record;}
-
-   @Override public Iterator<Metadata> metaIterator(){ return docType.iterator(); }
 
    @Override public void addDocument( Document document) { this.documents.add( document);}
 

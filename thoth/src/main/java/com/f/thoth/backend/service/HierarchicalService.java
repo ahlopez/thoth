@@ -9,7 +9,7 @@ public interface HierarchicalService<T>
 {
    List<T> findAll();
    
-   Optional<T> findById(Long id);
+   Optional<T> findById  (Long id);
 
    List<T> findByParent  ( T parent);
    int     countByParent ( T parent);

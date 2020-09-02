@@ -1,106 +1,110 @@
 package com.f.thoth.backend.data.gdoc.expediente;
 
 import java.time.LocalDateTime;
-import java.util.Set;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
+import javax.persistence.Column;
 import javax.persistence.FetchType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToOne;
-import javax.persistence.OrderColumn;
-import javax.persistence.Table;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
-import org.hibernate.annotations.BatchSize;
-
+import com.f.thoth.backend.data.entity.BaseEntity;
+import com.f.thoth.backend.data.entity.HierarchicalEntity;
+import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.DocType;
 import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
-import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.data.security.UserGroup;
 import com.f.thoth.ui.utils.FormattingUtils;
 
 /**
  * Representa un expediente documental
  */
-@Entity
-@Table(name = "EXPEDIENTE")
-public abstract class Expediente implements NeedsProtection, Comparable<Expediente>
+@MappedSuperclass
+public abstract class Expediente extends BaseEntity implements NeedsProtection, HierarchicalEntity<Expediente>, Comparable<Expediente>
 {
-   @Id
-   private String        id;   
 
+   @NotNull  (message = "{evidentia.name.required}")
+   @NotBlank (message = "{evidentia.name.required}")
+   @NotEmpty (message = "{evidentia.name.required}")
+   @Size(max = 255)
+   @Column(unique = true)
+   protected String           name;              // Expediente name
+   
    @NotNull(message = "{evidentia.objectToProtect.required") 
    @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true)
-   protected ObjectToProtect  objectToProtect;
-   
+   protected ObjectToProtect  objectToProtect;  // Objeto asociado de seguridad
+
    @ManyToOne
-   private Tenant        tenant;
+   protected BranchExpediente  owner;            // Expediente al que pertenece este expediente
    
    @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true)
-   private FileIndex     index;
+   private FileIndex          index;
    
    @ManyToOne
-   private DocType       attributes;
-   
-   @ManyToOne
-   private SingleUser    userOwner;
-   
-   @ManyToOne
-   private Role          roleOwner;
-   
-   @NotNull(message = "{evidentia.category.required") 
-   private Integer       category;
+   private DocType            attributes;
    
    @NotNull(message = "{evidentia.dateopened.required}")
-   private LocalDateTime openingDate;
+   private LocalDateTime      openingDate;
    
-   private LocalDateTime closingDate;
+   private LocalDateTime      closingDate;
    
-   private boolean       open;
-   
-   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-   @OrderColumn
-   @JoinColumn
-   @BatchSize(size = 20)
-   protected Set<Permission>       acl;   // Access control list
+   private boolean            open;
    
 
    // --------------- Constructors --------------------
    public Expediente()
    {
       this.tenant = ThothSession.getCurrentTenant();
+      buildCode();
    }
+   
+   public Expediente( String name, BranchExpediente owner)
+   {
+      if( TextUtil.isEmpty(name))
+         throw new IllegalArgumentException("Nombre del expediente no puede ser nulo ni vacío");
+      
+      this.name  = name;
+      this.owner = owner;
+      
+   }//Expediente constructor
+
+   @PrePersist
+   @PreUpdate
+   public void prepareData()
+   {
+      this.name     =  TextUtil.nameTidy(name).toLowerCase();
+      buildCode();
+   }//prepareData
+
+   @Override protected void buildCode()
+   {
+      this.code = (tenant == null? "[tenant]": tenant.getCode())+"[XPE]"+ getOwnerCode()+ ">"+ (name == null? "[name]" : name);
+   }//buildCode
 
    // ---------------- Getters & Setters --------------
 
-   public Tenant getTenant() { return tenant; }
-   //public void setTenant(Tenant tenant) {this.tenant = tenant;}
+   public void setName(String name){ this.name = name; }
 
+   public void setOwner(BranchExpediente owner) { this.owner = owner; }
+
+   public void setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect; }
+   
    public FileIndex getIndex() {return index;}
    public void setIndex(FileIndex index) {this.index = index;}
 
-   @Override public ObjectToProtect getObjectToProtect(){ return objectToProtect;}
-   public void setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect; }
-
    public DocType getAttributes() {return attributes;}
    public void setAttributes(DocType attributes) {this.attributes = attributes;}
-
-   public SingleUser getUserOwner() {return userOwner;}
-   public void setUserOwner(SingleUser userOwner) {this.userOwner = userOwner;}
-
-   public Role getRoleOwner() {return roleOwner;}
-   public void setRoleOwner(Role roleOwner) {this.roleOwner = roleOwner;}
-
-   public Integer getCategory() {return category;}
-   public void setCategory(Integer category) {this.category = category;}
 
    public LocalDateTime getOpeningDate() {return openingDate;}
    public void setOpeningDate(LocalDateTime openingDate) {this.openingDate = openingDate;}
@@ -110,36 +114,56 @@ public abstract class Expediente implements NeedsProtection, Comparable<Expedien
 
    public void setOpen(boolean open) {this.open = open;}
 
-   public Set<Permission>  getAcl() {return acl;}
-   public void             setAcl(Set<Permission> acl) {this.acl = acl;}
+   // --------------------------- Implements HierarchicalEntity ---------------------------------------
+   @Override public String      getName()   { return name;}
+   
+   @Override public Expediente   getOwner()  { return owner;}
+   
+   protected String getOwnerCode(){ return owner == null ? "" : owner.getOwnerCode()+ ":"+ name; }
 
+   // -----------------  Implements NeedsProtection ----------------
+   
+   @Override public ObjectToProtect getObjectToProtect()                  { return objectToProtect;}
+   
+   @Override public boolean         canBeAccessedBy(Integer userCategory) { return objectToProtect.canBeAccessedBy(userCategory);}
+   
+   @Override public boolean         isOwnedBy( SingleUser user)           { return objectToProtect.isOwnedBy(user);}
+   
+   @Override public boolean         isOwnedBy( Role role)                 { return objectToProtect.isOwnedBy(role);}
+   
+   @Override public boolean         isRestrictedTo( UserGroup userGroup)  { return objectToProtect.isRestrictedTo(userGroup);}
+   
+   @Override public boolean         admits( Role role)                    { return objectToProtect.admits(role);}
+   
+   @Override public void            grant( Permission permission)         { objectToProtect.grant(permission);}
+   
+   @Override public void            revoke( Permission permission)        { objectToProtect.revoke(permission);}
 
-   // ------------------ Object ------------------------
+   // ---------------------- Object -----------------------
 
    @Override public boolean equals( Object o)
    {
-         if (this == o)
-             return true;
+      if (this == o)
+         return true;
 
-          if (o == null || getClass() != o.getClass())
-             return false;
+      if (!(o instanceof Expediente ))
+         return false;
 
-          Expediente that = (Expediente) o;
-          return this.tenant.equals(that.tenant) && this.id.equals(that.id);
+      Expediente that = (Expediente) o;
+      return this.id != null && this.id.equals(that.id);
+
    }//equals
 
-   @Override public int hashCode() { return tenant.hashCode()* 1023+ id.hashCode();}
+   @Override public int hashCode() { return id == null? 83237: id.hashCode();}
+
 
    @Override public String toString()
    {
       StringBuilder s = new StringBuilder();
-      s.append(" tenant["+ tenant.getCode()+ "]")
-       .append(" id["+ id+ "]")
+      s.append(" name["+ name+ "]")
+       .append(" owner["+ owner.getCode()+ "]")
        .append(" n entries["+ index.size()+ "]")
        .append(" docType["+ attributes.getCode()+ "]")
-       .append(" userOwner["+ (userOwner != null? userOwner.getCode(): "-NO-")+ "]")
-       .append(" roleOwner["+ (roleOwner != null? roleOwner.getCode(): "-NO-")+ "]")
-       .append(" category["+ category+ "]")
        .append(" dateOpen["+ openingDate.format(FormattingUtils.FULL_DATE_FORMATTER)+ "]")
        .append(" dateCloses["+ closingDate.format(FormattingUtils.FULL_DATE_FORMATTER)+ "]")
        .append(" isOpen["+ isOpen()+ "]");
@@ -147,7 +171,13 @@ public abstract class Expediente implements NeedsProtection, Comparable<Expedien
       return s.toString();
    }//toString
 
-   @Override public int compareTo(Expediente other){ return other == null? 1 : this.id.compareTo(other.id); }
+   @Override  public int compareTo(Expediente that)
+   {
+      return this.equals(that)?  0 :
+             that == null?       1 :
+             this.getCode().compareTo(that.getCode());
+
+   }// compareTo
 
    public abstract boolean isBranch();
 
@@ -162,32 +192,5 @@ public abstract class Expediente implements NeedsProtection, Comparable<Expedien
             ((now.equals(openingDate) || now.equals(closingDate)) ||
                   (now.isAfter(openingDate) && now.isBefore(closingDate))) ;
    }//isOpen
-
-   public boolean canBeAccessedBy(Role role){ return false;}
-
-   public boolean canBeAccessedBy(int category){ return false;}
-
-   @Override public String  getKey() { return tenant.getCode()+ ">"+ id;}
-
-   @Override public boolean canBeAccessedBy(Integer userCategory) { return userCategory != null && category.compareTo(userCategory) <= 0;}
-
-   @Override public boolean isOwnedBy( SingleUser user) { return userOwner != null && user != null && userOwner.equals(user);}
-
-   @Override public boolean isOwnedBy( Role role) { return roleOwner != null && role != null && roleOwner.equals(role);}
-
-   @Override public boolean admits( Role role)
-   { 
-      for( Permission p: acl)
-      {
-         if ( p.grants( role, this) )
-            return true;
-      }
-      return false; 
-   }
-
-   @Override public void grant( Permission permission) { acl.add(permission);}
-
-   @Override public void revoke( Permission permission) { acl.remove(permission);}
-
 
 }//Expediente

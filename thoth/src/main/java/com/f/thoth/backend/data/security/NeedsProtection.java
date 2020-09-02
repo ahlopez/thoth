@@ -6,8 +6,6 @@ package com.f.thoth.backend.data.security;
 public interface NeedsProtection
 {
 
-   public String  getKey();
-   
    public ObjectToProtect getObjectToProtect();
 
    public boolean canBeAccessedBy(Integer userCategory);
@@ -15,11 +13,13 @@ public interface NeedsProtection
    public boolean isOwnedBy( SingleUser user);
 
    public boolean isOwnedBy( Role role);
-   
+
+   public boolean isRestrictedTo( UserGroup userGroup);
+
    public boolean admits( Role role);
-   
+
    public void    grant( Permission permission);
-   
+
    public void    revoke( Permission permission);
 
 }//NeedsProtection

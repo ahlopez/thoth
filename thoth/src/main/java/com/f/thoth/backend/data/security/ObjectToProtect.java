@@ -4,12 +4,11 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.Index;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
@@ -20,16 +19,10 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.BatchSize;
 
-import com.f.thoth.backend.data.entity.BaseEntity;
-import com.f.thoth.backend.data.entity.HierarchicalEntity;
-import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.ui.utils.Constant;
 
 
@@ -40,61 +33,47 @@ import com.f.thoth.ui.utils.Constant;
    @NamedEntityGraph(
          name = ObjectToProtect.BRIEF,
          attributeNodes = {
-            @NamedAttributeNode("tenant"),
-            @NamedAttributeNode("code"),
-            @NamedAttributeNode("name"),
+            @NamedAttributeNode("id"),
             @NamedAttributeNode("category"),
-            @NamedAttributeNode("owner"),
             @NamedAttributeNode("userOwner"),
-            @NamedAttributeNode("roleOwner")
+            @NamedAttributeNode("roleOwner"),
+            @NamedAttributeNode("restrictedTo")
          }),
    @NamedEntityGraph(
          name = ObjectToProtect.FULL,
          attributeNodes = {
             @NamedAttributeNode("id"),
-            @NamedAttributeNode("tenant"),
-            @NamedAttributeNode("code"),
-            @NamedAttributeNode("name"),
             @NamedAttributeNode("category"),
-            @NamedAttributeNode("owner"),
             @NamedAttributeNode("userOwner"),
             @NamedAttributeNode("roleOwner"),
+            @NamedAttributeNode("restrictedTo"),
             @NamedAttributeNode("acl")
          }) })
 
 @Entity
-@Table(name = "OBJECT_TO_PROTECT", indexes = { @Index(columnList = "code") })
-public class ObjectToProtect extends BaseEntity  implements NeedsProtection, HierarchicalEntity<ObjectToProtect>, Comparable<ObjectToProtect>
+@Table(name = "OBJECT_TO_PROTECT")
+public class ObjectToProtect
 {
    public static final String BRIEF = "ObjectToProtect.brief";
    public static final String FULL  = "ObjectToProtect.full";
    
-   public enum Type {  OPERATION, CLASSIFICATION}
-
-   @NotNull  (message = "{evidentia.name.required}")
-   @NotBlank (message = "{evidentia.name.required}")
-   @NotEmpty (message = "{evidentia.name.required}")
-   @Size(max = 255)
-   @Column(unique = true)
-   protected String          name;       // Object name
-
-   @NotNull  (message = "{evidentia.object_type.required}")
-   @Enumerated(EnumType.STRING)
-   protected ObjectToProtect.Type objectType;
-
+   @Id
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   protected Long            id;
+   
    @NotNull     (message= "{evidentia.category.required}")
    @Min(value=0, message= "{evidentia.category.minvalue}")
    @Max(value=5, message= "{evidentia.category.maxvalue}")
    protected Integer         category;   // Security category
 
    @ManyToOne
-   protected ObjectToProtect owner;      // Object group to which this object belongs
-
-   @ManyToOne
    protected SingleUser      userOwner;  // User that owns this object
 
    @ManyToOne
    protected Role            roleOwner;  // Role that owns this object
+
+   @ManyToOne
+   protected UserGroup       restrictedTo;  // UserGroup that owns this object
 
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
    @BatchSize(size = 20)
@@ -104,31 +83,17 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
    public ObjectToProtect()
    {
       super();
-      name = "[name]";
       init();
-      buildCode();
-   }//ObjectToProtect
-
-   public ObjectToProtect( String name, ObjectToProtect owner, ObjectToProtect.Type objectType)
-   {
-      super();
-      if ( TextUtil.isEmpty(name))
-         name= "[name]";
-
-      init();
-      this.name       = TextUtil.nameTidy(name);
-      this.owner      = owner;
-      this.objectType = objectType;
-      buildCode();
    }//ObjectToProtect
 
    private void init()
    {
-      category  = Constant.DEFAULT_CATEGORY;
-      owner     = null;
-      userOwner = null;
-      roleOwner = null;
-      acl       = new TreeSet<>();
+      id           = null;
+      category     = Constant.DEFAULT_CATEGORY;
+      userOwner    = null;
+      roleOwner    = null;
+      restrictedTo = null;
+      acl          = new TreeSet<>();
    }//init
 
 
@@ -136,35 +101,15 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
    @PreUpdate
    public void prepareData()
    {
-      this.name     =  TextUtil.nameTidy(name).toLowerCase();
-      buildCode();
+      if( category == null)
+         category = Constant.DEFAULT_CATEGORY;
+      
    }//prepareData
 
-   @Override protected void buildCode()
-   {
-      this.code = (tenant == null? "[Tenant]": tenant.getCode())+ 
-            "[OTP]>"+
-            (name == null? "[name]" : name);
-   }//buildCode
-   
-   public String isValid()
-   {
-      StringBuilder msg = new StringBuilder();
-      
-      if ( category < 0 || category > 5)
-         msg.append("Categoría de seguridad inválida");
-      
-      if ( !TextUtil.isValidName(name))
-         msg.append("Nombre["+ name+ "] es inválido"); 
-      
-      return msg.toString();
-   }//isValid
-
    // ----------------- Getters & Setters ----------------
-   
-   public void            setName(String name) { this.name = (name != null ? name.trim() : "Anonima");}
 
-   public void            setOwner(ObjectToProtect owner) {this.owner = owner;}
+   public Integer         getCategory() {return category;}
+   public void            setCategory(Integer category) {this.category = category;}
 
    public SingleUser      getUserOwner() {return userOwner;}
    public void            setUserOwner(SingleUser userOwner) {this.userOwner = userOwner;}
@@ -172,22 +117,11 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
    public Role            getRoleOwner() {return roleOwner;}
    public void            setRoleOwner(Role roleOwner) {this.roleOwner = roleOwner;}
 
-   public Integer         getCategory() {return category;}
-   public void            setCategory(Integer category) {this.category = category;}
+   public UserGroup       getRestrictedTo() {return restrictedTo;}
+   public void            setRestrictedTo(UserGroup restrictedTo) {this.restrictedTo = restrictedTo;}
 
    public Set<Permission> getAcl() {return acl;}
    public void            setAcl( Set<Permission> acl) {this.acl = acl;}
-
-   // Implements HierarchicalEntity
-   @Override public Long            getId()     { return super.getId();}
-   @Override public String          getName()   { return name;}
-   @Override public ObjectToProtect getOwner()  { return owner;}
-   @Override public String          getCode()   { return (tenant == null? "[tenant]": tenant.getCode())+"[OTP]"+ getOwnerCode()+ ">"+  name;}
-   
-   public String getOwnerCode()
-   {
-      return owner == null ? "" : owner.getOwnerCode()+ ">"+ name; 
-   }//getOwnerCode
 
    // ---------------------- Object -----------------------
 
@@ -209,12 +143,11 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
    @Override public String toString()
    {
       StringBuilder s = new StringBuilder();
-      s.append(" ObjectToProtect{"+ super.toString())
-       .append(" name["+ name+ "]")
-       .append(" category["+ category+ "]")
-       .append(" owner["+     (owner     == null? "---": owner.getCode())+ "]")
-       .append(" userOwner["+ (userOwner == null? "---": userOwner.getCode())+ "]")
-       .append(" roleOwner["+ (roleOwner == null? "---": roleOwner.getCode())+ "]}\n\tAcl{");
+      s.append( super.toString())
+       .append(" category["+      category+ "]")
+       .append(" userOwner["+    (userOwner    == null? "---": userOwner.getCode())+ "]")
+       .append(" roleOwner["+    (roleOwner    == null? "---": roleOwner.getCode())+ "]")
+       .append(" restrictedTo["+ (restrictedTo == null? "---": restrictedTo.getCode())+ "]}\n\tAcl{");
 
       int i = 1;
       for( Permission p: acl)
@@ -228,44 +161,29 @@ public class ObjectToProtect extends BaseEntity  implements NeedsProtection, Hie
       return s.toString();
    }//toString
 
-
-   @Override
-   public int compareTo(ObjectToProtect that)
-   {
-      return this.equals(that)?  0 :
-             that == null?       1 :
-             getCompareKey(this).compareTo(getCompareKey(that)); 
-
-   }// compareTo
-   
-   private String getCompareKey( ObjectToProtect object)
-   {
-      return ( object.owner == null? "": getCompareKey(object.owner))+ ":"+ object.getCode();      
-   }
-
    // -----------------  Logic ----------------
-   @Override public String  getKey() { return "[OTP]"+ id;}
+   public boolean isPersisted() { return id != null;}
    
-   @Override public ObjectToProtect getObjectToProtect() { return this;}
+   public boolean canBeAccessedBy(Integer userCategory) { return userCategory != null && category.compareTo(userCategory) <= 0;}
 
-   @Override public boolean canBeAccessedBy(Integer userCategory) { return userCategory != null && category.compareTo(userCategory) <= 0;}
+   public boolean isOwnedBy( SingleUser user)           { return userOwner    != null && userOwner.equals(user);}
 
-   @Override public boolean isOwnedBy( SingleUser user) { return userOwner != null && user != null && userOwner.equals(user);}
+   public boolean isOwnedBy( Role role)                 { return role         != null && roleOwner.equals(role);}
+   
+   public boolean isRestrictedTo( UserGroup userGroup)  { return restrictedTo != null && restrictedTo.equals(userGroup);}
 
-   @Override public boolean isOwnedBy( Role role) { return roleOwner != null && role != null && roleOwner.equals(role);}
+   public void grant( Permission permission)            { acl.add(permission);}
 
-   @Override public boolean admits( Role role)
-   { 
+   public void revoke( Permission permission)           { acl.remove(permission);}
+
+   public boolean admits( Role role)
+   {
       for( Permission p: acl)
       {
          if ( p.grants( role, this) )
             return true;
       }
-      return false; 
+      return false;
    }
-
-   @Override public void grant( Permission permission) { acl.add(permission);}
-
-   @Override public void revoke( Permission permission) { acl.remove(permission);}
 
 }//ObjectToProtect

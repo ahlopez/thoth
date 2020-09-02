@@ -43,15 +43,11 @@ public class User extends AbstractEntity
    @PreUpdate
    private void prepareData(){
       this.email = email == null ? null : email.toLowerCase();
-      buildCode();
    }
 
    public User() {
       // An empty constructor is needed for all beans
-	   buildCode();
    }
-   
-   @Override protected void buildCode() { this.code = (email == null? "[email]" : email);}
 
    public String getPasswordHash() {
       return passwordHash;

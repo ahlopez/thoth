@@ -1,28 +1,66 @@
 package com.f.thoth.backend.data.gdoc.classification;
 
 import java.time.LocalDate;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.Index;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderColumn;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedEntityGraphs;
+import javax.persistence.NamedSubgraph;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.BatchSize;
-
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
-import com.f.thoth.backend.data.security.Role;
+import com.f.thoth.backend.data.security.ObjectToProtect;
 
 
 /**
  * Representa una rama de la estructura jer�rquica de series documentales
  */
+@NamedEntityGraphs({
+   @NamedEntityGraph(
+         name = BranchSeries.BRIEF,
+         attributeNodes = {
+            @NamedAttributeNode("tenant"),
+            @NamedAttributeNode("code"),
+            @NamedAttributeNode("name"),
+            @NamedAttributeNode("owner"),
+            @NamedAttributeNode("schema"),
+            @NamedAttributeNode("dateOpened"),
+            @NamedAttributeNode("dateClosed"),
+            @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF)
+         },
+         subgraphs = @NamedSubgraph(name = ObjectToProtect.BRIEF,
+               attributeNodes = {
+                 @NamedAttributeNode("category"),
+                 @NamedAttributeNode("userOwner"),
+                 @NamedAttributeNode("roleOwner"),
+                 @NamedAttributeNode("restrictedTo")
+               })
+         ),
+   @NamedEntityGraph(
+         name = BranchSeries.FULL,
+         attributeNodes = {
+               @NamedAttributeNode("tenant"),
+               @NamedAttributeNode("code"),
+               @NamedAttributeNode("name"),
+               @NamedAttributeNode("owner"),
+               @NamedAttributeNode("schema"),
+               @NamedAttributeNode("dateOpened"),
+               @NamedAttributeNode("dateClosed"),
+               //   @NamedAttributeNode("retentionSchedule"),
+               @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)
+            },
+            subgraphs = @NamedSubgraph(name = ObjectToProtect.FULL,
+                  attributeNodes = {
+                    @NamedAttributeNode("category"),
+                    @NamedAttributeNode("userOwner"),
+                    @NamedAttributeNode("roleOwner"),
+                    @NamedAttributeNode("restrictedTo"),
+                    @NamedAttributeNode("acl")
+                  })
+            )
+         })
 @Entity
 @Table(name = "BRANCH_SERIES", indexes = { @Index(columnList = "code") })
 public class BranchSeries extends Series
@@ -30,47 +68,28 @@ public class BranchSeries extends Series
    public static final String BRIEF = "BranchSeries.brief";
    public static final String FULL  = "BranchSeries.full";
 
-   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-   @OrderColumn
-   @JoinColumn
-   @BatchSize(size = 10)
-   public Set<Series> subSeries;
-
    // ------------- Constructors ------------------
    public BranchSeries()
    {
       super();
-      subSeries = new TreeSet<>();
    }
 
-   public BranchSeries( String name, Schema schema, Integer category, Role roleOwner, Series parent,
-                     LocalDate dateOpened, LocalDate dateClosed, RetentionSchedule retentionSchedule)
+   public BranchSeries( String name, Schema schema, BranchSeries owner, LocalDate dateOpened, LocalDate dateClosed) //, RetentionSchedule retentionSchedule)
    {
-      super( name, schema, category, roleOwner, parent, dateOpened, dateClosed, retentionSchedule);
-
-      subSeries = new TreeSet<>();
-
+      super(  name, schema, owner, dateOpened, dateClosed); // , retentionSchedule
    }//BranchSeries
 
    // -------------- Getters & Setters ----------------
-   public Set<Series> getSubSeries() { return subSeries;}
-   public void        setSubSeries( Set<Series> subSeries){ this.subSeries = subSeries;}
 
    // --------------- Object methods ---------------------
 
    @Override  public String toString()
    {
       StringBuilder s = new StringBuilder();
-      s.append(" {BranchSeries "+ super.toString()+ " subSeries[");
-      for ( Series ss : subSeries)
-      {
-         s.append(ss.getCode() + " ");
-      }
-      s.append("]}\n");
+      s.append(" {BranchSeries "+ super.toString()+ "}\n");
       return s.toString();
    }//toString
 
    // ----------------   Logic ---------------------
-   public Iterator<Series> iterator() { return subSeries.iterator();}
 
 }//BranchSeries

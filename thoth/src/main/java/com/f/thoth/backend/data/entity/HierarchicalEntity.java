@@ -1,11 +1,12 @@
 package com.f.thoth.backend.data.entity;
 
+import com.f.thoth.backend.data.security.ObjectToProtect;
+
 public interface HierarchicalEntity<T>
 {
-   public Long    getId();
-   public String  getCode();
-   public String  getName();
-   public T       getOwner();
-   public String  getKey();
+   public Long            getId();
+   public ObjectToProtect getObjectToProtect();
+   public String          getName();   
+   public T               getOwner();
 
 }//HierarchicalEntity

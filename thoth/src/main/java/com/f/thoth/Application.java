@@ -25,13 +25,13 @@ import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.repositories.ClassificationClassRepository;
-import com.f.thoth.backend.repositories.ObjectToProtectRepository;
+import com.f.thoth.backend.repositories.OperationRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
 import com.f.thoth.backend.repositories.RoleRepository;
 import com.f.thoth.backend.repositories.TenantRepository;
 import com.f.thoth.backend.repositories.UserRepository;
 import com.f.thoth.backend.service.ClassificationClassService;
-import com.f.thoth.backend.service.ObjectToProtectService;
+import com.f.thoth.backend.service.OperationService;
 import com.f.thoth.backend.service.TenantService;
 import com.f.thoth.backend.service.UserService;
 import com.f.thoth.ui.MainView;
@@ -48,7 +48,7 @@ import com.f.thoth.ui.MainView;
             MainView.class,
             Application.class,
             UserService.class,
-            ObjectToProtectService.class,
+            OperationService.class,
             ClassificationClassService.class,
             TenantService.class,
             ObjectToProtect.class,
@@ -70,7 +70,7 @@ import com.f.thoth.ui.MainView;
          basePackageClasses =
          {
             UserRepository.class,
-            ObjectToProtectRepository.class,
+            OperationRepository.class,
             TenantRepository.class,
             RoleRepository.class,
             PermissionRepository.class,

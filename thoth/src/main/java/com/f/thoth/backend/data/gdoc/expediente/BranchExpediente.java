@@ -1,73 +1,34 @@
 package com.f.thoth.backend.data.gdoc.expediente;
 
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.Index;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.BatchSize;
-
 @Entity
-@Table(name = "BRANCH_EXPEDIENTE")
-public class BranchExpediente extends Expediente
+@Table(name = "BRANCH_EXPEDIENTE", indexes = { @Index(columnList = "code") })public class BranchExpediente extends Expediente
 {
-   @ManyToOne
-   public Expediente      parent;
-
-   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-   @JoinColumn(name="expediente_id")
-   @BatchSize(size = 20)
-   public Set<Expediente> subExpedientes;
 
    // --------------- Constructors --------------------
    public BranchExpediente()
    {
       super();
-      subExpedientes = new TreeSet<>();
+   }
+   
+   public BranchExpediente( String name, BranchExpediente owner)
+   {
+      super(name, owner);
    }
 
-   public BranchExpediente (Set<Expediente> subExpedientes)
-   {
-      super();
-      if (subExpedientes == null || subExpedientes.size() == 0)
-         throw new IllegalArgumentException("Conjunto de subExpedientes no puede ser nulo ni vacio");
-
-      this.subExpedientes = subExpedientes;
-   }//BranchExpediente
-
-   // ---------------- Getters & Setters ---------------
-
-   public Expediente getParent() {return parent;}
-   public void setParent(Expediente parent) {this.parent = parent;}
-
-   public Set<Expediente> getSubExpedientes(){ return subExpedientes;}
-   public void            setSubExpedientes( Set<Expediente> subExpedientes){ this.subExpedientes = subExpedientes;}
-
    // ---------------- Object Methods ------------------
+   @Override public String toString(){ return "BranchExpediente{"+ super.toString()+"}";}
 
-   @Override public boolean equals( Object other) { return super.equals(other);}
+   // ------------------ abstract Expediente -------------------------
 
-   @Override public int hashCode()  { return super.hashCode();}
+   @Override public boolean isBranch(){ return true;}
 
-   @Override public String toString(){ return "BranchExpediente{"+ super.toString()+ " n subExpedientes["+ subExpedientes.size()+ "]}";}
+   @Override public boolean isLeaf(){ return false;}
 
-   // ------------------ Logic -------------------------
-   public boolean addExpediente( Expediente expediente) { return subExpedientes.add(expediente);}
-
-   public Iterator<Expediente> iterator(){ return subExpedientes.iterator(); }
-
-   public boolean isBranch(){ return true;}
-
-   public boolean isLeaf(){ return false;}
-
-   public boolean isVolume(){ return false;}
+   @Override public boolean isVolume(){ return false;}
 
 
 }//BranchExpediente

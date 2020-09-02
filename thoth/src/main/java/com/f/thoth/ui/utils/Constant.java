@@ -21,7 +21,6 @@ public class Constant
    public static final String PAGE_USER_GROUPS = "user_groups";
    public static final String PAGE_SINGLE_USERS = "single_users";
    public static final String PAGE_PRODUCTS = "products";
-   public static final String PAGE_OBJECT_TO_PROTECT = "objects";
 
    public static final String TITLE_STOREFRONT = "Storefront";
    public static final String TITLE_DASHBOARD = "Dashboard";
@@ -40,7 +39,7 @@ public class Constant
   public static final String  PAGE_CLIENTES                                 = "clientes";
   public static final String     PAGE_TENANTS                               = "tenants";
   public static final String  PAGE_SEGURIDAD                                = "seguridad";
-  public static final String     PAGE_OBJETOS                               = "objetos_a_proteger";
+  public static final String     PAGE_OPERATIONS                            = "operations";
   public static final String     PAGE_INFORMACION                           = "informacion_a_proteger";
   public static final String     PAGE_ROLES                                 = "roles";
   public static final String     PAGE_PERMISOS_EJECUCION                    = "permisos_ejecucion";
@@ -105,7 +104,7 @@ public class Constant
   public static final String  TITLE_CLIENTES                                 = "Clientes";
   public static final String     TITLE_TENANTS                               = "Fondo";
   public static final String  TITLE_SEGURIDAD                                = "Seguridad";
-  public static final String     TITLE_OBJETOS                               = "Operaciones";
+  public static final String     TITLE_OPERATIONS                            = "Operaciones";
   public static final String     TITLE_INFORMACION                           = "Información";
   public static final String     TITLE_ROLES                                 = "Roles";
   public static final String     TITLE_PERMISOS_EJECUCION                    = "Permisos de ejecución";
@@ -168,7 +167,7 @@ public class Constant
   public static final String     TITLE_INDICES_ARCHIVO                       = "Indice de archivo";
 
 
-  public static final String     TITLE_SEDE_CORPORATIVA                                 = "Sede Corporativa";
+  public static final String      TITLE_SEDE_CORPORATIVA                                = "Sede Corporativa";
   public static final String        TITLE_CRP_OFICINA_GERENCIA_GENERAL                  = "Corporativa, Gerencia general";
   public static final String          TITLE_CRP_SERIE_ACTAS                             = "Corporativa, Actas";
   public static final String            TITLE_CRP_SUBSERIE_ACTAS_JUNTA_DIRECTIVA        = "Corporativa, Actas junta directiva";
@@ -210,7 +209,7 @@ public class Constant
   public static final String        TITLE_CRP_OFICINA_JURIDICA                          = "Corporativa, Subgerencia Jurídica";
   public static final String          TITLE_CRP_SERIE_PROCESOS                          = "Corporativa, Procesos jurídicos";
   public static final String             TITLE_CRP_SUBSERIE_JUR_DEMANDAS                = "Corporativa, Demandas en curso";
-  public static final String             TITLE_CRP_SUBSERIE_JUR_FALLOS_JUDICIALES       = "Corporativa, Demandas en curso";
+  public static final String             TITLE_CRP_SUBSERIE_JUR_FALLOS_JUDICIALES       = "Corporativa, Fallos de procesos";
   public static final String        TITLE_CRP_OFICINA_ADMINISTRACION                    = "Corporativa, Subgerencia Administrativa";
   public static final String          TITLE_CRP_SERIE_ACTIVOS_FIJOS                     = "Corporativa, Activos fijos";
   public static final String             TITLE_CRP_SUBSERIE_ADM_EDIFICACIONES           = "Corporativa, Edificaciones";
@@ -257,7 +256,7 @@ public class Constant
   public static final String        TITLE_BOG_OFICINA_JURIDICA                          = "Bogotá, Subgerencia Jurídica";
   public static final String          TITLE_BOG_SERIE_PROCESOS                          = "Bogotá, Procesos jurídicos";
   public static final String             TITLE_BOG_SUBSERIE_JUR_DEMANDAS                = "Bogotá, Demandas en curso";
-  public static final String             TITLE_BOG_SUBSERIE_JUR_FALLOS_JUDICIALES       = "Bogotá, Demandas en curso";
+  public static final String             TITLE_BOG_SUBSERIE_JUR_FALLOS_JUDICIALES       = "Bogotá, Fallos de procesos";
   public static final String        TITLE_BOG_OFICINA_ADMINISTRACION                    = "Bogotá, Subgerencia Administrativa";
   public static final String          TITLE_BOG_SERIE_ACTIVOS_FIJOS                     = "Bogotá, Activos fijos";
   public static final String             TITLE_BOG_SUBSERIE_ADM_EDIFICACIONES           = "Bogotá, Edificaciones";
@@ -304,7 +303,7 @@ public class Constant
   public static final String        TITLE_MED_OFICINA_JURIDICA                          = "Medellín, Subgerencia Jurídica";
   public static final String          TITLE_MED_SERIE_PROCESOS                          = "Medellín, Procesos jurídicos";
   public static final String             TITLE_MED_SUBSERIE_JUR_DEMANDAS                = "Medellín, Demandas en curso";
-  public static final String             TITLE_MED_SUBSERIE_JUR_FALLOS_JUDICIALES       = "Medellín, Demandas en curso";
+  public static final String             TITLE_MED_SUBSERIE_JUR_FALLOS_JUDICIALES       = "Medellín, Fallos de procesos";
   public static final String        TITLE_MED_OFICINA_ADMINISTRACION                    = "Medellín, Subgerencia Administrativa";
   public static final String          TITLE_MED_SERIE_ACTIVOS_FIJOS                     = "Medellín, Activos fijos";
   public static final String             TITLE_MED_SUBSERIE_ADM_EDIFICACIONES           = "Medellín, Edificaciones";
@@ -351,7 +350,7 @@ public class Constant
   public static final String        TITLE_CAL_OFICINA_JURIDICA                          = "Cali, Subgerencia Jurídica";
   public static final String          TITLE_CAL_SERIE_PROCESOS                          = "Cali, Procesos jurídicos";
   public static final String             TITLE_CAL_SUBSERIE_JUR_DEMANDAS                = "Cali, Demandas en curso";
-  public static final String             TITLE_CAL_SUBSERIE_JUR_FALLOS_JUDICIALES       = "Cali, Demandas en curso";
+  public static final String             TITLE_CAL_SUBSERIE_JUR_FALLOS_JUDICIALES       = "Cali, Fallos de procesos";
   public static final String        TITLE_CAL_OFICINA_ADMINISTRACION                    = "Cali, Subgerencia Administrativa";
   public static final String          TITLE_CAL_SERIE_ACTIVOS_FIJOS                     = "Cali, Activos fijos";
   public static final String             TITLE_CAL_SUBSERIE_ADM_EDIFICACIONES           = "Cali, Edificaciones";
@@ -398,7 +397,7 @@ public class Constant
   public static final String        TITLE_BAQ_OFICINA_JURIDICA                          = "Barranquilla, Subgerencia Jurídica";
   public static final String          TITLE_BAQ_SERIE_PROCESOS                          = "Barranquilla, Procesos jurídicos";
   public static final String             TITLE_BAQ_SUBSERIE_JUR_DEMANDAS                = "Barranquilla, Demandas en curso";
-  public static final String             TITLE_BAQ_SUBSERIE_JUR_FALLOS_JUDICIALES       = "Barranquilla, Demandas en curso";
+  public static final String             TITLE_BAQ_SUBSERIE_JUR_FALLOS_JUDICIALES       = "Barranquilla, Fallos de procesos";
   public static final String        TITLE_BAQ_OFICINA_ADMINISTRACION                    = "Barranquilla, Subgerencia Administrativa";
   public static final String          TITLE_BAQ_SERIE_ACTIVOS_FIJOS                     = "Barranquilla, Activos fijos";
   public static final String             TITLE_BAQ_SUBSERIE_ADM_EDIFICACIONES           = "Barranquilla, Edificaciones";
@@ -445,7 +444,7 @@ public class Constant
   public static final String        TITLE_BUC_OFICINA_JURIDICA                          = "Bucaramanga, Subgerencia Jurídica";
   public static final String          TITLE_BUC_SERIE_PROCESOS                          = "Bucaramanga, Procesos jurídicos";
   public static final String             TITLE_BUC_SUBSERIE_JUR_DEMANDAS                = "Bucaramanga, Demandas en curso";
-  public static final String             TITLE_BUC_SUBSERIE_JUR_FALLOS_JUDICIALES       = "Bucaramanga, Demandas en curso";
+  public static final String             TITLE_BUC_SUBSERIE_JUR_FALLOS_JUDICIALES       = "Bucaramanga, Fallos de procesos";
   public static final String        TITLE_BUC_OFICINA_ADMINISTRACION                    = "Bucaramanga, Subgerencia Administrativa";
   public static final String          TITLE_BUC_SERIE_ACTIVOS_FIJOS                     = "Bucaramanga, Activos fijos";
   public static final String             TITLE_BUC_SUBSERIE_ADM_EDIFICACIONES           = "Bucaramanga, Edificaciones";
@@ -492,7 +491,7 @@ public class Constant
   public static final String        TITLE_CTG_OFICINA_JURIDICA                          = "Cartagena, Subgerencia Jurídica";
   public static final String          TITLE_CTG_SERIE_PROCESOS                          = "Cartagena, Procesos jurídicos";
   public static final String             TITLE_CTG_SUBSERIE_JUR_DEMANDAS                = "Cartagena, Demandas en curso";
-  public static final String             TITLE_CTG_SUBSERIE_JUR_FALLOS_JUDICIALES       = "Cartagena, Demandas en curso";
+  public static final String             TITLE_CTG_SUBSERIE_JUR_FALLOS_JUDICIALES       = "Cartagena, Fallos de procesos";
   public static final String        TITLE_CTG_OFICINA_ADMINISTRACION                    = "Cartagena, Subgerencia Administrativa";
   public static final String          TITLE_CTG_SERIE_ACTIVOS_FIJOS                     = "Cartagena, Activos fijos";
   public static final String             TITLE_CTG_SUBSERIE_ADM_EDIFICACIONES           = "Cartagena, Edificaciones";

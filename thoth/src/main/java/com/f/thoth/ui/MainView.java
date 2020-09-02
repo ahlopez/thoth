@@ -9,7 +9,7 @@ import java.util.Optional;
 import com.f.thoth.app.security.SecurityUtils;
 import com.f.thoth.ui.utils.Constant;
 import com.f.thoth.ui.views.HasConfirmation;
-import com.f.thoth.ui.views.admin.objects.ObjectToProtectView;
+import com.f.thoth.ui.views.admin.objects.OperationView;
 import com.f.thoth.ui.views.admin.products.ProductsView;
 import com.f.thoth.ui.views.admin.roles.RoleView;
 import com.f.thoth.ui.views.admin.tenants.TenantsView;
@@ -137,19 +137,19 @@ public class MainView extends AppLayout
       ContextMenu securityMenu = new ContextMenu(security);
       securityMenu.setOpenOnClick(true);
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         securityMenu.addItem(createRoute(VaadinIcon.COG, Constant.TITLE_OBJETOS, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         securityMenu.addItem(createRoute(VaadinIcon.COG, Constant.TITLE_OPERATIONS, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         securityMenu.addItem(createRoute(VaadinIcon.BOOK, Constant.TITLE_INFORMACION, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         securityMenu.addItem(createRoute(VaadinIcon.BOOK, Constant.TITLE_INFORMACION, OperationView.class));
 
       if (SecurityUtils.isAccessGranted(RoleView.class))
          securityMenu.addItem(createRoute(VaadinIcon.ACADEMY_CAP, Constant.TITLE_ROLES, RoleView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
+      if (SecurityUtils.isAccessGranted(OperationView.class))
          securityMenu.addItem(createRoute(VaadinIcon.CHECK_CIRCLE, Constant.TITLE_PERMISOS_EJECUCION, ExecutePermissionView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
+      if (SecurityUtils.isAccessGranted(OperationView.class))
          securityMenu.addItem(createRoute(VaadinIcon.CHECK_SQUARE, Constant.TITLE_PERMISOS_ACCESO,AccessPermissionView.class));
 
       if ( securityMenu.getItems().size() > 0)
@@ -163,14 +163,14 @@ public class MainView extends AppLayout
       ContextMenu adminMenu = new ContextMenu(admin);
       adminMenu.setOpenOnClick(true);
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         adminMenu.addItem(createRoute(VaadinIcon.TABLE, Constant.TITLE_PARAMETROS, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         adminMenu.addItem(createRoute(VaadinIcon.TABLE, Constant.TITLE_PARAMETROS, OperationView.class));
 
       if (SecurityUtils.isAccessGranted(RoleView.class))
          adminMenu.addItem(createRoute(VaadinIcon.USER, Constant.TITLE_USUARIOS, RoleView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         adminMenu.addItem(createRoute(VaadinIcon.GROUP, Constant.TITLE_GRUPOS_USUARIOS, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         adminMenu.addItem(createRoute(VaadinIcon.GROUP, Constant.TITLE_GRUPOS_USUARIOS, OperationView.class));
 
       if ( adminMenu.getItems().size() > 0)
          mainMenu.add(admin);
@@ -183,20 +183,20 @@ public class MainView extends AppLayout
       ContextMenu classificationMenu = new ContextMenu(classification);
       classificationMenu.setOpenOnClick(true);
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         classificationMenu.addItem(createRoute(VaadinIcon.BUILDING_O, Constant.TITLE_FONDOS, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         classificationMenu.addItem(createRoute(VaadinIcon.BUILDING_O, Constant.TITLE_FONDOS, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         classificationMenu.addItem(createRoute(VaadinIcon.CLUSTER, Constant.TITLE_OFICINAS, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         classificationMenu.addItem(createRoute(VaadinIcon.CLUSTER, Constant.TITLE_OFICINAS, OperationView.class));
 
       if (SecurityUtils.isAccessGranted(RoleView.class))
          classificationMenu.addItem(createRoute(VaadinIcon.CONNECT, Constant.TITLE_SERIES, RoleView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         classificationMenu.addItem(createRoute(VaadinIcon.CONNECT_O, Constant.TITLE_SUBSERIES, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         classificationMenu.addItem(createRoute(VaadinIcon.CONNECT_O, Constant.TITLE_SUBSERIES, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         classificationMenu.addItem(createRoute(VaadinIcon.ELLIPSIS_V, Constant.TITLE_TIPOS_DOCUMENTALES,ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         classificationMenu.addItem(createRoute(VaadinIcon.ELLIPSIS_V, Constant.TITLE_TIPOS_DOCUMENTALES,OperationView.class));
 
       if ( classificationMenu.getItems().size() > 0)
          mainMenu.add(classification);
@@ -209,29 +209,29 @@ public class MainView extends AppLayout
       ContextMenu expedienteMenu = new ContextMenu(expediente);
       expedienteMenu.setOpenOnClick(true);
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         expedienteMenu.addItem(createRoute(VaadinIcon.FOLDER_O, Constant.TITLE_EXPEDIENTES, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         expedienteMenu.addItem(createRoute(VaadinIcon.FOLDER_O, Constant.TITLE_EXPEDIENTES, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         expedienteMenu.addItem(createRoute(VaadinIcon.FILE_TREE_SMALL, Constant.TITLE_SUBEXPEDIENTES, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         expedienteMenu.addItem(createRoute(VaadinIcon.FILE_TREE_SMALL, Constant.TITLE_SUBEXPEDIENTES, OperationView.class));
 
       if (SecurityUtils.isAccessGranted(RoleView.class))
          expedienteMenu.addItem(createRoute(VaadinIcon.FILE_TREE, Constant.TITLE_VOLUMENES, RoleView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         expedienteMenu.addItem(createRoute(VaadinIcon.LIST_OL, Constant.TITLE_INDICE, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         expedienteMenu.addItem(createRoute(VaadinIcon.LIST_OL, Constant.TITLE_INDICE, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         expedienteMenu.addItem(createRoute(VaadinIcon.DOWNLOAD, Constant.TITLE_EXPORTACION,ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         expedienteMenu.addItem(createRoute(VaadinIcon.DOWNLOAD, Constant.TITLE_EXPORTACION,OperationView.class));
 
       if (SecurityUtils.isAccessGranted(RoleView.class))
          expedienteMenu.addItem(createRoute(VaadinIcon.UPLOAD, Constant.TITLE_IMPORTACION, RoleView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         expedienteMenu.addItem(createRoute(VaadinIcon.COPY_O, Constant.TITLE_COPIA_DOCUMENTOS, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         expedienteMenu.addItem(createRoute(VaadinIcon.COPY_O, Constant.TITLE_COPIA_DOCUMENTOS, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         expedienteMenu.addItem(createRoute(VaadinIcon.PASTE, Constant.TITLE_TRANSER_DOCUMENTOS,ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         expedienteMenu.addItem(createRoute(VaadinIcon.PASTE, Constant.TITLE_TRANSER_DOCUMENTOS,OperationView.class));
 
       if ( expedienteMenu.getItems().size() > 0)
          mainMenu.add(expediente);
@@ -244,26 +244,26 @@ public class MainView extends AppLayout
       ContextMenu tramiteMenu = new ContextMenu(tramite);
       tramiteMenu.setOpenOnClick(true);
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         tramiteMenu.addItem(createRoute(VaadinIcon.LINES, Constant.TITLE_BANDEJA, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         tramiteMenu.addItem(createRoute(VaadinIcon.LINES, Constant.TITLE_BANDEJA, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         tramiteMenu.addItem(createRoute(VaadinIcon.SPLIT, Constant.TITLE_CLASIFICACION_DOCUMENTOS, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         tramiteMenu.addItem(createRoute(VaadinIcon.SPLIT, Constant.TITLE_CLASIFICACION_DOCUMENTOS, OperationView.class));
 
       if (SecurityUtils.isAccessGranted(RoleView.class))
          tramiteMenu.addItem(createRoute(VaadinIcon.ARROW_BACKWARD, Constant.TITLE_RETORNO, RoleView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         tramiteMenu.addItem(createRoute(VaadinIcon.ROAD_BRANCH, Constant.TITLE_RE_ENVIO, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         tramiteMenu.addItem(createRoute(VaadinIcon.ROAD_BRANCH, Constant.TITLE_RE_ENVIO, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         tramiteMenu.addItem(createRoute(VaadinIcon.CLIPBOARD_TEXT, Constant.TITLE_BORRADORES,ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         tramiteMenu.addItem(createRoute(VaadinIcon.CLIPBOARD_TEXT, Constant.TITLE_BORRADORES,OperationView.class));
 
       if (SecurityUtils.isAccessGranted(RoleView.class))
          tramiteMenu.addItem(createRoute(VaadinIcon.KEY_O, Constant.TITLE_FIRMA, RoleView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         tramiteMenu.addItem(createRoute(VaadinIcon.ARROW_FORWARD, Constant.TITLE_ENVIO, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         tramiteMenu.addItem(createRoute(VaadinIcon.ARROW_FORWARD, Constant.TITLE_ENVIO, OperationView.class));
 
       if ( tramiteMenu.getItems().size() > 0)
          mainMenu.add(tramite);
@@ -276,17 +276,17 @@ public class MainView extends AppLayout
       ContextMenu recepcionMenu = new ContextMenu(recepcion);
       recepcionMenu.setOpenOnClick(true);
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         recepcionMenu.addItem(createRoute(VaadinIcon.LEVEL_DOWN_BOLD, Constant.TITLE_RECEPCION_DOCUMENTOS, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         recepcionMenu.addItem(createRoute(VaadinIcon.LEVEL_DOWN_BOLD, Constant.TITLE_RECEPCION_DOCUMENTOS, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         recepcionMenu.addItem(createRoute(VaadinIcon.ENVELOPE, Constant.TITLE_RECEPCION_E_MAIL, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         recepcionMenu.addItem(createRoute(VaadinIcon.ENVELOPE, Constant.TITLE_RECEPCION_E_MAIL, OperationView.class));
 
       if (SecurityUtils.isAccessGranted(RoleView.class))
          recepcionMenu.addItem(createRoute(VaadinIcon.BARCODE, Constant.TITLE_DIGITALIZACION, RoleView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         recepcionMenu.addItem(createRoute(VaadinIcon.ROAD_BRANCH, Constant.TITLE_DIRECCIONAMIENTO, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         recepcionMenu.addItem(createRoute(VaadinIcon.ROAD_BRANCH, Constant.TITLE_DIRECCIONAMIENTO, OperationView.class));
 
       if ( recepcionMenu.getItems().size() > 0)
          mainMenu.add(recepcion);
@@ -299,11 +299,11 @@ public class MainView extends AppLayout
       ContextMenu envioMenu = new ContextMenu(envio);
       envioMenu.setOpenOnClick(true);
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         envioMenu.addItem(createRoute(VaadinIcon.BULLETS, Constant.TITLE_REGISTRO_ENVIOS, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         envioMenu.addItem(createRoute(VaadinIcon.BULLETS, Constant.TITLE_REGISTRO_ENVIOS, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         envioMenu.addItem(createRoute(VaadinIcon.FLIGHT_TAKEOFF, Constant.TITLE_ENVIO_EXTERNO, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         envioMenu.addItem(createRoute(VaadinIcon.FLIGHT_TAKEOFF, Constant.TITLE_ENVIO_EXTERNO, OperationView.class));
 
       if (SecurityUtils.isAccessGranted(RoleView.class))
          envioMenu.addItem(createRoute(VaadinIcon.CHECK_CIRCLE_O, Constant.TITLE_CONFIRMACION_ENVIO, RoleView.class));
@@ -322,23 +322,23 @@ public class MainView extends AppLayout
       MenuItem docsMenu = consultaMenu.addItem(new Div(VaadinIcon.COPY_O.create(), new Label(Constant.TITLE_DOCUMENTOS)));
       SubMenu consultaDocsMenu = docsMenu.getSubMenu();
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         consultaDocsMenu.addItem(createRoute(VaadinIcon.BUTTON, Constant.TITLE_CONSULTA_LIBRE, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         consultaDocsMenu.addItem(createRoute(VaadinIcon.BUTTON, Constant.TITLE_CONSULTA_LIBRE, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         consultaDocsMenu.addItem(createRoute(VaadinIcon.FORM, Constant.TITLE_CONSULTA_METADATOS, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         consultaDocsMenu.addItem(createRoute(VaadinIcon.FORM, Constant.TITLE_CONSULTA_METADATOS, OperationView.class));
 
       MenuItem expedienteMenu = consultaMenu.addItem(new Div(VaadinIcon.FILE_O.create(), new Label(Constant.TITLE_CONSULTA_EXPEDIENTES)));
       SubMenu consultaExpedienteMenu = expedienteMenu.getSubMenu();
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         consultaExpedienteMenu.addItem(createRoute(VaadinIcon.NATIVE_BUTTON, Constant.TITLE_CONSULTA_EXPEDIENTES_LIBRE, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         consultaExpedienteMenu.addItem(createRoute(VaadinIcon.NATIVE_BUTTON, Constant.TITLE_CONSULTA_EXPEDIENTES_LIBRE, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         consultaExpedienteMenu.addItem(createRoute(VaadinIcon.BULLETS, Constant.TITLE_CONSULTA_EXPEDIENTES_METADATOS, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         consultaExpedienteMenu.addItem(createRoute(VaadinIcon.BULLETS, Constant.TITLE_CONSULTA_EXPEDIENTES_METADATOS, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         consultaExpedienteMenu.addItem(createRoute(VaadinIcon.CONNECT, Constant.TITLE_CONSULTA_EXPEDIENTES_CLASIFICACION, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         consultaExpedienteMenu.addItem(createRoute(VaadinIcon.CONNECT, Constant.TITLE_CONSULTA_EXPEDIENTES_CLASIFICACION, OperationView.class));
 
       if ( consultaMenu.getItems().size() > 0)
          mainMenu.add(consulta);
@@ -351,11 +351,11 @@ public class MainView extends AppLayout
       ContextMenu procesosMenu = new ContextMenu(procesos);
       procesosMenu.setOpenOnClick(true);
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         procesosMenu.addItem(createRoute(VaadinIcon.BOLT, Constant.TITLE_EJECUCION_PROCESO, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         procesosMenu.addItem(createRoute(VaadinIcon.BOLT, Constant.TITLE_EJECUCION_PROCESO, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         procesosMenu.addItem(createRoute(VaadinIcon.ABACUS, Constant.TITLE_DEFINICION_PROCESO, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         procesosMenu.addItem(createRoute(VaadinIcon.ABACUS, Constant.TITLE_DEFINICION_PROCESO, OperationView.class));
 
       if ( procesosMenu.getItems().size() > 0)
          mainMenu.add(procesos);
@@ -368,26 +368,26 @@ public class MainView extends AppLayout
       ContextMenu archivoMenu = new ContextMenu(archivo);
       archivoMenu.setOpenOnClick(true);
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         archivoMenu.addItem(createRoute(VaadinIcon.CUBES, Constant.TITLE_LOCALES, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         archivoMenu.addItem(createRoute(VaadinIcon.CUBES, Constant.TITLE_LOCALES, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         archivoMenu.addItem(createRoute(VaadinIcon.STEP_FORWARD, Constant.TITLE_TRANSFERENCIA, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         archivoMenu.addItem(createRoute(VaadinIcon.STEP_FORWARD, Constant.TITLE_TRANSFERENCIA, OperationView.class));
 
       if (SecurityUtils.isAccessGranted(RoleView.class))
          archivoMenu.addItem(createRoute(VaadinIcon.STEP_BACKWARD, Constant.TITLE_RECIBO_TRANSFERENCIA, RoleView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         archivoMenu.addItem(createRoute(VaadinIcon.LOCATION_ARROW, Constant.TITLE_LOCALIZACION, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         archivoMenu.addItem(createRoute(VaadinIcon.LOCATION_ARROW, Constant.TITLE_LOCALIZACION, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         archivoMenu.addItem(createRoute(VaadinIcon.LEVEL_DOWN_BOLD, Constant.TITLE_PRESTAMO_EXPEDIENTE,ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         archivoMenu.addItem(createRoute(VaadinIcon.LEVEL_DOWN_BOLD, Constant.TITLE_PRESTAMO_EXPEDIENTE,OperationView.class));
 
       if (SecurityUtils.isAccessGranted(RoleView.class))
          archivoMenu.addItem(createRoute(VaadinIcon.LEVEL_UP_BOLD, Constant.TITLE_DEVOLUCION, RoleView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         archivoMenu.addItem(createRoute(VaadinIcon.LINES_LIST, Constant.TITLE_INDICES_ARCHIVO, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         archivoMenu.addItem(createRoute(VaadinIcon.LINES_LIST, Constant.TITLE_INDICES_ARCHIVO, OperationView.class));
 
       if ( archivoMenu.getItems().size() > 0)
          mainMenu.add(archivo);
@@ -613,8 +613,8 @@ public class MainView extends AppLayout
       if (SecurityUtils.isAccessGranted(TenantsView.class))
          tabs.add(createTab(VaadinIcon.HOSPITAL, Constant.TITLE_TENANTS, TenantsView.class));
 
-      if (SecurityUtils.isAccessGranted(ObjectToProtectView.class))
-         tabs.add(createTab(VaadinIcon.COG, Constant.TITLE_OBJECT_TO_PROTECT, ObjectToProtectView.class));
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         tabs.add(createTab(VaadinIcon.COG, Constant.TITLE_OBJECT_TO_PROTECT, OperationView.class));
 
       if (SecurityUtils.isAccessGranted(RoleView.class))
          tabs.add(createTab(VaadinIcon.ACADEMY_CAP, Constant.TITLE_ROLES, RoleView.class));

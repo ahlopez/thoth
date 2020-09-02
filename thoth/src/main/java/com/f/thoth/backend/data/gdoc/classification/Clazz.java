@@ -5,17 +5,15 @@ import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
-import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -30,13 +28,13 @@ import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
+import com.f.thoth.backend.data.security.UserGroup;
 import com.f.thoth.ui.utils.FormattingUtils;
 
 /**
  * Representa una clase del esquema de clasificacion
  */
-@Entity
-@Table(name = "CLAZZ", indexes = { @Index(columnList = "code") })
+@MappedSuperclass
 public class Clazz extends BaseEntity implements NeedsProtection, Comparable<Clazz>
 {
    @NotBlank(message = "{evidentia.name.required}")
@@ -59,7 +57,7 @@ public class Clazz extends BaseEntity implements NeedsProtection, Comparable<Cla
    protected Role       roleOwner;
 
    @ManyToOne
-   protected Clazz      parent;
+   protected BranchClass  owner;
 
    @NotNull(message = "{evidentia.dateopened.required}")
    protected LocalDate  dateOpened;
@@ -83,7 +81,7 @@ public class Clazz extends BaseEntity implements NeedsProtection, Comparable<Cla
       buildCode();
    }
 
-   public Clazz( String name, Schema schema, Integer category, Role roleOwner, Clazz parent,
+   public Clazz( String name, Schema schema, Integer category, Role roleOwner, BranchClass owner,
                  LocalDate dateOpened, LocalDate dateClosed, RetentionSchedule retentionSchedule)
    {
       super();
@@ -104,7 +102,7 @@ public class Clazz extends BaseEntity implements NeedsProtection, Comparable<Cla
       this.schema            = schema;
       this.category          = category;
       this.roleOwner         = roleOwner;
-      this.parent            = parent;
+      this.owner            = owner;
       this.dateOpened        = dateOpened;
       this.dateClosed        = dateClosed;
       this.retentionSchedule = retentionSchedule;
@@ -122,7 +120,7 @@ public class Clazz extends BaseEntity implements NeedsProtection, Comparable<Cla
 
    @Override protected void buildCode()
    {
-      this.code =   parent != null? parent.code + ">"+ name :
+      this.code =   owner != null? owner.code + ">"+ name :
                    (tenant == null? "[Tenant]" : tenant.getCode())+  "[CLS]>"+ (name == null? "[name]" : name);
    }//buildCode
 
@@ -147,8 +145,8 @@ public class Clazz extends BaseEntity implements NeedsProtection, Comparable<Cla
    public Role       getRoleOwner() { return roleOwner;}
    public void       setRoleOwner( Role roleOwner) { this.roleOwner = roleOwner;}
 
-   public Clazz      getParent() { return parent;}
-   public void       setParent(Clazz parent) { this.parent = parent;}
+   public BranchClass  getOwner() { return owner;}
+   public void         setOwner(BranchClass owner) { this.owner = owner;}
 
    public LocalDate  getDateOpened() { return dateOpened;}
    public void       setDateOpened( LocalDate dateOpened) { this.dateOpened = dateOpened;}
@@ -179,7 +177,7 @@ public class Clazz extends BaseEntity implements NeedsProtection, Comparable<Cla
       Clazz that = (Clazz) o;
 
       return  this.tenant.equals(that.tenant) && this.code.equals(that.code) &&
-              ((this.parent == null   && that.parent == null) || (this.parent != null && this.parent.equals(that.parent)));
+              ((this.owner == null   && that.owner == null) || (this.owner != null && this.owner.equals(that.owner)));
 
 
    }// equals
@@ -199,7 +197,7 @@ public class Clazz extends BaseEntity implements NeedsProtection, Comparable<Cla
         append( " category["+ category+ "]").
         append( " schema["+ schema.getCode()+ "]").
         append( " roleOwner["+ (roleOwner == null? "-NO-" : roleOwner.getCode())+ "]\n\t\t").append("\n\t\t").
-        append( " parent["+ parent == null? "-NO-" : parent.getCode()+ "]").
+        append( " owner["+ owner == null? "-NO-" : owner.getCode()+ "]").
         append( " dateOpened["+ dateOpened.format( FormattingUtils.FULL_DATE_FORMATTER)+ "]").
         append( " dateClosed["+ dateClosed.format( FormattingUtils.FULL_DATE_FORMATTER)+ "]").
         append( " retentionSchedule["+ retentionSchedule == null? "-NO-" :  retentionSchedule.getCode()+ "]");
@@ -221,19 +219,19 @@ public class Clazz extends BaseEntity implements NeedsProtection, Comparable<Cla
       return now.compareTo(dateOpened) >= 0 && now.compareTo(dateClosed) <= 0;
    }//isOpen
 
-   @Override public String getKey() { return code;}
-
    @Override public boolean canBeAccessedBy (Integer userCategory) { return this.category != null && userCategory != null && this.category.compareTo( userCategory) <= 0; }
 
-   @Override public boolean isOwnedBy( SingleUser user) { return false;}
+   @Override public boolean isOwnedBy( SingleUser user)            { return false;}
 
-   @Override public boolean isOwnedBy( Role role){ return roleOwner != null && roleOwner.equals(role); }
+   @Override public boolean isOwnedBy( Role role)                  { return roleOwner != null && roleOwner.equals(role); }
+   
+   @Override public boolean isRestrictedTo( UserGroup userGroup)   { return objectToProtect.isRestrictedTo(userGroup);}
    
    @Override public boolean admits( Role role)
    { 
       for( Permission p: acl)
       {
-         if ( p.grants( role, this) )
+         if ( p.grants( role, objectToProtect) )
             return true;
       }
       return false; 

@@ -1,26 +1,15 @@
 package com.f.thoth.backend.data.gdoc.classification;
 
 import java.time.LocalDate;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderColumn;
 import javax.persistence.Table;
 
-import org.hibernate.annotations.BatchSize;
-
-import com.f.thoth.backend.data.gdoc.expediente.Expediente;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.security.Role;
 
 /**
- * Representa una hoja del �rbol de clasificaci�n
+ * Representa una hoja del arbol de clasificacion
  */
 @Entity
 @Table(name = "LEAF_CLASS")
@@ -30,36 +19,25 @@ public class LeafClass extends Clazz
    public static final String BRIEF = "LeafClass.brief";
    public static final String FULL  = "LeafClass.full";
 
-   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-   @OrderColumn
-   @JoinColumn
-   @BatchSize(size = 40)
-   private Set<Expediente> expedientes;
-
    // ------------- Constructors ------------------
    public LeafClass()
    {
       super();
-      expedientes = new TreeSet<>();
    }//LeafClass
 
-   public LeafClass( String name, Schema schema, Integer category, Role roleOwner, Clazz parent,
+   public LeafClass( String name, Schema schema, Integer category, Role roleOwner, BranchClass owner,
                      LocalDate dateOpened, LocalDate dateClosed, RetentionSchedule retentionSchedule)
    {
-      super( name, schema, category, roleOwner, parent, dateOpened, dateClosed, retentionSchedule);
-      expedientes = new TreeSet<>();
+      super( name, schema, category, roleOwner, owner, dateOpened, dateClosed, retentionSchedule);
 
    }//LeafClass
 
    // -------------- Getters & Setters ----------------
-   public Set<Expediente> getExpedientes() { return expedientes;}
-   public void            setExpedientes( Set<Expediente> expedientes) { this.expedientes = expedientes;}
 
    // --------------- Object methods ---------------------
 
-   @Override  public String toString() { return " {LeafClass "+ super.toString()+ " expedientes["+ expedientes.size()+ "]}"; }
+   @Override  public String toString() { return " {LeafClass "+ super.toString()+  "]}"; }
 
    // ----------------   Logic ---------------------
-   public Iterator<Expediente> iterator() { return expedientes.iterator();}
 
 }//LeafClass

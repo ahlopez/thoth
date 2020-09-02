@@ -11,8 +11,6 @@ import javax.validation.constraints.Size;
 
 @Entity
 public class Product extends AbstractEntity {
-
-   private static int prodSequence = 0;
    
    @NotBlank(message = "{bakery.name.required}")
    @Size(max = 255)
@@ -65,8 +63,5 @@ public class Product extends AbstractEntity {
    
    public Product()
    {
-	   buildCode();
    }
-   
-   @Override protected void buildCode() { this.code = ""+ (++prodSequence);}
 }
