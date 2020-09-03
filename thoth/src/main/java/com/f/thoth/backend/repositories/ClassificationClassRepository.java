@@ -25,8 +25,11 @@ public interface ClassificationClassRepository extends JpaRepository<Classificat
    @Query("SELECT count(c) FROM ClassificationClass c where c.tenant=?1")
    long countAll(Tenant tenant);
 
-   @Query("SELECT c FROM ClassificationClass c where c.tenant= ?1 and c.objectToProtect.name like ?2")
+   @Query("SELECT c FROM ClassificationClass c where c.tenant= ?1 and c.name like ?2")
    Page<ClassificationClass> findByNameLikeIgnoreCase(Tenant tenant, String name, Pageable page);
+
+   @Query("SELECT count(c) FROM ClassificationClass c where c.tenant= ?1 and c.name like ?2")
+   Page<ClassificationClass> countByNameLikeIgnoreCase(Tenant tenant, String name, Pageable page);
    
 
    //   ----------- Hierarchical handling ----------------
@@ -44,10 +47,10 @@ public interface ClassificationClassRepository extends JpaRepository<Classificat
    int countByChildren(ClassificationClass group);
 
    @EntityGraph(value = ClassificationClass.BRIEF, type = EntityGraphType.FETCH)
-   @Query("SELECT c FROM ClassificationClass c WHERE c.tenant=?1 and lower(c.objectToProtect.name) like lower(concat('%', ?2,'%'))")
+   @Query("SELECT c FROM ClassificationClass c WHERE c.tenant=?1 and lower(c.name) like lower(concat('%', ?2,'%'))")
    List<ClassificationClass> findByNameLikeIgnoreCase(Tenant tenant, String name);
 
-   @Query("SELECT count(c) FROM ClassificationClass c WHERE c.tenant=?1 and lower(c.objectToProtect.name) like lower(concat('%', ?2,'%'))")
+   @Query("SELECT count(c) FROM ClassificationClass c WHERE c.tenant=?1 and lower(c.name) like lower(concat('%', ?2,'%'))")
    long countByNameLikeIgnoreCase(Tenant tenant, String name);
 
    //   ----------- ACL handling ----------------

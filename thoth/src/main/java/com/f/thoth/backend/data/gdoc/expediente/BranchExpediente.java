@@ -5,7 +5,8 @@ import javax.persistence.Index;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "BRANCH_EXPEDIENTE", indexes = { @Index(columnList = "code") })public class BranchExpediente extends Expediente
+@Table(name = "BRANCH_EXPEDIENTE", indexes = { @Index(columnList = "code") })
+public class BranchExpediente extends Expediente
 {
 
    // --------------- Constructors --------------------

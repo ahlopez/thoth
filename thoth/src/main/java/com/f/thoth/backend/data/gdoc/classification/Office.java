@@ -28,7 +28,7 @@ import com.f.thoth.ui.utils.FormattingUtils;
  * Representa una oficina productora de documentos
  */
 @MappedSuperclass
-public class Office extends BaseEntity implements NeedsProtection, HierarchicalEntity<Office>, Comparable<Office>
+public class Office extends BaseEntity implements NeedsProtection, HierarchicalEntity<BranchOffice>, Comparable<Office>
 {
    public static final String BRIEF = "Office.brief";
    public static final String FULL  = "Office.full";
@@ -132,9 +132,9 @@ public class Office extends BaseEntity implements NeedsProtection, HierarchicalE
 
 
    // --------------------------- Implements HierarchicalEntity ---------------------------------------
-   @Override public String      getName()   { return name;}
+   @Override public String       getName()   { return name;}
    
-   @Override public Office      getOwner()  { return owner;}
+   @Override public BranchOffice getOwner()  { return owner;}
 
    // -----------------  Implements NeedsProtection ----------------
    

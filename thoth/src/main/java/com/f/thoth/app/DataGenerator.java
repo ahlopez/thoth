@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.TreeSet;
 import java.util.function.Supplier;
 
 import javax.annotation.PostConstruct;
@@ -32,12 +33,14 @@ import com.f.thoth.backend.data.security.Operation;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.ClassificationClassRepository;
+import com.f.thoth.backend.repositories.ClassificationLevelRepository;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 import com.f.thoth.backend.repositories.OperationRepository;
 import com.f.thoth.backend.repositories.OrderRepository;
 import com.f.thoth.backend.repositories.PickupLocationRepository;
 import com.f.thoth.backend.repositories.ProductRepository;
 import com.f.thoth.backend.repositories.RoleRepository;
+import com.f.thoth.backend.repositories.SchemaRepository;
 import com.f.thoth.backend.repositories.TenantRepository;
 import com.f.thoth.backend.repositories.UserRepository;
 import com.f.thoth.backend.service.TenantService;
@@ -72,25 +75,30 @@ public class DataGenerator implements HasLogger {
    private PickupLocationRepository      pickupLocationRepository;
    private PasswordEncoder               passwordEncoder;
    private ClassificationClassRepository claseRepository;
+   private ClassificationLevelRepository classificationLevelRepository;
+   private SchemaRepository              schemaRepository;
 
    @Autowired
    public DataGenerator(TenantService tenantService, OrderRepository orderRepository, UserRepository userRepository,
          ProductRepository productRepository, PickupLocationRepository pickupLocationRepository,
          TenantRepository tenantRepository, RoleRepository roleRepository, OperationRepository operationRepository,
          ClassificationClassRepository claseRepository, ObjectToProtectRepository objectToProtectRepository,
+         ClassificationLevelRepository classificationLevelRepository, SchemaRepository schemaRepository,
          PasswordEncoder passwordEncoder)
    {
-      this.tenantService             = tenantService;
-      this.orderRepository           = orderRepository;
-      this.userRepository            = userRepository;
-      this.productRepository         = productRepository;
-      this.pickupLocationRepository  = pickupLocationRepository;
-      this.tenantRepository          = tenantRepository;
-      this.roleRepository            = roleRepository;
-      this.objectToProtectRepository = objectToProtectRepository;
-      this.operationRepository       = operationRepository;
-      this.claseRepository           = claseRepository;
-      this.passwordEncoder           = passwordEncoder;
+      this.tenantService                 = tenantService;
+      this.orderRepository               = orderRepository;
+      this.userRepository                = userRepository;
+      this.productRepository             = productRepository;
+      this.pickupLocationRepository      = pickupLocationRepository;
+      this.tenantRepository              = tenantRepository;
+      this.roleRepository                = roleRepository;
+      this.objectToProtectRepository     = objectToProtectRepository;
+      this.operationRepository           = operationRepository;
+      this.claseRepository               = claseRepository;
+      this.classificationLevelRepository = classificationLevelRepository;
+      this.schemaRepository              = schemaRepository;
+      this.passwordEncoder               = passwordEncoder;
 
    }//DataGenerator
 
@@ -257,7 +265,6 @@ public class DataGenerator implements HasLogger {
       ClassificationClass clase054 = createClass( tenant1,       Constant.TITLE_BOG_SUBSERIE_ACTAS_COMITE_FINANCIERO      , 3, clase051);  //   Bogot�, Actas_comit�_financiero
       ClassificationClass clase055 = createClass( tenant1,       Constant.TITLE_BOG_SUBSERIE_ACTAS_COMITE_ADMINISTRATIVO  , 3, clase051);  //   Bogot�, Actas_comit�_administrativo
       ClassificationClass clase056 = createClass( tenant1,       Constant.TITLE_BOG_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase051);  //   Bogot�, Actas_comit�_operaciones
-      ClassificationClass clase057 = createClass( tenant1,       Constant.TITLE_BOG_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase051);  //   Bogot�, Actas_comit�_operaciones
       ClassificationClass clase058 = createClass( tenant1,     Constant.TITLE_BOG_SERIE_PLANES                            , 2, clase050);  //   Bogot�, Planes
       ClassificationClass clase059 = createClass( tenant1,       Constant.TITLE_BOG_SUBSERIE_PLAN_OPERATIVO               , 3, clase058);  //   Bogot�, Plan_operativo
       ClassificationClass clase060 = createClass( tenant1,       Constant.TITLE_BOG_SUBSERIE_PLAN_FINANCIERO              , 3, clase058);  //   Bogot�, Plan_financiero
@@ -305,7 +312,6 @@ public class DataGenerator implements HasLogger {
       ClassificationClass clase102 = createClass( tenant1,       Constant.TITLE_MED_SUBSERIE_ACTAS_COMITE_FINANCIERO      , 3, clase099);  //   Medell�n, Actas_comit�_financiero
       ClassificationClass clase103 = createClass( tenant1,       Constant.TITLE_MED_SUBSERIE_ACTAS_COMITE_ADMINISTRATIVO  , 3, clase099);  //   Medell�n, Actas_comit�_administrativo
       ClassificationClass clase104 = createClass( tenant1,       Constant.TITLE_MED_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase099);  //   Medell�n, Actas_comit�_operaciones
-      ClassificationClass clase105 = createClass( tenant1,       Constant.TITLE_MED_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase099);  //   Medell�n, Actas_comit�_operaciones
       ClassificationClass clase106 = createClass( tenant1,     Constant.TITLE_MED_SERIE_PLANES                            , 2, clase098);  //   Medell�n, Planes
       ClassificationClass clase107 = createClass( tenant1,       Constant.TITLE_MED_SUBSERIE_PLAN_OPERATIVO               , 3, clase106);  //   Medell�n, Plan_operativo
       ClassificationClass clase108 = createClass( tenant1,       Constant.TITLE_MED_SUBSERIE_PLAN_FINANCIERO              , 3, clase106);  //   Medell�n, Plan_financiero
@@ -353,7 +359,6 @@ public class DataGenerator implements HasLogger {
       ClassificationClass clase150 = createClass( tenant1,       Constant.TITLE_CAL_SUBSERIE_ACTAS_COMITE_FINANCIERO      , 3, clase147);  //   Cali, Actas_comit�_financiero
       ClassificationClass clase151 = createClass( tenant1,       Constant.TITLE_CAL_SUBSERIE_ACTAS_COMITE_ADMINISTRATIVO  , 3, clase147);  //   Cali, Actas_comit�_administrativo
       ClassificationClass clase152 = createClass( tenant1,       Constant.TITLE_CAL_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase147);  //   Cali, Actas_comit�_operaciones
-      ClassificationClass clase153 = createClass( tenant1,       Constant.TITLE_CAL_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase147);  //   Cali, Actas_comit�_operaciones
       ClassificationClass clase154 = createClass( tenant1,     Constant.TITLE_CAL_SERIE_PLANES                            , 2, clase146);  //   Cali, Planes
       ClassificationClass clase155 = createClass( tenant1,       Constant.TITLE_CAL_SUBSERIE_PLAN_OPERATIVO               , 3, clase154);  //   Cali, Plan_operativo
       ClassificationClass clase156 = createClass( tenant1,       Constant.TITLE_CAL_SUBSERIE_PLAN_FINANCIERO              , 3, clase154);  //   Cali, Plan_financiero
@@ -401,7 +406,6 @@ public class DataGenerator implements HasLogger {
       ClassificationClass clase198 = createClass( tenant1,       Constant.TITLE_BAQ_SUBSERIE_ACTAS_COMITE_FINANCIERO      , 3, clase195);  //   Barranquilla, Actas_comit�_financiero
       ClassificationClass clase199 = createClass( tenant1,       Constant.TITLE_BAQ_SUBSERIE_ACTAS_COMITE_ADMINISTRATIVO  , 3, clase195);  //   Barranquilla, Actas_comit�_administrativo
       ClassificationClass clase200 = createClass( tenant1,       Constant.TITLE_BAQ_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase195);  //   Barranquilla, Actas_comit�_operaciones
-      ClassificationClass clase201 = createClass( tenant1,       Constant.TITLE_BAQ_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase195);  //   Barranquilla, Actas_comit�_operaciones
       ClassificationClass clase202 = createClass( tenant1,     Constant.TITLE_BAQ_SERIE_PLANES                            , 2, clase194);  //   Barranquilla, Planes
       ClassificationClass clase203 = createClass( tenant1,       Constant.TITLE_BAQ_SUBSERIE_PLAN_OPERATIVO               , 3, clase202);  //   Barranquilla, Plan_operativo
       ClassificationClass clase204 = createClass( tenant1,       Constant.TITLE_BAQ_SUBSERIE_PLAN_FINANCIERO              , 3, clase202);  //   Barranquilla, Plan_financiero
@@ -449,7 +453,6 @@ public class DataGenerator implements HasLogger {
       ClassificationClass clase246 = createClass( tenant1,       Constant.TITLE_BUC_SUBSERIE_ACTAS_COMITE_FINANCIERO      , 3, clase243);  //   Bucaramanga, Actas_comit�_financiero
       ClassificationClass clase247 = createClass( tenant1,       Constant.TITLE_BUC_SUBSERIE_ACTAS_COMITE_ADMINISTRATIVO  , 3, clase243);  //   Bucaramanga, Actas_comit�_administrativo
       ClassificationClass clase248 = createClass( tenant1,       Constant.TITLE_BUC_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase243);  //   Bucaramanga, Actas_comit�_operaciones
-      ClassificationClass clase249 = createClass( tenant1,       Constant.TITLE_BUC_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase243);  //   Bucaramanga, Actas_comit�_operaciones
       ClassificationClass clase250 = createClass( tenant1,     Constant.TITLE_BUC_SERIE_PLANES                            , 2, clase242);  //   Bucaramanga, Planes
       ClassificationClass clase251 = createClass( tenant1,       Constant.TITLE_BUC_SUBSERIE_PLAN_OPERATIVO               , 3, clase250);  //   Bucaramanga, Plan_operativo
       ClassificationClass clase252 = createClass( tenant1,       Constant.TITLE_BUC_SUBSERIE_PLAN_FINANCIERO              , 3, clase250);  //   Bucaramanga, Plan_financiero
@@ -497,7 +500,6 @@ public class DataGenerator implements HasLogger {
       ClassificationClass clase294 = createClass( tenant1,       Constant.TITLE_CTG_SUBSERIE_ACTAS_COMITE_FINANCIERO      , 3, clase291);  //   Cartagena, Actas_comit�_financiero
       ClassificationClass clase295 = createClass( tenant1,       Constant.TITLE_CTG_SUBSERIE_ACTAS_COMITE_ADMINISTRATIVO  , 3, clase291);  //   Cartagena, Actas_comit�_administrativo
       ClassificationClass clase296 = createClass( tenant1,       Constant.TITLE_CTG_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase291);  //   Cartagena, Actas_comit�_operaciones
-      ClassificationClass clase297 = createClass( tenant1,       Constant.TITLE_CTG_SUBSERIE_ACTAS_COMITE_OPERACIONES     , 3, clase291);  //   Cartagena, Actas_comit�_operaciones
       ClassificationClass clase298 = createClass( tenant1,     Constant.TITLE_CTG_SERIE_PLANES                            , 2, clase290);  //   Cartagena, Planes
       ClassificationClass clase299 = createClass( tenant1,       Constant.TITLE_CTG_SUBSERIE_PLAN_OPERATIVO               , 3, clase298);  //   Cartagena, Plan_operativo
       ClassificationClass clase300 = createClass( tenant1,       Constant.TITLE_CTG_SUBSERIE_PLAN_FINANCIERO              , 3, clase298);  //   Cartagena, Plan_financiero
@@ -570,21 +572,42 @@ public class DataGenerator implements HasLogger {
       Operation savedOperation = operationRepository.saveAndFlush(operation);
       return savedOperation;
    }//createObject
-   
 
+
+   private static int  levelSeq = 1;
    private ClassificationClass createClass( Tenant tenant,  String name, int level, ClassificationClass parent)
    {
+      Schema newSchema = new Schema("Schema"+(levelSeq++), new TreeSet<>());
       ClassificationClass classificationClass = 
-            new ClassificationClass( new ClassificationLevel(level, Schema.EMPTY), name, parent, new ObjectToProtect());
-      
+            new ClassificationClass( new ClassificationLevel(level, newSchema), name, parent, new ObjectToProtect());
+
       classificationClass.setTenant(tenant);    
       ObjectToProtect associatedObject = classificationClass.getObjectToProtect();
       objectToProtectRepository.saveAndFlush(associatedObject);
+
+      ClassificationLevel nivel = classificationClass.getLevel();
+      if ( !nivel.isPersisted())
+      {
+         ClassificationLevel newLevel = classificationLevelRepository.findByLevel(nivel.getLevel());
+         if( newLevel == null || !nivel.getLevel().equals(newLevel.getLevel()))
+         {
+            nivel.setTenant(tenant);
+            Schema schema = nivel.getSchema();
+            if ( !schema.isPersisted())
+            {
+               schema.setTenant(tenant);
+               schemaRepository.saveAndFlush(schema);
+            }
+            classificationLevelRepository.saveAndFlush(nivel);
+         }else {
+            classificationClass.setLevel(newLevel);
+         }
+      }    
       claseRepository.saveAndFlush(classificationClass);
       return classificationClass;
    }//createClass
-   
-   
+
+
 
    private Tenant createTenant(TenantRepository tenantRepository, String name)
    {

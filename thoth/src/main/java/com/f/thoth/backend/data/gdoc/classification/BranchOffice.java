@@ -47,7 +47,6 @@ import com.f.thoth.backend.data.security.ObjectToProtect;
                @NamedAttributeNode("schema"),
                @NamedAttributeNode("dateOpened"),
                @NamedAttributeNode("dateClosed"),
-               @NamedAttributeNode("subOffices"),
                //   @NamedAttributeNode("retentionSchedule"),
                @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)
             },

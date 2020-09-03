@@ -10,7 +10,7 @@ import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.security.Role;
 
 /**
- * Representa una rama del �rbol de clasificaci�n
+ * Representa una rama del arbol de clasificacion
  */
 @Entity
 @Table(name = "BRANCH_CLASS", indexes = { @Index(columnList = "code") })

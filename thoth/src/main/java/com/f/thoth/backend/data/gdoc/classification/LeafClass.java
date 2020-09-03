@@ -32,7 +32,7 @@ public class LeafClass extends Clazz
 
    }//LeafClass
 
-   // -------------- Getters & Setters ----------------
+   // -------------- Getters & Setters -------------------
 
    // --------------- Object methods ---------------------
 

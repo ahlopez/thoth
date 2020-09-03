@@ -79,7 +79,7 @@ public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements Ha
             }
          }
          if (nuevo)
-            newGrants.add(  new Permission(role, (ObjectToProtect)obj, period.getFromDate(), period.getToDate()));        
+            newGrants.add(  new Permission(role, obj.getObjectToProtect(), period.getFromDate(), period.getToDate()));        
       });
       
       return newGrants;

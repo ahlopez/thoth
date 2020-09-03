@@ -31,7 +31,7 @@ import com.f.thoth.ui.utils.FormattingUtils;
  * Representa un expediente documental
  */
 @MappedSuperclass
-public abstract class Expediente extends BaseEntity implements NeedsProtection, HierarchicalEntity<Expediente>, Comparable<Expediente>
+public abstract class Expediente extends BaseEntity implements NeedsProtection, HierarchicalEntity<BranchExpediente>, Comparable<Expediente>
 {
 
    @NotNull  (message = "{evidentia.name.required}")
@@ -117,7 +117,7 @@ public abstract class Expediente extends BaseEntity implements NeedsProtection, 
    // --------------------------- Implements HierarchicalEntity ---------------------------------------
    @Override public String      getName()   { return name;}
    
-   @Override public Expediente   getOwner()  { return owner;}
+   @Override public BranchExpediente getOwner()  { return owner;}
    
    protected String getOwnerCode(){ return owner == null ? "" : owner.getOwnerCode()+ ":"+ name; }
 

@@ -178,7 +178,7 @@ public class Constant
   public static final String          TITLE_CRP_SERIE_PLANES                            = "Corporativa, Planes";
   public static final String            TITLE_CRP_SUBSERIE_PLAN_OPERATIVO               = "Corporativa, Plan operativo";
   public static final String            TITLE_CRP_SUBSERIE_PLAN_FINANCIERO              = "Corporativa, Plan financiero";
-  public static final String            TITLE_CRP_SUBSERIE_PRESUPUESTO                  = "Corporativa, Presupuesto";
+  public static final String            TITLE_CRP_SUBSERIE_PRESUPUESTO                  = "Corporativa, Presupuesto aprobado";
   public static final String        TITLE_CRP_OFICINA_OPERACIONES                       = "Corporativa, Subgerencia de Operaciones";
   public static final String          TITLE_CRP_SERIE_ACTAS_OPERACIONES                 = "Corporativa, Actas Operaciones";
   public static final String             TITLE_CRP_SUBSERIE_OPER_CTAS_COMITE_CALIDAD    = "Corporativa, Actas Comité calidad";
@@ -225,7 +225,7 @@ public class Constant
   public static final String          TITLE_BOG_SERIE_PLANES                            = "Bogotá, Planes";
   public static final String            TITLE_BOG_SUBSERIE_PLAN_OPERATIVO               = "Bogotá, Plan operativo";
   public static final String            TITLE_BOG_SUBSERIE_PLAN_FINANCIERO              = "Bogotá, Plan financiero";
-  public static final String            TITLE_BOG_SUBSERIE_PRESUPUESTO                  = "Bogotá, Presupuesto";
+  public static final String            TITLE_BOG_SUBSERIE_PRESUPUESTO                  = "Bogotá, Presupuesto aprobado";
   public static final String        TITLE_BOG_OFICINA_OPERACIONES                       = "Bogotá, Subgerencia de Operaciones";
   public static final String          TITLE_BOG_SERIE_ACTAS_OPERACIONES                 = "Bogotá, Actas Operaciones";
   public static final String             TITLE_BOG_SUBSERIE_OPER_CTAS_COMITE_CALIDAD    = "Bogotá, Actas Comité calidad";
@@ -272,7 +272,7 @@ public class Constant
   public static final String          TITLE_MED_SERIE_PLANES                            = "Medellín, Planes";
   public static final String            TITLE_MED_SUBSERIE_PLAN_OPERATIVO               = "Medellín, Plan operativo";
   public static final String            TITLE_MED_SUBSERIE_PLAN_FINANCIERO              = "Medellín, Plan financiero";
-  public static final String            TITLE_MED_SUBSERIE_PRESUPUESTO                  = "Medellín, Presupuesto";
+  public static final String            TITLE_MED_SUBSERIE_PRESUPUESTO                  = "Medellín, Presupuesto aprobado";
   public static final String        TITLE_MED_OFICINA_OPERACIONES                       = "Medellín, Subgerencia de Operaciones";
   public static final String          TITLE_MED_SERIE_ACTAS_OPERACIONES                 = "Medellín, Actas Operaciones";
   public static final String             TITLE_MED_SUBSERIE_OPER_CTAS_COMITE_CALIDAD    = "Medellín, Actas Comité calidad";
@@ -319,7 +319,7 @@ public class Constant
   public static final String          TITLE_CAL_SERIE_PLANES                            = "Cali, Planes";
   public static final String            TITLE_CAL_SUBSERIE_PLAN_OPERATIVO               = "Cali, Plan operativo";
   public static final String            TITLE_CAL_SUBSERIE_PLAN_FINANCIERO              = "Cali, Plan financiero";
-  public static final String            TITLE_CAL_SUBSERIE_PRESUPUESTO                  = "Cali, Presupuesto";
+  public static final String            TITLE_CAL_SUBSERIE_PRESUPUESTO                  = "Cali, Presupuesto aprobado";
   public static final String        TITLE_CAL_OFICINA_OPERACIONES                       = "Cali, Subgerencia de Operaciones";
   public static final String          TITLE_CAL_SERIE_ACTAS_OPERACIONES                 = "Cali, Actas Operaciones";
   public static final String             TITLE_CAL_SUBSERIE_OPER_CTAS_COMITE_CALIDAD    = "Cali, Actas Comité calidad";
@@ -366,7 +366,7 @@ public class Constant
   public static final String          TITLE_BAQ_SERIE_PLANES                            = "Barranquilla, Planes";
   public static final String            TITLE_BAQ_SUBSERIE_PLAN_OPERATIVO               = "Barranquilla, Plan operativo";
   public static final String            TITLE_BAQ_SUBSERIE_PLAN_FINANCIERO              = "Barranquilla, Plan financiero";
-  public static final String            TITLE_BAQ_SUBSERIE_PRESUPUESTO                  = "Barranquilla, Presupuesto";
+  public static final String            TITLE_BAQ_SUBSERIE_PRESUPUESTO                  = "Barranquilla, Presupuesto aprobado";
   public static final String        TITLE_BAQ_OFICINA_OPERACIONES                       = "Barranquilla, Subgerencia de Operaciones";
   public static final String          TITLE_BAQ_SERIE_ACTAS_OPERACIONES                 = "Barranquilla, Actas Operaciones";
   public static final String             TITLE_BAQ_SUBSERIE_OPER_CTAS_COMITE_CALIDAD    = "Barranquilla, Actas Comité calidad";
@@ -413,7 +413,7 @@ public class Constant
   public static final String          TITLE_BUC_SERIE_PLANES                            = "Bucaramanga, Planes";
   public static final String            TITLE_BUC_SUBSERIE_PLAN_OPERATIVO               = "Bucaramanga, Plan operativo";
   public static final String            TITLE_BUC_SUBSERIE_PLAN_FINANCIERO              = "Bucaramanga, Plan financiero";
-  public static final String            TITLE_BUC_SUBSERIE_PRESUPUESTO                  = "Bucaramanga, Presupuesto";
+  public static final String            TITLE_BUC_SUBSERIE_PRESUPUESTO                  = "Bucaramanga, Presupuesto aprobado";
   public static final String        TITLE_BUC_OFICINA_OPERACIONES                       = "Bucaramanga, Subgerencia de Operaciones";
   public static final String          TITLE_BUC_SERIE_ACTAS_OPERACIONES                 = "Bucaramanga, Actas Operaciones";
   public static final String             TITLE_BUC_SUBSERIE_OPER_CTAS_COMITE_CALIDAD    = "Bucaramanga, Actas Comité calidad";
@@ -460,7 +460,7 @@ public class Constant
   public static final String          TITLE_CTG_SERIE_PLANES                            = "Cartagena, Planes";
   public static final String            TITLE_CTG_SUBSERIE_PLAN_OPERATIVO               = "Cartagena, Plan operativo";
   public static final String            TITLE_CTG_SUBSERIE_PLAN_FINANCIERO              = "Cartagena, Plan financiero";
-  public static final String            TITLE_CTG_SUBSERIE_PRESUPUESTO                  = "Cartagena, Presupuesto";
+  public static final String            TITLE_CTG_SUBSERIE_PRESUPUESTO                  = "Cartagena, Presupuesto aprobado";
   public static final String        TITLE_CTG_OFICINA_OPERACIONES                       = "Cartagena, Subgerencia de Operaciones";
   public static final String          TITLE_CTG_SERIE_ACTAS_OPERACIONES                 = "Cartagena, Actas Operaciones";
   public static final String             TITLE_CTG_SUBSERIE_OPER_CTAS_COMITE_CALIDAD    = "Cartagena, Actas Comité calidad";

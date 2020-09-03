@@ -22,13 +22,13 @@ public interface ObjectToProtectRepository extends JpaRepository<ObjectToProtect
    @Query("SELECT o FROM ObjectToProtect o where o = ?1")
    Optional<ObjectToProtect> findByObject(ObjectToProtect object);
 
-   @Query("SELECT o FROM ObjectToProtect o where o.tenant=?1")
+   @Query("SELECT o FROM ObjectToProtect o")
    Page<ObjectToProtect> findBy(Tenant tenant, Pageable page);
 
-   @Query("SELECT o FROM ObjectToProtect o where o.tenant=?1")
+   @Query("SELECT o FROM ObjectToProtect o")
    List<ObjectToProtect> findAll(Tenant tenant);
 
-   @Query("SELECT count(o) FROM ObjectToProtect o where o.tenant=?1")
-   long countAll(Tenant tenant);
+   @Query("SELECT count(o) FROM ObjectToProtect o")
+   long countAll();
 
 }//ObjectToProtectRepository

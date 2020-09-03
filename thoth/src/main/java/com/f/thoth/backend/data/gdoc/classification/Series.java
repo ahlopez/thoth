@@ -28,7 +28,7 @@ import com.f.thoth.ui.utils.FormattingUtils;
  * Representa una serie documental
  */
 @MappedSuperclass
-public class Series extends BaseEntity implements NeedsProtection, HierarchicalEntity<Series>, Comparable<Series>
+public class Series extends BaseEntity implements NeedsProtection, HierarchicalEntity<BranchSeries>, Comparable<Series>
 {
    @NotBlank(message = "{evidentia.name.required}")
    @NotNull (message = "{evidentia.name.required}")
@@ -129,9 +129,9 @@ public class Series extends BaseEntity implements NeedsProtection, HierarchicalE
 */ 
 
    // --------------------------- Implements HierarchicalEntity ---------------------------------------
-   @Override public String      getName()   { return name;}
+   @Override public String       getName()   { return name;}
    
-   @Override public Series      getOwner()  { return owner;}
+   @Override public BranchSeries getOwner()  { return owner;}
 
    // -----------------  Implements NeedsProtection ----------------
    

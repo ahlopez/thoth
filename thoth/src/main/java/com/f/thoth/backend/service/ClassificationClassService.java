@@ -14,12 +14,14 @@ import org.springframework.stereotype.Service;
 
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.gdoc.classification.ClassificationClass;
+import com.f.thoth.backend.data.gdoc.classification.ClassificationLevel;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.ClassificationClassRepository;
+import com.f.thoth.backend.repositories.ClassificationLevelRepository;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
 
@@ -29,15 +31,21 @@ public class ClassificationClassService implements FilterableCrudService<Classif
    private final ClassificationClassRepository  claseRepository;
    private final PermissionRepository           permissionRepository;
    private final ObjectToProtectRepository      objectToProtectRepository;
+   private final ClassificationLevelRepository  classificationLevelRepository;
+   {
+      // TODO Auto-generated constructor stub
+   }
 
    @Autowired
-   public ClassificationClassService(ClassificationClassRepository claseRepository, 
-                                     PermissionRepository permissionRepository,
-                                     ObjectToProtectRepository objectToProtectRepository)
+   public ClassificationClassService(ClassificationClassRepository   claseRepository, 
+                                     PermissionRepository            permissionRepository,
+                                     ClassificationLevelRepository   classificationLevelRepository,
+                                     ObjectToProtectRepository       objectToProtectRepository)
    {
-      this.claseRepository           = claseRepository;
-      this.permissionRepository      = permissionRepository;
-      this.objectToProtectRepository = objectToProtectRepository;
+      this.claseRepository               = claseRepository;
+      this.permissionRepository          = permissionRepository;
+      this.classificationLevelRepository = classificationLevelRepository;
+      this.objectToProtectRepository     = objectToProtectRepository;
    }
 
    @Override public Page<ClassificationClass> findAnyMatching(Optional<String> filter, Pageable pageable)
@@ -79,11 +87,18 @@ public class ClassificationClassService implements FilterableCrudService<Classif
       return clase;
    }//createNew
 
-   @Override public ClassificationClass save(User currentUser, ClassificationClass entity)
+   @Override public ClassificationClass save(User currentUser, ClassificationClass clazz)
    {
       try {
-         objectToProtectRepository.save( entity.getObjectToProtect());
-         return FilterableCrudService.super.save(currentUser, entity);
+         ObjectToProtect associatedObject = clazz.getObjectToProtect();
+         if ( !associatedObject.isPersisted())
+            objectToProtectRepository.saveAndFlush( associatedObject);
+         
+         ClassificationLevel level = clazz.getLevel();
+         if ( !level.isPersisted())
+            classificationLevelRepository.saveAndFlush(level);
+         
+         return FilterableCrudService.super.save(currentUser, clazz);
       } catch (DataIntegrityViolationException e) {
          throw new UserFriendlyDataException("Ya hay una Clase con esa llave. Por favor escoja una llave única para la clase");
       }

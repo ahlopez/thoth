@@ -21,6 +21,7 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.BatchSize;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
+import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.security.NeedsProtection;
@@ -35,7 +36,7 @@ import com.f.thoth.ui.utils.FormattingUtils;
  * Representa una clase del esquema de clasificacion
  */
 @MappedSuperclass
-public class Clazz extends BaseEntity implements NeedsProtection, Comparable<Clazz>
+public class Clazz extends BaseEntity implements NeedsProtection, HierarchicalEntity<BranchClass>, Comparable<Clazz>
 {
    @NotBlank(message = "{evidentia.name.required}")
    @NotNull (message = "{evidentia.name.required}")
@@ -102,7 +103,7 @@ public class Clazz extends BaseEntity implements NeedsProtection, Comparable<Cla
       this.schema            = schema;
       this.category          = category;
       this.roleOwner         = roleOwner;
-      this.owner            = owner;
+      this.owner             = owner;
       this.dateOpened        = dateOpened;
       this.dateClosed        = dateClosed;
       this.retentionSchedule = retentionSchedule;
@@ -126,14 +127,8 @@ public class Clazz extends BaseEntity implements NeedsProtection, Comparable<Cla
 
    // -------------- Getters & Setters ----------------
 
-   public String     getName(){ return name;}
-   public void       setName( String name)
-   {
-      this.name = name;
-      buildCode();
-   }
+   public void       setName( String name){ this.name = name;}
 
-   @Override public ObjectToProtect getObjectToProtect(){ return objectToProtect;}
    public void setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect; }
 
    public Schema     getSchema(){ return this.schema;}
@@ -145,7 +140,6 @@ public class Clazz extends BaseEntity implements NeedsProtection, Comparable<Cla
    public Role       getRoleOwner() { return roleOwner;}
    public void       setRoleOwner( Role roleOwner) { this.roleOwner = roleOwner;}
 
-   public BranchClass  getOwner() { return owner;}
    public void         setOwner(BranchClass owner) { this.owner = owner;}
 
    public LocalDate  getDateOpened() { return dateOpened;}
@@ -159,6 +153,15 @@ public class Clazz extends BaseEntity implements NeedsProtection, Comparable<Cla
 
    public Set<Permission>   getAcl() {return acl;}
    public void              setAcl(Set<Permission> acl) {this.acl = acl;}
+   
+   // ------------------- implements HierarchicalEntity<BranchOffice> -----------
+   
+   @Override public ObjectToProtect getObjectToProtect(){ return objectToProtect;}
+   
+   @Override public String          getName(){ return name;}
+   
+   @Override public BranchClass     getOwner() { return owner;}
+   
 
    // --------------- Object methods ---------------------
 
@@ -197,7 +200,7 @@ public class Clazz extends BaseEntity implements NeedsProtection, Comparable<Cla
         append( " category["+ category+ "]").
         append( " schema["+ schema.getCode()+ "]").
         append( " roleOwner["+ (roleOwner == null? "-NO-" : roleOwner.getCode())+ "]\n\t\t").append("\n\t\t").
-        append( " owner["+ owner == null? "-NO-" : owner.getCode()+ "]").
+        append( " owner["+ owner == null? "---" : owner.getCode()+ "]").
         append( " dateOpened["+ dateOpened.format( FormattingUtils.FULL_DATE_FORMATTER)+ "]").
         append( " dateClosed["+ dateClosed.format( FormattingUtils.FULL_DATE_FORMATTER)+ "]").
         append( " retentionSchedule["+ retentionSchedule == null? "-NO-" :  retentionSchedule.getCode()+ "]");
