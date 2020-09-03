@@ -108,6 +108,7 @@ public class DocType extends BaseEntity implements NeedsProtection, Hierarchical
 
    public DocType( String name, Schema schema, DocType owner, boolean requiresContent)
    {
+      super();
       if( TextUtil.isEmpty(name))
          throw new IllegalArgumentException( "Nombre["+ name+ "] del tipo documental es invalido");
 

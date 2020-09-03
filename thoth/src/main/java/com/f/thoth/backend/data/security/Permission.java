@@ -22,21 +22,21 @@ public class Permission extends BaseEntity implements Comparable<Permission>
 {
    @NotNull(message = "{evidentia.role.required}")
    @ManyToOne
-   private Role          role;
+   private Role          role;                          // rol a quien se concede el permiso
 
    @NotNull (message = "{evidentia.object.required}")
    @ManyToOne
-   public ObjectToProtect  objectToProtect;            
+   public ObjectToProtect  objectToProtect;             // objeto sobre el que se concede permiso de acceso    
 
    @NotNull(message = "{evidentia.date.required}")
-   private LocalDate     fromDate;
+   private LocalDate     fromDate;                      // fecha inicial del período de concesión (inclusive)
 
    @NotNull(message = "{evidentia.date.required}")
-   private LocalDate     toDate;
+   private LocalDate     toDate;                        // fecha final del período de concesión (inclusive)
 
    @NotNull(message = "{evidentia.user.required}")
    @ManyToOne
-   private User  grantedBy;
+   private User          grantedBy;                     // usuario que concede el permiso
 
    // ------------- Constructors ------------------
    public Permission()
@@ -73,9 +73,9 @@ public class Permission extends BaseEntity implements Comparable<Permission>
 
    @Override protected void buildCode()
    {
-      this.code = (tenant == null? "[Tenant]" : tenant.getCode())+ "[PRM]>"+
-                  (role ==  null? "[role]": role.getCode())+ ":"+ 
-    		         (objectToProtect == null? "[object]" : objectToProtect);
+      this.code = (tenant == null? "[Tenant]" : tenant.getId())+ ">"+
+                  (role ==  null? "[role]": role.getId())+ ":"+ 
+    		         (objectToProtect == null? "[object]" : objectToProtect.getId());
    }//buildCode
 
    // -------------- Getters & Setters ----------------

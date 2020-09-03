@@ -75,7 +75,7 @@ public class ObjectToProtect
    @ManyToOne
    protected UserGroup       restrictedTo;  // UserGroup that owns this object
 
-   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
    @BatchSize(size = 20)
    protected Set<Permission>  acl;       // Access control list
 
@@ -107,7 +107,8 @@ public class ObjectToProtect
    }//prepareData
 
    // ----------------- Getters & Setters ----------------
-
+   public Long            getId() { return id;}
+   
    public Integer         getCategory() {return category;}
    public void            setCategory(Integer category) {this.category = category;}
 

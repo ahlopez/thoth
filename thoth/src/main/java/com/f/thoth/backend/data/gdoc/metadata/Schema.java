@@ -47,11 +47,13 @@ public class Schema extends BaseEntity implements Comparable<Schema>
    // ------------- Constructors ------------------
    public Schema()
    {
+      super();
       fields = new TreeSet<>();
    }
 
    public Schema( String name, Set<Metadata> fields)
    {
+      super();
       if( !TextUtil.isValidName(name))
          throw new IllegalArgumentException("Nombre inválido");
 

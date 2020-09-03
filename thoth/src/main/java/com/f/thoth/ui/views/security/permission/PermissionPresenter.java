@@ -11,7 +11,6 @@ import com.f.thoth.app.HasLogger;
 import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.User;
-import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.service.PermissionService;

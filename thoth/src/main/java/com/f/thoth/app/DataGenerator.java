@@ -144,7 +144,7 @@ public class DataGenerator implements HasLogger {
       tenant2.addRole(role9);
       tenant2.addRole(role10);
 
-      getLogger().info("... generating Objects to protect" );
+      getLogger().info("... generating Operations" );
       Operation obj01 = createOperation( tenant1, Constant.TITLE_CLIENTES                                , null );  // Clientes
       Operation obj02 = createOperation( tenant1,    Constant.TITLE_TENANTS                              , obj01);  // Fondo
       Operation obj03 = createOperation( tenant1, Constant.TITLE_SEGURIDAD                               , null );  // Seguridad
@@ -210,6 +210,7 @@ public class DataGenerator implements HasLogger {
       Operation obj63 = createOperation( tenant1,       Constant.TITLE_DEVOLUCION                        , obj61);  // Retorno de expediente
       Operation obj64 = createOperation( tenant1,    Constant.TITLE_INDICES_ARCHIVO                      , obj56);  // Indice de archivo
 
+      getLogger().info("... generating Classification classes" );
       ClassificationClass clase001 = createClass( tenant1, Constant.TITLE_SEDE_CORPORATIVA                                , 0, null);      //   Sede Corporativa
       ClassificationClass clase002 = createClass( tenant1,   Constant.TITLE_CRP_OFICINA_GERENCIA_GENERAL                  , 1, clase001);  //   Corporativa, Gerencia_general
       ClassificationClass clase003 = createClass( tenant1,     Constant.TITLE_CRP_SERIE_ACTAS                             , 2, clase002);  //   Corporativa, Actas
@@ -258,7 +259,7 @@ public class DataGenerator implements HasLogger {
       ClassificationClass clase047 = createClass( tenant1,        Constant.TITLE_CRP_SUBSERIE_ADM_EDIFICACIONES           , 3, clase046);  //   Corporativa, Edificaciones
       ClassificationClass clase048 = createClass( tenant1,        Constant.TITLE_CRP_SUBSERIE_ADM_SERVICIOS               , 3, clase046);  //   Corporativa, Servicios p�blicos
       ClassificationClass clase049 = createClass( tenant1, Constant.TITLE_SEDE_BOGOTA                                     , 0, null);      //   Sede Bogot�
-      ClassificationClass clase050 = createClass( tenant1,   Constant.TITLE_BOG_OFICINA_SUBGERENCIA                       , 1, clase001);  //   Gerencia Bogot�
+      ClassificationClass clase050 = createClass( tenant1,   Constant.TITLE_BOG_OFICINA_SUBGERENCIA                       , 1, clase049);  //   Gerencia Bogot�
       ClassificationClass clase051 = createClass( tenant1,     Constant.TITLE_BOG_SERIE_ACTAS                             , 2, clase050);  //   Bogot�, Actas
       ClassificationClass clase052 = createClass( tenant1,       Constant.TITLE_BOG_SUBSERIE_ACTAS_JUNTA_DIRECTIVA        , 3, clase051);  //   Bogot�, Actas_junta_directiva
       ClassificationClass clase053 = createClass( tenant1,       Constant.TITLE_BOG_SUBSERIE_ACTAS_COMITE_GERENCIA        , 3, clase051);  //   Bogot�, Actas_comit�_gerencia
@@ -305,7 +306,7 @@ public class DataGenerator implements HasLogger {
       ClassificationClass clase095 = createClass( tenant1,        Constant.TITLE_BOG_SUBSERIE_ADM_EDIFICACIONES           , 3, clase094);  //   Bogot�, Edificaciones
       ClassificationClass clase096 = createClass( tenant1,        Constant.TITLE_BOG_SUBSERIE_ADM_SERVICIOS               , 3, clase094);  //   Bogot�, Servicios p�blicos
       ClassificationClass clase097 = createClass( tenant1, Constant.TITLE_SEDE_MEDELLIN                                   , 0, null);      //   Sede Medell�n
-      ClassificationClass clase098 = createClass( tenant1,   Constant.TITLE_MED_OFICINA_SUBGERENCIA                       , 1, clase001);  //   Gerencia Medell�n
+      ClassificationClass clase098 = createClass( tenant1,   Constant.TITLE_MED_OFICINA_SUBGERENCIA                       , 1, clase097);  //   Gerencia Medell�n
       ClassificationClass clase099 = createClass( tenant1,     Constant.TITLE_MED_SERIE_ACTAS                             , 2, clase098);  //   Medell�n, Actas
       ClassificationClass clase100 = createClass( tenant1,       Constant.TITLE_MED_SUBSERIE_ACTAS_JUNTA_DIRECTIVA        , 3, clase099);  //   Medell�n, Actas_junta_directiva
       ClassificationClass clase101 = createClass( tenant1,       Constant.TITLE_MED_SUBSERIE_ACTAS_COMITE_GERENCIA        , 3, clase099);  //   Medell�n, Actas_comit�_gerencia
@@ -352,7 +353,7 @@ public class DataGenerator implements HasLogger {
       ClassificationClass clase143 = createClass( tenant1,        Constant.TITLE_MED_SUBSERIE_ADM_EDIFICACIONES           , 3, clase142);  //   Medell�n, Edificaciones
       ClassificationClass clase144 = createClass( tenant1,        Constant.TITLE_MED_SUBSERIE_ADM_SERVICIOS               , 3, clase142);  //   Medell�n, Servicios p�blicos
       ClassificationClass clase145 = createClass( tenant1, Constant.TITLE_SEDE_CALI                                       , 0, null);      //   Sede Cali
-      ClassificationClass clase146 = createClass( tenant1,   Constant.TITLE_CAL_OFICINA_SUBGERENCIA                       , 1, clase001);  //   Gerencia Cali
+      ClassificationClass clase146 = createClass( tenant1,   Constant.TITLE_CAL_OFICINA_SUBGERENCIA                       , 1, clase145);  //   Gerencia Cali
       ClassificationClass clase147 = createClass( tenant1,     Constant.TITLE_CAL_SERIE_ACTAS                             , 2, clase146);  //   Cali, Actas
       ClassificationClass clase148 = createClass( tenant1,       Constant.TITLE_CAL_SUBSERIE_ACTAS_JUNTA_DIRECTIVA        , 3, clase147);  //   Cali, Actas_junta_directiva
       ClassificationClass clase149 = createClass( tenant1,       Constant.TITLE_CAL_SUBSERIE_ACTAS_COMITE_GERENCIA        , 3, clase147);  //   Cali, Actas_comit�_gerencia
@@ -399,7 +400,7 @@ public class DataGenerator implements HasLogger {
       ClassificationClass clase191 = createClass( tenant1,        Constant.TITLE_CAL_SUBSERIE_ADM_EDIFICACIONES           , 3, clase190);  //   Cali, Edificaciones
       ClassificationClass clase192 = createClass( tenant1,        Constant.TITLE_CAL_SUBSERIE_ADM_SERVICIOS               , 3, clase190);  //   Cali, Servicios p�blicos
       ClassificationClass clase193 = createClass( tenant1, Constant.TITLE_SEDE_BARRANQUILLA                               , 3, null);      //   Sede Barranquilla
-      ClassificationClass clase194 = createClass( tenant1,   Constant.TITLE_BAQ_OFICINA_SUBGERENCIA                       , 1, clase001);  //   Gerencia Barranquilla
+      ClassificationClass clase194 = createClass( tenant1,   Constant.TITLE_BAQ_OFICINA_SUBGERENCIA                       , 1, clase193);  //   Gerencia Barranquilla
       ClassificationClass clase195 = createClass( tenant1,     Constant.TITLE_BAQ_SERIE_ACTAS                             , 2, clase194);  //   Barranquilla, Actas
       ClassificationClass clase196 = createClass( tenant1,       Constant.TITLE_BAQ_SUBSERIE_ACTAS_JUNTA_DIRECTIVA        , 3, clase195);  //   Barranquilla, Actas_junta_directiva
       ClassificationClass clase197 = createClass( tenant1,       Constant.TITLE_BAQ_SUBSERIE_ACTAS_COMITE_GERENCIA        , 3, clase195);  //   Barranquilla, Actas_comit�_gerencia
@@ -446,7 +447,7 @@ public class DataGenerator implements HasLogger {
       ClassificationClass clase239 = createClass( tenant1,        Constant.TITLE_BAQ_SUBSERIE_ADM_EDIFICACIONES           , 3, clase238);  //   Barranquilla, Edificaciones
       ClassificationClass clase240 = createClass( tenant1,        Constant.TITLE_BAQ_SUBSERIE_ADM_SERVICIOS               , 3, clase238);  //   Barranquilla, Servicios p�blicos
       ClassificationClass clase241 = createClass( tenant1, Constant.TITLE_SEDE_BUCARAMANGA                                , 3, null);      //   Sede Bucaramanga
-      ClassificationClass clase242 = createClass( tenant1,   Constant.TITLE_BUC_OFICINA_SUBGERENCIA                       , 1, clase001);  //   Gerencia Bucaramanga
+      ClassificationClass clase242 = createClass( tenant1,   Constant.TITLE_BUC_OFICINA_SUBGERENCIA                       , 1, clase241);  //   Gerencia Bucaramanga
       ClassificationClass clase243 = createClass( tenant1,     Constant.TITLE_BUC_SERIE_ACTAS                             , 2, clase242);  //   Bucaramanga, Actas
       ClassificationClass clase244 = createClass( tenant1,       Constant.TITLE_BUC_SUBSERIE_ACTAS_JUNTA_DIRECTIVA        , 3, clase243);  //   Bucaramanga, Actas_junta_directiva
       ClassificationClass clase245 = createClass( tenant1,       Constant.TITLE_BUC_SUBSERIE_ACTAS_COMITE_GERENCIA        , 3, clase243);  //   Bucaramanga, Actas_comit�_gerencia
@@ -493,7 +494,7 @@ public class DataGenerator implements HasLogger {
       ClassificationClass clase287 = createClass( tenant1,        Constant.TITLE_BUC_SUBSERIE_ADM_EDIFICACIONES           , 3, clase286);  //   Bucaramanga, Edificaciones
       ClassificationClass clase288 = createClass( tenant1,        Constant.TITLE_BUC_SUBSERIE_ADM_SERVICIOS               , 3, clase286);  //   Bucaramanga, Servicios p�blicos
       ClassificationClass clase289 = createClass( tenant1, Constant.TITLE_SEDE_CARTAGENA                                  , 3, null);      //   Sede Cartagena
-      ClassificationClass clase290 = createClass( tenant1,   Constant.TITLE_CTG_OFICINA_SUBGERENCIA                       , 1, clase001);  //   Gerencia Cartagena
+      ClassificationClass clase290 = createClass( tenant1,   Constant.TITLE_CTG_OFICINA_SUBGERENCIA                       , 1, clase289);  //   Gerencia Cartagena
       ClassificationClass clase291 = createClass( tenant1,     Constant.TITLE_CTG_SERIE__ACTAS                            , 2, clase290);  //   Cartagena, Actas
       ClassificationClass clase292 = createClass( tenant1,       Constant.TITLE_CTG_SUBSERIE_ACTAS_JUNTA_DIRECTIVA        , 3, clase291);  //   Cartagena, Actas_junta_directiva
       ClassificationClass clase293 = createClass( tenant1,       Constant.TITLE_CTG_SUBSERIE_ACTAS_COMITE_GERENCIA        , 3, clase291);  //   Cartagena, Actas_comit�_gerencia

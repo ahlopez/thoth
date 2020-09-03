@@ -104,7 +104,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
    private HorizontalLayout setupRoleSelector(String name)
    {
       HorizontalLayout roleLayout = new HorizontalLayout();
-      ComboBox<Role> roleSelector = new ComboBox<>();
+      roleSelector = new ComboBox<>();
       roleSelector.setLabel("Rol");
       roleSelector.setDataProvider(ThothSession.getTenantRoles());
       roleSelector.setItemLabelGenerator(createItemLabelGenerator(Role::getName));

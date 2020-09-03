@@ -16,58 +16,60 @@ public class SchemaValues extends BaseEntity implements SchemaValuesImporter
 {
    @ManyToOne
    private Schema    schema;
-   
-   @NotNull (message = "{evidentia.values.required") 
-   @NotEmpty(message = "{evidentia.values.required") 
+
+   @NotNull (message = "{evidentia.values.required")
+   @NotEmpty(message = "{evidentia.values.required")
    private String    values;
-   
+
    public SchemaValues()
-   {     
+   {
+      super();
       values = "<values><value/></values>";
    }
-   
+
    public SchemaValues( SchemaValues.ImporterDirector importerDirector)
    {
+      super();
       values = "";
-      importerDirector.dirija( this);  
+      importerDirector.dirija( this);
       String ok = isValid();
       if ( ok != null)
          throw new IllegalStateException("Importación de valores construyó un esquema inconsistente. Razón\n"+ ok );
-      
+
       buildCode();
    }//SchemaValues
-   
+
    private String isValid()
    {
       StringBuilder msg = new StringBuilder();
       if ( TextUtil.isEmpty(values))
          msg.append("Valores del esquema no pueden ser nulos ni vacíos\n");
-      
+
       return msg.toString();
    }//isValid
-   
 
-   @Override public void buildCode(){ this.code = (tenant == null? "[Tenant]": tenant.getCode())+ "[SCM]"+ (id == null? "---": id);}
-   
+
+   @Override public void buildCode(){ this.code = (tenant == null? "[Tenant]": tenant.getCode())+ "[SCV]"+ (id == null? "---": id);}
+
    // ------------------------   Getters && Setters ----------------------------
-   public Schema getSchema() { return schema; }
+   public Schema         getSchema() { return schema; }
    @Override public void setSchema(Schema schema) { this.schema = schema; }
-
-   public String   getValues() { return values; }
-   public void     setValues(String values) { this.values = values; }
+   
+   public String         getValues() { return values; }
+   public void           setValues(String values) { this.values = values; }
    @Override public void addValue( String value) {  this.values = this.values+ ";"+ value; }
-   
+
    // ------------------------   Builders ----------------------------
-   
+
    public interface Exporter
    {
-      public void initExport();
-      public void exportSchema( Schema schema);
-      public void exportValues( String values);
-      public void endExport();
+      public void   initExport();
+      public void   exportSchema( Schema schema);
+      public void   exportValues( String values);
+      public void   endExport();
       public Object getProduct();
    }//Exporter
-   
+
    public Object export( SchemaValues.Exporter exporter)
    {
       exporter.initExport();
@@ -76,7 +78,7 @@ public class SchemaValues extends BaseEntity implements SchemaValuesImporter
       exporter.endExport();
       return exporter.getProduct();
    }//export
-   
+
    public interface ImporterDirector
    {
       public void dirija( SchemaValuesImporter importer);
