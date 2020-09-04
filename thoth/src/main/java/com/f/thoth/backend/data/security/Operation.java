@@ -2,6 +2,7 @@ package com.f.thoth.backend.data.security;
 
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -83,9 +84,9 @@ public class Operation extends BaseEntity implements NeedsProtection, Hierarchic
    protected Operation       owner;      // Operation group to which this operation belongs
 
    @NotNull(message = "{evidentia.objectToProtect.required")
-   @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true)
+   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
    protected ObjectToProtect  objectToProtect;  // Associated security object
-
+ 
    // --------------------- Construccion -------------------------
    public Operation()
    {
@@ -159,33 +160,33 @@ public class Operation extends BaseEntity implements NeedsProtection, Hierarchic
    public UserGroup             getRestrictedTo() {return objectToProtect.getRestrictedTo();}
    public void                  setRestrictedTo(UserGroup restrictedTo) {objectToProtect.setRestrictedTo(restrictedTo);}
 
-   public Set<Permission>       getAcl() {return objectToProtect.getAcl();}
-   public void                  setAcl( Set<Permission> acl) {objectToProtect.setAcl(acl);}
+   public Set<Role>             getAcl() {return objectToProtect.getAcl();}
+   public void                  setAcl( Set<Role> acl) {objectToProtect.setAcl(acl);}
 
    // --------------------------- Implements HierarchicalEntity ---------------------------------------
    @Override public String      getName()   { return name;}
-   
+
    @Override public Operation   getOwner()  { return owner;}
-   
+
    private String getOwnerCode(){ return owner == null ? "" : owner.getOwnerCode()+ ":"+ name; }
 
    // -----------------  Implements NeedsProtection ----------------
-   
+
    @Override public ObjectToProtect getObjectToProtect()                  { return objectToProtect;}
-   
+
    @Override public boolean         canBeAccessedBy(Integer userCategory) { return objectToProtect.canBeAccessedBy(userCategory);}
-   
+
    @Override public boolean         isOwnedBy( SingleUser user)           { return objectToProtect.isOwnedBy(user);}
-   
+
    @Override public boolean         isOwnedBy( Role role)                 { return objectToProtect.isOwnedBy(role);}
-   
+
    @Override public boolean         isRestrictedTo( UserGroup userGroup)  { return objectToProtect.isRestrictedTo(userGroup);}
-   
+
    @Override public boolean         admits( Role role)                    { return objectToProtect.admits(role);}
-   
-   @Override public void            grant( Permission permission)         { objectToProtect.grant(permission);}
-   
-   @Override public void            revoke( Permission permission)        { objectToProtect.revoke(permission);}
+
+   @Override public void            grant( Role  role)                    { objectToProtect.grant(role);}
+
+   @Override public void            revoke(Role role)                     { objectToProtect.revoke(role);}
 
    // ---------------------- Object -----------------------
 

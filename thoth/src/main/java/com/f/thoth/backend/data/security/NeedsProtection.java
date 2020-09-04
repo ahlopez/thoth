@@ -18,8 +18,8 @@ public interface NeedsProtection
 
    public boolean admits( Role role);
 
-   public void    grant( Permission permission);
+   public void    grant( Role role);
 
-   public void    revoke( Permission permission);
+   public void    revoke( Role role);
 
 }//NeedsProtection

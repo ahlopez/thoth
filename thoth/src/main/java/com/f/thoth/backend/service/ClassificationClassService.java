@@ -150,7 +150,7 @@ public class ClassificationClassService implements FilterableCrudService<Classif
          if ( !newGrant.isPersisted())
             permissionRepository.saveAndFlush(newGrant);
          
-         objectOfClass.grant(newGrant);
+         objectOfClass.grant(role);
          objectToProtectRepository.saveAndFlush(objectOfClass);
       });
    }//grant
@@ -164,7 +164,7 @@ public class ClassificationClassService implements FilterableCrudService<Classif
          Permission toRevoke = permissionRepository.findByRoleObject(newRevoke.getRole(),objectOfClass);
          if ( toRevoke != null)
          {
-            objectOfClass.revoke(toRevoke);
+            objectOfClass.revoke(role);
             objectToProtectRepository.saveAndFlush(objectOfClass);
             permissionRepository.delete(toRevoke);
          }

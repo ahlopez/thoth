@@ -2,6 +2,7 @@ package com.f.thoth.backend.data.gdoc.expediente;
 
 import java.time.LocalDateTime;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
@@ -20,7 +21,6 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.DocType;
 import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
-import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
 import com.f.thoth.backend.data.security.ThothSession;
@@ -40,27 +40,27 @@ public abstract class Expediente extends BaseEntity implements NeedsProtection, 
    @Size(max = 255)
    @Column(unique = true)
    protected String           name;              // Expediente name
-   
-   @NotNull(message = "{evidentia.objectToProtect.required") 
-   @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true)
+
+   @NotNull(message = "{evidentia.objectToProtect.required")
+   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
    protected ObjectToProtect  objectToProtect;  // Objeto asociado de seguridad
 
    @ManyToOne
    protected BranchExpediente  owner;            // Expediente al que pertenece este expediente
-   
+
    @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true)
    private FileIndex          index;
-   
+
    @ManyToOne
    private DocType            attributes;
-   
+
    @NotNull(message = "{evidentia.dateopened.required}")
    private LocalDateTime      openingDate;
-   
+
    private LocalDateTime      closingDate;
-   
+
    private boolean            open;
-   
+
 
    // --------------- Constructors --------------------
    public Expediente()
@@ -68,15 +68,15 @@ public abstract class Expediente extends BaseEntity implements NeedsProtection, 
       this.tenant = ThothSession.getCurrentTenant();
       buildCode();
    }
-   
+
    public Expediente( String name, BranchExpediente owner)
    {
       if( TextUtil.isEmpty(name))
          throw new IllegalArgumentException("Nombre del expediente no puede ser nulo ni vacío");
-      
+
       this.name  = name;
       this.owner = owner;
-      
+
    }//Expediente constructor
 
    @PrePersist
@@ -99,7 +99,7 @@ public abstract class Expediente extends BaseEntity implements NeedsProtection, 
    public void setOwner(BranchExpediente owner) { this.owner = owner; }
 
    public void setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect; }
-   
+
    public FileIndex getIndex() {return index;}
    public void setIndex(FileIndex index) {this.index = index;}
 
@@ -116,28 +116,28 @@ public abstract class Expediente extends BaseEntity implements NeedsProtection, 
 
    // --------------------------- Implements HierarchicalEntity ---------------------------------------
    @Override public String      getName()   { return name;}
-   
+
    @Override public BranchExpediente getOwner()  { return owner;}
-   
+
    protected String getOwnerCode(){ return owner == null ? "" : owner.getOwnerCode()+ ":"+ name; }
 
    // -----------------  Implements NeedsProtection ----------------
-   
+
    @Override public ObjectToProtect getObjectToProtect()                  { return objectToProtect;}
-   
+
    @Override public boolean         canBeAccessedBy(Integer userCategory) { return objectToProtect.canBeAccessedBy(userCategory);}
-   
+
    @Override public boolean         isOwnedBy( SingleUser user)           { return objectToProtect.isOwnedBy(user);}
-   
+
    @Override public boolean         isOwnedBy( Role role)                 { return objectToProtect.isOwnedBy(role);}
-   
+
    @Override public boolean         isRestrictedTo( UserGroup userGroup)  { return objectToProtect.isRestrictedTo(userGroup);}
-   
+
    @Override public boolean         admits( Role role)                    { return objectToProtect.admits(role);}
-   
-   @Override public void            grant( Permission permission)         { objectToProtect.grant(permission);}
-   
-   @Override public void            revoke( Permission permission)        { objectToProtect.revoke(permission);}
+
+   @Override public void            grant( Role  role)                    { objectToProtect.grant(role);}
+
+   @Override public void            revoke(Role role)                     { objectToProtect.revoke(role);}
 
    // ---------------------- Object -----------------------
 

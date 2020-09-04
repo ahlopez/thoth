@@ -108,28 +108,28 @@ public class UserGroup extends Usuario implements HierarchicalEntity<UserGroup>
 
    // --------------------------- Implements HierarchicalEntity ---------------------------------------
    @Override public String      getName()   { return name;}
-   
+
    @Override public UserGroup   getOwner()  { return owner;}
-   
+
    private String getOwnerCode(){ return owner == null ? "" : owner.getOwnerCode()+ ":"+ name; }
 
    // -----------------  Implements NeedsProtection ----------------
-   
+
    @Override public ObjectToProtect getObjectToProtect()                  { return objectToProtect;}
-   
+
    @Override public boolean         canBeAccessedBy(Integer userCategory) { return objectToProtect.canBeAccessedBy(userCategory);}
-   
+
    @Override public boolean         isOwnedBy( SingleUser user)           { return objectToProtect.isOwnedBy(user);}
-   
+
    @Override public boolean         isOwnedBy( Role role)                 { return objectToProtect.isOwnedBy(role);}
-   
+
    @Override public boolean         isRestrictedTo( UserGroup userGroup)  { return objectToProtect.isRestrictedTo(userGroup);}
-   
+
    @Override public boolean         admits( Role role)                    { return objectToProtect.admits(role);}
-   
-   @Override public void            grant( Permission permission)         { objectToProtect.grant(permission);}
-   
-   @Override public void            revoke( Permission permission)        { objectToProtect.revoke(permission);}
+
+   @Override public void            grant( Role  role)         { objectToProtect.grant(role);}
+
+   @Override public void            revoke(Role role)        { objectToProtect.revoke(role);}
 
    // ---------------------- Object -----------------------
 
@@ -170,7 +170,7 @@ public class UserGroup extends Usuario implements HierarchicalEntity<UserGroup>
    {
       //TODO: Implementar la restricción de grupo de usuarios
       if ( ! object.canBeAccessedBy( this.userCategory))
-         return false;    
+         return false;
 
       for( Role r : this.roles)
       {

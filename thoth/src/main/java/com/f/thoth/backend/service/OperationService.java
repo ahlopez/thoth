@@ -128,7 +128,8 @@ public class OperationService implements FilterableCrudService<Operation>, Permi
    
    @Override public List<Operation> findObjectsGranted( Role role)
    {
-      return operationRepository.findOperationsGranted(role);
+      List<Operation> granted = operationRepository.findOperationsGranted(role);
+      return granted;
    }
 
    public void grantRevoke( User currentUser, Role role, Set<Permission> newGrants, Set<Permission> newRevokes)
@@ -148,10 +149,12 @@ public class OperationService implements FilterableCrudService<Operation>, Permi
             if ( !newGrant.isPersisted())
                 permissionRepository.saveAndFlush(newGrant);
             
-            operation.grant(newGrant);
+            operation.grant(role);
             operationRepository.saveAndFlush(operation);
         }
       });
+      List<Operation>grantedTo = operationRepository.findOperationsGranted(role);
+      int x = 1;
    }//grant
 
    
@@ -163,7 +166,7 @@ public class OperationService implements FilterableCrudService<Operation>, Permi
          if ( operation != null)
          {
             Permission toRevoke = permissionRepository.findByRoleObject(newRevoke.getRole(),newRevoke.getObjectToProtect());
-            operation.revoke(toRevoke);
+            operation.revoke(role);
             objectToProtectRepository.saveAndFlush(operation.getObjectToProtect());
             permissionRepository.delete(toRevoke);
         }

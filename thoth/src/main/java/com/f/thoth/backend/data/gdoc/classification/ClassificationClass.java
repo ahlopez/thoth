@@ -3,6 +3,7 @@ package com.f.thoth.backend.data.gdoc.classification;
 import java.time.LocalDate;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -26,7 +27,6 @@ import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
-import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
 import com.f.thoth.backend.data.security.UserGroup;
@@ -97,7 +97,7 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
    protected String          name;                         // Node name
 
    @NotNull(message = "{evidentia.objectToProtect.required") 
-   @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true)
+   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
    protected ObjectToProtect  objectToProtect;             // Associated security object
 
    @NotNull(message = "{evidentia.level.required") 
@@ -250,8 +250,8 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
    public UserGroup             getRestrictedTo() {return objectToProtect.getRestrictedTo();}
    public void                  setRestrictedTo(UserGroup restrictedTo) {objectToProtect.setRestrictedTo(restrictedTo);}
 
-   public Set<Permission>       getAcl() {return objectToProtect.getAcl();}
-   public void                  setAcl( Set<Permission> acl) {objectToProtect.setAcl(acl);}
+   public Set<Role>             getAcl() {return objectToProtect.getAcl();}
+   public void                  setAcl( Set<Role> acl) {objectToProtect.setAcl(acl);}
 
    // --------------------------- Implements HierarchicalEntity ---------------------------------------
    @Override public String                getName()   { return name;}
@@ -274,9 +274,9 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
    
    @Override public boolean         admits( Role role)                    { return objectToProtect.admits(role);}
    
-   @Override public void            grant( Permission permission)         { objectToProtect.grant(permission);}
+   @Override public void            grant( Role role)                     { objectToProtect.grant(role);}
    
-   @Override public void            revoke( Permission permission)        { objectToProtect.revoke(permission);}
+   @Override public void            revoke( Role role)                    { objectToProtect.revoke(role);}
 
 
    // --------------- Logic ------------------------------

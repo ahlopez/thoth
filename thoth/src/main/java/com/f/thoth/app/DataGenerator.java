@@ -569,8 +569,8 @@ public class DataGenerator implements HasLogger {
    {
       Operation operation = new Operation( name, new ObjectToProtect(), owner);
       operation.setTenant(tenant);
-      objectToProtectRepository.saveAndFlush( operation.getObjectToProtect());
-      Operation savedOperation = operationRepository.saveAndFlush(operation);
+    //  objectToProtectRepository.saveAndFlush( operation.getObjectToProtect());
+      Operation savedOperation = operationRepository.save(operation);
       return savedOperation;
    }//createObject
 
@@ -583,8 +583,6 @@ public class DataGenerator implements HasLogger {
             new ClassificationClass( new ClassificationLevel(level, newSchema), name, parent, new ObjectToProtect());
 
       classificationClass.setTenant(tenant);    
-      ObjectToProtect associatedObject = classificationClass.getObjectToProtect();
-      objectToProtectRepository.saveAndFlush(associatedObject);
 
       ClassificationLevel nivel = classificationClass.getLevel();
       if ( !nivel.isPersisted())

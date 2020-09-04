@@ -2,6 +2,7 @@ package com.f.thoth.backend.data.gdoc.classification;
 
 import java.time.LocalDate;
 
+import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
@@ -18,7 +19,6 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
-import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
 import com.f.thoth.backend.data.security.UserGroup;
@@ -32,16 +32,16 @@ public class Office extends BaseEntity implements NeedsProtection, HierarchicalE
 {
    public static final String BRIEF = "Office.brief";
    public static final String FULL  = "Office.full";
-   
+
    @NotBlank(message = "{evidentia.name.required}")
    @NotNull (message = "{evidentia.name.required}")
    @Size(min= 2, max = 50, message= "{evidentia.name.length}")
    protected String     name;
 
-   @NotNull(message = "{evidentia.objectToProtect.required") 
-   @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true)
+   @NotNull(message = "{evidentia.objectToProtect.required")
+   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
    protected ObjectToProtect  objectToProtect;
-   
+
    @ManyToOne
    protected BranchOffice  owner;
 
@@ -106,7 +106,7 @@ public class Office extends BaseEntity implements NeedsProtection, HierarchicalE
    {
       this.code = (tenant == null? "[tenant]": tenant.getCode())+"[OFI]"+ getOwnerCode()+ ">"+ (name == null? "[name]" : name);
    }//buildCode
-   
+
    protected String getOwnerCode(){ return owner == null ? "" : owner.getOwnerCode()+ ":"+ name; }
 
    // -------------- Getters & Setters ----------------
@@ -133,27 +133,27 @@ public class Office extends BaseEntity implements NeedsProtection, HierarchicalE
 
    // --------------------------- Implements HierarchicalEntity ---------------------------------------
    @Override public String       getName()   { return name;}
-   
+
    @Override public BranchOffice getOwner()  { return owner;}
 
    // -----------------  Implements NeedsProtection ----------------
-   
+
    @Override public ObjectToProtect getObjectToProtect()                  { return objectToProtect;}
-   
+
    @Override public boolean         canBeAccessedBy(Integer userCategory) { return objectToProtect.canBeAccessedBy(userCategory);}
-   
+
    @Override public boolean         isOwnedBy( SingleUser user)           { return objectToProtect.isOwnedBy(user);}
-   
+
    @Override public boolean         isOwnedBy( Role role)                 { return objectToProtect.isOwnedBy(role);}
-   
+
    @Override public boolean         isRestrictedTo( UserGroup userGroup)  { return objectToProtect.isRestrictedTo(userGroup);}
-   
+
    @Override public boolean         admits( Role role)                    { return objectToProtect.admits(role);}
-   
-   @Override public void            grant( Permission permission)         { objectToProtect.grant(permission);}
-   
-   @Override public void            revoke( Permission permission)        { objectToProtect.revoke(permission);}
-   
+
+   @Override public void            grant( Role  role)                    { objectToProtect.grant(role);}
+
+   @Override public void            revoke(Role role)                     { objectToProtect.revoke(role);}
+
    // --------------- Object methods ---------------------
 
    @Override public boolean equals( Object o)
@@ -199,6 +199,6 @@ public class Office extends BaseEntity implements NeedsProtection, HierarchicalE
       LocalDate now = LocalDate.now();
       return now.compareTo(dateOpened) >= 0 && now.compareTo(dateClosed) <= 0;
    }//isOpen
-   
+
 
 }//Office

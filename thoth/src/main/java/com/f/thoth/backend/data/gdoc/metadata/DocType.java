@@ -1,5 +1,6 @@
 package com.f.thoth.backend.data.gdoc.metadata;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
@@ -21,7 +22,6 @@ import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
-import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
 import com.f.thoth.backend.data.security.UserGroup;
@@ -83,7 +83,7 @@ public class DocType extends BaseEntity implements NeedsProtection, Hierarchical
    protected String           name;
 
    @NotNull(message = "{evidentia.objectToProtect.required")
-   @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true)
+   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
    protected ObjectToProtect  objectToProtect;
 
    @ManyToOne
@@ -183,9 +183,9 @@ public class DocType extends BaseEntity implements NeedsProtection, Hierarchical
 
    @Override public boolean         admits( Role role)                    { return objectToProtect.admits(role);}
 
-   @Override public void            grant( Permission permission)         { objectToProtect.grant(permission);}
+   @Override public void            grant( Role role)                     { objectToProtect.grant(role);}
 
-   @Override public void            revoke( Permission permission)        { objectToProtect.revoke(permission);}
+   @Override public void            revoke( Role role)                    { objectToProtect.revoke(role);}
 
    // ---------------------- Object -----------------------
 

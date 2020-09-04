@@ -9,6 +9,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
@@ -64,20 +65,21 @@ public class ObjectToProtect
    @NotNull     (message= "{evidentia.category.required}")
    @Min(value=0, message= "{evidentia.category.minvalue}")
    @Max(value=5, message= "{evidentia.category.maxvalue}")
-   protected Integer         category;   // Security category
+   protected Integer         category;      // Security category
 
    @ManyToOne
-   protected SingleUser      userOwner;  // User that owns this object
+   protected SingleUser      userOwner;     // User that owns this object
 
    @ManyToOne
-   protected Role            roleOwner;  // Role that owns this object
+   protected Role            roleOwner;     // Role that owns this object
 
    @ManyToOne
    protected UserGroup       restrictedTo;  // UserGroup that owns this object
 
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+   @JoinColumn(name="role_id")
    @BatchSize(size = 20)
-   protected Set<Permission>  acl;       // Access control list
+   protected Set<Role>  acl;               // Access control list
 
    // -------------- Constructors -------------
    public ObjectToProtect()
@@ -121,8 +123,8 @@ public class ObjectToProtect
    public UserGroup       getRestrictedTo() {return restrictedTo;}
    public void            setRestrictedTo(UserGroup restrictedTo) {this.restrictedTo = restrictedTo;}
 
-   public Set<Permission> getAcl() {return acl;}
-   public void            setAcl( Set<Permission> acl) {this.acl = acl;}
+   public Set<Role> getAcl() {return acl;}
+   public void            setAcl( Set<Role> acl) {this.acl = acl;}
 
    // ---------------------- Object -----------------------
 
@@ -144,17 +146,17 @@ public class ObjectToProtect
    @Override public String toString()
    {
       StringBuilder s = new StringBuilder();
-      s.append( super.toString())
+      s.append(" id["+            id+ "]")
        .append(" category["+      category+ "]")
        .append(" userOwner["+    (userOwner    == null? "---": userOwner.getCode())+ "]")
        .append(" roleOwner["+    (roleOwner    == null? "---": roleOwner.getCode())+ "]")
        .append(" restrictedTo["+ (restrictedTo == null? "---": restrictedTo.getCode())+ "]}\n\tAcl{");
 
       int i = 1;
-      for( Permission p: acl)
+      for( Role r: acl)
       {
-         s.append((i % 10 == 0? "\n\t   ": " "))
-          .append(p.getRole().getCode());
+         s.append((i % 5 == 0? "\n\t   ": " "))
+          .append(r.getCode());
          i++;
       }
       s.append("\n\t   }\n");
@@ -173,15 +175,15 @@ public class ObjectToProtect
    
    public boolean isRestrictedTo( UserGroup userGroup)  { return restrictedTo != null && restrictedTo.equals(userGroup);}
 
-   public void grant( Permission permission)            { acl.add(permission);}
+   public void grant( Role role)                        { acl.add(role); }
 
-   public void revoke( Permission permission)           { acl.remove(permission);}
+   public void revoke( Role role)                       { acl.remove(role);}
 
    public boolean admits( Role role)
    {
-      for( Permission p: acl)
+      for( Role r: acl)
       {
-         if ( p.grants( role, this) )
+         if ( r.equals( role) )
             return true;
       }
       return false;

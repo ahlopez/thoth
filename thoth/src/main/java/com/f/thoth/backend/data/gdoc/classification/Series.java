@@ -2,6 +2,7 @@ package com.f.thoth.backend.data.gdoc.classification;
 
 import java.time.LocalDate;
 
+import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
@@ -18,7 +19,6 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
-import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
 import com.f.thoth.backend.data.security.UserGroup;
@@ -35,8 +35,8 @@ public class Series extends BaseEntity implements NeedsProtection, HierarchicalE
    @Size(min= 2, max = 50, message= "{evidentia.name.length}")
    protected String     name;
 
-   @NotNull(message = "{evidentia.objectToProtect.required") 
-   @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true)
+   @NotNull(message = "{evidentia.objectToProtect.required")
+   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
    protected ObjectToProtect  objectToProtect;
 
    @ManyToOne
@@ -54,7 +54,7 @@ public class Series extends BaseEntity implements NeedsProtection, HierarchicalE
    @NotNull(message = "{remun.status.required}")
    @ManyToOne
    protected RetentionSchedule retentionSchedule;
-*/   
+*/
 
    // ------------- Constructors ------------------
    public Series()
@@ -104,7 +104,7 @@ public class Series extends BaseEntity implements NeedsProtection, HierarchicalE
    {
       this.code = (tenant == null? "[tenant]": tenant.getCode())+"[SER]"+ getOwnerCode()+ ">"+ (name == null? "[name]" : name);
    }//buildCode
-   
+
    protected String getOwnerCode(){ return owner == null ? "" : owner.getOwnerCode()+ ":"+ name; }
 
    // -------------- Getters & Setters ----------------
@@ -114,7 +114,7 @@ public class Series extends BaseEntity implements NeedsProtection, HierarchicalE
    public void              setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect; }
 
    public void              setOwner(BranchSeries owner) { this.owner = owner;}
-   
+
    public Schema            getSchema(){ return this.schema;}
    public void              setSchema( Schema schema){ this.schema = schema;}
 
@@ -126,31 +126,31 @@ public class Series extends BaseEntity implements NeedsProtection, HierarchicalE
 /*
    public RetentionSchedule getRetentionSchedule() { return retentionSchedule;}
    public void              setRetentionSchedule( RetentionSchedule retentionSchedule){ this.retentionSchedule= retentionSchedule;}
-*/ 
+*/
 
    // --------------------------- Implements HierarchicalEntity ---------------------------------------
    @Override public String       getName()   { return name;}
-   
+
    @Override public BranchSeries getOwner()  { return owner;}
 
    // -----------------  Implements NeedsProtection ----------------
-   
+
    @Override public ObjectToProtect getObjectToProtect()                  { return objectToProtect;}
-   
+
    @Override public boolean         canBeAccessedBy(Integer userCategory) { return objectToProtect.canBeAccessedBy(userCategory);}
-   
+
    @Override public boolean         isOwnedBy( SingleUser user)           { return objectToProtect.isOwnedBy(user);}
-   
+
    @Override public boolean         isOwnedBy( Role role)                 { return objectToProtect.isOwnedBy(role);}
-   
+
    @Override public boolean         isRestrictedTo( UserGroup userGroup)  { return objectToProtect.isRestrictedTo(userGroup);}
-   
+
    @Override public boolean         admits( Role role)                    { return objectToProtect.admits(role);}
-   
-   @Override public void            grant( Permission permission)         { objectToProtect.grant(permission);}
-   
-   @Override public void            revoke( Permission permission)        { objectToProtect.revoke(permission);}
-   
+
+   @Override public void            grant( Role  role)                    { objectToProtect.grant(role);}
+
+   @Override public void            revoke(Role role)                     { objectToProtect.revoke(role);}
+
    // --------------- Object methods ---------------------
 
    @Override public boolean equals( Object o)

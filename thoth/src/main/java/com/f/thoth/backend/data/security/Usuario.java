@@ -37,14 +37,14 @@ public abstract class Usuario extends BaseEntity implements NeedsProtection, Com
    @NotBlank(message = "{evidentia.name.required}")
    @Size(min = 1, max = 255, message="{evidentia.name.min.max.length}")
    protected String        name;                 // user first name
-   
+
    @NotNull     (message= "{evidentia.category.required}")
    @Min(value=0, message= "{evidentia.category.minvalue}")
    @Max(value=5, message= "{evidentia.category.maxvalue}")
    protected Integer         userCategory;   // Security category
 
    @NotNull(message = "{evidentia.objectToProtect.required")
-   @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true)
+   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
    protected ObjectToProtect  objectToProtect;   // Associated security object
 
    @NotNull(message = "{evidentia.date.required}")
@@ -81,7 +81,7 @@ public abstract class Usuario extends BaseEntity implements NeedsProtection, Com
       this.toDate    =  toDate    != null ? toDate   : LocalDate.now().plusDays(DEFAULT_TO_DATE);
       this.locked    =  isLocked();
    }//prepareData
-   
+
    private LocalDate yearStart()
    {
       LocalDate now = LocalDate.now();
@@ -93,7 +93,7 @@ public abstract class Usuario extends BaseEntity implements NeedsProtection, Com
 
    public String     getName()   { return name;}
    public void       setName(String name) { this.name = name;}
-   
+
    public void       setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect= objectToProtect;}
 
    public Integer    getCategory() {return userCategory;}
@@ -123,22 +123,22 @@ public abstract class Usuario extends BaseEntity implements NeedsProtection, Com
    public void       setLocked(boolean locked) { this.locked = locked;}
 
    // -----------------  Implements NeedsProtection ----------------
-   
+
    @Override public ObjectToProtect getObjectToProtect()                  { return objectToProtect;}
-   
+
    @Override public boolean         canBeAccessedBy(Integer userCategory) { return objectToProtect.canBeAccessedBy(userCategory);}
-   
+
    @Override public boolean         isOwnedBy( SingleUser user)           { return objectToProtect.isOwnedBy(user);}
-   
+
    @Override public boolean         isOwnedBy( Role role)                 { return objectToProtect.isOwnedBy(role);}
-   
+
    @Override public boolean         isRestrictedTo( UserGroup userGroup)  { return objectToProtect.isRestrictedTo(userGroup);}
-   
+
    @Override public boolean         admits( Role role)                    { return objectToProtect.admits(role);}
-   
-   @Override public void            grant( Permission permission)         { objectToProtect.grant(permission);}
-   
-   @Override public void            revoke( Permission permission)        { objectToProtect.revoke(permission);}
+
+   @Override public void            grant( Role  role)         { objectToProtect.grant(role);}
+
+   @Override public void            revoke(Role role)        { objectToProtect.revoke(role);}
 
    // --------------- Object ------------------
 
@@ -167,10 +167,10 @@ public abstract class Usuario extends BaseEntity implements NeedsProtection, Com
    {
       return this.equals(that)?  0 :
          that ==  null        ?  1 :
-         this.code == null  && that.code == null?  0 :   
+         this.code == null  && that.code == null?  0 :
          this.code != null  && that.code == null?  1 :
-         this.code == null  && that.code != null? -1 :   
-         this.code.compareTo(that.code);     
+         this.code == null  && that.code != null? -1 :
+         this.code.compareTo(that.code);
 
    }// compareTo
 
@@ -181,7 +181,7 @@ public abstract class Usuario extends BaseEntity implements NeedsProtection, Com
       if ( role != null)
          roles.add(role);
    }//addToRole
-   
+
    public void revokeRole( Role role)
    {
       roles.remove(role);

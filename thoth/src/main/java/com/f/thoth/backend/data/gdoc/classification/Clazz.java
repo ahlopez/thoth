@@ -2,23 +2,17 @@ package com.f.thoth.backend.data.gdoc.classification;
 
 import java.time.LocalDate;
 import java.util.Objects;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import org.hibernate.annotations.BatchSize;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.HierarchicalEntity;
@@ -26,7 +20,6 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
-import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
 import com.f.thoth.backend.data.security.UserGroup;
@@ -43,8 +36,8 @@ public class Clazz extends BaseEntity implements NeedsProtection, HierarchicalEn
    @Size(min= 2, max = 50, message= "{evidentia.name.length}")
    protected String     name;
 
-   @NotNull(message = "{evidentia.objectToProtect.required") 
-   @OneToOne(fetch = FetchType.EAGER, orphanRemoval = true)
+   @NotNull(message = "{evidentia.objectToProtect.required")
+   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
    protected ObjectToProtect  objectToProtect;
 
    @NotNull(message = "{evidentia.schema.required}")
@@ -68,12 +61,6 @@ public class Clazz extends BaseEntity implements NeedsProtection, HierarchicalEn
    @NotNull(message = "{remun.status.required}")
    @ManyToOne
    protected RetentionSchedule retentionSchedule;
-
-   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-   @OrderColumn
-   @JoinColumn(name="class_id")
-   @BatchSize(size = 20)
-   protected Set<Permission>  acl;   // Access control list
 
    // ------------- Constructors ------------------
    public Clazz()
@@ -151,17 +138,14 @@ public class Clazz extends BaseEntity implements NeedsProtection, HierarchicalEn
    public RetentionSchedule getRetentionSchedule() { return retentionSchedule;}
    public void              setRetentionSchedule( RetentionSchedule retentionSchedule) {this.retentionSchedule = retentionSchedule;}
 
-   public Set<Permission>   getAcl() {return acl;}
-   public void              setAcl(Set<Permission> acl) {this.acl = acl;}
-   
    // ------------------- implements HierarchicalEntity<BranchOffice> -----------
-   
+
    @Override public ObjectToProtect getObjectToProtect(){ return objectToProtect;}
-   
+
    @Override public String          getName(){ return name;}
-   
+
    @Override public BranchClass     getOwner() { return owner;}
-   
+
 
    // --------------- Object methods ---------------------
 
@@ -227,22 +211,13 @@ public class Clazz extends BaseEntity implements NeedsProtection, HierarchicalEn
    @Override public boolean isOwnedBy( SingleUser user)            { return false;}
 
    @Override public boolean isOwnedBy( Role role)                  { return roleOwner != null && roleOwner.equals(role); }
-   
+
    @Override public boolean isRestrictedTo( UserGroup userGroup)   { return objectToProtect.isRestrictedTo(userGroup);}
-   
-   @Override public boolean admits( Role role)
-   { 
-      for( Permission p: acl)
-      {
-         if ( p.grants( role, objectToProtect) )
-            return true;
-      }
-      return false; 
-      
-   }//admits
 
-   @Override public void grant( Permission permission) { acl.add(permission);}
+   @Override public boolean admits( Role role)                     { return objectToProtect.admits(role);}
 
-   @Override public void revoke( Permission permission) { acl.remove(permission);}
+   @Override public void grant( Role role)                         { objectToProtect.grant(role);}
+
+   @Override public void revoke( Role role)                        { objectToProtect.revoke(role);}
 
 }//Clazz
