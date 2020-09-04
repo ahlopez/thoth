@@ -58,6 +58,6 @@ public abstract class AbstractEntity
 	  public int hashCode() { return Objects.hash(id, version); }
 
 	  @Override
-	  public String toString() { return "id[" + id + "] version[" + version + "]"; }
+	  public String toString() { return "id[" + id + ":" + version + "]"; }
 
 }// AbstractEntity

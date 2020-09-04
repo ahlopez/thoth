@@ -55,7 +55,9 @@ public abstract class BaseEntity extends AbstractEntity
 
 	@Override public String toString() 
 	{ 
-	   return super.toString()+ " tenant["+ tenant==null?"[tenant]": tenant.getName()+ "] code["+ (code==null? "---": code)+ "]";
+	   return super.toString()+ 
+	          " tenant["+ (tenant==null?"[tenant]": tenant.getName())+ "]"+
+	          " code["+ (code==null? "---": code)+ "]";
 	}
 
 }//BaseEntity

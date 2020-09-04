@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.f.thoth.backend.data.security.ObjectToProtect;
+import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
 
 public interface ObjectToProtectRepository extends JpaRepository<ObjectToProtect, Long>
@@ -22,13 +23,18 @@ public interface ObjectToProtectRepository extends JpaRepository<ObjectToProtect
    @Query("SELECT o FROM ObjectToProtect o where o = ?1")
    Optional<ObjectToProtect> findByObject(ObjectToProtect object);
 
+   @EntityGraph(value = ObjectToProtect.BRIEF, type = EntityGraphType.LOAD)
    @Query("SELECT o FROM ObjectToProtect o")
    Page<ObjectToProtect> findBy(Tenant tenant, Pageable page);
 
+   @EntityGraph(value = ObjectToProtect.BRIEF, type = EntityGraphType.LOAD)
    @Query("SELECT o FROM ObjectToProtect o")
    List<ObjectToProtect> findAll(Tenant tenant);
 
    @Query("SELECT count(o) FROM ObjectToProtect o")
    long countAll();
+ 
+   @Query("SELECT o FROM ObjectToProtect o JOIN o.acl p WHERE o = p.objectToProtect AND p.role= ?1")
+   List<ObjectToProtect>findObjectsGranted( Role role);
 
 }//ObjectToProtectRepository

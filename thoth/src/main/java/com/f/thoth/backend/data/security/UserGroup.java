@@ -91,7 +91,9 @@ public class UserGroup extends Usuario implements HierarchicalEntity<UserGroup>
 
    @Override protected void buildCode()
    {
-      this.code = (tenant == null? "[tenant]": tenant.getCode())+"[UGR]"+ getOwnerCode()+ ">"+ (name == null? "[name]" : name);
+      this.code = (tenant == null? "[tenant]": tenant.getCode())+"[UGR]"+
+                  (owner == null? ":": owner.getOwnerCode())+ ">"+
+                  (name == null? "[name]" : name);
    }//buildCode
 
    // --------------- Getters & Setters -----------------
@@ -111,7 +113,7 @@ public class UserGroup extends Usuario implements HierarchicalEntity<UserGroup>
 
    @Override public UserGroup   getOwner()  { return owner;}
 
-   private String getOwnerCode(){ return owner == null ? "" : owner.getOwnerCode()+ ":"+ name; }
+   private String getOwnerCode(){ return (owner == null ? "" : owner.getOwnerCode())+ ":"+ name; }
 
    // -----------------  Implements NeedsProtection ----------------
 
@@ -127,9 +129,9 @@ public class UserGroup extends Usuario implements HierarchicalEntity<UserGroup>
 
    @Override public boolean         admits( Role role)                    { return objectToProtect.admits(role);}
 
-   @Override public void            grant( Role  role)         { objectToProtect.grant(role);}
+   @Override public void            grant( Permission  permission)        { objectToProtect.grant(permission);}
 
-   @Override public void            revoke(Role role)        { objectToProtect.revoke(role);}
+   @Override public void            revoke(Permission permission)         { objectToProtect.revoke(permission);}
 
    // ---------------------- Object -----------------------
 

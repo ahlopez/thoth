@@ -17,21 +17,26 @@ import com.f.thoth.backend.data.security.Tenant;
 
 public interface OperationRepository extends JpaRepository<Operation, Long>
 {
+   @EntityGraph(value = Operation.BRIEF, type = EntityGraphType.LOAD)
    @Query("SELECT o FROM Operation o where o.tenant=?1")
    Page<Operation> findBy(Tenant tenant, Pageable page);
    
+   @EntityGraph(value = Operation.FULL, type = EntityGraphType.LOAD)
    @Query("SELECT o FROM Operation o where o.objectToProtect=?1")
    Operation findByObjectToProtect(ObjectToProtect objectToProtect);
 
+   @EntityGraph(value = Operation.BRIEF, type = EntityGraphType.LOAD)
    @Query("SELECT o FROM Operation o where o.tenant=?1")
    List<Operation> findAll(Tenant tenant);
 
    @Query("SELECT count(o) FROM Operation o where o.tenant=?1")
    long countAll(Tenant tenant);
 
+   @EntityGraph(value = Operation.BRIEF, type = EntityGraphType.LOAD)
    @Query("SELECT o FROM Operation o where o.tenant=?1 and lower(o.name) like  lower(?2)")
    Page<Operation> findByNameLikeIgnoreCase(Tenant tenant, String name, Pageable page);   
 
+   @EntityGraph(value = Operation.BRIEF, type = EntityGraphType.LOAD)
    @Query("SELECT o FROM Operation o where o.tenant=?1 and lower(o.name) like lower(?2)")
    List<Operation> findByNameLikeIgnoreCase(Tenant tenant, String name);   
 
@@ -53,7 +58,7 @@ public interface OperationRepository extends JpaRepository<Operation, Long>
    long countByNameLikeIgnoreCase(Tenant tenant, String name);
 
    //   ----------- ACL handling ----------------
-   @EntityGraph(value = Operation.FULL, type = EntityGraphType.LOAD)
+   @EntityGraph(value = Operation.BRIEF, type = EntityGraphType.FETCH)
    @Query("SELECT DISTINCT o FROM Operation o, Permission p  WHERE o.objectToProtect = p.objectToProtect and p.role = ?1")
    List<Operation> findOperationsGranted( Role role);
    

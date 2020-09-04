@@ -20,6 +20,7 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
+import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
 import com.f.thoth.backend.data.security.UserGroup;
@@ -108,9 +109,12 @@ public class Clazz extends BaseEntity implements NeedsProtection, HierarchicalEn
 
    @Override protected void buildCode()
    {
-      this.code =   owner != null? owner.code + ">"+ name :
-                   (tenant == null? "[Tenant]" : tenant.getCode())+  "[CLS]>"+ (name == null? "[name]" : name);
+      this.code = (tenant == null? "[tenant]": tenant.getCode())+"[CLZ]"+
+                  (owner == null? ":": owner.getOwnerCode())+ ">"+
+                  (name == null? "[name]" : name);
    }//buildCode
+
+   protected String getOwnerCode(){ return (owner == null ? "" : owner.getOwnerCode())+ ":"+ name; }
 
    // -------------- Getters & Setters ----------------
 
@@ -216,8 +220,8 @@ public class Clazz extends BaseEntity implements NeedsProtection, HierarchicalEn
 
    @Override public boolean admits( Role role)                     { return objectToProtect.admits(role);}
 
-   @Override public void grant( Role role)                         { objectToProtect.grant(role);}
+   @Override public void    grant( Permission  permission)         { objectToProtect.grant(permission);}
 
-   @Override public void revoke( Role role)                        { objectToProtect.revoke(role);}
+   @Override public void    revoke(Permission permission)          { objectToProtect.revoke(permission);}
 
 }//Clazz

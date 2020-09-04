@@ -115,7 +115,7 @@ public class Permission extends BaseEntity implements Comparable<Permission>
    public int hashCode() { return id == null? 11: id.hashCode(); }
 
    @Override
-   public String toString() { return "Permission{ "+ super.toString()+ " role["+ role.getName()+ "]\n\t object["+ objectToProtect.toString()+ "]\n\t from["+  fromDate+ "] to["+ toDate+ "] grantedBy["+ grantedBy.getEmail()+ "]}";}
+   public String toString() { return "Permission{ "+ super.toString()+ " role["+ role.getName()+ "]\n\t object["+ objectToProtect.toString()+ "]\n\t from["+  fromDate+ "] to["+ toDate+ "] grantedBy["+ grantedBy.getEmail()+ "]}\n";}
 
    @Override
    public int compareTo(Permission that)
@@ -130,16 +130,13 @@ public class Permission extends BaseEntity implements Comparable<Permission>
    }// compareTo
 
    // --------------- Logic ---------------------
-
-   public boolean isCurrent()
-   {
-      LocalDate now = LocalDate.now();
-      return now.compareTo(fromDate) >= 0 && now.compareTo(toDate) <= 0;
-   }//isCurrent
    
    public boolean grants( Role role, ObjectToProtect objectWanted)
    {
-      return this.role.equals(role) && this.objectToProtect.equals(objectWanted) && isCurrent();
-   }
+      LocalDate now = LocalDate.now();
+      return this.role.equals(role) && 
+             this.objectToProtect.equals(objectWanted) && 
+             now.compareTo(fromDate) >= 0 && now.compareTo(toDate) <= 0;
+   }//grants
 
 }//Permission

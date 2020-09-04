@@ -21,6 +21,7 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.DocType;
 import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
+import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
 import com.f.thoth.backend.data.security.ThothSession;
@@ -87,9 +88,12 @@ public abstract class Expediente extends BaseEntity implements NeedsProtection, 
       buildCode();
    }//prepareData
 
+
    @Override protected void buildCode()
    {
-      this.code = (tenant == null? "[tenant]": tenant.getCode())+"[XPE]"+ getOwnerCode()+ ">"+ (name == null? "[name]" : name);
+      this.code = (tenant == null? "[tenant]": tenant.getCode())+"[XPE]"+
+                  (owner == null? ":": owner.getOwnerCode())+ ">"+
+                  (name == null? "[name]" : name);
    }//buildCode
 
    // ---------------- Getters & Setters --------------
@@ -119,7 +123,7 @@ public abstract class Expediente extends BaseEntity implements NeedsProtection, 
 
    @Override public BranchExpediente getOwner()  { return owner;}
 
-   protected String getOwnerCode(){ return owner == null ? "" : owner.getOwnerCode()+ ":"+ name; }
+   protected String getOwnerCode(){ return (owner == null ? "" : owner.getOwnerCode())+ ":"+ name; }
 
    // -----------------  Implements NeedsProtection ----------------
 
@@ -135,9 +139,9 @@ public abstract class Expediente extends BaseEntity implements NeedsProtection, 
 
    @Override public boolean         admits( Role role)                    { return objectToProtect.admits(role);}
 
-   @Override public void            grant( Role  role)                    { objectToProtect.grant(role);}
+   @Override public void            grant( Permission  permission)        { objectToProtect.grant(permission);}
 
-   @Override public void            revoke(Role role)                     { objectToProtect.revoke(role);}
+   @Override public void            revoke(Permission permission)         { objectToProtect.revoke(permission);}
 
    // ---------------------- Object -----------------------
 

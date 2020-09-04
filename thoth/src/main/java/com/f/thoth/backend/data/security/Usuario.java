@@ -136,9 +136,9 @@ public abstract class Usuario extends BaseEntity implements NeedsProtection, Com
 
    @Override public boolean         admits( Role role)                    { return objectToProtect.admits(role);}
 
-   @Override public void            grant( Role  role)         { objectToProtect.grant(role);}
+   @Override public void            grant( Permission  permission)        { objectToProtect.grant(permission);}
 
-   @Override public void            revoke(Role role)        { objectToProtect.revoke(role);}
+   @Override public void            revoke(Permission permission)         { objectToProtect.revoke(permission);}
 
    // --------------- Object ------------------
 

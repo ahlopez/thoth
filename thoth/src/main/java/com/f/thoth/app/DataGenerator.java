@@ -34,7 +34,6 @@ import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.ClassificationClassRepository;
 import com.f.thoth.backend.repositories.ClassificationLevelRepository;
-import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 import com.f.thoth.backend.repositories.OperationRepository;
 import com.f.thoth.backend.repositories.OrderRepository;
 import com.f.thoth.backend.repositories.PickupLocationRepository;
@@ -70,7 +69,6 @@ public class DataGenerator implements HasLogger {
    private OrderRepository               orderRepository;
    private UserRepository                userRepository;
    private ProductRepository             productRepository;
-   private ObjectToProtectRepository     objectToProtectRepository;
    private OperationRepository           operationRepository;
    private PickupLocationRepository      pickupLocationRepository;
    private PasswordEncoder               passwordEncoder;
@@ -82,7 +80,7 @@ public class DataGenerator implements HasLogger {
    public DataGenerator(TenantService tenantService, OrderRepository orderRepository, UserRepository userRepository,
          ProductRepository productRepository, PickupLocationRepository pickupLocationRepository,
          TenantRepository tenantRepository, RoleRepository roleRepository, OperationRepository operationRepository,
-         ClassificationClassRepository claseRepository, ObjectToProtectRepository objectToProtectRepository,
+         ClassificationClassRepository claseRepository, 
          ClassificationLevelRepository classificationLevelRepository, SchemaRepository schemaRepository,
          PasswordEncoder passwordEncoder)
    {
@@ -93,7 +91,6 @@ public class DataGenerator implements HasLogger {
       this.pickupLocationRepository      = pickupLocationRepository;
       this.tenantRepository              = tenantRepository;
       this.roleRepository                = roleRepository;
-      this.objectToProtectRepository     = objectToProtectRepository;
       this.operationRepository           = operationRepository;
       this.claseRepository               = claseRepository;
       this.classificationLevelRepository = classificationLevelRepository;

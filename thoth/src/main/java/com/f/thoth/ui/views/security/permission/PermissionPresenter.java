@@ -51,7 +51,6 @@ public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements Ha
    {  
       return service.findObjectsGranted(role);
    }//loadGrants
-   
    public void grantRevoke( Collection<E> objectsGranted, Role role, Period period )
    {
       List<Permission> oldGrants  = service.findGrants(role);
@@ -106,7 +105,7 @@ public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements Ha
       return newRevokes;
       
    }//getNewRevokes
-  
+
 
    /*
    private boolean executeOperation(Runnable operation)

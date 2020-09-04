@@ -143,18 +143,16 @@ public class OperationService implements FilterableCrudService<Operation>, Permi
    {
       newGrants.forEach( newGrant-> 
       {
+         if (!newGrant.isPersisted())
+            permissionRepository.saveAndFlush(newGrant);
+         
          Operation operation= operationRepository.findByObjectToProtect(newGrant.getObjectToProtect());
          if ( operation != null)
          {
-            if ( !newGrant.isPersisted())
-                permissionRepository.saveAndFlush(newGrant);
-            
-            operation.grant(role);
+            operation.grant(newGrant);            
             operationRepository.saveAndFlush(operation);
         }
       });
-      List<Operation>grantedTo = operationRepository.findOperationsGranted(role);
-      int x = 1;
    }//grant
 
    
@@ -166,7 +164,7 @@ public class OperationService implements FilterableCrudService<Operation>, Permi
          if ( operation != null)
          {
             Permission toRevoke = permissionRepository.findByRoleObject(newRevoke.getRole(),newRevoke.getObjectToProtect());
-            operation.revoke(role);
+            operation.revoke(toRevoke);
             objectToProtectRepository.saveAndFlush(operation.getObjectToProtect());
             permissionRepository.delete(toRevoke);
         }

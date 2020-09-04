@@ -74,7 +74,7 @@ implements HasValue<E, T>
    public void init( Collection<T> initialSelection)
    {
       resetSelector();
-      initialSelection.forEach( val-> treeGrid.select(val));
+      initialSelection.forEach( val-> setValue(val));
    }//init
 
 

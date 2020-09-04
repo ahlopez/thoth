@@ -57,11 +57,11 @@ public class ObjectToProtect
 {
    public static final String BRIEF = "ObjectToProtect.brief";
    public static final String FULL  = "ObjectToProtect.full";
-   
+
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
    protected Long            id;
-   
+
    @NotNull     (message= "{evidentia.category.required}")
    @Min(value=0, message= "{evidentia.category.minvalue}")
    @Max(value=5, message= "{evidentia.category.maxvalue}")
@@ -77,9 +77,9 @@ public class ObjectToProtect
    protected UserGroup       restrictedTo;  // UserGroup that owns this object
 
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-   @JoinColumn(name="role_id")
+   @JoinColumn(name="permission_id")
    @BatchSize(size = 20)
-   protected Set<Role>  acl;               // Access control list
+   protected Set<Permission>  acl;               // Access control list
 
    // -------------- Constructors -------------
    public ObjectToProtect()
@@ -105,12 +105,12 @@ public class ObjectToProtect
    {
       if( category == null)
          category = Constant.DEFAULT_CATEGORY;
-      
+
    }//prepareData
 
    // ----------------- Getters & Setters ----------------
    public Long            getId() { return id;}
-   
+
    public Integer         getCategory() {return category;}
    public void            setCategory(Integer category) {this.category = category;}
 
@@ -123,8 +123,8 @@ public class ObjectToProtect
    public UserGroup       getRestrictedTo() {return restrictedTo;}
    public void            setRestrictedTo(UserGroup restrictedTo) {this.restrictedTo = restrictedTo;}
 
-   public Set<Role> getAcl() {return acl;}
-   public void            setAcl( Set<Role> acl) {this.acl = acl;}
+   public Set<Permission> getAcl() {return acl;}
+   public void            setAcl( Set<Permission> acl) {this.acl = acl;}
 
    // ---------------------- Object -----------------------
 
@@ -153,10 +153,10 @@ public class ObjectToProtect
        .append(" restrictedTo["+ (restrictedTo == null? "---": restrictedTo.getCode())+ "]}\n\tAcl{");
 
       int i = 1;
-      for( Role r: acl)
+      for( Permission p: acl)
       {
-         s.append((i % 5 == 0? "\n\t   ": " "))
-          .append(r.getCode());
+         s.append(i % 5 == 0? "\n\t   ": (i == 1? "": ", "))
+          .append(p.getRole().getCode());
          i++;
       }
       s.append("\n\t   }\n");
@@ -166,15 +166,20 @@ public class ObjectToProtect
 
    // -----------------  Logic ----------------
    public boolean isPersisted() { return id != null;}
-   
+
    public boolean canBeAccessedBy(Integer userCategory) { return userCategory != null && category.compareTo(userCategory) <= 0;}
 
    public boolean isOwnedBy( SingleUser user)           { return userOwner    != null && userOwner.equals(user);}
 
    public boolean isOwnedBy( Role role)                 { return role         != null && roleOwner.equals(role);}
-   
-   public boolean isRestrictedTo( UserGroup userGroup)  { return restrictedTo != null && restrictedTo.equals(userGroup);}
 
+   public boolean isRestrictedTo( UserGroup userGroup)  { return restrictedTo != null && restrictedTo.equals(userGroup);}
+   
+   public void grant( Permission permission)            { acl.add(permission);}
+
+   public void revoke( Permission permission)           { acl.remove(permission);}
+    
+   /*
    public void grant( Role role)                        { acl.add(role); }
 
    public void revoke( Role role)                       { acl.remove(role);}
@@ -188,5 +193,19 @@ public class ObjectToProtect
       }
       return false;
    }
+   */
+ 
+   public boolean admits( Role role)
+   {
+      for( Permission p: acl)
+      {
+         if ( p.grants( role, this) )
+            return true;
+      }
+      return false;
+   }
+
+
+
 
 }//ObjectToProtect

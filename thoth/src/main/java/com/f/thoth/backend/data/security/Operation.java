@@ -1,7 +1,5 @@
 package com.f.thoth.backend.data.security;
 
-import java.util.Set;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -28,7 +26,6 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 /**
  * Representa una operacion que puede ser ejecutada
  */
-
 @NamedEntityGraphs({
    @NamedEntityGraph(
          name = Operation.BRIEF,
@@ -130,7 +127,9 @@ public class Operation extends BaseEntity implements NeedsProtection, Hierarchic
 
    @Override protected void buildCode()
    {
-      this.code = (tenant == null? "[tenant]": tenant.getCode())+"[EXE]"+ getOwnerCode()+ ">"+ (name == null? "[name]" : name);
+      this.code = (tenant == null? "[tenant]": tenant.getCode())+"[EXE]"+ 
+                  (owner == null? "": owner.getOwnerCode())+ 
+                   ">"+ (name == null? "[name]" : name);
    }//buildCode
 
    public String isValid()
@@ -160,15 +159,12 @@ public class Operation extends BaseEntity implements NeedsProtection, Hierarchic
    public UserGroup             getRestrictedTo() {return objectToProtect.getRestrictedTo();}
    public void                  setRestrictedTo(UserGroup restrictedTo) {objectToProtect.setRestrictedTo(restrictedTo);}
 
-   public Set<Role>             getAcl() {return objectToProtect.getAcl();}
-   public void                  setAcl( Set<Role> acl) {objectToProtect.setAcl(acl);}
-
    // --------------------------- Implements HierarchicalEntity ---------------------------------------
    @Override public String      getName()   { return name;}
 
    @Override public Operation   getOwner()  { return owner;}
 
-   private String getOwnerCode(){ return owner == null ? "" : owner.getOwnerCode()+ ":"+ name; }
+   private String getOwnerCode(){ return (owner == null ? "" : owner.getOwnerCode())+ ":"+ name; }
 
    // -----------------  Implements NeedsProtection ----------------
 
@@ -184,9 +180,9 @@ public class Operation extends BaseEntity implements NeedsProtection, Hierarchic
 
    @Override public boolean         admits( Role role)                    { return objectToProtect.admits(role);}
 
-   @Override public void            grant( Role  role)                    { objectToProtect.grant(role);}
+   @Override public void            grant( Permission  permission)        { objectToProtect.grant(permission);}
 
-   @Override public void            revoke(Role role)                     { objectToProtect.revoke(role);}
+   @Override public void            revoke(Permission permission)         { objectToProtect.revoke(permission);}
 
    // ---------------------- Object -----------------------
 
@@ -211,7 +207,7 @@ public class Operation extends BaseEntity implements NeedsProtection, Hierarchic
       s.append(" Operacion{"+ super.toString())
        .append(" name["+ name+ "]")
        .append(" owner["+ (owner     == null? "---": owner.getCode()))
-       .append(" [").append(objectToProtect.toString()).append("]}\n");
+       .append(" \n   [").append(objectToProtect.toString()).append("   ]}\n");
 
       return s.toString();
    }//toString

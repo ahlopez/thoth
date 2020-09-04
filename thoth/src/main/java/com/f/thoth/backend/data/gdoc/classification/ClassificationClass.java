@@ -1,7 +1,6 @@
 package com.f.thoth.backend.data.gdoc.classification;
 
 import java.time.LocalDate;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -27,6 +26,7 @@ import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
+import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
 import com.f.thoth.backend.data.security.UserGroup;
@@ -53,7 +53,7 @@ import com.f.thoth.backend.data.security.UserGroup;
             @NamedAttributeNode("owner"),
             @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF)
          },
-         subgraphs = @NamedSubgraph(name = ObjectToProtect.BRIEF, 
+         subgraphs = @NamedSubgraph(name = ObjectToProtect.BRIEF,
                attributeNodes = {
                  @NamedAttributeNode("category"),
                  @NamedAttributeNode("userOwner"),
@@ -71,7 +71,7 @@ import com.f.thoth.backend.data.security.UserGroup;
             //   @NamedAttributeNode("retentionSchedule"),
                @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)
             },
-            subgraphs = @NamedSubgraph(name = ObjectToProtect.FULL, 
+            subgraphs = @NamedSubgraph(name = ObjectToProtect.FULL,
                   attributeNodes = {
                     @NamedAttributeNode("category"),
                     @NamedAttributeNode("userOwner"),
@@ -96,11 +96,11 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
    @Column(unique = true)
    protected String          name;                         // Node name
 
-   @NotNull(message = "{evidentia.objectToProtect.required") 
+   @NotNull(message = "{evidentia.objectToProtect.required")
    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
    protected ObjectToProtect  objectToProtect;             // Associated security object
 
-   @NotNull(message = "{evidentia.level.required") 
+   @NotNull(message = "{evidentia.level.required")
    @ManyToOne
    protected ClassificationLevel    level;                 // Classification level
 
@@ -114,7 +114,7 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
    @ManyToOne
    protected RetentionSchedule retentionSchedule;
    */
-   
+
    @ManyToOne
    protected ClassificationClass owner;                    //  Classification node to which this ClassificationClass belongs
 
@@ -135,21 +135,21 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
 
       if ( level == null)
          throw new IllegalArgumentException("Nivel de la clase del esquema de clasificación no puede ser nulo");
-     
+
       if ( TextUtil.isEmpty(name))
          throw new IllegalArgumentException("Nombre de la clase del esquema de clasificación no puede ser nulo");
-           
+
       if ( objectToProtect == null)
          throw new IllegalArgumentException("Objeto de seguridad de la clase del esquema de clasificación no puede ser nulo");
-      
-      init(); 
+
+      init();
       this.level            = level;
       this.name             = TextUtil.nameTidy(name);
       this.owner            = owner;
       this.objectToProtect  = objectToProtect;
       buildCode();
    }//Clazz
-   
+
    private void init()
    {
       LocalDate now          = LocalDate.now();
@@ -157,7 +157,7 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
       this.dateClosed        = LocalDate.MAX;
       this.owner             = null;
       // this.retentionSchedule = null;
-      
+
    }//init
 
    @PrePersist
@@ -170,7 +170,9 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
 
    @Override protected void buildCode()
    {
-      this.code = (tenant == null? "[Tenant]" : tenant.getCode())+ getOwnerCode()+ "[CLS]>"+ (name == null? "[name]" : name);
+      this.code = (tenant == null? "[tenant]": tenant.getCode())+"[CLS]"+
+                  (owner == null? ":": owner.getOwnerCode())+ ">"+
+                  (name == null? "[name]" : name);
    }//buildCode
 
    // -------------- Getters & Setters ----------------
@@ -225,7 +227,7 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
 
       return s.toString();
    }//toString
-   
+
 
    @Override  public int compareTo(ClassificationClass that)
    {
@@ -236,7 +238,7 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
    }// compareTo
 
 
-   // --------------- Implements NeedsProtection ------------------------------   
+   // --------------- Implements NeedsProtection ------------------------------
 
    public Integer               getCategory() {return objectToProtect.getCategory();}
    public void                  setCategory(Integer category) {objectToProtect.setCategory(category);}
@@ -250,33 +252,30 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
    public UserGroup             getRestrictedTo() {return objectToProtect.getRestrictedTo();}
    public void                  setRestrictedTo(UserGroup restrictedTo) {objectToProtect.setRestrictedTo(restrictedTo);}
 
-   public Set<Role>             getAcl() {return objectToProtect.getAcl();}
-   public void                  setAcl( Set<Role> acl) {objectToProtect.setAcl(acl);}
-
    // --------------------------- Implements HierarchicalEntity ---------------------------------------
    @Override public String                getName()   { return name;}
-   
+
    @Override public ClassificationClass   getOwner()  { return owner;}
-   
-   private String getOwnerCode(){ return owner == null ? "" : owner.getOwnerCode()+ ":"+ name; }
+
+   private String getOwnerCode(){ return (owner == null ? "" : owner.getOwnerCode())+ ":"+ name; }
 
    // -----------------  Implements NeedsProtection ----------------
-   
+
    @Override public ObjectToProtect getObjectToProtect()                  { return objectToProtect;}
-   
+
    @Override public boolean         canBeAccessedBy(Integer userCategory) { return objectToProtect.canBeAccessedBy(userCategory);}
-   
+
    @Override public boolean         isOwnedBy( SingleUser user)           { return objectToProtect.isOwnedBy(user);}
-   
+
    @Override public boolean         isOwnedBy( Role role)                 { return objectToProtect.isOwnedBy(role);}
-   
+
    @Override public boolean         isRestrictedTo( UserGroup userGroup)  { return objectToProtect.isRestrictedTo(userGroup);}
-   
+
    @Override public boolean         admits( Role role)                    { return objectToProtect.admits(role);}
-   
-   @Override public void            grant( Role role)                     { objectToProtect.grant(role);}
-   
-   @Override public void            revoke( Role role)                    { objectToProtect.revoke(role);}
+
+   @Override public void            grant( Permission  permission)        { objectToProtect.grant(permission);}
+
+   @Override public void            revoke(Permission permission)         { objectToProtect.revoke(permission);}
 
 
    // --------------- Logic ------------------------------
