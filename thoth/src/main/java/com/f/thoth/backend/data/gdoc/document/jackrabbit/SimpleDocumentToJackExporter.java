@@ -12,7 +12,7 @@ import com.f.thoth.backend.data.gdoc.document.Content;
 import com.f.thoth.backend.data.gdoc.document.Publicity;
 import com.f.thoth.backend.data.gdoc.document.SimpleDocument;
 import com.f.thoth.backend.data.gdoc.metadata.DocType;
-import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
+import com.f.thoth.backend.data.gdoc.metadata.PropertyValues;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.ui.utils.FormattingUtils;
 
@@ -75,7 +75,7 @@ public class SimpleDocumentToJackExporter implements SimpleDocument.Exporter
 
    }//exportBasic
 
-   @Override public void   exportMeta ( SchemaValues values)
+   @Override public void   exportMeta ( PropertyValues values)
    {
       /*
       try {

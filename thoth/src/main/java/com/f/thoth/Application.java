@@ -19,7 +19,7 @@ import com.f.thoth.backend.data.gdoc.expediente.IndexEntry;
 import com.f.thoth.backend.data.gdoc.metadata.DocType;
 import com.f.thoth.backend.data.gdoc.metadata.Metadata;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
-import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
+import com.f.thoth.backend.data.gdoc.metadata.PropertyValues;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
@@ -58,7 +58,7 @@ import com.f.thoth.ui.MainView;
             FileIndex.class,
             IndexEntry.class,
             Schema.class,
-            SchemaValues.class,
+            PropertyValues.class,
             Metadata.class,
             DocType.class,
             Retencion.class,
@@ -89,7 +89,7 @@ import com.f.thoth.ui.MainView;
            FileIndex.class,
            IndexEntry.class,
            Schema.class,
-           SchemaValues.class,
+           PropertyValues.class,
            Metadata.class,
            DocType.class,
            Retencion.class,

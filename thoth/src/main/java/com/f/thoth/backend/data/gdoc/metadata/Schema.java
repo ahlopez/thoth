@@ -11,7 +11,6 @@ import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -36,8 +35,7 @@ public class Schema extends BaseEntity implements Comparable<Schema>
 
    @NotNull (message = "{evidentia.fields.required}")
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-   @OrderColumn
-   @JoinColumn
+   @JoinColumn(name="schema_id")
    @BatchSize(size = 30)
    private Set<Metadata>  fields;
    

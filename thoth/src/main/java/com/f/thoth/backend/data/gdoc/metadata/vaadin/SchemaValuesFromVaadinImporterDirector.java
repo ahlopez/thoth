@@ -3,11 +3,11 @@ package com.f.thoth.backend.data.gdoc.metadata.vaadin;
 import java.util.stream.Stream;
 
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
-import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
+import com.f.thoth.backend.data.gdoc.metadata.PropertyValues;
 import com.vaadin.flow.component.AbstractField;
 import com.vaadin.flow.component.Component;
 
-public class SchemaValuesFromVaadinImporterDirector implements SchemaValues.ImporterDirector
+public class SchemaValuesFromVaadinImporterDirector implements PropertyValues.ImporterDirector
 {
    Schema    schema;
    Component component;

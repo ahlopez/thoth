@@ -1,6 +1,7 @@
 package com.f.thoth.backend.data.gdoc.metadata;
 
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotEmpty;
@@ -11,26 +12,30 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.vaadin.SchemaValuesImporter;
 
 @Entity
-@Table(name = "SCHEMA_VALUES")
-public class SchemaValues extends BaseEntity implements SchemaValuesImporter
+@Table(name = "PROPERTY_VALUES")
+public class PropertyValues extends BaseEntity implements SchemaValuesImporter
 {
+
+   @NotNull(message="{evientia.schema.required}")
    @ManyToOne
+   @JoinColumn(name="esquema_id")
    private Schema    schema;
 
-   @NotNull (message = "{evidentia.values.required")
-   @NotEmpty(message = "{evidentia.values.required")
-   private String    values;
 
-   public SchemaValues()
+   @NotNull (message = "{evidentia.valores.required}")
+   @NotEmpty(message = "{evidentia.valores.required}")
+   private String    valores;
+
+   public PropertyValues()
    {
       super();
-      values = "<values><value/></values>";
+      valores = "<valores><value/></valores>";
    }
 
-   public SchemaValues( SchemaValues.ImporterDirector importerDirector)
+   public PropertyValues( PropertyValues.ImporterDirector importerDirector)
    {
       super();
-      values = "";
+      valores = "";
       importerDirector.dirija( this);
       String ok = isValid();
       if ( ok != null)
@@ -42,7 +47,7 @@ public class SchemaValues extends BaseEntity implements SchemaValuesImporter
    private String isValid()
    {
       StringBuilder msg = new StringBuilder();
-      if ( TextUtil.isEmpty(values))
+      if ( TextUtil.isEmpty(valores))
          msg.append("Valores del esquema no pueden ser nulos ni vacíos\n");
 
       return msg.toString();
@@ -52,12 +57,13 @@ public class SchemaValues extends BaseEntity implements SchemaValuesImporter
    @Override public void buildCode(){ this.code = (tenant == null? "[Tenant]": tenant.getCode())+ "[SCV]"+ (id == null? "---": id);}
 
    // ------------------------   Getters && Setters ----------------------------
+   
    public Schema         getSchema() { return schema; }
    @Override public void setSchema(Schema schema) { this.schema = schema; }
    
-   public String         getValues() { return values; }
-   public void           setValues(String values) { this.values = values; }
-   @Override public void addValue( String value) {  this.values = this.values+ ";"+ value; }
+   public String         getValues() { return valores; }
+   public void           setValues(String valores) { this.valores = valores; }
+   @Override public void addValue( String value) {  this.valores = this.valores+ ";"+ value; }
 
    // ------------------------   Builders ----------------------------
 
@@ -65,16 +71,16 @@ public class SchemaValues extends BaseEntity implements SchemaValuesImporter
    {
       public void   initExport();
       public void   exportSchema( Schema schema);
-      public void   exportValues( String values);
+      public void   exportValues( String valores);
       public void   endExport();
       public Object getProduct();
    }//Exporter
 
-   public Object export( SchemaValues.Exporter exporter)
+   public Object export( PropertyValues.Exporter exporter)
    {
       exporter.initExport();
       exporter.exportSchema(schema);
-      exporter.exportValues(values);
+      exporter.exportValues(valores);
       exporter.endExport();
       return exporter.getProduct();
    }//export
@@ -84,4 +90,4 @@ public class SchemaValues extends BaseEntity implements SchemaValuesImporter
       public void dirija( SchemaValuesImporter importer);
    }
 
-}//SchemaValues
+}//PropertyValues

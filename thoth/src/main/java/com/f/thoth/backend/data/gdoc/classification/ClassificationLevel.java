@@ -17,33 +17,33 @@ import com.f.thoth.backend.data.gdoc.metadata.Schema;
 @Table(name = "CLASSIFICATION_LEVEL")
 public class ClassificationLevel extends BaseEntity implements Comparable<ClassificationLevel>
 {
-   @NotNull(message = "{evidentia.level.required") 
-   protected Integer    level;  
-   
+   @NotNull(message = "{evidentia.level.required}")
+   protected Integer    level;
+
    @NotNull(message = "{evidentia.schema.required}")
    @ManyToOne
    protected Schema     schema;
 
    // ------------------- Construction ---------------------
    public ClassificationLevel()
-   { 
+   {
       init();
       buildCode();
    }
-   
+
    public ClassificationLevel( Integer level, Schema schema)
    {
       if ( level == null)
          throw new IllegalArgumentException("Nivel de los nodos de clasificación no puede ser nulo");
-      
+
       if ( schema == null)
          throw new IllegalArgumentException("Esquema de metadatos de los nodos de clasificación no puede ser nulo");
-         
+
       this.level  = level;
       this.schema = schema;
       buildCode();
    }//ClassificationLevel
-   
+
    private void init()
    {
       level = 1;
@@ -62,14 +62,14 @@ public class ClassificationLevel extends BaseEntity implements Comparable<Classi
    {
       this.code = (tenant == null? "[tenant]": tenant.getCode())+"[LEV]"+ (level == null? "[level]" : level);
    }
-   
+
    // ------------------- Getters && Setters ---------------
 
    public Integer getLevel() { return level; }
    public void setLevel(Integer level) { this.level = level;}
 
    public Schema getSchema() { return schema; }
-   public void setSchema(Schema schema) { this.schema = schema; }   
+   public void setSchema(Schema schema) { this.schema = schema; }
 
    // ---------------------- Object -----------------------
 
@@ -103,11 +103,11 @@ public class ClassificationLevel extends BaseEntity implements Comparable<Classi
    public int compareTo(ClassificationLevel that)
    {
      return  this.equals(that)?                         0:
-             that == null || that.level == null?        1:    
+             that == null || that.level == null?        1:
              this.level == null && that.level == null?  0:
              this.level == null?                       -1:
              this.level.compareTo(that.level);
-               
+
    }//compareTo
 
 }//ClassificationLevel

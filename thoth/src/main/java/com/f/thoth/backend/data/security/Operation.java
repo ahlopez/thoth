@@ -80,10 +80,10 @@ public class Operation extends BaseEntity implements NeedsProtection, Hierarchic
    @ManyToOne
    protected Operation       owner;      // Operation group to which this operation belongs
 
-   @NotNull(message = "{evidentia.objectToProtect.required")
+   @NotNull(message = "{evidentia.objectToProtect.required}")
    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
    protected ObjectToProtect  objectToProtect;  // Associated security object
- 
+
    // --------------------- Construccion -------------------------
    public Operation()
    {
@@ -127,8 +127,8 @@ public class Operation extends BaseEntity implements NeedsProtection, Hierarchic
 
    @Override protected void buildCode()
    {
-      this.code = (tenant == null? "[tenant]": tenant.getCode())+"[EXE]"+ 
-                  (owner == null? "": owner.getOwnerCode())+ 
+      this.code = (tenant == null? "[tenant]": tenant.getCode())+"[EXE]"+
+                  (owner == null? "": owner.getOwnerCode())+
                    ">"+ (name == null? "[name]" : name);
    }//buildCode
 
@@ -191,7 +191,7 @@ public class Operation extends BaseEntity implements NeedsProtection, Hierarchic
       if (this == o)
          return true;
 
-      if (!(o instanceof ObjectToProtect ))
+      if (!(o instanceof Operation ))
          return false;
 
       Operation that = (Operation) o;

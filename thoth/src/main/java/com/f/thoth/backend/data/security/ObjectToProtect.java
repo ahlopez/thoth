@@ -174,27 +174,11 @@ public class ObjectToProtect
    public boolean isOwnedBy( Role role)                 { return role         != null && roleOwner.equals(role);}
 
    public boolean isRestrictedTo( UserGroup userGroup)  { return restrictedTo != null && restrictedTo.equals(userGroup);}
-   
+
    public void grant( Permission permission)            { acl.add(permission);}
 
    public void revoke( Permission permission)           { acl.remove(permission);}
-    
-   /*
-   public void grant( Role role)                        { acl.add(role); }
 
-   public void revoke( Role role)                       { acl.remove(role);}
-
-   public boolean admits( Role role)
-   {
-      for( Role r: acl)
-      {
-         if ( r.equals( role) )
-            return true;
-      }
-      return false;
-   }
-   */
- 
    public boolean admits( Role role)
    {
       for( Permission p: acl)

@@ -12,7 +12,7 @@ import javax.validation.constraints.NotNull;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
-import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
+import com.f.thoth.backend.data.gdoc.metadata.PropertyValues;
 import com.f.thoth.backend.data.security.SingleUser;
 
 /**
@@ -32,7 +32,7 @@ public class IndexEntry extends BaseEntity implements Comparable<IndexEntry>
    private FileIndex     index;
    
    @ManyToOne
-   private SchemaValues  attributes;
+   private PropertyValues  attributes;
    
    @ManyToOne
    private FileIndex     expediente;

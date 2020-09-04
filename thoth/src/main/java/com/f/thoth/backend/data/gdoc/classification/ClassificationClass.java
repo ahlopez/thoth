@@ -96,11 +96,11 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
    @Column(unique = true)
    protected String          name;                         // Node name
 
-   @NotNull(message = "{evidentia.objectToProtect.required")
+   @NotNull(message = "{evidentia.objectToProtect.required}")
    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
    protected ObjectToProtect  objectToProtect;             // Associated security object
 
-   @NotNull(message = "{evidentia.level.required")
+   @NotNull(message = "{evidentia.level.required}")
    @ManyToOne
    protected ClassificationLevel    level;                 // Classification level
 

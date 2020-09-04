@@ -33,11 +33,13 @@ implements HasValue<E, T>
    private final Set<T>                 result;
    private SearchBar                    searchBar;
    private TreeGrid<T>                  treeGrid;
+   private MultiSelect<Grid<T>, T>      multiSelect;
    private List<T>                      gridNodes;
    private Grid<T>                      searchGrid;
    private final Grid.SelectionMode     selectionMode;
    private final HierarchicalService<T> service;
-   private final List<T>                emptyGrid = new ArrayList<>();
+   private final List<T>                emptyGrid     = new ArrayList<>();
+   private final Set<T>                 expandedNodes = new TreeSet<>();
 
 
    public AbstractHierarchicalSelector ( HierarchicalService<T> service, Grid.SelectionMode selectionMode, String name)
@@ -56,7 +58,7 @@ implements HasValue<E, T>
       add( new Label(name));
       HorizontalLayout  layout = new HorizontalLayout();
       layout.setWidthFull();
-      treeGrid = buildSelector(layout);
+      treeGrid = buildSelector();
       layout.add(treeGrid);
 
       if ( selectionMode != Grid.SelectionMode.NONE)
@@ -67,18 +69,11 @@ implements HasValue<E, T>
          layout.add(searchGrid);
       }
       add( layout);
-      refreshSelector();
 
    }//setup
 
-   public void init( Collection<T> initialSelection)
-   {
-      resetSelector();
-      initialSelection.forEach( val-> setValue(val));
-   }//init
 
-
-   private TreeGrid<T> buildSelector( HorizontalLayout layout)
+   private TreeGrid<T> buildSelector( )
    {
       TreeGrid<T>tGrid = new TreeGrid<>();
       tGrid.addClassName("selector-tree");
@@ -86,23 +81,28 @@ implements HasValue<E, T>
       tGrid.addHierarchyColumn(T::getName).setHeader("Nombre");
       tGrid.setSelectionMode(selectionMode);
 
+      dataProvider = getDataProvider(service);
+      tGrid.setDataProvider(dataProvider);
+      tGrid.addExpandListener            ( e-> expandedNodes.addAll(e.getItems()));
+
       switch( selectionMode)
       {
-      case SINGLE: 
+      case SINGLE:
          tGrid.addItemClickListener      ( e-> tGrid.select(e.getItem()));
          tGrid.addItemDoubleClickListener( e-> tGrid.deselect(e.getItem()));
          tGrid.addSelectionListener      ( e-> setValue( e.getFirstSelectedItem().get()));
          break;
       case MULTI:
-         MultiSelect<Grid<T>, T> multiSelect = tGrid.asMultiSelect();
-         multiSelect.addValueChangeListener(e -> 
-           {  
-              result.clear();
-              e.getValue().forEach( v-> setValue(v)); 
-           });
+         multiSelect = tGrid.asMultiSelect();
+         multiSelect.addValueChangeListener(event -> 
+         {
+            Set<T> values = event.getValue();
+            if ( values != null)
+               values.forEach( value-> result.add(value));
+         });
          break;
       default:
-         
+
       }//switch
 
       return tGrid;
@@ -149,19 +149,19 @@ implements HasValue<E, T>
       searchBar.setActionText("Buscar ");
       searchBar.getActionButton().getElement().setAttribute("new-button", false);
       searchBar.addFilterChangeListener(e ->
+      {
+         String filter = searchBar.getFilter();
+         searchGrid.setVisible(false);
+         if ( TextUtil.isNotEmpty(filter))
          {
-            String filter = searchBar.getFilter();
-            searchGrid.setVisible(false);
-            if ( TextUtil.isNotEmpty(filter))
+            Collection<T> filteredItems = service.findByNameLikeIgnoreCase(tenant, filter);
+            if ( filteredItems.size() > 0)
             {
-               Collection<T> filteredItems = service.findByNameLikeIgnoreCase(tenant, filter);
-               if ( filteredItems.size() > 0)
-               {
-                  searchGrid.setVisible(true);
-                  searchGrid.setItems(filteredItems);
-               }
+               searchGrid.setVisible(true);
+               searchGrid.setItems(filteredItems);
             }
-         });
+         }
+      });
 
       return searchBar;
 
@@ -174,34 +174,33 @@ implements HasValue<E, T>
       switch (selectionMode)
       {
       case SINGLE:
+      {
+         registration = sGrid.asSingleSelect().addValueChangeListener(e ->
          {
-            registration = sGrid.asSingleSelect().addValueChangeListener(e ->
-               {
-                  tGrid.deselectAll();
-                  T value = e.getValue();
-                  if (value != null)
-                  {
-                     setValue(value);
-                     tGrid.select(value);
-                     backtrackParents(tGrid::expand, value);
-                  }
-               });
-            break;
-         }
+            tGrid.deselectAll();
+            T value = e.getValue();
+            if (value != null)
+            {
+               setValue(value);
+               tGrid.select(value);
+               backtrackParents(tGrid::expand, value);
+            }
+         });
+         break;
+      }
       case MULTI:
+      {
+         registration = sGrid.asMultiSelect().addValueChangeListener(e ->
          {
-            registration = sGrid.asMultiSelect().addValueChangeListener(e ->
-               {
-                  Set<T> vals= (Set<T>)e.getValue();
-                  tGrid.asMultiSelect().setValue(vals);
-                  for (T value: vals)
-                  {
-                     setValue(value);
-                     backtrackParents(tGrid::expand, value);
-                  }
-               });
-            break;
-         }
+            Set<T> vals= (Set<T>)e.getValue();
+            multiSelect.setValue(vals);
+            for (T value: vals)
+            {
+               backtrackParents(tGrid::expand, value);
+            }
+         });
+         break;
+      }
       default:
          tGrid.deselectAll();
       }
@@ -249,11 +248,11 @@ implements HasValue<E, T>
    {
       List<T> children = getChildrenOf( parent);
       children.forEach( child->
-         {
-            treeData.addItem(parent, child);
-            addChildrenOf(child, treeData);
-            gridNodes.remove(child);
-         });
+      {
+         treeData.addItem(parent, child);
+         addChildrenOf(child, treeData);
+         gridNodes.remove(child);
+      });
    }//addChildrenOf
 
 
@@ -261,36 +260,46 @@ implements HasValue<E, T>
    {
       List<T> children = new ArrayList<>();
       gridNodes.forEach(item->
+      {
+         T parent =  item.getOwner();
+         if (parent == null)
          {
-            T parent =  item.getOwner();
-            if (parent == null)
-            {
-               if (owner == null)
-                  children.add(item);
-            }
-            else if (parent.equals(owner))
+            if (owner == null)
                children.add(item);
-         });
+         }
+         else if (parent.equals(owner))
+            children.add(item);
+      });
       return children;
    }//getChildrenOf
 
-
-
-   public void refreshSelector( )
+   //   --------------------------     init, reset -------------------------------
+   public void init( Collection<T> initialSelection)
    {
-      searchBar.clear();
-      dataProvider = getDataProvider(service);
-      treeGrid.setDataProvider(dataProvider);
-      dataProvider.refreshAll();
-      searchGrid.setItems(emptyGrid);
-   }//refreshSelector
-   
+      resetSelector();
+      if (initialSelection != null)
+      {
+         result.clear();
+         initialSelection.forEach(value-> 
+         {
+            setValue(value);
+            backtrackParents(treeGrid::expand, value);
+         });
+      }
+   }//init
+
+
    public void resetSelector()
    {
       searchBar.clear();
       treeGrid.deselectAll();
-   }
-   
+      treeGrid.collapse(expandedNodes);
+      expandedNodes.clear();
+      searchGrid.setItems(emptyGrid);
+      result.clear();
+
+   }//resetSelector
+
 
 
    // ---------- implements HasValue<E,T> --------------------
@@ -355,5 +364,5 @@ implements HasValue<E, T>
       }
 
    }//setValue
-   
+
 }//AbstractHierarchicalSelector

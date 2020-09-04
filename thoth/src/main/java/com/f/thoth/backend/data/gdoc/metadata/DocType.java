@@ -83,7 +83,7 @@ public class DocType extends BaseEntity implements NeedsProtection, Hierarchical
    @Size(min= 2, max = 50, message= "{evidentia.name.length}")
    protected String           name;
 
-   @NotNull(message = "{evidentia.objectToProtect.required")
+   @NotNull(message = "{evidentia.objectToProtect.required}")
    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
    protected ObjectToProtect  objectToProtect;
 

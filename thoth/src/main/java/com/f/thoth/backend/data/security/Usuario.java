@@ -43,7 +43,7 @@ public abstract class Usuario extends BaseEntity implements NeedsProtection, Com
    @Max(value=5, message= "{evidentia.category.maxvalue}")
    protected Integer         userCategory;   // Security category
 
-   @NotNull(message = "{evidentia.objectToProtect.required")
+   @NotNull(message = "{evidentia.objectToProtect.required}")
    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
    protected ObjectToProtect  objectToProtect;   // Associated security object
 
