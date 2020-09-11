@@ -27,9 +27,9 @@ public class Field extends BaseEntity implements Comparable<Field>
    
    private boolean  visible;
    
-   private boolean  editable;
+   private boolean  readOnly;
    
-   private boolean  enabled;
+   private boolean  required;
 
 
    // --------------------- Construction -------------------------
@@ -39,11 +39,11 @@ public class Field extends BaseEntity implements Comparable<Field>
       this.name = "[name]";
       this.metadata = null;
       this.visible  = true;
-      this.editable = false;
-      this.enabled  = false;
+      this.readOnly = false;
+      this.required = false;
    }//Field
 
-   public Field( String name, Metadata metadata, boolean visible, boolean editable, boolean enabled)
+   public Field( String name, Metadata metadata, boolean visible, boolean readOnly, boolean required)
    {
       super();
       if ( !TextUtil.isIdentifier(name))
@@ -55,8 +55,8 @@ public class Field extends BaseEntity implements Comparable<Field>
       this.name     = name;
       this.metadata = metadata;
       this.visible  = visible;
-      this.editable = editable;
-      this.enabled  = enabled;
+      this.readOnly = readOnly;
+      this.required = required;
 
    }//Field
    
@@ -95,11 +95,11 @@ public class Field extends BaseEntity implements Comparable<Field>
    public boolean    isVisible() { return visible;}
    public void       setVisible( boolean visible) { this.visible = visible;}
 
-   public boolean    isEditable() { return editable;}
-   public void       setEditable(boolean editable) { this.editable = editable;}
+   public boolean    isEditable() { return readOnly;}
+   public void       setEditable(boolean readOnly) { this.readOnly = readOnly;}
 
-   public boolean    isEnabled() { return enabled;}
-   public void       setEnabled( boolean enabled) { this.enabled = enabled;}
+   public boolean    isEnabled() { return required;}
+   public void       setEnabled( boolean required) { this.required = required;}
    
    // ---------------------- Builders ---------------------
    public interface Exporter
@@ -107,7 +107,7 @@ public class Field extends BaseEntity implements Comparable<Field>
       public void initExport();
       public void exportName( String name);
       public void exportMetadata( Metadata metadata);
-      public void exportFlags( boolean visible, boolean editable, boolean enabled);
+      public void exportFlags( boolean visible, boolean readOnly, boolean required);
       public void endExport();
       public Object getProduct();
    }//Exporter
@@ -144,8 +144,8 @@ public class Field extends BaseEntity implements Comparable<Field>
       s.append(" Field{"+ super.toString())
        .append(" name["+ name+ "]")
        .append(" visible["+  visible+ "]")
-       .append(" editable["+ editable+ "]")
-       .append(" enabled["+  enabled+ "]")
+       .append(" readOnly["+ readOnly+ "]")
+       .append(" required["+  required+ "]")
        .append("}\n");
 
       return s.toString();

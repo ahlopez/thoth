@@ -15,10 +15,18 @@ import com.vaadin.flow.data.provider.ListDataProvider;
 public class MetadataToComponentExporter implements Exporter
 {
    private Component field;
+   private String  name;
+   private boolean visible;
+   private boolean readOnly;
+   private boolean required;
    
-   public MetadataToComponentExporter()
-   {     
-   }
+   public MetadataToComponentExporter(String name, boolean visible, boolean readOnly, boolean required)
+   {  
+      this.name     = name;
+      this.visible  = visible;
+      this.readOnly = readOnly;
+      this.required = required;
+   }//MetadataToComponentExporter
 
    @Override public void initExport() { }
 
@@ -26,49 +34,64 @@ public class MetadataToComponentExporter implements Exporter
    {
       switch (type)
       {
-      case  STRING   :  // String.class
-         field = new TextField();
-         break;
       case  ENUM     :  //  String.class
          ComboBox<String> combo = new ComboBox<String>();
          String[] values = range.split(";");
+         for (int i=0; i < values.length; i++)
+            values[i] = values[i].trim();
+         
          combo.setDataProvider(new ListDataProvider<String>( Arrays.asList(values)));
+         combo.setVisible(visible);
+         combo.setReadOnly(readOnly);
+         combo.setRequired(required);
+         combo.setRequiredIndicatorVisible(required);
+         combo.setLabel(this.name);
          field = combo;
          break;
       case  BINARY   :  //  Byte[].class
          TextArea area = new TextArea();
+         area.setVisible(visible);
+         area.setReadOnly(readOnly);
+         area.setRequired(required);
+         area.setRequiredIndicatorVisible(required);
+         area.setLabel(this.name);
          if ( range != null)
             area.setValue(range);
          
+         field=area;
          break;
       case  BOOLEAN  :  //  Boolean.class
-         field = new Checkbox();
-         break;
-      case  DECIMAL  :  //  BigDecimal.class
-         field = new TextField();
-         break;
-      case  INTEGER  :  //  BigInteger.class
-         field = new TextField();
+         Checkbox check = new Checkbox();
+         check.setVisible(visible);
+         check.setReadOnly(readOnly);
+         check.setRequiredIndicatorVisible(required);
+         check.setLabel(this.name);
+         field = check;
          break;
       case  DATETIME :  //  LocalDateTime.class
-         field = new DateTimePicker();
+         DateTimePicker fecha = new DateTimePicker();
+         fecha.setVisible(visible);
+         fecha.setReadOnly(readOnly);
+         fecha.setRequiredIndicatorVisible(required);
+         fecha.setLabel(this.name);
+         field = fecha;
          break;
+      case  DECIMAL  :  // BigDecimal.class
+      case  INTEGER  :  // BigInteger.class
       case  REFERENCE:  // String.class
-         field = new TextField();
-         break;
       case  URI      :  // URI.class
-         field = new TextField();
-         break;
       case  ID       :  // String.class
-         field = new TextField();
-         break;
       case  PATH     :  // String.class
-         field = new TextField();
-         break;
       case  HTML     :  // String.class;
-         field = new TextField();
+      case  STRING   :  // String.class
       default:
-         field = new TextField();
+         TextField text = new TextField();
+         text.setVisible(visible);
+         text.setReadOnly(readOnly);
+         text.setRequired(required);
+         text.setRequiredIndicatorVisible(required);
+         text.setLabel(this.name);
+         field= text;
       }//switch (type)
 
    }//export

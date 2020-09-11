@@ -91,7 +91,7 @@ public class Schema extends BaseEntity implements Comparable<Schema>
    {
       public void initExport();
       public void exportName(String name);
-      public void exportField(Metadata field);
+      public void exportField(Field field);
       public void endExport();
       public Object getProduct();
       
