@@ -28,7 +28,7 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 @Entity
 @Table(name = "SCHEMA", indexes = { @Index(columnList = "code")})
 public class Schema extends BaseEntity implements Comparable<Schema>
-{
+{  
    @NotBlank(message = "{evidentia.name.required}")
    @NotNull (message = "{evidentia.name.required}")
    private String         name;
@@ -37,7 +37,7 @@ public class Schema extends BaseEntity implements Comparable<Schema>
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
    @JoinColumn(name="schema_id")
    @BatchSize(size = 30)
-   private Set<Metadata>  fields;
+   private Set<Field>  fields;
    
    public static final Schema EMPTY = new Schema("EMPTY", new TreeSet<>());
 
@@ -49,14 +49,14 @@ public class Schema extends BaseEntity implements Comparable<Schema>
       fields = new TreeSet<>();
    }
 
-   public Schema( String name, Set<Metadata> fields)
+   public Schema( String name, Set<Field> fields)
    {
       super();
       if( !TextUtil.isValidName(name))
          throw new IllegalArgumentException("Nombre inválido");
 
       if(fields == null )
-         throw new IllegalArgumentException("Conjunto de metadatos del esquema no puede ser nulo ni vacío");
+         throw new IllegalArgumentException("Conjunto de campos del esquema no puede ser nulo ni vacío");
 
       this.name   = name;
       this.fields = fields;
@@ -82,8 +82,8 @@ public class Schema extends BaseEntity implements Comparable<Schema>
       buildCode();
    }//setName
 
-   public Set<Metadata>  getFields() { return fields;}
-   public void           setFields( Set<Metadata> fields){ this.fields = fields;}
+   public Set<Field>  getMetadata() { return fields;}
+   public void           setFields( Set<Field> fields){ this.fields = fields;}
    
    // --------------- Builders ---------------------
    
@@ -97,11 +97,11 @@ public class Schema extends BaseEntity implements Comparable<Schema>
       
    }//Exporter
    
-   public Object export( Schema.Exporter exporter)
+   public Object export( Schema.Exporter exporter, Field.Exporter fieldExporter)
    {
       exporter.initExport();
       exporter.exportName( name);
-      fields.forEach( field-> exporter.exportField(field));
+      fields.forEach( field-> field.export(fieldExporter));
       exporter.endExport();
       return exporter.getProduct();
    }//export
@@ -150,8 +150,8 @@ public class Schema extends BaseEntity implements Comparable<Schema>
    private String fieldNames()
    {
       StringBuilder s = new StringBuilder();
-      for(Metadata m: fields)
-         s.append( m.getName()).append(" ");
+      for(Field f: fields)
+         s.append( f.getName()).append(" ");
 
       return s.toString();
    }//fieldNames
@@ -162,7 +162,7 @@ public class Schema extends BaseEntity implements Comparable<Schema>
       return other == null?  1 :  this.equals(other)? 0:  this.code.compareTo( other.code);
    }
 
-   public Iterator<Metadata> iterator()
+   public Iterator<Field> iterator()
    {
       return fields.iterator();
    }

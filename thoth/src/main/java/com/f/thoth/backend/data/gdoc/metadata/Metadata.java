@@ -30,10 +30,6 @@ public class Metadata extends BaseEntity implements  Comparable<Metadata>
    @NotNull (message = "{evidentia.type.required}")
    private Type      type;
 
-   private boolean   required = true;
-
-   private boolean   editable = false;
-
    @NotNull (message = "{evidentia.range.required}")
    @NotEmpty(message = "{evidentia.range.required}")
    private String    range;
@@ -64,8 +60,6 @@ public class Metadata extends BaseEntity implements  Comparable<Metadata>
       
       this.name     = TextUtil.nameTidy(name);
       this.type     = type;
-      this.required = required;
-      this.editable = editable;
       this.range    = range;
       buildCode();
       
@@ -88,12 +82,6 @@ public class Metadata extends BaseEntity implements  Comparable<Metadata>
    public Type    getType(){ return type;}
    public void    setType( Type type){ this.type = type;}
 
-   public boolean isRequired() { return required;}
-   public void    setRequired( boolean required){ this.required = required;}
-
-   public boolean isEditable() { return editable;}
-   public void    setEditable( boolean editable){ this.editable = editable;}
-
    public String  getRange(){ return range;}
    public void    setRange(String range) { this.range = range;}
    
@@ -102,7 +90,7 @@ public class Metadata extends BaseEntity implements  Comparable<Metadata>
    public interface Exporter
    {
       public void initExport();
-      public void export(String name, Type type, boolean required, boolean editable, String range);
+      public void export(String name, Type type, String range);
       public void endExport();
       public Object getProduct();
       
@@ -111,7 +99,7 @@ public class Metadata extends BaseEntity implements  Comparable<Metadata>
    public Object export( Metadata.Exporter exporter)
    {
       exporter.initExport();
-      exporter.export(name, type, required, editable, range);
+      exporter.export(name, type, range);
       exporter.endExport();
       return exporter.getProduct();
       
@@ -150,8 +138,6 @@ public class Metadata extends BaseEntity implements  Comparable<Metadata>
       s.append( super.toString()).append("\n\t\t").
         append( " name["+ name+ "]").
         append( " type["+ type+ "]").
-        append( " required["+ required+ "]").
-        append( " editable["+ editable+ "]").
         append( " range["+ range.toString()+ "]");
 
       return s.toString();

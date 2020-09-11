@@ -22,7 +22,7 @@ public class MetadataToComponentExporter implements Exporter
 
    @Override public void initExport() { }
 
-   @Override  public void export(String name, Type type, boolean required, boolean editable, String range)
+   @Override  public void export(String name, Type type, String range)
    {
       switch (type)
       {

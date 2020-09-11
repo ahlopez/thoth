@@ -17,6 +17,8 @@ import com.f.thoth.ui.views.admin.users.SingleUserView;
 import com.f.thoth.ui.views.admin.users.UserGroupView;
 import com.f.thoth.ui.views.admin.users.UsersView;
 import com.f.thoth.ui.views.dashboard.DashboardView;
+import com.f.thoth.ui.views.properties.MetadataSchemaView;
+import com.f.thoth.ui.views.properties.MetadataView;
 import com.f.thoth.ui.views.security.permission.AccessPermissionView;
 import com.f.thoth.ui.views.security.permission.ExecutePermissionView;
 import com.f.thoth.ui.views.storefront.StorefrontView;
@@ -95,6 +97,7 @@ public class MainView extends AppLayout
       createClientsMenu();
       createSecurityMenu();
       createAdminMenu();
+      createPropertiesMenu();
       createClasificationMenu();
       createExpedientesMenu();
       createTramiteMenu();
@@ -170,12 +173,32 @@ public class MainView extends AppLayout
          adminMenu.addItem(createRoute(VaadinIcon.USER, Constant.TITLE_USUARIOS, RoleView.class));
 
       if (SecurityUtils.isAccessGranted(OperationView.class))
-         adminMenu.addItem(createRoute(VaadinIcon.GROUP, Constant.TITLE_GRUPOS_USUARIOS, OperationView.class));
+         adminMenu.addItem(createRoute(VaadinIcon.GROUP, Constant.TITLE_GRUPOS_USUARIOS, UserGroupView.class));
 
       if ( adminMenu.getItems().size() > 0)
          mainMenu.add(admin);
 
    }//createAdminMenu
+   
+   private void createPropertiesMenu()
+   {
+      Div properties = new Div(VaadinIcon.ABACUS.create(), new Label(Constant.TITLE_PROPIEDADES));
+      ContextMenu propertiesMenu = new ContextMenu(properties);
+      propertiesMenu.setOpenOnClick(true);
+
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         propertiesMenu.addItem(createRoute(VaadinIcon.GROUP, Constant.TITLE_METADATA, MetadataView.class));
+
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         propertiesMenu.addItem(createRoute(VaadinIcon.GROUP, Constant.TITLE_ESQUEMAS_METADATA, MetadataSchemaView.class));
+
+      if (SecurityUtils.isAccessGranted(OperationView.class))
+         propertiesMenu.addItem(createRoute(VaadinIcon.GROUP, Constant.TITLE_TIPOS_DOCUMENTALES, MetadataView.class));
+
+      if ( propertiesMenu.getItems().size() > 0)
+         mainMenu.add(properties);
+      
+   }//createPropertiesMenu
 
    private void createClasificationMenu()
    {
@@ -184,19 +207,10 @@ public class MainView extends AppLayout
       classificationMenu.setOpenOnClick(true);
 
       if (SecurityUtils.isAccessGranted(OperationView.class))
-         classificationMenu.addItem(createRoute(VaadinIcon.BUILDING_O, Constant.TITLE_FONDOS, OperationView.class));
+         classificationMenu.addItem(createRoute(VaadinIcon.LEVEL_RIGHT_BOLD, Constant.TITLE_NIVELES, OperationView.class));
 
       if (SecurityUtils.isAccessGranted(OperationView.class))
-         classificationMenu.addItem(createRoute(VaadinIcon.CLUSTER, Constant.TITLE_OFICINAS, OperationView.class));
-
-      if (SecurityUtils.isAccessGranted(RoleView.class))
-         classificationMenu.addItem(createRoute(VaadinIcon.CONNECT, Constant.TITLE_SERIES, RoleView.class));
-
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         classificationMenu.addItem(createRoute(VaadinIcon.CONNECT_O, Constant.TITLE_SUBSERIES, OperationView.class));
-
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         classificationMenu.addItem(createRoute(VaadinIcon.ELLIPSIS_V, Constant.TITLE_TIPOS_DOCUMENTALES,OperationView.class));
+         classificationMenu.addItem(createRoute(VaadinIcon.SPLIT, Constant.TITLE_ESQUEMAS_CLASIFICACIÓN, OperationView.class));
 
       if ( classificationMenu.getItems().size() > 0)
          mainMenu.add(classification);
@@ -512,62 +526,62 @@ public class MainView extends AppLayout
       TITLE_SEGURIDAD                                = "Seguridad";
          TITLE_OBJETOS                               = "Objetos a proteger";
          TITLE_ROLES                                 = "Roles";
-         TITLE_PERMISOS_EJECUCION                    = "Permisos de ejecuci�n";
+         TITLE_PERMISOS_EJECUCION                    = "Permisos de ejecucien";
          TITLE_PERMISOS_ACCESO                       = "Permisos de acceso";
-      TITLE_ADMINISTRACION                           = "Administraci�n";
-         TITLE_PARAMETROS                            = "Par�metros";
+      TITLE_ADMINISTRACION                           = "Administracien";
+         TITLE_PARAMETROS                            = "Paremetros";
          TITLE_USUARIOS                              = "Usuarios";
          TITLE_GRUPOS_USUARIOS                       = "Grupos de usuarios";
-      TITLE_CLASIFICACION                            = "Clasificaci�n";
+      TITLE_CLASIFICACION                            = "Clasificacien";
          TITLE_FONDOS                                = "Fondos";
          TITLE_OFICINAS                              = "Oficinas";
          TITLE_SERIES                                = "Series";
          TITLE_SUBSERIES                             = "Subseries";
          TITLE_TIPOS_DOCUMENTALES                    = "Tipos documentales";
-      TITLE_ADMIN_EXPEDIENTES                        = "Administraci�n expedientes";
+      TITLE_ADMIN_EXPEDIENTES                        = "Administracien expedientes";
          TITLE_EXPEDIENTES                           = "Expedientes";
          TITLE_SUBEXPEDIENTES                        = "Sub-expedientes";
-         TITLE_VOLUMENES                             = "Vol�menes";
-         TITLE_INDICE                                = "�ndice de expedientes";
-         TITLE_EXPORTACION                           = "Exportaci�n de expedientes";
-         TITLE_IMPORTACION                           = "Importaci�n de expedientes";
+         TITLE_VOLUMENES                             = "Volemenes";
+         TITLE_INDICE                                = "endice de expedientes";
+         TITLE_EXPORTACION                           = "Exportacien de expedientes";
+         TITLE_IMPORTACION                           = "Importacien de expedientes";
          TITLE_COPIA_DOCUMENTOS                      = "Copia documento a otro expediente";
          TITLE_TRANSER_DOCUMENTOS                    = "Transferencia de documento a otro expediente";
       TITLE_TRAMITE                                  = "Tramite de documentos";
          TITLE_BANDEJA                               = "Bandeja personal";
-         TITLE_CLASIFICACION_DOCUMENTOS              = "Clasificaci�n de documento";
-         TITLE_RETORNO                               = "Devoluci�n de documento";
-         TITLE_RE_ENVIO                              = "Re-env�o de documento";
+         TITLE_CLASIFICACION_DOCUMENTOS              = "Clasificacien de documento";
+         TITLE_RETORNO                               = "Devolucien de documento";
+         TITLE_RE_ENVIO                              = "Re-enveo de documento";
          TITLE_BORRADORES                            = "Carga borrador de documento";
          TITLE_FIRMA                                 = "Firma de documento";
-         TITLE_ENVIO                                 = "Env�o de documento";
-      TITLE_RECEPCION                                = "Recepci�n de documentos";
-         TITLE_RECEPCION_DOCUMENTOS                  = "Recepci�n en ventanilla";
-         TITLE_RECEPCION_E_MAIL                      = "Recepci�n correo electr�nico";
-         TITLE_DIGITALIZACION                        = "Digitalizaci�n";
+         TITLE_ENVIO                                 = "Enveo de documento";
+      TITLE_RECEPCION                                = "Recepcien de documentos";
+         TITLE_RECEPCION_DOCUMENTOS                  = "Recepcien en ventanilla";
+         TITLE_RECEPCION_E_MAIL                      = "Recepcien correo electrenico";
+         TITLE_DIGITALIZACION                        = "Digitalizacien";
          TITLE_DIRECCIONAMIENTO                      = "Enrutamiento de documentos";
       TITLE_CORRESPONDENCIA_EXTERNA                  = "Correspondencia externa";
-         TITLE_REGISTRO_ENVIOS                       = "Consolidaci�n env�os externos";
-         TITLE_ENVIO_EXTERNO                         = "Prepara planillas env�o";
-         TITLE_CONFIRMACI�N_ENVIO                    = "Confirmaci�n de recepci�n";
+         TITLE_REGISTRO_ENVIOS                       = "Consolidacien enveos externos";
+         TITLE_ENVIO_EXTERNO                         = "Prepara planillas enveo";
+         TITLE_CONFIRMACIeN_ENVIO                    = "Confirmacien de recepcien";
       TITLE_CONSULTA                                 = "Consulta";
          TITLE_DOCUMENTOS                            = "Consulta de documentos";
             TITLE_CONSULTA_LIBRE                     = "Consulta libre documentos";
-            TITLE_CONSULTA_METADATOS                 = "Consulta documentos seg�n metadatos";
+            TITLE_CONSULTA_METADATOS                 = "Consulta documentos segen metadatos";
          TITLE_CONSULTA_EXPEDIENTES                  = "Consulta de expedientes";
-            TITLE_CONSULTA_EXPEDIENTES_LIBRE         = "Consulta de expedientes seg�n texto libre";
-            TITLE_CONSULTA_EXPEDIENTES_METADATOS     = "Consulta de expedientes seg�n metadatos";
-            TITLE_CONSULTA_EXPEDIENTES_CLASIFICACION = "Consulta de expedientes seg�n clasificaci�n";
+            TITLE_CONSULTA_EXPEDIENTES_LIBRE         = "Consulta de expedientes segen texto libre";
+            TITLE_CONSULTA_EXPEDIENTES_METADATOS     = "Consulta de expedientes segen metadatos";
+            TITLE_CONSULTA_EXPEDIENTES_CLASIFICACION = "Consulta de expedientes segen clasificacien";
       TITLE_PROCESOS                                 = "Procesos";
-         TITLE_EJECUCION_PROCESO                     = "Ejecuci�n de proceso";
-         TITLE_DEFINICION_PROCESO                    = "Definici�n de proceso";
+         TITLE_EJECUCION_PROCESO                     = "Ejecucien de proceso";
+         TITLE_DEFINICION_PROCESO                    = "Definicien de proceso";
       TITLE_ARCHIVO                                  = "Archivo";
          TITLE_LOCALES                               = "Locales";
-         TITLE_TRANSFERENCIA                         = "Preparaci�n de transferencia";
-         TITLE_RECIBO_TRANSFERENCIA                  = "Recepci�n de transferencia";
-         TITLE_LOCALIZACION                          = "Localizaci�n de documentos";
-         TITLE_PRESTAMO                              = "Pr�stamos";
-            TITLE_PRESTAMO_EXPEDIENTE                = "Pr�stamo de expedientes";
+         TITLE_TRANSFERENCIA                         = "Preparacien de transferencia";
+         TITLE_RECIBO_TRANSFERENCIA                  = "Recepcien de transferencia";
+         TITLE_LOCALIZACION                          = "Localizacien de documentos";
+         TITLE_PRESTAMO                              = "Prestamos";
+            TITLE_PRESTAMO_EXPEDIENTE                = "Prestamo de expedientes";
             TITLE_DEVOLUCION                         = "Retorno de expediente";
          TITLE_INDICES_ARCHIVO                       = "Indice de archivo";
 

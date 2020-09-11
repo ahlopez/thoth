@@ -1,0 +1,162 @@
+package com.f.thoth.backend.data.gdoc.metadata;
+
+import javax.persistence.Entity;
+import javax.persistence.Index;
+import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
+import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
+import com.f.thoth.backend.data.entity.BaseEntity;
+import com.f.thoth.backend.data.entity.util.TextUtil;
+
+@Entity
+@Table(name = "FIELD", indexes = { @Index(columnList = "code")})
+public class Field extends BaseEntity implements Comparable<Field>
+{
+   @NotBlank(message = "{evidentia.name.required}")
+   @NotNull (message = "{evidentia.name.required}")
+   @Size(min= 2, max = 50, message= "{evidentia.name.length}")
+   private String   name;
+   
+   @ManyToOne
+   private Metadata metadata;
+   
+   private boolean  visible;
+   
+   private boolean  editable;
+   
+   private boolean  enabled;
+
+
+   // --------------------- Construction -------------------------
+   public Field()
+   {  
+      super();
+      this.name = "[name]";
+      this.metadata = null;
+      this.visible  = true;
+      this.editable = false;
+      this.enabled  = false;
+   }//Field
+
+   public Field( String name, Metadata metadata, boolean visible, boolean editable, boolean enabled)
+   {
+      super();
+      if ( !TextUtil.isIdentifier(name))
+         throw new IllegalArgumentException("Nombre inválido para el campo");
+
+      if ( metadata == null)
+         throw new IllegalArgumentException("Metadato asociado al campo no puede ser nulo");
+
+      this.name     = name;
+      this.metadata = metadata;
+      this.visible  = visible;
+      this.editable = editable;
+      this.enabled  = enabled;
+
+   }//Field
+   
+
+   @PrePersist
+   @PreUpdate
+   public void prepareData()
+   {
+      this.name     =  TextUtil.nameTidy(name).toLowerCase();
+      buildCode();
+   }//prepareData
+
+   @Override protected void buildCode()
+   {
+      this.code = (tenant == null? "[tenant]": tenant.getCode())+"[FLD]>"+
+                   (name == null? "[name]" : name);
+   }//buildCode
+
+   public String isValid()
+   {
+      StringBuilder msg = new StringBuilder();
+      if ( !TextUtil.isValidName(name))
+         msg.append("Nombre de la Operation["+ name+ "] es inválido\n");
+
+      return msg.toString();
+   }//isValid
+
+
+   // ------------------------ Getters && Setters ---------------------------
+   public String     getName() { return name;}
+   public void       setName( String name) { this.name = name;}
+
+   public Metadata   getMetadata() { return metadata;}
+   public void       setMetadata( Metadata metadata) { this.metadata = metadata;}
+
+   public boolean    isVisible() { return visible;}
+   public void       setVisible( boolean visible) { this.visible = visible;}
+
+   public boolean    isEditable() { return editable;}
+   public void       setEditable(boolean editable) { this.editable = editable;}
+
+   public boolean    isEnabled() { return enabled;}
+   public void       setEnabled( boolean enabled) { this.enabled = enabled;}
+   
+   // ---------------------- Builders ---------------------
+   public interface Exporter
+   { 
+      public void initExport();
+      public void exportName( String name);
+      public void exportMetadata( Metadata metadata);
+      public void exportFlags( boolean visible, boolean editable, boolean enabled);
+      public void endExport();
+      public Object getProduct();
+   }//Exporter
+   
+   public Object export( Field.Exporter exporter)
+   {
+      exporter.initExport();
+      exporter.exportName(name);
+      exporter.exportMetadata(metadata);
+      exporter.endExport();
+      return exporter.getProduct();
+   }//export
+
+
+   // ---------------------- Object -----------------------
+   @Override public boolean equals( Object o)
+   {
+      if (this == o)
+         return true;
+
+      if (!(o instanceof Field ))
+         return false;
+
+      Field that = (Field) o;
+      return this.id != null && this.id.equals(that.id);
+
+   }//equals
+
+   @Override public int hashCode() { return id == null? 8087: id.hashCode();}
+
+   @Override public String toString()
+   {
+      StringBuilder s = new StringBuilder();
+      s.append(" Field{"+ super.toString())
+       .append(" name["+ name+ "]")
+       .append(" visible["+  visible+ "]")
+       .append(" editable["+ editable+ "]")
+       .append(" enabled["+  enabled+ "]")
+       .append("}\n");
+
+      return s.toString();
+   }//toString
+
+   @Override
+   public int compareTo(Field that)
+   {
+      return this.equals(that)?  0 :
+             that == null?       1 :
+             this.getCode().compareTo(that.getCode());
+   }//compareTo
+
+}//Field
