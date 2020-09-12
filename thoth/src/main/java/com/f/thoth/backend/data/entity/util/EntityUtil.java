@@ -10,16 +10,25 @@ public final class EntityUtil
    private static Map<String,String> className = new TreeMap<>();
    static
    {
-	   className.put( "DocType",         "Tipo Documental");
-	   className.put( "ObjectToProtect", "Objeto");
-	   className.put( "Permission",      "Permiso");
-	   className.put( "Role",            "Rol");
-	   className.put( "Schema",          "Esquema");
-	   className.put( "SingleUser",      "Usuario");
-	   className.put( "Tenant",          "Cliente");
-	   className.put( "UserGroup",       "Grupo de Usuarios");
-   }
-  
+      className.put( "DocType",             "Tipo Documental");
+      className.put( "ObjectToProtect",     "Objeto");
+      className.put( "Permission",          "Permiso");
+      className.put( "Role",                "Rol");
+      className.put( "Schema",              "Esquema");
+      className.put( "SingleUser",          "Usuario");
+      className.put( "Tenant",              "Cliente");
+      className.put( "UserGroup",           "Grupo de Usuarios");
+      className.put( "Metadata",            "Metadato");
+      className.put( "Field",               "Campo");
+      className.put( "Schema",              "Esquema");
+      className.put( "BranchClass",         "Rama");
+      className.put( "LeafClass",           "Clase");
+      className.put( "Retencion",           "Programa retención");
+      className.put( "ClassificationClass", "Clase");
+      className.put( "ClassificationLevel", "Nivel");
+
+   }//className
+
    public static final String getName(Class<? extends AbstractEntity> type)
    {
       String typeName = type.getSimpleName();

@@ -48,5 +48,8 @@ public enum Type
          return null;
       }
    }
+   
+   public String getDisplayName() { return name();}
+
 
 }//Type

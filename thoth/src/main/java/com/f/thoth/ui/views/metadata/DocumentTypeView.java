@@ -1,4 +1,4 @@
-package com.f.thoth.ui.views.properties;
+package com.f.thoth.ui.views.metadata;
 
 public class DocumentTypeView
 {

@@ -17,8 +17,8 @@ import com.f.thoth.ui.views.admin.users.SingleUserView;
 import com.f.thoth.ui.views.admin.users.UserGroupView;
 import com.f.thoth.ui.views.admin.users.UsersView;
 import com.f.thoth.ui.views.dashboard.DashboardView;
-import com.f.thoth.ui.views.properties.MetadataSchemaView;
-import com.f.thoth.ui.views.properties.MetadataView;
+import com.f.thoth.ui.views.metadata.MetadataSchemaView;
+import com.f.thoth.ui.views.metadata.MetadataView;
 import com.f.thoth.ui.views.security.permission.AccessPermissionView;
 import com.f.thoth.ui.views.security.permission.ExecutePermissionView;
 import com.f.thoth.ui.views.storefront.StorefrontView;
@@ -187,13 +187,13 @@ public class MainView extends AppLayout
       propertiesMenu.setOpenOnClick(true);
 
       if (SecurityUtils.isAccessGranted(OperationView.class))
-         propertiesMenu.addItem(createRoute(VaadinIcon.GROUP, Constant.TITLE_METADATA, MetadataView.class));
+         propertiesMenu.addItem(createRoute(VaadinIcon.CUBE, Constant.TITLE_METADATA, MetadataView.class));
 
       if (SecurityUtils.isAccessGranted(OperationView.class))
-         propertiesMenu.addItem(createRoute(VaadinIcon.GROUP, Constant.TITLE_ESQUEMAS_METADATA, MetadataSchemaView.class));
+         propertiesMenu.addItem(createRoute(VaadinIcon.CUBES, Constant.TITLE_ESQUEMAS_METADATA, MetadataSchemaView.class));
 
       if (SecurityUtils.isAccessGranted(OperationView.class))
-         propertiesMenu.addItem(createRoute(VaadinIcon.GROUP, Constant.TITLE_TIPOS_DOCUMENTALES, MetadataView.class));
+         propertiesMenu.addItem(createRoute(VaadinIcon.GRID_BIG_O, Constant.TITLE_TIPOS_DOCUMENTALES, MetadataView.class));
 
       if ( propertiesMenu.getItems().size() > 0)
          mainMenu.add(properties);

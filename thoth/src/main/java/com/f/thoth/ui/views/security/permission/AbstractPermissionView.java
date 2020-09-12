@@ -42,7 +42,6 @@ import com.vaadin.flow.shared.Registration;
 /**
  * Representa la vista de actualización de permisos de ejecución/acceso a datos
  */
-//@JsModule ("./styles/shared-styles.js")
 @CssImport("./styles/shared-styles.css")
 public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E>>
                 extends    VerticalLayout

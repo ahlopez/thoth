@@ -1,4 +1,4 @@
-package com.f.thoth.ui.views.properties;
+package com.f.thoth.ui.views.metadata;
 
 import java.util.List;
 import java.util.Optional;
@@ -7,11 +7,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
+import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.service.MetadataService;
 import com.f.thoth.backend.service.SchemaService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -21,12 +23,12 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-@Route(value = Constant.PAGE_ESQUEMAS_METADATA, layout = MainView.class)
+@Route(value = Constant.PAGE_ESQUEMAS_METADATA, layout=MainView.class)
 @PageTitle("Metadatos | Evidentia")
+@CssImport("./styles/shared-styles.css")
 public class MetadataSchemaView extends VerticalLayout 
 {
-
-    private final SchemaForm form;
+    private final SchemaForm   form;
     private Grid<Schema>       grid  = new Grid<>(Schema.class);
     private TextField    filterText  = new TextField();
 
@@ -34,10 +36,10 @@ public class MetadataSchemaView extends VerticalLayout
     private User            currentUser;
 
     @Autowired
-    public MetadataSchemaView(User currentUser, SchemaService schemaService, MetadataService metadataService) 
+    public MetadataSchemaView(SchemaService schemaService, MetadataService metadataService) 
     {
         this.schemaService   = schemaService;
-        this.currentUser     = currentUser;
+        this.currentUser     = ThothSession.getCurrentUser();
         
         addClassName("list-view");
         setSizeFull();
