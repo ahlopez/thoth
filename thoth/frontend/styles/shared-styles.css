@@ -7,6 +7,9 @@
 .list-view .selector-grid {
    flex: 2; ?
 }
+.list-view .metadata-grid {
+   flex: 2; ?
+}
 .list-view .left-section {
    flex: 1;
 }
