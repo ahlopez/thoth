@@ -161,10 +161,13 @@ public class Schema extends BaseEntity implements Comparable<Schema>
    {
       return other == null?  1 :  this.equals(other)? 0:  this.code.compareTo( other.code);
    }
+   
+   // -------------------------- Logic ------------------------------
 
-   public Iterator<Field> iterator()
-   {
-      return fields.iterator();
-   }
+   public Iterator<Field> iterator()    { return fields.iterator(); }
+   
+   public void deleteField(Field field) { fields.remove(field); }
+   
+   public void addField( Field field)   { fields.add(field); }
 
 }//Schema

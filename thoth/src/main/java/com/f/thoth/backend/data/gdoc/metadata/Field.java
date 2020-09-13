@@ -8,6 +8,7 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
@@ -30,20 +31,25 @@ public class Field extends BaseEntity implements Comparable<Field>
    private boolean  readOnly;
    
    private boolean  required;
+   
+   @NotNull (message = "{evidentia.name.required}")
+   @PositiveOrZero
+   private Integer  sortOrder;
 
 
    // --------------------- Construction -------------------------
    public Field()
    {  
       super();
-      this.name = "[name]";
+      this.name     = "[name]";
       this.metadata = null;
       this.visible  = true;
       this.readOnly = false;
       this.required = false;
+      this.sortOrder= 0;
    }//Field
 
-   public Field( String name, Metadata metadata, boolean visible, boolean readOnly, boolean required)
+   public Field( String name, Metadata metadata, boolean visible, boolean readOnly, boolean required, int sortOrder)
    {
       super();
       if ( !TextUtil.isIdentifier(name))
@@ -57,6 +63,7 @@ public class Field extends BaseEntity implements Comparable<Field>
       this.visible  = visible;
       this.readOnly = readOnly;
       this.required = required;
+      this.sortOrder= (sortOrder <= 0? 0: sortOrder);
 
    }//Field
    
@@ -95,11 +102,14 @@ public class Field extends BaseEntity implements Comparable<Field>
    public boolean    isVisible() { return visible;}
    public void       setVisible( boolean visible) { this.visible = visible;}
 
-   public boolean    isEditable() { return readOnly;}
-   public void       setEditable(boolean readOnly) { this.readOnly = readOnly;}
+   public boolean    isReadOnly() { return readOnly;}
+   public void       setReadOnly(boolean readOnly) { this.readOnly = readOnly;}
 
-   public boolean    isEnabled() { return required;}
-   public void       setEnabled( boolean required) { this.required = required;}
+   public boolean    isRequired() { return required;}
+   public void       setRequired( boolean required) { this.required = required;}
+   
+   public Integer    getSortOrder() { return sortOrder;}
+   public void       setSortOrder( Integer sortOrder) { this.sortOrder = sortOrder;}
    
    // ---------------------- Builders ---------------------
    public interface Exporter
@@ -156,7 +166,7 @@ public class Field extends BaseEntity implements Comparable<Field>
    {
       return this.equals(that)?  0 :
              that == null?       1 :
-             this.getCode().compareTo(that.getCode());
+             this.sortOrder.compareTo(that.sortOrder);
    }//compareTo
 
 }//Field

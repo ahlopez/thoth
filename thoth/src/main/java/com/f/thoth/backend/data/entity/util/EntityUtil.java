@@ -10,20 +10,20 @@ public final class EntityUtil
    private static Map<String,String> className = new TreeMap<>();
    static
    {
-      className.put( "DocType",             "Tipo Documental");
+      className.put( "Tenant",              "Cliente");
       className.put( "ObjectToProtect",     "Objeto");
+      className.put( "Operation",           "Operación");
       className.put( "Permission",          "Permiso");
       className.put( "Role",                "Rol");
-      className.put( "Schema",              "Esquema");
       className.put( "SingleUser",          "Usuario");
-      className.put( "Tenant",              "Cliente");
       className.put( "UserGroup",           "Grupo de Usuarios");
       className.put( "Metadata",            "Metadato");
       className.put( "Field",               "Campo");
       className.put( "Schema",              "Esquema");
+      className.put( "DocType",             "Tipo Documental");
       className.put( "BranchClass",         "Rama");
       className.put( "LeafClass",           "Clase");
-      className.put( "Retencion",           "Programa retención");
+      className.put( "Retencion",           "Regla de retención");
       className.put( "ClassificationClass", "Clase");
       className.put( "ClassificationLevel", "Nivel");
 

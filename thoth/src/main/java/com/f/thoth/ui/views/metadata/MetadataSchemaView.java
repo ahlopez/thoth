@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.annotation.Secured;
 
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
@@ -23,119 +24,119 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-@Route(value = Constant.PAGE_ESQUEMAS_METADATA, layout=MainView.class)
-@PageTitle("Metadatos | Evidentia")
 @CssImport("./styles/shared-styles.css")
+@PageTitle("Metadatos | Evidentia")
+@Route(value = Constant.PAGE_ESQUEMAS_METADATA, layout=MainView.class)
+@Secured(com.f.thoth.backend.data.Role.ADMIN)
 public class MetadataSchemaView extends VerticalLayout 
 {
-    private final SchemaForm   form;
-    private Grid<Schema>       grid  = new Grid<>(Schema.class);
-    private TextField    filterText  = new TextField();
+   private final SchemaForm schemaForm;
+   private Grid<Schema>     grid  = new Grid<>(Schema.class);
+   private TextField  filterText  = new TextField();
 
-    private SchemaService   schemaService;
-    private User            currentUser;
+   private Schema          schema;
+   private SchemaService   schemaService;
+   private User            currentUser;
 
-    @Autowired
-    public MetadataSchemaView(SchemaService schemaService, MetadataService metadataService) 
-    {
-        this.schemaService   = schemaService;
-        this.currentUser     = ThothSession.getCurrentUser();
-        
-        addClassName("list-view");
-        setSizeFull();
-        configureGrid();
+   @Autowired
+   public MetadataSchemaView(SchemaService schemaService, MetadataService metadataService) 
+   {
+      this.schemaService   = schemaService;
+      this.currentUser     = ThothSession.getCurrentUser();
 
-        form = new SchemaForm(metadataService.findAll());
-        form.addListener(SchemaForm.SaveEvent.class,   this::saveSchema);
-        form.addListener(SchemaForm.DeleteEvent.class, this::deleteSchema);
-        form.addListener(SchemaForm.CloseEvent.class,  e -> closeEditor());
+      addClassName("list-view");
+      setSizeFull();
+      configureGrid();
 
-        Div content = new Div(grid, form);
-        content.addClassName("content");
-        content.setSizeFull();
+      schemaForm = new SchemaForm(metadataService.findAll());
+      schemaForm.addListener(SchemaForm.SaveEvent.class,   this::saveSchema);
+      schemaForm.addListener(SchemaForm.DeleteEvent.class, this::deleteSchema);
+      schemaForm.addListener(SchemaForm.CloseEvent.class,  e -> closeEditor());
 
-        add(getToolBar(), content);
-        updateList();
-        closeEditor();
-        
-    }//MetadataSchemaView
+      Div content = new Div(grid, schemaForm);
+      content.addClassName("content");
+      content.setSizeFull();
+
+      add(getToolBar(), content);
+      updateList();
+      closeEditor();
+
+   }//MetadataSchemaView
 
 
-    protected String getBasePage() {
-       return Constant.PAGE_ESQUEMAS_METADATA;
-    }
+   protected String getBasePage() { return Constant.PAGE_ESQUEMAS_METADATA; }
 
-    
-    private void deleteSchema(SchemaForm.DeleteEvent evt) 
-    {
-        schemaService.delete(currentUser, evt.getSchema());
-        updateList();
-        closeEditor();
-    }//deleteSchema
+   private HorizontalLayout getToolBar() 
+   {
+      filterText.setPlaceholder("Filtrar según nombre...");
+      filterText.setClearButtonVisible(true);
+      filterText.setValueChangeMode(ValueChangeMode.LAZY);
+      filterText.addValueChangeListener(e -> updateList());
 
-    private void saveSchema(SchemaForm.SaveEvent evt) 
-    {
-        schemaService.save(currentUser, evt.getSchema());
-        updateList();
-        closeEditor();
-    }//saveSchema
+      Button addMetadataButton = new Button("Nuevo esquema", click -> addSchema());
 
-    private HorizontalLayout getToolBar() 
-    {
-        filterText.setPlaceholder("Filtrar según nombre...");
-        filterText.setClearButtonVisible(true);
-        filterText.setValueChangeMode(ValueChangeMode.LAZY);
-        filterText.addValueChangeListener(e -> updateList());
+      HorizontalLayout toolbar = new HorizontalLayout(filterText, addMetadataButton);
+      toolbar.addClassName("toolbar");
+      return toolbar;
+   }//getToolBar
 
-        Button addMetadataButton = new Button("Nuevo esquema", click -> addSchema());
+   private void addSchema() 
+   {
+      grid.asSingleSelect().clear();
+      schema = new Schema();
+      editSchema(schema);
+   }//addSchema
 
-        HorizontalLayout toolbar = new HorizontalLayout(filterText, addMetadataButton);
-        toolbar.addClassName("toolbar");
-        return toolbar;
-    }//getToolBar
+   private void configureGrid() 
+   {
+      grid.addClassName("metadata-grid");
+      grid.setSizeFull();
+      grid.setColumns("name");
+      grid.getColumns().forEach(col -> col.setAutoWidth(true));
+      grid.asSingleSelect().addValueChangeListener(event -> editSchema(event.getValue()));
 
-    private void addSchema() 
-    {
-        grid.asSingleSelect().clear();
-        editSchema(new Schema());
-    }
+   }//configureGrid
 
-    private void configureGrid() 
-    {
-        grid.addClassName("metadata-grid");
-        grid.setSizeFull();
-        grid.removeColumnByKey("esquema");
-        grid.setColumns("Nombre", "Campos");
-        grid.getColumns().forEach(col -> col.setAutoWidth(true));
+   private void editSchema(Schema schema) 
+   {
+      if (schema == null) 
+      {
+         closeEditor();
+      } else 
+      {
+         schemaForm.setSchema(schema);
+         schemaForm.setVisible(true);
+         addClassName("editing");
+      }
+   }//editSchema
 
-        grid.asSingleSelect().addValueChangeListener(evt -> editSchema(evt.getValue()));
-    }//configureGrid
+   private void closeEditor() 
+   {
+      schemaForm.setSchema(null);
+      schemaForm.setVisible(false);
+      removeClassName("editing");
+   }//closeEditor
 
-    private void editSchema(Schema schema) 
-    {
-        if (schema == null) 
-        {
-            closeEditor();
-        } else 
-        {
-            form.setSchema(schema);
-            form.setVisible(true);
-            addClassName("editing");
-        }
-    }//editSchema
+   private void updateList() 
+   {
+      Optional<String> filter = Optional.of(filterText.getValue());      
+      List<Schema>    schemas = schemaService.findAnyMatching(filter);
+      grid.setItems(schemas);
+   }//updateList
 
-    private void closeEditor() 
-    {
-        form.setSchema(null);
-        form.setVisible(false);
-        removeClassName("editing");
-    }//closeEditor
 
-    private void updateList() 
-    {
-       Optional<String> filter = Optional.of(filterText.getValue());      
-       List<Schema>    schemas = schemaService.findAnyMatching(filter);
-       grid.setItems(schemas);
-    }
+   private void deleteSchema(SchemaForm.DeleteEvent event) 
+   {
+      schemaService.delete(currentUser, event.getSchema());
+      updateList();
+      closeEditor();
+   }//deleteSchema
+
+   private void saveSchema(SchemaForm.SaveEvent event) 
+   {
+      schemaService.save(currentUser, event.getSchema());
+      updateList();
+      closeEditor();
+   }//saveSchema
 
 }//MetadataSchemaView

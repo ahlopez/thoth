@@ -169,10 +169,10 @@ public class MainView extends AppLayout
       if (SecurityUtils.isAccessGranted(OperationView.class))
          adminMenu.addItem(createRoute(VaadinIcon.TABLE, Constant.TITLE_PARAMETROS, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(RoleView.class))
-         adminMenu.addItem(createRoute(VaadinIcon.USER, Constant.TITLE_USUARIOS, RoleView.class));
+      if (SecurityUtils.isAccessGranted(SingleUserView.class))
+         adminMenu.addItem(createRoute(VaadinIcon.USER, Constant.TITLE_USUARIOS, SingleUserView.class));
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
+      if (SecurityUtils.isAccessGranted(UserGroupView.class))
          adminMenu.addItem(createRoute(VaadinIcon.GROUP, Constant.TITLE_GRUPOS_USUARIOS, UserGroupView.class));
 
       if ( adminMenu.getItems().size() > 0)
@@ -186,14 +186,14 @@ public class MainView extends AppLayout
       ContextMenu propertiesMenu = new ContextMenu(properties);
       propertiesMenu.setOpenOnClick(true);
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
+      if (SecurityUtils.isAccessGranted(MetadataView.class))
          propertiesMenu.addItem(createRoute(VaadinIcon.CUBE, Constant.TITLE_METADATA, MetadataView.class));
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
+      if (SecurityUtils.isAccessGranted(MetadataSchemaView.class))
          propertiesMenu.addItem(createRoute(VaadinIcon.CUBES, Constant.TITLE_ESQUEMAS_METADATA, MetadataSchemaView.class));
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         propertiesMenu.addItem(createRoute(VaadinIcon.GRID_BIG_O, Constant.TITLE_TIPOS_DOCUMENTALES, MetadataView.class));
+      if (SecurityUtils.isAccessGranted(MetadataSchemaView.class))
+         propertiesMenu.addItem(createRoute(VaadinIcon.GRID_BIG_O, Constant.TITLE_TIPOS_DOCUMENTALES, MetadataSchemaView.class));
 
       if ( propertiesMenu.getItems().size() > 0)
          mainMenu.add(properties);

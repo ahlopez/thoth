@@ -25,8 +25,8 @@ import com.vaadin.flow.data.selection.MultiSelect;
 import com.vaadin.flow.shared.Registration;
 
 public class AbstractHierarchicalSelector<T extends HierarchicalEntity<T>, E extends HasValue.ValueChangeEvent<T>>
-extends  VerticalLayout
-implements HasValue<E, T>
+       extends  VerticalLayout
+       implements HasValue<E, T>
 {
    private TreeDataProvider<T>          dataProvider;
    private final Tenant                 tenant;
