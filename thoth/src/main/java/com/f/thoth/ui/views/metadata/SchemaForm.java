@@ -14,6 +14,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.shared.Registration;
 
 public class SchemaForm extends VerticalLayout
@@ -21,6 +22,8 @@ public class SchemaForm extends VerticalLayout
    private Schema        schema;
    private Grid<Field>   fieldGrid;
    private FieldForm     fieldForm;
+   private TextField     schemaName  = new TextField("Esquema");
+
 
    private Button save   = new Button("Guardar esquema");
    private Button delete = new Button("Eliminar esquema");
@@ -29,6 +32,7 @@ public class SchemaForm extends VerticalLayout
 
    public SchemaForm(List<Metadata> availableMetadata)
    {
+      add(schemaName);
       add( configureFieldGrid());
       add( configureFieldForm(availableMetadata));
       add( configureButtons());
@@ -37,7 +41,11 @@ public class SchemaForm extends VerticalLayout
 
    }//SchemaForm
 
-   public void setSchema( Schema schema) { this.schema = schema;}
+   public void setSchema( Schema schema) 
+   {       
+      this.schema = schema;
+      updateList();
+   }//setSchema
 
    private Component configureFieldGrid()
    {
@@ -102,8 +110,12 @@ public class SchemaForm extends VerticalLayout
    private void updateList() 
    {
       if (schema != null)
+      {
           fieldGrid.setItems(schema.getMetadata());
-   }
+          fieldGrid.setVisible(true);
+          schemaName.setValue(schema.getName());
+      }
+   }//updateList
 
    private Component configureButtons() 
    {

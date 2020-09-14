@@ -27,13 +27,18 @@ import com.f.thoth.backend.data.entity.Product;
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.gdoc.classification.ClassificationClass;
 import com.f.thoth.backend.data.gdoc.classification.ClassificationLevel;
+import com.f.thoth.backend.data.gdoc.metadata.Field;
+import com.f.thoth.backend.data.gdoc.metadata.Metadata;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
+import com.f.thoth.backend.data.gdoc.metadata.Type;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Operation;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.ClassificationClassRepository;
 import com.f.thoth.backend.repositories.ClassificationLevelRepository;
+import com.f.thoth.backend.repositories.FieldRepository;
+import com.f.thoth.backend.repositories.MetadataRepository;
 import com.f.thoth.backend.repositories.OperationRepository;
 import com.f.thoth.backend.repositories.OrderRepository;
 import com.f.thoth.backend.repositories.PickupLocationRepository;
@@ -47,8 +52,8 @@ import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
 @SpringComponent
-public class DataGenerator implements HasLogger {
-
+public class DataGenerator implements HasLogger 
+{
    private static final String[] FILLING = new String[] { "Strawberry", "Chocolate", "Blueberry", "Raspberry",
    "Vanilla" };
    private static final String[] TYPE = new String[] { "Cake", "Pastry", "Tart", "Muffin", "Biscuit", "Bread", "Bagel",
@@ -75,13 +80,15 @@ public class DataGenerator implements HasLogger {
    private ClassificationClassRepository claseRepository;
    private ClassificationLevelRepository classificationLevelRepository;
    private SchemaRepository              schemaRepository;
+   private MetadataRepository            metadataRepository;
+   private FieldRepository               fieldRepository;
 
    @Autowired
    public DataGenerator(TenantService tenantService, OrderRepository orderRepository, UserRepository userRepository,
          ProductRepository productRepository, PickupLocationRepository pickupLocationRepository,
          TenantRepository tenantRepository, RoleRepository roleRepository, OperationRepository operationRepository,
-         ClassificationClassRepository claseRepository,
-         ClassificationLevelRepository classificationLevelRepository, SchemaRepository schemaRepository,
+         ClassificationClassRepository claseRepository, MetadataRepository metadataRepository, FieldRepository fieldRepository,
+         SchemaRepository schemaRepository, ClassificationLevelRepository classificationLevelRepository, 
          PasswordEncoder passwordEncoder)
    {
       this.tenantService                 = tenantService;
@@ -95,6 +102,8 @@ public class DataGenerator implements HasLogger {
       this.claseRepository               = claseRepository;
       this.classificationLevelRepository = classificationLevelRepository;
       this.schemaRepository              = schemaRepository;
+      this.fieldRepository               = fieldRepository;
+      this.metadataRepository            = metadataRepository;
       this.passwordEncoder               = passwordEncoder;
 
    }//DataGenerator
@@ -539,6 +548,47 @@ public class DataGenerator implements HasLogger {
       ClassificationClass clase335 = createClass( tenant1,        Constant.TITLE_CTG_SUBSERIE_ADM_EDIFICACIONES           , 3, clase334);  //   Cartagena, Edificaciones
       ClassificationClass clase336 = createClass( tenant1,        Constant.TITLE_CTG_SUBSERIE_ADM_SERVICIOS               , 3, clase334);  //   Cartagena, Servicios publicos
 
+      getLogger().info("... generating metadata");
+      Metadata nameMeta  = createMeta("String", Type.STRING, "length > 0");
+      Field    nameField = createField("Nombre", nameMeta, true, false, true, 1);
+      Field    bossField = createField("Jefe",   nameMeta, true, false, true, 2);
+      
+      Metadata dateMeta  = createMeta("Fecha", Type.DATETIME, "not null");
+      Field    fromField = createField("Desde", dateMeta, true, true,  true, 3);
+      Field    toField   = createField("Hasta", dateMeta, true, false, true, 4);
+      
+      Metadata intMeta   = createMeta("Entero", Type.INTEGER, " >0; < 100");
+      Field    cantField = createField("Cantidad", intMeta, true, false, true, 5);
+      Field    edadField = createField("Edad",     intMeta, true, true,  true, 6);
+      
+      Metadata decMeta   = createMeta("Decimal", Type.DECIMAL," >= 0.0");
+      Field    ratioField= createField("Razón", decMeta, true, false, true, 7);
+      
+      Schema   officeSchema = createSchema("Office");      
+      officeSchema.addField(nameField);
+      officeSchema.addField(bossField);
+      officeSchema.addField(fromField);
+      officeSchema.addField(toField);
+      schemaRepository.saveAndFlush(officeSchema);
+      schemaRepository.flush();
+      Schema miOffice = schemaRepository.findById(officeSchema.getId()).get();
+      List<Schema>allSchema = schemaRepository.findAll();
+      
+      
+      Schema   otherSchema = createSchema("Other");
+      otherSchema.addField(nameField);
+      otherSchema.addField(bossField);
+      otherSchema.addField(fromField);
+      otherSchema.addField(toField);
+      otherSchema.addField(cantField);
+      otherSchema.addField(edadField);
+      otherSchema.addField(ratioField);
+      schemaRepository.saveAndFlush(otherSchema);
+      schemaRepository.flush();
+      miOffice = schemaRepository.findById(officeSchema.getId()).get();
+      Schema miOther  = schemaRepository.findById(otherSchema.getId()).get();
+      allSchema = schemaRepository.findAll();
+       
 
       getLogger().info("... generating users");
       User baker = createBaker(userRepository, passwordEncoder);
@@ -603,6 +653,28 @@ public class DataGenerator implements HasLogger {
       claseRepository.saveAndFlush(classificationClass);
       return classificationClass;
    }//createClass
+   
+   private Metadata createMeta(String name, Type type, String range)
+   {
+      Metadata meta = new Metadata(name, type, range);
+      metadataRepository.saveAndFlush(meta);
+      return meta;
+   }//createMeta
+   
+   private Field createField(String name, Metadata meta, boolean visible, boolean readOnly, boolean required, int sortOrder)
+   {
+      Field field = new Field(name, meta, visible, readOnly, required, sortOrder);
+      fieldRepository.saveAndFlush(field);
+      return field;
+   }//createField
+   
+   private Schema createSchema(String name)
+   {
+      Schema schema = new Schema(name, new TreeSet<>());
+      schemaRepository.saveAndFlush(schema);
+      return schema;
+   }//createSchema
+
 
 
 

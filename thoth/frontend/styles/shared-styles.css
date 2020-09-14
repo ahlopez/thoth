@@ -30,6 +30,20 @@
    padding: var(--lumo-space-m); ?
 }
 
+/* Schema view */
+.schema-view .left-section {
+   min-width: 400px;
+   flex: 1;
+}
+.schema-view .content {
+   max-width: 900px;
+   display: flex 1;
+}
+.schema-view .right-section {
+   min-width: 900px;
+   flex: 2;
+}
+
 /* Hierarchical selector */
 .selector-tree {
    flex: 1; ?

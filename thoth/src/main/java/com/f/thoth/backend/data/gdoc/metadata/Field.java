@@ -152,10 +152,11 @@ public class Field extends BaseEntity implements Comparable<Field>
    {
       StringBuilder s = new StringBuilder();
       s.append(" Field{"+ super.toString())
-       .append(" name["+ name+ "]")
-       .append(" visible["+  visible+ "]")
-       .append(" readOnly["+ readOnly+ "]")
+       .append(" name["+      name+ "]")
+       .append(" visible["+   visible+ "]")
+       .append(" readOnly["+  readOnly+ "]")
        .append(" required["+  required+ "]")
+       .append(" sortOrder["+ sortOrder+ "]")
        .append("}\n");
 
       return s.toString();

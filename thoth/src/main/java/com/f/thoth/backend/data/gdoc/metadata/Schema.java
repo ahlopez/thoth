@@ -15,6 +15,7 @@ import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.BatchSize;
@@ -26,15 +27,16 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
  * Representa un esquema de metadatos
  */
 @Entity
-@Table(name = "SCHEMA", indexes = { @Index(columnList = "code")})
+@Table(name = "ESQUEMA", indexes = { @Index(columnList = "code")}) 
 public class Schema extends BaseEntity implements Comparable<Schema>
 {  
    @NotBlank(message = "{evidentia.name.required}")
    @NotNull (message = "{evidentia.name.required}")
+   @NotEmpty(message = "{evidentia.name.required}")
    private String         name;
 
    @NotNull (message = "{evidentia.fields.required}")
-   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
    @JoinColumn(name="schema_id")
    @BatchSize(size = 30)
    private Set<Field>  fields;
@@ -47,6 +49,7 @@ public class Schema extends BaseEntity implements Comparable<Schema>
    {
       super();
       fields = new TreeSet<>();
+      buildCode();
    }
 
    public Schema( String name, Set<Field> fields)
@@ -67,7 +70,7 @@ public class Schema extends BaseEntity implements Comparable<Schema>
    @PreUpdate
    public void prepareData()
    {
-      this.name =  name != null ? name.trim() : "Generico";
+      this.name =  (name != null ? name.trim() : "[schema]");
       buildCode();
    }//prepareData
 

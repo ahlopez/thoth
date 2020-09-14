@@ -2,6 +2,7 @@ package com.f.thoth.ui.views.metadata;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.TreeSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -16,7 +17,8 @@ import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -30,13 +32,17 @@ import com.vaadin.flow.router.Route;
 @Secured(com.f.thoth.backend.data.Role.ADMIN)
 public class MetadataSchemaView extends VerticalLayout 
 {
-   private final SchemaForm schemaForm;
+   private SchemaForm schemaForm;
    private Grid<Schema>     grid  = new Grid<>(Schema.class);
    private TextField  filterText  = new TextField();
 
-   private Schema          schema;
    private SchemaService   schemaService;
    private User            currentUser;
+
+   private VerticalLayout   leftSection;
+   private VerticalLayout   content;
+   private VerticalLayout   rightSection;
+
 
    @Autowired
    public MetadataSchemaView(SchemaService schemaService, MetadataService metadataService) 
@@ -44,22 +50,29 @@ public class MetadataSchemaView extends VerticalLayout
       this.schemaService   = schemaService;
       this.currentUser     = ThothSession.getCurrentUser();
 
-      addClassName("list-view");
+      addClassName("schema-view");
       setSizeFull();
-      configureGrid();
 
-      schemaForm = new SchemaForm(metadataService.findAll());
-      schemaForm.addListener(SchemaForm.SaveEvent.class,   this::saveSchema);
-      schemaForm.addListener(SchemaForm.DeleteEvent.class, this::deleteSchema);
-      schemaForm.addListener(SchemaForm.CloseEvent.class,  e -> closeEditor());
+      leftSection         = new VerticalLayout();
+      leftSection.addClassName  ("left-section");
+      leftSection.add(new Label (" "));
 
-      Div content = new Div(grid, schemaForm);
-      content.addClassName("content");
+      rightSection        = new VerticalLayout();
+      rightSection.addClassName ("right-section");
+
+      content             = new VerticalLayout();
+      content.addClassName      ("content");
       content.setSizeFull();
+      content.add(new H3("Esquemas registrados"));
 
-      add(getToolBar(), content);
+      content.add(getToolBar(), configureGrid());
+      rightSection.add(configureForm(metadataService));
       updateList();
       closeEditor();
+      
+      HorizontalLayout panel=  new HorizontalLayout(leftSection, content, rightSection);
+      panel.setSizeFull();
+      add( panel);
 
    }//MetadataSchemaView
 
@@ -68,34 +81,46 @@ public class MetadataSchemaView extends VerticalLayout
 
    private HorizontalLayout getToolBar() 
    {
-      filterText.setPlaceholder("Filtrar según nombre...");
+      filterText.setPlaceholder("[Filtro]");
+      filterText.setWidth("70%");
       filterText.setClearButtonVisible(true);
       filterText.setValueChangeMode(ValueChangeMode.LAZY);
       filterText.addValueChangeListener(e -> updateList());
 
-      Button addMetadataButton = new Button("Nuevo esquema", click -> addSchema());
+      Button addSchemaButton = new Button("Nuevo esquema", click -> addSchema());
+      addSchemaButton.setWidth("30%");
 
-      HorizontalLayout toolbar = new HorizontalLayout(filterText, addMetadataButton);
+      HorizontalLayout toolbar = new HorizontalLayout(filterText, addSchemaButton);
       toolbar.addClassName("toolbar");
       return toolbar;
    }//getToolBar
 
    private void addSchema() 
    {
-      grid.asSingleSelect().clear();
-      schema = new Schema();
-      editSchema(schema);
+      //grid.asSingleSelect().clear();
+      editSchema(new Schema("[Nuevo esquema]", new TreeSet<>()));
    }//addSchema
 
-   private void configureGrid() 
+   private Grid<Schema> configureGrid() 
    {
       grid.addClassName("metadata-grid");
       grid.setSizeFull();
       grid.setColumns("name");
       grid.getColumns().forEach(col -> col.setAutoWidth(true));
       grid.asSingleSelect().addValueChangeListener(event -> editSchema(event.getValue()));
+      return grid;
 
    }//configureGrid
+   
+   private SchemaForm configureForm(MetadataService metadataService)
+   {
+      schemaForm = new SchemaForm(metadataService.findAll());
+      schemaForm.addListener(SchemaForm.SaveEvent.class,   this::saveSchema);
+      schemaForm.addListener(SchemaForm.DeleteEvent.class, this::deleteSchema);
+      schemaForm.addListener(SchemaForm.CloseEvent.class,  e -> closeEditor());
+      return schemaForm;
+      
+   }//configureForm
 
    private void editSchema(Schema schema) 
    {
@@ -104,8 +129,12 @@ public class MetadataSchemaView extends VerticalLayout
          closeEditor();
       } else 
       {
+         if( schema.isPersisted())
+            schema = schemaService.load(schema.getId());
+         
          schemaForm.setSchema(schema);
          schemaForm.setVisible(true);
+         rightSection.setVisible(true);
          addClassName("editing");
       }
    }//editSchema
@@ -114,7 +143,9 @@ public class MetadataSchemaView extends VerticalLayout
    {
       schemaForm.setSchema(null);
       schemaForm.setVisible(false);
-      removeClassName("editing");
+      removeClassName("editing");      
+      rightSection.setVisible(false);
+
    }//closeEditor
 
    private void updateList() 

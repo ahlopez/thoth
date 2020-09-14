@@ -23,8 +23,8 @@ public class FieldForm extends FormLayout
     private TextField          campo    = new TextField("Campo");
     private ComboBox<Metadata> metadata = new ComboBox<>("Metadato");
 
-    private Button save   = new Button("Guardar");
-    private Button delete = new Button("Eliminar");
+    private Button save   = new Button("Guardar Campo");
+    private Button delete = new Button("Eliminar Campo");
     private Button close  = new Button("Cancelar");
 
     Binder<Field> binder = new BeanValidationBinder<>(Field.class);
@@ -32,6 +32,14 @@ public class FieldForm extends FormLayout
     public FieldForm(List<Metadata> availableMetadata) 
     {
         addClassName("field-form");
+
+        setResponsiveSteps(
+              new ResponsiveStep("30em", 1),
+              new ResponsiveStep("30em", 2),
+              new ResponsiveStep("30em", 3),
+              new ResponsiveStep("30em", 4)
+              );
+
         metadata.setItems(availableMetadata);
         metadata.setItemLabelGenerator(Metadata::getName);
 
@@ -51,9 +59,9 @@ public class FieldForm extends FormLayout
 
     private Component createButtonsLayout() 
     {
-        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        save.addThemeVariants  (ButtonVariant.LUMO_PRIMARY);
         delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
-        close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        close.addThemeVariants (ButtonVariant.LUMO_TERTIARY);
 
         save.addClickShortcut (Key.ENTER);
         close.addClickShortcut(Key.ESCAPE);

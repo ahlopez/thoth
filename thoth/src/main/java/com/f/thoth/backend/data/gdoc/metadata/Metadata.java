@@ -39,17 +39,17 @@ public class Metadata extends BaseEntity implements  Comparable<Metadata>
    public Metadata()
    {
       super();
-      reset("[metadato]", Type.STRING, false, true, "");
+      reset("[metadato]", Type.STRING, "");
       buildCode();
    }
 
-   public Metadata( String name, Type type, boolean required, boolean editable, String range)
+   public Metadata( String name, Type type, String range)
    {
       super();
-      reset(name, type, required, editable, range);
+      reset(name, type, range);
    }//Metadata
    
-   public void reset(String name, Type type, boolean required, boolean editable, String range)
+   public void reset(String name, Type type, String range)
    {
       if ( TextUtil.isEmpty(name))
          throw new IllegalArgumentException("Nombre del metadato no puede ser nulo ni vacío");

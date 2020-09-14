@@ -249,7 +249,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 	public String toString()
 	{
 		return "Tenant{ id["+ id+ "] version["+ version+ "] name["+ name+ "] code["+  code+ "] roles["+  roles.size()+
-				"] singleUsers["+ singleUsers.size()+ "userGroups["+ userGroups.size()+ "] docTypes["+ docTypes.size()+ "]}";
+				"] singleUsers["+ singleUsers.size()+ "] userGroups["+ userGroups.size()+ "] docTypes["+ docTypes.size()+ "]}";
 	}
 
 	@Override
