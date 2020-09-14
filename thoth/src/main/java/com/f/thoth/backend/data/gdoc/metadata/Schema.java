@@ -10,7 +10,8 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -35,9 +36,15 @@ public class Schema extends BaseEntity implements Comparable<Schema>
    @NotEmpty(message = "{evidentia.name.required}")
    private String         name;
 
+   /*
    @NotNull (message = "{evidentia.fields.required}")
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-   @JoinColumn(name="schema_id")
+   @JoinColumn(name="field_id")
+   @BatchSize(size = 30)
+   */
+   @NotNull (message = "{evidentia.fields.required}")
+   @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+   @JoinTable(name="SCHEMA_FIELDS", joinColumns=@JoinColumn(name="schema_id"), inverseJoinColumns=@JoinColumn(name="field_id"))
    @BatchSize(size = 30)
    private Set<Field>  fields;
    
@@ -85,8 +92,8 @@ public class Schema extends BaseEntity implements Comparable<Schema>
       buildCode();
    }//setName
 
-   public Set<Field>  getMetadata() { return fields;}
-   public void           setFields( Set<Field> fields){ this.fields = fields;}
+   public Set<Field>  getFields() { return fields;}
+   public void        setFields( Set<Field> fields){ this.fields = fields;}
    
    // --------------- Builders ---------------------
    

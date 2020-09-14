@@ -1,6 +1,7 @@
 package com.f.thoth.ui.views.metadata;
 
 import java.util.List;
+import java.util.Set;
 
 import com.f.thoth.backend.data.gdoc.metadata.Field;
 import com.f.thoth.backend.data.gdoc.metadata.Metadata;
@@ -32,6 +33,7 @@ public class SchemaForm extends VerticalLayout
 
    public SchemaForm(List<Metadata> availableMetadata)
    {
+      setVisible(false);
       add(schemaName);
       add( configureFieldGrid());
       add( configureFieldForm(availableMetadata));
@@ -41,8 +43,8 @@ public class SchemaForm extends VerticalLayout
 
    }//SchemaForm
 
-   public void setSchema( Schema schema) 
-   {       
+   public void setSchema( Schema schema)
+   {
       this.schema = schema;
       updateList();
    }//setSchema
@@ -51,14 +53,13 @@ public class SchemaForm extends VerticalLayout
    {
       fieldGrid = new Grid<>();
       fieldGrid.addClassName("selector-list");
-      fieldGrid.setVisible(false);
       fieldGrid.setWidthFull();
       fieldGrid.addColumn(Field::getName)     .setHeader("Nombre")      .setFlexGrow(40);
       fieldGrid.addColumn(Field::isVisible)   .setHeader("Visible")     .setFlexGrow(15);
       fieldGrid.addColumn(Field::isReadOnly)  .setHeader("Solo lectura").setFlexGrow(15);
       fieldGrid.addColumn(Field::isRequired)  .setHeader("Requerido")   .setFlexGrow(15);
       fieldGrid.addColumn(Field::getSortOrder).setHeader("Orden")       .setFlexGrow(15);
-      fieldGrid.setSelectionMode(Grid.SelectionMode.SINGLE);   
+      //fieldGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
       fieldGrid.asSingleSelect().addValueChangeListener(e-> editField(e.getValue()));
       return fieldGrid;
    }//configureFieldGrid
@@ -73,26 +74,26 @@ public class SchemaForm extends VerticalLayout
    }//configureFieldForm
 
 
-   private void deleteField(FieldForm.DeleteEvent event) 
+   private void deleteField(FieldForm.DeleteEvent event)
    {
       schema.deleteField(event.getField());
       updateList();
       closeEditor();
    }//deleteSchema
 
-   private void saveField(FieldForm.SaveEvent event) 
+   private void saveField(FieldForm.SaveEvent event)
    {
       schema.addField(event.getField());
       updateList();
       closeEditor();
    }//saveSchema
 
-   private void editField(Field field) 
+   private void editField(Field field)
    {
-      if (field == null) 
+      if (field == null)
       {
          closeEditor();
-      } else 
+      } else
       {
          fieldForm.setField(field);
          fieldForm.setVisible(true);
@@ -100,24 +101,25 @@ public class SchemaForm extends VerticalLayout
       }
    }//editSchema
 
-   private void closeEditor() 
+   private void closeEditor()
    {
       fieldForm.setField(null);
       fieldForm.setVisible(false);
       removeClassName("editing");
    }//closeEditor
 
-   private void updateList() 
+   private void updateList()
    {
       if (schema != null)
       {
-          fieldGrid.setItems(schema.getMetadata());
-          fieldGrid.setVisible(true);
+          setVisible(true);
+          Set<Field> fields = schema.getFields();
+          fieldGrid.setItems(fields);
           schemaName.setValue(schema.getName());
       }
    }//updateList
 
-   private Component configureButtons() 
+   private Component configureButtons()
    {
       save.  addThemeVariants(ButtonVariant.LUMO_PRIMARY);
       delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
@@ -136,47 +138,47 @@ public class SchemaForm extends VerticalLayout
 
 
    // --------------------- Events -----------------------
-   public static abstract class SchemaFormEvent extends ComponentEvent<SchemaForm> 
+   public static abstract class SchemaFormEvent extends ComponentEvent<SchemaForm>
    {
       private Schema schema;
 
-      protected SchemaFormEvent(SchemaForm source, Schema schema) 
+      protected SchemaFormEvent(SchemaForm source, Schema schema)
       {
          super(source, false);
          this.schema = schema;
       }//SchemaFormEvent
 
-      public Schema getSchema() 
+      public Schema getSchema()
       {
          return schema;
       }
    }//SchemaFormEvent
 
-   public static class SaveEvent extends SchemaFormEvent 
+   public static class SaveEvent extends SchemaFormEvent
    {
-      SaveEvent(SchemaForm source, Schema schema) 
+      SaveEvent(SchemaForm source, Schema schema)
       {
          super(source, schema);
       }
    }//SaveEvent
 
-   public static class DeleteEvent extends SchemaFormEvent 
+   public static class DeleteEvent extends SchemaFormEvent
    {
-      DeleteEvent(SchemaForm source, Schema schema) 
+      DeleteEvent(SchemaForm source, Schema schema)
       {
          super(source, schema);
       }
    }//DeleteEvent
 
-   public static class CloseEvent extends SchemaFormEvent 
+   public static class CloseEvent extends SchemaFormEvent
    {
-      CloseEvent(SchemaForm source) 
+      CloseEvent(SchemaForm source)
       {
          super(source, null);
       }
    }//CloseEvent
 
-   public <T extends ComponentEvent<?>> Registration addListener(Class<T> eventType, ComponentEventListener<T> listener) 
+   public <T extends ComponentEvent<?>> Registration addListener(Class<T> eventType, ComponentEventListener<T> listener)
    {
       return getEventBus().addListener(eventType, listener);
    }//addListener

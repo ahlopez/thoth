@@ -30,7 +30,7 @@ import com.vaadin.flow.router.Route;
 @PageTitle("Metadatos | Evidentia")
 @Route(value = Constant.PAGE_ESQUEMAS_METADATA, layout=MainView.class)
 @Secured(com.f.thoth.backend.data.Role.ADMIN)
-public class MetadataSchemaView extends VerticalLayout 
+public class MetadataSchemaView extends VerticalLayout
 {
    private SchemaForm schemaForm;
    private Grid<Schema>     grid  = new Grid<>(Schema.class);
@@ -45,7 +45,7 @@ public class MetadataSchemaView extends VerticalLayout
 
 
    @Autowired
-   public MetadataSchemaView(SchemaService schemaService, MetadataService metadataService) 
+   public MetadataSchemaView(SchemaService schemaService, MetadataService metadataService)
    {
       this.schemaService   = schemaService;
       this.currentUser     = ThothSession.getCurrentUser();
@@ -69,7 +69,7 @@ public class MetadataSchemaView extends VerticalLayout
       rightSection.add(configureForm(metadataService));
       updateList();
       closeEditor();
-      
+
       HorizontalLayout panel=  new HorizontalLayout(leftSection, content, rightSection);
       panel.setSizeFull();
       add( panel);
@@ -79,29 +79,28 @@ public class MetadataSchemaView extends VerticalLayout
 
    protected String getBasePage() { return Constant.PAGE_ESQUEMAS_METADATA; }
 
-   private HorizontalLayout getToolBar() 
+   private HorizontalLayout getToolBar()
    {
       filterText.setPlaceholder("[Filtro]");
-      filterText.setWidth("70%");
+      filterText.setWidthFull();
       filterText.setClearButtonVisible(true);
       filterText.setValueChangeMode(ValueChangeMode.LAZY);
       filterText.addValueChangeListener(e -> updateList());
 
       Button addSchemaButton = new Button("Nuevo esquema", click -> addSchema());
-      addSchemaButton.setWidth("30%");
 
       HorizontalLayout toolbar = new HorizontalLayout(filterText, addSchemaButton);
+      toolbar.setWidthFull();
       toolbar.addClassName("toolbar");
       return toolbar;
    }//getToolBar
 
-   private void addSchema() 
+   private void addSchema()
    {
-      //grid.asSingleSelect().clear();
       editSchema(new Schema("[Nuevo esquema]", new TreeSet<>()));
    }//addSchema
 
-   private Grid<Schema> configureGrid() 
+   private Grid<Schema> configureGrid()
    {
       grid.addClassName("metadata-grid");
       grid.setSizeFull();
@@ -111,7 +110,7 @@ public class MetadataSchemaView extends VerticalLayout
       return grid;
 
    }//configureGrid
-   
+
    private SchemaForm configureForm(MetadataService metadataService)
    {
       schemaForm = new SchemaForm(metadataService.findAll());
@@ -119,19 +118,19 @@ public class MetadataSchemaView extends VerticalLayout
       schemaForm.addListener(SchemaForm.DeleteEvent.class, this::deleteSchema);
       schemaForm.addListener(SchemaForm.CloseEvent.class,  e -> closeEditor());
       return schemaForm;
-      
+
    }//configureForm
 
-   private void editSchema(Schema schema) 
+   private void editSchema(Schema schema)
    {
-      if (schema == null) 
+      if (schema == null)
       {
          closeEditor();
-      } else 
+      } else
       {
          if( schema.isPersisted())
             schema = schemaService.load(schema.getId());
-         
+
          schemaForm.setSchema(schema);
          schemaForm.setVisible(true);
          rightSection.setVisible(true);
@@ -139,31 +138,30 @@ public class MetadataSchemaView extends VerticalLayout
       }
    }//editSchema
 
-   private void closeEditor() 
+   private void closeEditor()
    {
       schemaForm.setSchema(null);
       schemaForm.setVisible(false);
-      removeClassName("editing");      
-      rightSection.setVisible(false);
+      removeClassName("editing");
 
    }//closeEditor
 
-   private void updateList() 
+   private void updateList()
    {
-      Optional<String> filter = Optional.of(filterText.getValue());      
+      Optional<String> filter = Optional.of(filterText.getValue());
       List<Schema>    schemas = schemaService.findAnyMatching(filter);
       grid.setItems(schemas);
    }//updateList
 
 
-   private void deleteSchema(SchemaForm.DeleteEvent event) 
+   private void deleteSchema(SchemaForm.DeleteEvent event)
    {
       schemaService.delete(currentUser, event.getSchema());
       updateList();
       closeEditor();
    }//deleteSchema
 
-   private void saveSchema(SchemaForm.SaveEvent event) 
+   private void saveSchema(SchemaForm.SaveEvent event)
    {
       schemaService.save(currentUser, event.getSchema());
       updateList();
