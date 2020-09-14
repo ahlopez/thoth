@@ -43,6 +43,9 @@
    min-width: 900px;
    flex: 2;
 }
+.schema-view .right-section .selector-list {
+   flex: 2;?
+}
 
 /* Hierarchical selector */
 .selector-tree {

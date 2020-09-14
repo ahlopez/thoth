@@ -98,7 +98,7 @@ public class MetadataSchemaView extends VerticalLayout
 
    private void addSchema()
    {
-      editSchema(new Schema("[Nuevo esquema]", new TreeSet<>()));
+      editSchema(new Schema("Nombre", new TreeSet<>()));
    }//addSchema
 
    private Grid<Schema> configureGrid()

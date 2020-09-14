@@ -26,18 +26,19 @@ public class SchemaForm extends VerticalLayout
    private TextField     schemaName  = new TextField("Esquema");
 
 
-   private Button save   = new Button("Guardar esquema");
-   private Button delete = new Button("Eliminar esquema");
-   private Button close  = new Button("Cancelar");
+   private Button save     = new Button("Guardar esquema");
+   private Button delete   = new Button("Eliminar esquema");
+   private Button close    = new Button("Cancelar");
+   private Button newField = new Button("Nuevo campo", click -> addField());
 
 
    public SchemaForm(List<Metadata> availableMetadata)
    {
       setVisible(false);
-      add(schemaName);
+      add( new HorizontalLayout(schemaName, newField));
       add( configureFieldGrid());
-      add( configureFieldForm(availableMetadata));
       add( configureButtons());
+      add( configureFieldForm(availableMetadata));
       updateList();
       closeEditor();
 
@@ -73,18 +74,24 @@ public class SchemaForm extends VerticalLayout
    }//configureFieldForm
 
 
+   private void addField()
+   {
+      Field nuevo = new Field();
+      nuevo.setName("Nombre");
+      editField(nuevo);
+   }//addField
+
+
    private void deleteField(FieldForm.DeleteEvent event)
    {
       schema.deleteField(event.getField());
       updateList();
-      closeEditor();
    }//deleteSchema
 
    private void saveField(FieldForm.SaveEvent event)
    {
       schema.addField(event.getField());
       updateList();
-      closeEditor();
    }//saveSchema
 
    private void editField(Field field)
@@ -121,9 +128,10 @@ public class SchemaForm extends VerticalLayout
 
    private Component configureButtons()
    {
-      save.  addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-      delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
-      close. addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+      save.    addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+      delete.  addThemeVariants(ButtonVariant.LUMO_ERROR);
+      close.   addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+      newField.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
       save.addClickShortcut (Key.ENTER);
       close.addClickShortcut(Key.ESCAPE);
