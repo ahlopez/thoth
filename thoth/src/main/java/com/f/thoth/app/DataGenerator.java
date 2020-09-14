@@ -562,18 +562,14 @@ public class DataGenerator implements HasLogger
       Field    edadField = createField("Edad",     intMeta, true, true,  true, 6);
       
       Metadata decMeta   = createMeta("Decimal", Type.DECIMAL," >= 0.0");
-      Field    ratioField= createField("Razón", decMeta, true, false, true, 7);
+      Field    ratioField= createField("Razon", decMeta, true, false, true, 7);
       
       Schema   officeSchema = createSchema("Office");      
       officeSchema.addField(nameField);
       officeSchema.addField(bossField);
       officeSchema.addField(fromField);
       officeSchema.addField(toField);
-      schemaRepository.saveAndFlush(officeSchema);
-      schemaRepository.flush();
-      Schema miOffice = schemaRepository.findById(officeSchema.getId()).get();
-      List<Schema>allSchema = schemaRepository.findAll();
-      
+      schemaRepository.saveAndFlush(officeSchema);     
       
       Schema   otherSchema = createSchema("Other");
       otherSchema.addField(nameField);
@@ -583,12 +579,7 @@ public class DataGenerator implements HasLogger
       otherSchema.addField(cantField);
       otherSchema.addField(edadField);
       otherSchema.addField(ratioField);
-      schemaRepository.saveAndFlush(otherSchema);
-      schemaRepository.flush();
-      miOffice = schemaRepository.findById(officeSchema.getId()).get();
-      Schema miOther  = schemaRepository.findById(otherSchema.getId()).get();
-      allSchema = schemaRepository.findAll();
-       
+      schemaRepository.saveAndFlush(otherSchema);   
 
       getLogger().info("... generating users");
       User baker = createBaker(userRepository, passwordEncoder);

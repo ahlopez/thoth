@@ -88,6 +88,7 @@ public class MetadataSchemaView extends VerticalLayout
       filterText.addValueChangeListener(e -> updateList());
 
       Button addSchemaButton = new Button("Nuevo esquema", click -> addSchema());
+      addSchemaButton.setWidth("40%");
 
       HorizontalLayout toolbar = new HorizontalLayout(filterText, addSchemaButton);
       toolbar.setWidthFull();
@@ -131,8 +132,8 @@ public class MetadataSchemaView extends VerticalLayout
          if( schema.isPersisted())
             schema = schemaService.load(schema.getId());
 
-         schemaForm.setSchema(schema);
          schemaForm.setVisible(true);
+         schemaForm.setSchema(schema);
          rightSection.setVisible(true);
          addClassName("editing");
       }
