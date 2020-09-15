@@ -13,6 +13,8 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -33,13 +35,17 @@ public class FieldForm extends FormLayout
    Binder<Field> binder = new BeanValidationBinder<>(Field.class);
 
    public FieldForm(List<Metadata> availableMetadata) 
-   {      
+   {  
+      addClassName("field-form");
       setResponsiveSteps(
             new ResponsiveStep("30em", 1),
             new ResponsiveStep("30em", 2),
             new ResponsiveStep("30em", 3));
       
-      TextField  campo    = new TextField("Campo");
+      H3  title = new H3("Campo a actualizar");
+      title.getElement().setAttribute("colspan", "2");
+      
+      TextField  campo    = new TextField("Nombre");
       campo.setRequired(true);
       campo.setRequiredIndicatorVisible(true);
       campo.getElement().setAttribute("colspan", "2");
@@ -58,6 +64,7 @@ public class FieldForm extends FormLayout
       sortOrder.setRequiredIndicatorVisible(true);
 
        add(
+            title,
             campo,
             metadata,
             visible,
@@ -94,14 +101,22 @@ public class FieldForm extends FormLayout
 
       save.addClickShortcut (Key.ENTER);
       close.addClickShortcut(Key.ESCAPE);
+      
+      save.  setWidth("40%");
+      delete.setWidth("40%");
+      close. setWidth("20%");
 
       save.addClickListener  (click -> validateAndSave());
       delete.addClickListener(click -> fireEvent(new DeleteEvent(this, binder.getBean())));
       close.addClickListener (click -> fireEvent(new CloseEvent(this)));
 
       binder.addStatusChangeListener(evt -> save.setEnabled(binder.isValid()));
+      Label space = new Label(" ");
+      space.setWidthFull();
+      HorizontalLayout buttons = new HorizontalLayout(space, save, delete, close);
+      buttons.getElement().setAttribute("colspan", "3");
 
-      return new HorizontalLayout(save, delete, close);
+      return buttons; 
    }//createButtonsLayout
 
    private void validateAndSave() 

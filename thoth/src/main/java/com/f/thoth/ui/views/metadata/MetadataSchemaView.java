@@ -15,6 +15,7 @@ import com.f.thoth.backend.service.SchemaService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
@@ -87,8 +88,10 @@ public class MetadataSchemaView extends VerticalLayout
       filterText.setValueChangeMode(ValueChangeMode.LAZY);
       filterText.addValueChangeListener(e -> updateList());
 
-      Button addSchemaButton = new Button("Nuevo esquema", click -> addSchema());
+      Button addSchemaButton = new Button("+Nuevo esquema", click -> addSchema());
       addSchemaButton.setWidth("40%");
+      addSchemaButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
 
       HorizontalLayout toolbar = new HorizontalLayout(filterText, addSchemaButton);
       toolbar.setWidthFull();

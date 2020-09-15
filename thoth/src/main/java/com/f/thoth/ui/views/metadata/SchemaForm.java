@@ -13,6 +13,8 @@ import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -23,19 +25,27 @@ public class SchemaForm extends VerticalLayout
    private Schema        schema;
    private Grid<Field>   fieldGrid;
    private FieldForm     fieldForm;
-   private TextField     schemaName  = new TextField("Esquema");
+   private TextField     schemaName  = new TextField();
 
 
    private Button save     = new Button("Guardar esquema");
    private Button delete   = new Button("Eliminar esquema");
    private Button close    = new Button("Cancelar");
-   private Button newField = new Button("Nuevo campo", click -> addField());
+   private Button newField = new Button("+Nuevo campo", click -> addField());
 
 
    public SchemaForm(List<Metadata> availableMetadata)
    {
       setVisible(false);
-      add( new HorizontalLayout(schemaName, newField));
+      H3 title = new H3("Esquema");
+      HorizontalLayout titles =  new HorizontalLayout(title, schemaName, newField);
+      titles.setWidthFull();
+      titles.setPadding(true);
+      titles.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.BASELINE);
+      
+      schemaName.addValueChangeListener(e-> schema.setName(e.getValue()));
+      schemaName.getElement().getStyle().set("margin-right", "auto");
+      add( titles);
       add( configureFieldGrid());
       add( configureButtons());
       add( configureFieldForm(availableMetadata));
@@ -53,7 +63,6 @@ public class SchemaForm extends VerticalLayout
    private Component configureFieldGrid()
    {
       fieldGrid = new Grid<>();
-      //fieldGrid.addClassName("selector-list");
       fieldGrid.setWidthFull();
       fieldGrid.addColumn(Field::getName)     .setHeader("Nombre")      .setFlexGrow(40);
       fieldGrid.addColumn(Field::isVisible)   .setHeader("Visible")     .setFlexGrow(15);
@@ -85,12 +94,14 @@ public class SchemaForm extends VerticalLayout
    private void deleteField(FieldForm.DeleteEvent event)
    {
       schema.deleteField(event.getField());
+      closeEditor();
       updateList();
    }//deleteSchema
 
    private void saveField(FieldForm.SaveEvent event)
    {
       schema.addField(event.getField());
+      closeEditor();
       updateList();
    }//saveSchema
 
@@ -111,7 +122,6 @@ public class SchemaForm extends VerticalLayout
    {
       fieldForm.setField(null);
       fieldForm.setVisible(false);
-      setVisible(false);
       removeClassName("editing");
    }//closeEditor
 
@@ -119,7 +129,7 @@ public class SchemaForm extends VerticalLayout
    {
       if (schema != null)
       {
-          setVisible(true);
+      //    setVisible(true);
           Set<Field> fields = schema.getFields();
           fieldGrid.setItems(fields);
           schemaName.setValue(schema.getName());
@@ -132,15 +142,21 @@ public class SchemaForm extends VerticalLayout
       delete.  addThemeVariants(ButtonVariant.LUMO_ERROR);
       close.   addThemeVariants(ButtonVariant.LUMO_TERTIARY);
       newField.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-
+      
       save.addClickShortcut (Key.ENTER);
       close.addClickShortcut(Key.ESCAPE);
 
       save.addClickListener  (click -> fireEvent(new SaveEvent  (this, schema)));
       delete.addClickListener(click -> fireEvent(new DeleteEvent(this, schema)));
       close.addClickListener (click -> fireEvent(new CloseEvent (this)));
+      
+      save.getElement().getStyle().set("margin-left", "auto");
 
-      return new HorizontalLayout(save, delete, close);
+      HorizontalLayout buttons = new HorizontalLayout();
+      buttons.setWidthFull();
+      buttons.setPadding(true);
+      buttons.add( save, delete, close);
+      return buttons;
    }//configureButtons
 
 

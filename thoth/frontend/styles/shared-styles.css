@@ -46,6 +46,20 @@
 .schema-view .right-section .selector-list {
    flex: 2;?
 }
+.schema-view .right-section .vertical-center {
+  margin: 0;
+  position: absolute;
+  top: 50%;
+  -ms-transform: translateY(-50%);
+  transform: translateY(-50%);
+}
+
+.schema-view .right-section .field-form {
+   /*  border: 1px solid blue; */
+   /*  border-style: ridge;    */
+     border: 1px ridge lightgray;
+     background-color: ivory;
+}
 
 /* Hierarchical selector */
 .selector-tree {
