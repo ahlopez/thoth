@@ -89,7 +89,7 @@ public class LevelsView extends VerticalLayout
       filterText.setValueChangeMode(ValueChangeMode.LAZY);
       filterText.addValueChangeListener(e -> updateList());
 
-      Button addLevelButton = new Button("+Nuevo esquema", click -> addLevel());
+      Button addLevelButton = new Button("+ Nuevo nivel", click -> addLevel());
       addLevelButton.setWidth("40%");
       addLevelButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 

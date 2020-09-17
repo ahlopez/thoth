@@ -24,20 +24,22 @@ public class Field extends BaseEntity implements Comparable<Field>
    @NotBlank(message = "{evidentia.name.required}")
    @NotNull (message = "{evidentia.name.required}")
    @Size(min= 2, max = 50, message= "{evidentia.name.length}")
-   private String   name;
+   private String   name;                        // Nombre del campo
    
    @ManyToOne
-   private Metadata metadata;
+   private Metadata metadata;                    // Metadato asociado al campo
    
-   private boolean  visible;
+   private boolean  visible;                     // Es el campo visible?
    
-   private boolean  readOnly;
+   private boolean  readOnly;                    // Es el campo solo de lectura?
    
-   private boolean  required;
+   private boolean  required;                    // Es el campo requerido
    
    @NotNull (message = "{evidentia.order.required}")
    @Positive(message = "{evidentia.order.positive}")
-   private Integer  sortOrder;
+   private Integer  sortOrder;                   // Orden del campo en la lista de campos
+   
+   private Integer  columns;                     // Número de columnas que ocupa el campo
 
 
    // --------------------- Construction -------------------------
@@ -50,9 +52,10 @@ public class Field extends BaseEntity implements Comparable<Field>
       this.readOnly = false;
       this.required = false;
       this.sortOrder= 0;
+      this.columns  = 1;
    }//Field
 
-   public Field( String name, Metadata metadata, boolean visible, boolean readOnly, boolean required, int sortOrder)
+   public Field( String name, Metadata metadata, boolean visible, boolean readOnly, boolean required, int sortOrder, int columns)
    {
       super();
       if ( !TextUtil.isIdentifier(name))
@@ -67,6 +70,7 @@ public class Field extends BaseEntity implements Comparable<Field>
       this.readOnly = readOnly;
       this.required = required;
       this.sortOrder= (sortOrder <= 0? 0: sortOrder);
+      this.columns  = (columns <= 0? 1: columns);
 
    }//Field
    
@@ -89,7 +93,7 @@ public class Field extends BaseEntity implements Comparable<Field>
    {
       StringBuilder msg = new StringBuilder();
       if ( !TextUtil.isValidName(name))
-         msg.append("Nombre de la Operation["+ name+ "] es inválido\n");
+         msg.append("Nombre del Campo["+ name+ "] es inválido\n");
 
       return msg.toString();
    }//isValid
@@ -114,12 +118,16 @@ public class Field extends BaseEntity implements Comparable<Field>
    public Integer    getSortOrder() { return sortOrder;}
    public void       setSortOrder( Integer sortOrder) { this.sortOrder = sortOrder;}
    
+   public Integer    getColumns() { return columns;}
+   public void       setColumns( Integer columns) { this.columns = columns;}
+   
    // ---------------------- Builders ---------------------
    public interface Exporter
    { 
       public void initExport();
       public void exportBasic( String name, Metadata metadata);
       public void exportFlags( boolean visible, boolean readOnly, boolean required);
+      public void exportNumbers( Integer sortOrder, Integer columns);
       public void endExport();
       public Object getProduct();
    }//Exporter
@@ -128,6 +136,8 @@ public class Field extends BaseEntity implements Comparable<Field>
    {
       exporter.initExport();
       exporter.exportBasic(name, metadata);
+      exporter.exportFlags( visible, readOnly, required);
+      exporter.exportNumbers( sortOrder, columns);
       exporter.endExport();
       return exporter.getProduct();
    }//export

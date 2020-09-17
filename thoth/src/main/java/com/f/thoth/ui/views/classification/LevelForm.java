@@ -41,6 +41,8 @@ public class LevelForm extends VerticalLayout
 
    public LevelForm(List<Schema> availableSchemas)
    {
+      addClassName("field-form");
+
       setVisible(false);
       add( new H3("Definición del nivel"));
       
@@ -48,11 +50,13 @@ public class LevelForm extends VerticalLayout
       name.setRequired(true);
       name.setRequiredIndicatorVisible(true);
       name.getElement().setAttribute("colspan", "2");
+      name.addValueChangeListener(v-> { if(level != null) level.setName(v.getValue());});
       
       orden = new TextField("Orden");
       orden.setRequired(true);
       orden.setRequiredIndicatorVisible(true);
       orden.getElement().setAttribute("colspan", "1");
+      orden.addValueChangeListener(v-> { if(level != null) level.setOrden( Integer.valueOf(v.getValue()));});
       
       ComboBox<Schema> schema = new ComboBox<>("Esquema de metadatos");
       schema.setItems(availableSchemas);

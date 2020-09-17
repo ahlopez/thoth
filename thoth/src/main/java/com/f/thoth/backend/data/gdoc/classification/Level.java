@@ -40,7 +40,7 @@ public class Level extends BaseEntity implements Comparable<Level>
    {
       super();
       name   = "";
-      orden  = 0;
+      orden  = 1;
       schema = new Schema();
       buildCode();
    }//Level constructor

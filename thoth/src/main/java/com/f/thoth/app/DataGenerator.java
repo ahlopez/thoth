@@ -550,19 +550,19 @@ public class DataGenerator implements HasLogger
 
       getLogger().info("... generating metadata");
       Metadata nameMeta  = createMeta("String", Type.STRING, "length > 0");
-      Field    nameField = createField("Nombre", nameMeta, true, false, true, 1);
-      Field    bossField = createField("Jefe",   nameMeta, true, false, true, 2);
+      Field    nameField = createField("Nombre", nameMeta, true, false, true, 1, 4);
+      Field    bossField = createField("Jefe",   nameMeta, true, false, true, 2, 4);
       
       Metadata dateMeta  = createMeta("Fecha", Type.DATETIME, "not null");
-      Field    fromField = createField("Desde", dateMeta, true, true,  true, 3);
-      Field    toField   = createField("Hasta", dateMeta, true, false, true, 4);
+      Field    fromField = createField("Desde", dateMeta, true, true,  true, 3, 2);
+      Field    toField   = createField("Hasta", dateMeta, true, false, true, 4, 2);
       
       Metadata intMeta   = createMeta("Entero", Type.INTEGER, " >0; < 100");
-      Field    cantField = createField("Cantidad", intMeta, true, false, true, 5);
-      Field    edadField = createField("Edad",     intMeta, true, true,  true, 6);
+      Field    cantField = createField("Cantidad", intMeta, true, false, true, 5, 1);
+      Field    edadField = createField("Edad",     intMeta, true, true,  true, 6, 1);
       
       Metadata decMeta   = createMeta("Decimal", Type.DECIMAL," >= 0.0");
-      Field    ratioField= createField("Razon", decMeta, true, false, true, 7);
+      Field    ratioField= createField("Razon", decMeta, true, false, true, 7, 1);
       
       Schema   officeSchema = createSchema("Office");      
       officeSchema.addField(nameField);
@@ -652,9 +652,9 @@ public class DataGenerator implements HasLogger
       return meta;
    }//createMeta
    
-   private Field createField(String name, Metadata meta, boolean visible, boolean readOnly, boolean required, int sortOrder)
+   private Field createField(String name, Metadata meta, boolean visible, boolean readOnly, boolean required, int sortOrder, int columns)
    {
-      Field field = new Field(name, meta, visible, readOnly, required, sortOrder);
+      Field field = new Field(name, meta, visible, readOnly, required, sortOrder, columns);
       fieldRepository.saveAndFlush(field);
       return field;
    }//createField

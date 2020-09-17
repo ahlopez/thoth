@@ -24,6 +24,7 @@ public class FieldToComponentExporter implements Field.Exporter
    private boolean   visible;
    private boolean   readOnly;
    private boolean   required;
+   private String    columns;
    private Metadata  metadata;
    
    public FieldToComponentExporter()
@@ -51,6 +52,13 @@ public class FieldToComponentExporter implements Field.Exporter
       this.readOnly = readOnly;
       this.required = required;      
    }//exportFlags
+   
+   
+   public void exportNumbers( Integer sortOrder, Integer columns)
+   {
+      this.columns   = columns.toString();
+   }//exportNumbers
+   
 
    @Override  public void endExport() 
    { 
@@ -70,6 +78,7 @@ public class FieldToComponentExporter implements Field.Exporter
          combo.setRequired(required);
          combo.setRequiredIndicatorVisible(required);
          combo.setLabel(this.name);
+         combo.getElement().setAttribute("colspan", columns );
          field = combo;
          break;
       case  BINARY   :  //  Byte[].class
@@ -78,6 +87,7 @@ public class FieldToComponentExporter implements Field.Exporter
          area.setReadOnly(readOnly);
          area.setRequired(required);
          area.setRequiredIndicatorVisible(required);
+         area.getElement().setAttribute("colspan", columns );
          area.setLabel(this.name);
          if ( range != null)
             area.setValue(range);
@@ -89,6 +99,7 @@ public class FieldToComponentExporter implements Field.Exporter
          check.setVisible(visible);
          check.setReadOnly(readOnly);
          check.setRequiredIndicatorVisible(required);
+         check.getElement().setAttribute("colspan", columns );
          check.setLabel(this.name);
          field = check;
          break;
@@ -97,6 +108,7 @@ public class FieldToComponentExporter implements Field.Exporter
          fecha.setVisible(visible);
          fecha.setReadOnly(readOnly);
          fecha.setRequiredIndicatorVisible(required);
+         fecha.getElement().setAttribute("colspan", columns );
          fecha.setLabel(this.name);
          field = fecha;
          break;
@@ -114,6 +126,7 @@ public class FieldToComponentExporter implements Field.Exporter
          text.setReadOnly(readOnly);
          text.setRequired(required);
          text.setRequiredIndicatorVisible(required);
+         text.getElement().setAttribute("colspan", columns );
          text.setLabel(this.name);
          field= text;
       }//switch (type)
