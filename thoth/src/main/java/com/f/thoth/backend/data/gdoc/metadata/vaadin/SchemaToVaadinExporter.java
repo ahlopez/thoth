@@ -6,6 +6,9 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 
+/**
+ * Builder de exportación de un esquema de metadatos a un componente Vaadin
+ */
 public class SchemaToVaadinExporter implements Schema.Exporter
 {
    VerticalLayout layout;
@@ -21,7 +24,7 @@ public class SchemaToVaadinExporter implements Schema.Exporter
 
    @Override  public void exportName(String name) { layout.add( new Label(name));}
 
-   @Override  public void exportField(Field field) { layout.add( (Component)field.export(fieldExporter));}
+   @Override  public void exportField(Field field){ layout.add( (Component)field.export(fieldExporter));}
 
    @Override  public void endExport() { }
 

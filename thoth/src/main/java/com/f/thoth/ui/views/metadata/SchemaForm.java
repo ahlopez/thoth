@@ -31,7 +31,7 @@ public class SchemaForm extends VerticalLayout
    private Button save     = new Button("Guardar esquema");
    private Button delete   = new Button("Eliminar esquema");
    private Button close    = new Button("Cancelar");
-   private Button newField = new Button("+Nuevo campo", click -> addField());
+   private Button newField = new Button("+ Nuevo campo", click -> addField());
 
 
    public SchemaForm(List<Metadata> availableMetadata)
@@ -116,7 +116,7 @@ public class SchemaForm extends VerticalLayout
          fieldForm.setVisible(true);
          addClassName("editing");
       }
-   }//editSchema
+   }//editField
 
    private void closeEditor()
    {

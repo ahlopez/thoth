@@ -26,7 +26,7 @@ import com.vaadin.flow.shared.Registration;
 public class FieldForm extends FormLayout 
 {
    private static final Converter<String, Integer>    SORT_ORDER_CONVERTER =
-         new StringToIntegerConverter( 0, "Orden inválido");
+                  new StringToIntegerConverter( 0, "Orden inválido");
 
    private Button save   = new Button("Guardar Campo");
    private Button delete = new Button("Eliminar Campo");

@@ -82,13 +82,13 @@ public class MetadataSchemaView extends VerticalLayout
 
    private HorizontalLayout getToolBar()
    {
-      filterText.setPlaceholder("[Filtro]");
+      filterText.setPlaceholder("Filtro...");
       filterText.setWidthFull();
       filterText.setClearButtonVisible(true);
       filterText.setValueChangeMode(ValueChangeMode.LAZY);
       filterText.addValueChangeListener(e -> updateList());
 
-      Button addSchemaButton = new Button("+Nuevo esquema", click -> addSchema());
+      Button addSchemaButton = new Button("+ Nuevo esquema", click -> addSchema());
       addSchemaButton.setWidth("40%");
       addSchemaButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 

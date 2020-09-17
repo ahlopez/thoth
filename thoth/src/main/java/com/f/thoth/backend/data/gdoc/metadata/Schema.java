@@ -36,12 +36,6 @@ public class Schema extends BaseEntity implements Comparable<Schema>
    @NotEmpty(message = "{evidentia.name.required}")
    private String         name;
 
-   /*
-   @NotNull (message = "{evidentia.fields.required}")
-   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-   @JoinColumn(name="field_id")
-   @BatchSize(size = 30)
-   */
    @NotNull (message = "{evidentia.fields.required}")
    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
    @JoinTable(name="SCHEMA_FIELDS", joinColumns=@JoinColumn(name="schema_id"), inverseJoinColumns=@JoinColumn(name="field_id"))
@@ -107,11 +101,11 @@ public class Schema extends BaseEntity implements Comparable<Schema>
       
    }//Exporter
    
-   public Object export( Schema.Exporter exporter, Field.Exporter fieldExporter)
+   public Object export( Schema.Exporter exporter)
    {
       exporter.initExport();
       exporter.exportName( name);
-      fields.forEach( field-> field.export(fieldExporter));
+      fields.forEach( field-> exporter.exportField(field));
       exporter.endExport();
       return exporter.getProduct();
    }//export

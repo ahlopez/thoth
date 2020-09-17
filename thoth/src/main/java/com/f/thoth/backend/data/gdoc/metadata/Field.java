@@ -8,12 +8,15 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 
+/**
+ * Representa un campo (metadato) que tiene visualización
+ */
 @Entity
 @Table(name = "FIELD", indexes = { @Index(columnList = "code")})
 public class Field extends BaseEntity implements Comparable<Field>
@@ -32,8 +35,8 @@ public class Field extends BaseEntity implements Comparable<Field>
    
    private boolean  required;
    
-   @NotNull (message = "{evidentia.name.required}")
-   @PositiveOrZero
+   @NotNull (message = "{evidentia.order.required}")
+   @Positive(message = "{evidentia.order.positive}")
    private Integer  sortOrder;
 
 
@@ -115,8 +118,7 @@ public class Field extends BaseEntity implements Comparable<Field>
    public interface Exporter
    { 
       public void initExport();
-      public void exportName( String name);
-      public void exportMetadata( Metadata metadata);
+      public void exportBasic( String name, Metadata metadata);
       public void exportFlags( boolean visible, boolean readOnly, boolean required);
       public void endExport();
       public Object getProduct();
@@ -125,8 +127,7 @@ public class Field extends BaseEntity implements Comparable<Field>
    public Object export( Field.Exporter exporter)
    {
       exporter.initExport();
-      exporter.exportName(name);
-      exporter.exportMetadata(metadata);
+      exporter.exportBasic(name, metadata);
       exporter.endExport();
       return exporter.getProduct();
    }//export
@@ -153,6 +154,7 @@ public class Field extends BaseEntity implements Comparable<Field>
       StringBuilder s = new StringBuilder();
       s.append(" Field{"+ super.toString())
        .append(" name["+      name+ "]")
+       .append(" metadata["+ metadata.toString()+ "]")
        .append(" visible["+   visible+ "]")
        .append(" readOnly["+  readOnly+ "]")
        .append(" required["+  required+ "]")

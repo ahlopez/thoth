@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import com.f.thoth.app.security.SecurityConfiguration;
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.gdoc.classification.ClassificationClass;
+import com.f.thoth.backend.data.gdoc.classification.Level;
 import com.f.thoth.backend.data.gdoc.classification.Retencion;
 import com.f.thoth.backend.data.gdoc.classification.RetentionSchedule;
 import com.f.thoth.backend.data.gdoc.expediente.Expediente;
@@ -18,19 +19,21 @@ import com.f.thoth.backend.data.gdoc.expediente.FileIndex;
 import com.f.thoth.backend.data.gdoc.expediente.IndexEntry;
 import com.f.thoth.backend.data.gdoc.metadata.DocType;
 import com.f.thoth.backend.data.gdoc.metadata.Metadata;
-import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.gdoc.metadata.PropertyValues;
+import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.repositories.ClassificationClassRepository;
+import com.f.thoth.backend.repositories.LevelRepository;
 import com.f.thoth.backend.repositories.OperationRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
 import com.f.thoth.backend.repositories.RoleRepository;
 import com.f.thoth.backend.repositories.TenantRepository;
 import com.f.thoth.backend.repositories.UserRepository;
 import com.f.thoth.backend.service.ClassificationClassService;
+import com.f.thoth.backend.service.LevelService;
 import com.f.thoth.backend.service.OperationService;
 import com.f.thoth.backend.service.TenantService;
 import com.f.thoth.backend.service.UserService;
@@ -50,9 +53,11 @@ import com.f.thoth.ui.MainView;
             UserService.class,
             OperationService.class,
             ClassificationClassService.class,
+            LevelService.class,
             TenantService.class,
             ObjectToProtect.class,
             Role.class,
+            Level.class,
             Permission.class,
             Expediente.class,
             FileIndex.class,
@@ -74,7 +79,8 @@ import com.f.thoth.ui.MainView;
             TenantRepository.class,
             RoleRepository.class,
             PermissionRepository.class,
-            ClassificationClassRepository.class
+            ClassificationClassRepository.class,
+            LevelRepository.class
          }
       )
 @EntityScan(
@@ -84,13 +90,14 @@ import com.f.thoth.ui.MainView;
            Role.class,
            ObjectToProtect.class,
            ClassificationClass.class,
+           Level.class,
            Permission.class,
            Expediente.class,
            FileIndex.class,
            IndexEntry.class,
            Schema.class,
-           PropertyValues.class,
            Metadata.class,
+           PropertyValues.class,
            DocType.class,
            Retencion.class,
            RetentionSchedule.class,
