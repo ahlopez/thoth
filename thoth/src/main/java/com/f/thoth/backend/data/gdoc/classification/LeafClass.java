@@ -26,7 +26,7 @@ public class LeafClass extends Clazz
    }//LeafClass
 
    public LeafClass( String name, Schema schema, Integer category, Role roleOwner, BranchClass owner,
-                     LocalDate dateOpened, LocalDate dateClosed, RetentionSchedule retentionSchedule)
+                     LocalDate dateOpened, LocalDate dateClosed, Retention retentionSchedule)
    {
       super( name, schema, category, roleOwner, owner, dateOpened, dateClosed, retentionSchedule);
 

@@ -55,6 +55,7 @@ public class Constant
   public static final String     PAGE_TIPOS_DOCUMENTALES                    = "tipos_documentales";
   public static final String  PAGE_CLASIFICACION                            = "clasificacion";
   public static final String     PAGE_NIVELES                               = "niveles";
+  public static final String     PAGE_RETENCION                             = "retencion";
   public static final String     PAGE_ESQUEMAS_CLASIFICACION                = "esquema_clasificacion";
   public static final String  PAGE_ADMIN_EXPEDIENTES                        = "admin_expediente";
   public static final String     PAGE_EXPEDIENTES                           = "expediente";
@@ -121,6 +122,7 @@ public class Constant
   public static final String     TITLE_TIPOS_DOCUMENTALES                    = "Tipos_documentales";
   public static final String  TITLE_CLASIFICACION                            = "Clasificacion";
   public static final String     TITLE_NIVELES                               = "Niveles";
+  public static final String     TITLE_RETENCION                             = "Calendario de conservacion";
   public static final String     TITLE_ESQUEMAS_CLASIFICACIÓN                = "Esquema de clasificacion";
   public static final String  TITLE_ADMIN_EXPEDIENTES                        = "Gestión de expedientes";
   public static final String     TITLE_EXPEDIENTES                           = "Expedientes mayores";

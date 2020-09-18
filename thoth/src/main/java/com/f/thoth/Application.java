@@ -12,8 +12,7 @@ import com.f.thoth.app.security.SecurityConfiguration;
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.gdoc.classification.ClassificationClass;
 import com.f.thoth.backend.data.gdoc.classification.Level;
-import com.f.thoth.backend.data.gdoc.classification.Retencion;
-import com.f.thoth.backend.data.gdoc.classification.RetentionSchedule;
+import com.f.thoth.backend.data.gdoc.classification.Retention;
 import com.f.thoth.backend.data.gdoc.expediente.Expediente;
 import com.f.thoth.backend.data.gdoc.expediente.FileIndex;
 import com.f.thoth.backend.data.gdoc.expediente.IndexEntry;
@@ -29,12 +28,14 @@ import com.f.thoth.backend.repositories.ClassificationClassRepository;
 import com.f.thoth.backend.repositories.LevelRepository;
 import com.f.thoth.backend.repositories.OperationRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
+import com.f.thoth.backend.repositories.RetentionRepository;
 import com.f.thoth.backend.repositories.RoleRepository;
 import com.f.thoth.backend.repositories.TenantRepository;
 import com.f.thoth.backend.repositories.UserRepository;
 import com.f.thoth.backend.service.ClassificationClassService;
 import com.f.thoth.backend.service.LevelService;
 import com.f.thoth.backend.service.OperationService;
+import com.f.thoth.backend.service.RetentionService;
 import com.f.thoth.backend.service.TenantService;
 import com.f.thoth.backend.service.UserService;
 import com.f.thoth.ui.MainView;
@@ -55,6 +56,7 @@ import com.f.thoth.ui.MainView;
             ClassificationClassService.class,
             LevelService.class,
             TenantService.class,
+            RetentionService.class,
             ObjectToProtect.class,
             Role.class,
             Level.class,
@@ -66,8 +68,7 @@ import com.f.thoth.ui.MainView;
             PropertyValues.class,
             Metadata.class,
             DocType.class,
-            Retencion.class,
-            RetentionSchedule.class
+            Retention.class
          },
            exclude = ErrorMvcAutoConfiguration.class
       )
@@ -80,6 +81,7 @@ import com.f.thoth.ui.MainView;
             RoleRepository.class,
             PermissionRepository.class,
             ClassificationClassRepository.class,
+            RetentionRepository.class,
             LevelRepository.class
          }
       )
@@ -99,8 +101,7 @@ import com.f.thoth.ui.MainView;
            Metadata.class,
            PropertyValues.class,
            DocType.class,
-           Retencion.class,
-           RetentionSchedule.class,
+           Retention.class,
          }
       )
 public class Application extends SpringBootServletInitializer

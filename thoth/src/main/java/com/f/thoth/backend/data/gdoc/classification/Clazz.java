@@ -61,7 +61,7 @@ public class Clazz extends BaseEntity implements NeedsProtection, HierarchicalEn
 
    @NotNull(message = "{remun.status.required}")
    @ManyToOne
-   protected RetentionSchedule retentionSchedule;
+   protected Retention retentionSchedule;
 
    // ------------- Constructors ------------------
    public Clazz()
@@ -71,7 +71,7 @@ public class Clazz extends BaseEntity implements NeedsProtection, HierarchicalEn
    }
 
    public Clazz( String name, Schema schema, Integer category, Role roleOwner, BranchClass owner,
-                 LocalDate dateOpened, LocalDate dateClosed, RetentionSchedule retentionSchedule)
+                 LocalDate dateOpened, LocalDate dateClosed, Retention retentionSchedule)
    {
       super();
 
@@ -139,8 +139,8 @@ public class Clazz extends BaseEntity implements NeedsProtection, HierarchicalEn
    public LocalDate  getDateClosed() { return dateClosed;}
    public void       setDateClosed( LocalDate dateClosed){ this.dateClosed = dateClosed;}
 
-   public RetentionSchedule getRetentionSchedule() { return retentionSchedule;}
-   public void              setRetentionSchedule( RetentionSchedule retentionSchedule) {this.retentionSchedule = retentionSchedule;}
+   public Retention getRetentionSchedule() { return retentionSchedule;}
+   public void              setRetentionSchedule( Retention retentionSchedule) {this.retentionSchedule = retentionSchedule;}
 
    // ------------------- implements HierarchicalEntity<BranchOffice> -----------
 

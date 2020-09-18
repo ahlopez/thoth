@@ -83,7 +83,6 @@ public class LevelService implements FilterableCrudService<Level>
    public Level createNew(User currentUser)
    {
       Level level = new Level();
-      level.setTenant(ThothSession.getCurrentTenant());
       return level;
    }
 
