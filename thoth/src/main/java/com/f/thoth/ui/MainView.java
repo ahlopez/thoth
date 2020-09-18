@@ -16,7 +16,7 @@ import com.f.thoth.ui.views.admin.tenants.TenantsView;
 import com.f.thoth.ui.views.admin.users.SingleUserView;
 import com.f.thoth.ui.views.admin.users.UserGroupView;
 import com.f.thoth.ui.views.admin.users.UsersView;
-import com.f.thoth.ui.views.classification.LevelsView;
+import com.f.thoth.ui.views.classification.LevelView;
 import com.f.thoth.ui.views.dashboard.DashboardView;
 import com.f.thoth.ui.views.metadata.MetadataSchemaView;
 import com.f.thoth.ui.views.metadata.MetadataView;
@@ -208,7 +208,7 @@ public class MainView extends AppLayout
       classificationMenu.setOpenOnClick(true);
 
       if (SecurityUtils.isAccessGranted(OperationView.class))
-         classificationMenu.addItem(createRoute(VaadinIcon.LEVEL_RIGHT_BOLD, Constant.TITLE_NIVELES, LevelsView.class));
+         classificationMenu.addItem(createRoute(VaadinIcon.LEVEL_RIGHT_BOLD, Constant.TITLE_NIVELES, LevelView.class));
 
       if (SecurityUtils.isAccessGranted(OperationView.class))
          classificationMenu.addItem(createRoute(VaadinIcon.SPLIT, Constant.TITLE_ESQUEMAS_CLASIFICACIÓN, OperationView.class));

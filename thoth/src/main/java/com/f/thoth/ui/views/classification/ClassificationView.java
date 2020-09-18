@@ -1,6 +1,6 @@
 package com.f.thoth.ui.views.classification;
 
-import static com.f.thoth.ui.utils.Constant.PAGE_NIVELES;
+import static com.f.thoth.ui.utils.Constant.PAGE_ESQUEMAS_CLASIFICACION;
 import static com.f.thoth.ui.utils.Constant.TITLE_NIVELES;
 
 import java.util.List;
@@ -29,10 +29,10 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-@Route(value = PAGE_NIVELES, layout = MainView.class)
+@Route(value = PAGE_ESQUEMAS_CLASIFICACION, layout = MainView.class)
 @PageTitle(TITLE_NIVELES)
 @Secured(Role.ADMIN)
-public class LevelsView extends VerticalLayout
+public class ClassificationView extends VerticalLayout
 {
    private LevelForm  levelForm;
    private Grid<Level>     grid  = new Grid<>(Level.class);
@@ -47,7 +47,7 @@ public class LevelsView extends VerticalLayout
 
 
    @Autowired
-   public LevelsView(LevelService levelService, SchemaService schemaService)
+   public ClassificationView(LevelService levelService, SchemaService schemaService)
    {
       this.levelService   = levelService;
       this.currentUser    = ThothSession.getCurrentUser();
@@ -76,10 +76,10 @@ public class LevelsView extends VerticalLayout
       panel.setSizeFull();
       add( panel);
 
-   }//LevelsView
+   }//ClassificationView
 
 
-   protected String getBasePage() { return PAGE_NIVELES; }
+   protected String getBasePage() { return PAGE_ESQUEMAS_CLASIFICACION; }
 
    private HorizontalLayout getToolBar()
    {
@@ -174,7 +174,7 @@ public class LevelsView extends VerticalLayout
       closeEditor();
    }//saveLevel
 
-}//LevelView
+}//ClassificationView
 
 
 

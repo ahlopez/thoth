@@ -21,6 +21,7 @@ public final class EntityUtil
       className.put( "Field",               "Campo");
       className.put( "Schema",              "Esquema");
       className.put( "DocType",             "Tipo Documental");
+      className.put( "Level",               "Nivel");
       className.put( "BranchClass",         "Rama");
       className.put( "LeafClass",           "Clase");
       className.put( "Retencion",           "Regla de retención");

@@ -55,7 +55,7 @@ public class Constant
   public static final String     PAGE_TIPOS_DOCUMENTALES                    = "tipos_documentales";
   public static final String  PAGE_CLASIFICACION                            = "clasificacion";
   public static final String     PAGE_NIVELES                               = "niveles";
-  public static final String     PAGE_ESQUEMAS_CLASIFICACIÓN                = "esquema_clasificacion";
+  public static final String     PAGE_ESQUEMAS_CLASIFICACION                = "esquema_clasificacion";
   public static final String  PAGE_ADMIN_EXPEDIENTES                        = "admin_expediente";
   public static final String     PAGE_EXPEDIENTES                           = "expediente";
   public static final String     PAGE_SUBEXPEDIENTES                        = "sub_expediente";
