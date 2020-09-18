@@ -49,6 +49,7 @@ public class Schema extends BaseEntity implements Comparable<Schema>
    public Schema()
    {
       super();
+      name   = "";
       fields = new TreeSet<>();
       buildCode();
    }
@@ -144,8 +145,7 @@ public class Schema extends BaseEntity implements Comparable<Schema>
       s.append( "Schema{").
       append( super.toString()).
       append( " name["+ name+ "]").append("\n\t\t").
-      append( " fields["+ fieldNames()).
-      append( "]}");
+      append( " fields["+ fieldNames()+ "]}\n");
 
       return s.toString();
 
