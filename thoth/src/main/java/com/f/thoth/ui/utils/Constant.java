@@ -7,11 +7,12 @@ import org.springframework.data.domain.Sort;
 public class Constant
 {
 
-   public static final Locale APP_LOCALE = new Locale("co");
-   public static final String TENANT= "TENANT";
+   public static final Locale  APP_LOCALE = new Locale("co");
+   public static final String  TENANT= "TENANT";
    public static final Integer MIN_CATEGORY = new Integer(0);
    public static final Integer MAX_CATEGORY = new Integer(5);
    public static final Integer DEFAULT_CATEGORY = MIN_CATEGORY;
+   public static final String  VALUE_SEPARATOR = "||";
 
    public static final String PAGE_ROOT = "";
    public static final String PAGE_STOREFRONT = "storefront";
@@ -508,4 +509,4 @@ public class Constant
    // Mutable for testing.
    public static int NOTIFICATION_DURATION = 4000;
 
-}//BakeryConst
+}//Constant

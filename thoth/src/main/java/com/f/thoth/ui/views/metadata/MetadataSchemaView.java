@@ -51,7 +51,7 @@ public class MetadataSchemaView extends VerticalLayout
       this.schemaService   = schemaService;
       this.currentUser     = ThothSession.getCurrentUser();
 
-      addClassName("schema-view");
+      addClassName("main-view");
       setSizeFull();
 
       leftSection         = new VerticalLayout();

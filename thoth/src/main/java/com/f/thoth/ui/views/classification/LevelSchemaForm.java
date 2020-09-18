@@ -3,50 +3,41 @@ package com.f.thoth.ui.views.classification;
 import com.f.thoth.backend.data.gdoc.classification.Level;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.gdoc.metadata.vaadin.SchemaToVaadinExporter;
+import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.shared.Registration;
 
-public class LevelSchemaForm extends FormLayout
+public class LevelSchemaForm extends VerticalLayout
 {
 
    private Level  level  = null;
    private Button save   = new Button("Guardar campos");
    private Button close  = new Button("Cancelar");
 
+   private Component       schemaFields;
    private Schema.Exporter schemaExporter = new SchemaToVaadinExporter();
 
    public LevelSchemaForm(Schema schema) 
    {  
-      addClassName("field-form");
-      setResponsiveSteps(
-            new ResponsiveStep("30em", 1),
-            new ResponsiveStep("30em", 2),
-            new ResponsiveStep("30em", 3));
-
-      H3  title = new H3("Campos a actualizar");
-      title.getElement().setAttribute("colspan", "2");
-
       schemaExporter = new SchemaToVaadinExporter();
-
-   }//LevelForm
+   }//LevelSchemaForm
    
    public void setLevel( Level level)
    {
       if (level == null)
          return;
       
-      this.level = level;
-      Component schemaFields = (Component)level.getSchema().export(schemaExporter);
-
+      removeAll();
+      this.level        = level;
+      this.schemaFields = (Component)level.getSchema().export(schemaExporter);
       add(
             schemaFields,
             createButtonsLayout()
@@ -61,24 +52,39 @@ public class LevelSchemaForm extends FormLayout
       save.addClickShortcut (Key.ENTER);
       close.addClickShortcut(Key.ESCAPE);
 
-      save.  setWidth("40%");
+      save.  setWidth("20%");
       close. setWidth("20%");
 
       save.addClickListener  (click -> validateAndSave());
-      close.addClickListener (click -> fireEvent(new CloseEvent(this)));
+      close.addClickListener (click -> close());
       
-      Label space = new Label(" ");
-      space.setWidthFull();
-      HorizontalLayout buttons = new HorizontalLayout(space, save, close);
-      buttons.getElement().setAttribute("colspan", "3");
+      HorizontalLayout buttons = new HorizontalLayout( save, close);
+      save.getElement().getStyle().set("margin-left", "auto");
+      buttons.setWidthFull();
 
       return buttons; 
    }//createButtonsLayout
-
+   
    private void validateAndSave() 
    {
-         fireEvent(new SaveEvent(this, level));
+       StringBuilder values = new StringBuilder();
+       schemaFields.getChildren().forEach( c->  
+       {
+          if (c instanceof HasValue<?,?>)
+          {  
+             Object val = ((HasValue<?,?>)c).getValue();
+             values.append(val == null? " ": val.toString());
+             values.append(Constant.VALUE_SEPARATOR);
+          }
+       });
+       fireEvent(new SaveEvent(this, level, values.toString()));
    }//validateAndSave
+   
+   private void close()
+   {
+      fireEvent(new CloseEvent(this));
+   }//close   
+   
 
    // --------------------- Events -----------------------
    public static abstract class LevelSchemaFormEvent extends ComponentEvent<LevelSchemaForm> 
@@ -99,10 +105,13 @@ public class LevelSchemaForm extends FormLayout
 
    public static class SaveEvent extends LevelSchemaFormEvent 
    {
-      SaveEvent(LevelSchemaForm source, Level level) 
+      private String values;
+      SaveEvent(LevelSchemaForm source, Level level, String values) 
       {
          super(source, level);
+         this.values = values;
       }
+      public String getValues() { return values;}
    }//SaveEvent
 
    public static class CloseEvent extends LevelSchemaFormEvent 

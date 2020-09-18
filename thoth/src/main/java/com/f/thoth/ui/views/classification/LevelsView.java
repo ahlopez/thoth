@@ -32,7 +32,7 @@ import com.vaadin.flow.router.Route;
 @Route(value = PAGE_NIVELES, layout = MainView.class)
 @PageTitle(TITLE_NIVELES)
 @Secured(Role.ADMIN)
-public class LevelsView extends VerticalLayout 
+public class LevelsView extends VerticalLayout
 {
    private LevelForm  levelForm;
    private Grid<Level>     grid  = new Grid<>(Level.class);
@@ -52,7 +52,7 @@ public class LevelsView extends VerticalLayout
       this.levelService   = levelService;
       this.currentUser    = ThothSession.getCurrentUser();
 
-      addClassName("schema-view");
+      addClassName("main-view");
       setSizeFull();
 
       leftSection  = new VerticalLayout();
@@ -140,7 +140,7 @@ public class LevelsView extends VerticalLayout
          levelForm.setVisible(true);
          levelForm.setLevel(level);
          rightSection.setVisible(true);
-         addClassName("editing");
+         levelForm.addClassName("selected-item-form");
       }
    }//editLevel
 
@@ -148,7 +148,7 @@ public class LevelsView extends VerticalLayout
    {
       levelForm.setLevel(null);
       levelForm.setVisible(false);
-      removeClassName("editing");
+      levelForm.removeClassName("selected-item-form");
 
    }//closeEditor
 

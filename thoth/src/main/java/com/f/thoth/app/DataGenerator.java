@@ -550,8 +550,8 @@ public class DataGenerator implements HasLogger
 
       getLogger().info("... generating metadata");
       Metadata nameMeta  = createMeta("String", Type.STRING, "length > 0");
-      Field    nameField = createField("Nombre", nameMeta, true, false, true, 1, 4);
-      Field    bossField = createField("Jefe",   nameMeta, true, false, true, 2, 4);
+      Field    nameField = createField("Nombre", nameMeta, true, false, true, 1, 2);
+      Field    bossField = createField("Jefe",   nameMeta, true, false, true, 2, 2);
       
       Metadata dateMeta  = createMeta("Fecha", Type.DATETIME, "not null");
       Field    fromField = createField("Desde", dateMeta, true, true,  true, 3, 2);

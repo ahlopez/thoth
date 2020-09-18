@@ -12,7 +12,7 @@ import com.vaadin.flow.component.html.H3;
  */
 public class SchemaToVaadinExporter implements Schema.Exporter
 {
-   FormLayout layout;
+   FormLayout     layout;
    Field.Exporter fieldExporter;
    
    public SchemaToVaadinExporter()
@@ -20,20 +20,24 @@ public class SchemaToVaadinExporter implements Schema.Exporter
       layout  = new FormLayout(); 
       layout.setWidthFull();
       layout.setResponsiveSteps(
-            new ResponsiveStep("80em", 1),
-            new ResponsiveStep("80em", 2),
-            new ResponsiveStep("80em", 3),
-            new ResponsiveStep("80em", 4)
+            new ResponsiveStep("30em", 1),
+            new ResponsiveStep("30em", 2),
+            new ResponsiveStep("30em", 3),
+            new ResponsiveStep("30em", 4)
             );
-
       fieldExporter = new FieldToComponentExporter();
    }//SchemaToVaadinExporter
    
-   @Override  public void initExport() { }
+   @Override  public void initExport() { layout.removeAll(); }
 
-   @Override  public void exportName(String name) { layout.add( new H3(name));}
+   @Override  public void exportName(String name) 
+   { 
+      H3 nameLabel = new H3(name);
+      layout.add(nameLabel);
+      layout.setColspan(nameLabel, 4);
+   }//exportName
 
-   @Override  public void exportField(Field field){ layout.add( (Component)field.export(fieldExporter));}
+   @Override  public void exportField(Field field) { layout.add((Component)field.export(fieldExporter));}
 
    @Override  public void endExport() { }
 
