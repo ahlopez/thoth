@@ -31,41 +31,37 @@
 }
 
 /* Schema view */
-.schema-view .left-section {
+.main-view .left-section {
    min-width: 400px;
    flex: 1;
 }
-.schema-view .content {
+.main-view .content {
    max-width: 900px;
    display: flex 1;
 }
-.schema-view .right-section {
+.main-view .right-section {
    min-width: 900px;
    flex: 2;
 }
-.schema-view .right-section .selector-list {
-   flex: 2;?
-}
-.schema-view .right-section .vertical-center {
-  margin: 0;
-  position: absolute;
-  top: 50%;
-  -ms-transform: translateY(-50%);
-  transform: translateY(-50%);
+
+.main-view .right-section .selected-item-form {
+      border: 1px ridge lightgray;
+      background-color: ivory;
+      margin: 0px;
 }
 
-.schema-view .right-section .field-form {
-   /*  border: 1px solid blue; */
-   /*  border-style: ridge;    */
+.main-view .right-section .selected-item-form .field-form {
      border: 1px ridge lightgray;
      background-color: ivory;
+     margin: 0px;
 }
+
 
 /* Hierarchical selector */
 .selector-tree {
    flex: 1; ?
 }
-.selector-list {
+.selected-item-form {
    flex: 1; ?
 }
 
@@ -77,12 +73,4 @@
 .notifier-accept{
    background-color: Beige;
    color: RoyalBlue
-}
-
-/* Media */
-@media all and (max-width: 1100px) { ?
-   .list-view.editing .toolbar,
-   .list-view.editing .selector-grid {
-      display: none;
-   }
 }
