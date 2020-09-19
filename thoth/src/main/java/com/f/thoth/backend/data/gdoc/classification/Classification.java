@@ -197,6 +197,9 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
 
    public Retention  getRetentionSchedule() { return retentionSchedule;}
    public void       setRetentionSchedule( Retention retentionSchedule) {this.retentionSchedule = retentionSchedule;}
+   
+   public SchemaValues getMetadata() { return metadata;}
+   public void         setSchemaValues ( SchemaValues metadata) { this.metadata = metadata;}
 
 
    // --------------- Object methods ---------------------

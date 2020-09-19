@@ -1,7 +1,8 @@
 package com.f.thoth.ui.views.classification;
 
-import com.f.thoth.backend.data.gdoc.classification.Level;
+import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
+import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.gdoc.metadata.vaadin.SchemaToVaadinExporter;
 import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.component.Component;
@@ -18,7 +19,7 @@ import com.vaadin.flow.shared.Registration;
 public class ClassificationForm extends VerticalLayout
 {
 
-   private Level  level  = null;
+   private Classification  classification  = null;
    private Button save   = new Button("Guardar campos");
    private Button close  = new Button("Cancelar");
 
@@ -30,19 +31,21 @@ public class ClassificationForm extends VerticalLayout
       schemaExporter = new SchemaToVaadinExporter();
    }//ClassificationForm
    
-   public void setLevel( Level level)
+   public void setClassification( Classification classification)
    {
-      if (level == null)
+      if (classification == null)
          return;
       
       removeAll();
-      this.level        = level;
-      this.schemaFields = (Component)level.getSchema().export(schemaExporter);
+      this.classification   = classification;
+      SchemaValues schemaValues = classification.getMetadata();
+      Schema       classificationSchema = schemaValues.getSchema();
+      this.schemaFields = (Component)classificationSchema.export(schemaExporter);
       add(
             schemaFields,
             createButtonsLayout()
             );
-   }//setLevel
+   }//setClassification
 
    private Component createButtonsLayout() 
    {
@@ -77,7 +80,7 @@ public class ClassificationForm extends VerticalLayout
              values.append(Constant.VALUE_SEPARATOR);
           }
        });
-       fireEvent(new SaveEvent(this, level, values.toString()));
+       fireEvent(new SaveEvent(this, classification, values.toString()));
    }//validateAndSave
    
    private void close()
@@ -89,26 +92,26 @@ public class ClassificationForm extends VerticalLayout
    // --------------------- Events -----------------------
    public static abstract class ClassificationFormEvent extends ComponentEvent<ClassificationForm> 
    {
-      private Level level;
+      private Classification classification;
 
-      protected ClassificationFormEvent(ClassificationForm source, Level level) 
+      protected ClassificationFormEvent(ClassificationForm source, Classification classification) 
       {
          super(source, false);
-         this.level = level;
+         this.classification = classification;
       }//ClassificationFormEvent
 
-      public Level getLevel() 
+      public Classification getClassification() 
       {
-         return level;
+         return classification;
       }
    }//ClassificationFormEvent
 
    public static class SaveEvent extends ClassificationFormEvent 
    {
       private String values;
-      SaveEvent(ClassificationForm source, Level level, String values) 
+      SaveEvent(ClassificationForm source, Classification classification, String values) 
       {
-         super(source, level);
+         super(source, classification);
          this.values = values;
       }
       public String getValues() { return values;}
