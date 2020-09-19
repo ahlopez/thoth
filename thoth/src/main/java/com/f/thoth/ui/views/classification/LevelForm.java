@@ -24,7 +24,7 @@ import com.vaadin.flow.shared.Registration;
 public class LevelForm extends VerticalLayout
 {
    private Level           level;
-   private LevelSchemaForm levelSchemaForm;
+   private ClassificationForm levelSchemaForm;
 
    private TextField       name;
    private TextField       orden;
@@ -93,14 +93,14 @@ public class LevelForm extends VerticalLayout
 
    private Component configureLevelSchemaForm()
    {
-      levelSchemaForm = new LevelSchemaForm(levelSchema);
-      levelSchemaForm.addListener(LevelSchemaForm.SaveEvent.class,   this::saveSchema);
-      levelSchemaForm.addListener(LevelSchemaForm.CloseEvent.class,  e -> closeEditor());
+      levelSchemaForm = new ClassificationForm(levelSchema);
+      levelSchemaForm.addListener(ClassificationForm.SaveEvent.class,   this::saveSchema);
+      levelSchemaForm.addListener(ClassificationForm.CloseEvent.class,  e -> closeEditor());
       return levelSchemaForm;
    }//configureLevelSchemaForm
 
 
-   private void saveSchema(LevelSchemaForm.SaveEvent event)
+   private void saveSchema(ClassificationForm.SaveEvent event)
    {
       updateLevel();
       closeEditor();      

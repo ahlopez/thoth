@@ -15,7 +15,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.shared.Registration;
 
-public class LevelSchemaForm extends VerticalLayout
+public class ClassificationForm extends VerticalLayout
 {
 
    private Level  level  = null;
@@ -25,10 +25,10 @@ public class LevelSchemaForm extends VerticalLayout
    private Component       schemaFields;
    private Schema.Exporter schemaExporter = new SchemaToVaadinExporter();
 
-   public LevelSchemaForm(Schema schema) 
+   public ClassificationForm(Schema schema) 
    {  
       schemaExporter = new SchemaToVaadinExporter();
-   }//LevelSchemaForm
+   }//ClassificationForm
    
    public void setLevel( Level level)
    {
@@ -87,26 +87,26 @@ public class LevelSchemaForm extends VerticalLayout
    
 
    // --------------------- Events -----------------------
-   public static abstract class LevelSchemaFormEvent extends ComponentEvent<LevelSchemaForm> 
+   public static abstract class ClassificationFormEvent extends ComponentEvent<ClassificationForm> 
    {
       private Level level;
 
-      protected LevelSchemaFormEvent(LevelSchemaForm source, Level level) 
+      protected ClassificationFormEvent(ClassificationForm source, Level level) 
       {
          super(source, false);
          this.level = level;
-      }//LevelSchemaFormEvent
+      }//ClassificationFormEvent
 
       public Level getLevel() 
       {
          return level;
       }
-   }//LevelSchemaFormEvent
+   }//ClassificationFormEvent
 
-   public static class SaveEvent extends LevelSchemaFormEvent 
+   public static class SaveEvent extends ClassificationFormEvent 
    {
       private String values;
-      SaveEvent(LevelSchemaForm source, Level level, String values) 
+      SaveEvent(ClassificationForm source, Level level, String values) 
       {
          super(source, level);
          this.values = values;
@@ -114,9 +114,9 @@ public class LevelSchemaForm extends VerticalLayout
       public String getValues() { return values;}
    }//SaveEvent
 
-   public static class CloseEvent extends LevelSchemaFormEvent 
+   public static class CloseEvent extends ClassificationFormEvent 
    {
-      CloseEvent(LevelSchemaForm source) 
+      CloseEvent(ClassificationForm source) 
       {
          super(source, null);
       }
@@ -127,4 +127,4 @@ public class LevelSchemaForm extends VerticalLayout
       return getEventBus().addListener(eventType, listener);
    }//addListener
 
-}//LevelForm
+}//ClassificationForm

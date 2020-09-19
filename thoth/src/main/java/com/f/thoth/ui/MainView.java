@@ -16,6 +16,7 @@ import com.f.thoth.ui.views.admin.tenants.TenantsView;
 import com.f.thoth.ui.views.admin.users.SingleUserView;
 import com.f.thoth.ui.views.admin.users.UserGroupView;
 import com.f.thoth.ui.views.admin.users.UsersView;
+import com.f.thoth.ui.views.classification.ClassificationView;
 import com.f.thoth.ui.views.classification.LevelView;
 import com.f.thoth.ui.views.classification.RetentionView;
 import com.f.thoth.ui.views.dashboard.DashboardView;
@@ -214,8 +215,8 @@ public class MainView extends AppLayout
       if (SecurityUtils.isAccessGranted(RetentionView.class))
          classificationMenu.addItem(createRoute(VaadinIcon.CALENDAR_O, Constant.TITLE_RETENCION, RetentionView.class));
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         classificationMenu.addItem(createRoute(VaadinIcon.SPLIT, Constant.TITLE_ESQUEMAS_CLASIFICACIÓN, OperationView.class));
+      if (SecurityUtils.isAccessGranted(ClassificationView.class))
+         classificationMenu.addItem(createRoute(VaadinIcon.SPLIT, Constant.TITLE_ESQUEMAS_CLASIFICACIÓN, ClassificationView.class));
 
       if ( classificationMenu.getItems().size() > 0)
          mainMenu.add(classification);

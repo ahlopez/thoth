@@ -3,6 +3,7 @@ package com.f.thoth.ui.views.classification;
 import static com.f.thoth.ui.utils.Constant.PAGE_ESQUEMAS_CLASIFICACION;
 import static com.f.thoth.ui.utils.Constant.TITLE_NIVELES;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,20 +12,24 @@ import org.springframework.security.access.annotation.Secured;
 
 import com.f.thoth.backend.data.Role;
 import com.f.thoth.backend.data.entity.User;
-import com.f.thoth.backend.data.gdoc.classification.Level;
+import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.service.ClassificationService;
+import com.f.thoth.backend.service.HierarchicalService;
 import com.f.thoth.backend.service.LevelService;
 import com.f.thoth.backend.service.SchemaService;
 import com.f.thoth.ui.MainView;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.treegrid.TreeGrid;
+import com.vaadin.flow.data.provider.hierarchy.TreeData;
+import com.vaadin.flow.data.provider.hierarchy.TreeDataProvider;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -34,23 +39,31 @@ import com.vaadin.flow.router.Route;
 @Secured(Role.ADMIN)
 public class ClassificationView extends VerticalLayout
 {
-   private LevelForm  levelForm;
-   private Grid<Level>     grid  = new Grid<>(Level.class);
-   private TextField  filterText = new TextField();
+   private ClassificationForm             classificationForm;
+   private TextField             filterText = new TextField();
+   private Classification        owner;
 
-   private LevelService   levelService;
-   private User            currentUser;
+   private LevelService          levelService;
+   private ClassificationService classificationService;
+   private User                  currentUser;
 
-   private VerticalLayout   leftSection;
-   private VerticalLayout   content;
-   private VerticalLayout   rightSection;
+   private VerticalLayout        leftSection;
+   private VerticalLayout        content;
+   private VerticalLayout        rightSection;
+   
+   private TreeDataProvider<Classification>   dataProvider;
+   private TreeGrid<Classification> tGrid = new TreeGrid<>(Classification.class);
+   private List<Classification>   classNodes;
+
 
 
    @Autowired
-   public ClassificationView(LevelService levelService, SchemaService schemaService)
+   public ClassificationView(LevelService levelService, ClassificationService classificationService, SchemaService schemaService)
    {
-      this.levelService   = levelService;
-      this.currentUser    = ThothSession.getCurrentUser();
+      this.levelService          = levelService;
+      this.classificationService = classificationService;
+      this.currentUser           = ThothSession.getCurrentUser();
+      this.owner                 = null;
 
       addClassName("main-view");
       setSizeFull();
@@ -67,9 +80,9 @@ public class ClassificationView extends VerticalLayout
       content.setSizeFull();
       content.add(new H3("Niveles registrados"));
 
-      content.add(getToolBar(), configureGrid());
-      rightSection.add(configureForm(schemaService.findAll()));
-      updateList();
+      content.add(configureToolBar(), configureGrid());
+      rightSection.add(configureForm());
+      updateTree();
       closeEditor();
 
       HorizontalLayout panel=  new HorizontalLayout(leftSection, content, rightSection);
@@ -78,99 +91,147 @@ public class ClassificationView extends VerticalLayout
 
    }//ClassificationView
 
-
    protected String getBasePage() { return PAGE_ESQUEMAS_CLASIFICACION; }
 
-   private HorizontalLayout getToolBar()
+   private HorizontalLayout configureToolBar()
    {
       filterText.setPlaceholder("Filtro...");
       filterText.setWidthFull();
       filterText.setClearButtonVisible(true);
       filterText.setValueChangeMode(ValueChangeMode.LAZY);
-      filterText.addValueChangeListener(e -> updateList());
+      filterText.addValueChangeListener(e -> updateTree());
 
-      Button addLevelButton = new Button("+ Nuevo nivel", click -> addLevel());
-      addLevelButton.setWidth("40%");
-      addLevelButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+      Button addClassButton = new Button("+ Nueva clase", click -> addClass());
+      addClassButton.setWidth("40%");
+      addClassButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-
-      HorizontalLayout toolbar = new HorizontalLayout(filterText, addLevelButton);
+      HorizontalLayout toolbar = new HorizontalLayout(filterText, addClassButton);
       toolbar.setWidthFull();
       toolbar.addClassName("toolbar");
       return toolbar;
-   }//getToolBar
+   }//configureToolBar
 
-   private void addLevel()
+   private void addClass()
    {
-      editLevel(new Level());
-   }//addLevel
+      Classification newClass = new Classification();
+      newClass.setOwner(owner);
+      editClass(newClass);
+   }//addClass
 
-   private Grid<Level> configureGrid()
+   private TreeGrid<Classification> configureGrid()
    {
-      grid.addClassName("metadata-grid");
-      grid.setSizeFull();
-      grid.addColumn(level -> level.getName() == null? "---" : level.getName()) .setHeader("Nombre").setFlexGrow(20);
-      grid.addColumn(level -> level.getOrden()== null? "---" : level.getOrden()).setHeader("Orden") .setFlexGrow(10);
-      grid.getColumns().forEach(col -> col.setAutoWidth(true));
-      grid.asSingleSelect().addValueChangeListener(event -> editLevel(event.getValue()));
-      return grid;
+      tGrid.addClassName("metadata-tGrid");
+      tGrid.setSizeFull();
+      tGrid.addHierarchyColumn(Classification::getName).setHeader("Nombre");
+      dataProvider = getDataProvider(classificationService);
+      tGrid.setDataProvider(dataProvider);
+      tGrid.asSingleSelect().addValueChangeListener(event -> 
+         {
+            owner = event.getValue();
+            editClass(event.getValue());
+         });
+      return tGrid;
 
    }//configureGrid
+   
 
-   private LevelForm configureForm(List<Schema>availableSchemas)
+   private  TreeDataProvider<Classification>  getDataProvider(HierarchicalService<Classification> service )
    {
-      levelForm = new LevelForm(availableSchemas);
-      levelForm.addListener(LevelForm.SaveEvent.class,   this::saveLevel);
-      levelForm.addListener(LevelForm.DeleteEvent.class, this::deleteLevel);
-      levelForm.addListener(LevelForm.CloseEvent.class,  e -> closeEditor());
-      return levelForm;
+      classNodes = service.findAll();
+      TreeData<Classification> treeData = new TreeData<Classification>();
+      addChildrenOf(null, treeData);
+      TreeDataProvider<Classification> dataProvider = new TreeDataProvider<>(treeData);
+      return dataProvider;
+
+   }//getDataProvider
+   
+
+   private void addChildrenOf(Classification parent, TreeData<Classification> treeData)
+   {
+      List<Classification> children = getChildrenOf( parent);
+      children.forEach( child->
+      {
+         treeData.addItem(parent, child);
+         addChildrenOf(child, treeData);
+         classNodes.remove(child);
+      });
+   }//addChildrenOf
+   
+
+   private List<Classification>getChildrenOf( Classification owner)
+   {
+      List<Classification> children = new ArrayList<>();
+      classNodes.forEach(item->
+      {
+         Classification parent =  item.getOwner();
+         if (parent == null)
+         {
+            if (owner == null)
+               children.add(item);
+         }
+         else if (parent.equals(owner))
+            children.add(item);
+      });
+      return children;
+   }//getChildrenOf
+
+
+
+
+   private ClassificationForm configureForm()
+   {
+      classificationForm = new ClassificationForm(availableSchemas);
+      classificationForm.addListener(ClassificationForm.SaveEvent.class,   this::saveLevel);
+      classificationForm.addListener(ClassificationForm.DeleteEvent.class, this::deleteLevel);
+      classificationForm.addListener(ClassificationForm.CloseEvent.class,  e -> closeEditor());
+      return classificationForm;
 
    }//configureForm
 
-   private void editLevel(Level level)
+   private void editClass(Classification classification)
    {
-      if (level == null)
+      if (classification == null)
       {
          closeEditor();
       } else
       {
-         if( level.isPersisted())
-            level = levelService.load(level.getId());
+         if( classification.isPersisted())
+            classification = classificationService.load(classification.getId());
 
-         levelForm.setVisible(true);
-         levelForm.setLevel(level);
+         classificationForm.setVisible(true);
+         classificationForm.setClassification(classification);
          rightSection.setVisible(true);
-         levelForm.addClassName("selected-item-form");
+         classificationForm.addClassName("selected-item-form");
       }
-   }//editLevel
+   }//editClass
 
    private void closeEditor()
    {
-      levelForm.setLevel(null);
-      levelForm.setVisible(false);
-      levelForm.removeClassName("selected-item-form");
+      classificationForm.setClassification(null);
+      classificationForm.setVisible(false);
+      classificationForm.removeClassName("selected-item-form");
 
    }//closeEditor
 
-   private void updateList()
+   private void updateTree()
    {
       Optional<String> filter = Optional.of(filterText.getValue());
-      List<Level>      levels = levelService.findAnyMatching(filter);
-      grid.setItems(levels);
-   }//updateList
+      List<Classification>      levels = levelService.findAnyMatching(filter);
+      tGrid.setItems(levels);
+   }//updateTree
 
 
-   private void deleteLevel(LevelForm.DeleteEvent event)
+   private void deleteLevel(ClassificationForm.DeleteEvent event)
    {
       levelService.delete(currentUser, event.getLevel());
-      updateList();
+      updateTree();
       closeEditor();
    }//deleteLevel
 
-   private void saveLevel(LevelForm.SaveEvent event)
+   private void saveLevel(ClassificationForm.SaveEvent event)
    {
       levelService.save(currentUser, event.getLevel());
-      updateList();
+      updateTree();
       closeEditor();
    }//saveLevel
 
