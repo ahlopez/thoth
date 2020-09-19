@@ -22,6 +22,8 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 @Table(name = "RETENTION")
 public class Retention extends BaseEntity implements Comparable<Retention>
 {
+   public static  Retention DEFAULT = new Retention( "DEFAULT", 5, 15, 30, Disposicion.SELECCION, TradicionDocumental.COPIA_DIGITAL);
+   
    @NotBlank(message = "{evidentia.name.required}")
    @NotNull (message = "{evidentia.name.required}")
    @Size(min= 2, max = 50, message= "{evidentia.name.length}")
@@ -86,7 +88,7 @@ public class Retention extends BaseEntity implements Comparable<Retention>
    }//prepareData
 
 
-   @Override protected void buildCode()
+   @Override public void buildCode()
    {
       this.code =  (tenant == null? "[Tenant]" : tenant.getCode())+ "[RET]>"+
                    (name == null? "[name]": name);

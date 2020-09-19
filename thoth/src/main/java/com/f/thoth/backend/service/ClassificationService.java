@@ -13,42 +13,42 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import com.f.thoth.backend.data.entity.User;
-import com.f.thoth.backend.data.gdoc.classification.ClassificationClass;
-import com.f.thoth.backend.data.gdoc.classification.ClassificationLevel;
+import com.f.thoth.backend.data.gdoc.classification.Classification;
+import com.f.thoth.backend.data.gdoc.classification.Level;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
-import com.f.thoth.backend.repositories.ClassificationClassRepository;
-import com.f.thoth.backend.repositories.ClassificationLevelRepository;
+import com.f.thoth.backend.repositories.ClassificationRepository;
+import com.f.thoth.backend.repositories.LevelRepository;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
 
 @Service
-public class ClassificationClassService implements FilterableCrudService<ClassificationClass>, PermissionService<ClassificationClass>
+public class ClassificationService implements FilterableCrudService<Classification>, PermissionService<Classification>
 {
-   private final ClassificationClassRepository  claseRepository;
+   private final ClassificationRepository       claseRepository;
    private final PermissionRepository           permissionRepository;
    private final ObjectToProtectRepository      objectToProtectRepository;
-   private final ClassificationLevelRepository  classificationLevelRepository;
+   private final LevelRepository                levelRepository;
    {
       // TODO Auto-generated constructor stub
    }
 
    @Autowired
-   public ClassificationClassService(ClassificationClassRepository   claseRepository, 
-                                     PermissionRepository            permissionRepository,
-                                     ClassificationLevelRepository   classificationLevelRepository,
-                                     ObjectToProtectRepository       objectToProtectRepository)
+   public ClassificationService(ClassificationRepository     claseRepository,
+                                PermissionRepository         permissionRepository,
+                                LevelRepository              levelRepository,
+                                ObjectToProtectRepository    objectToProtectRepository)
    {
       this.claseRepository               = claseRepository;
       this.permissionRepository          = permissionRepository;
-      this.classificationLevelRepository = classificationLevelRepository;
+      this.levelRepository               = levelRepository;
       this.objectToProtectRepository     = objectToProtectRepository;
    }
 
-   @Override public Page<ClassificationClass> findAnyMatching(Optional<String> filter, Pageable pageable)
+   @Override public Page<Classification> findAnyMatching(Optional<String> filter, Pageable pageable)
    {
       if (filter.isPresent())
       {
@@ -70,34 +70,34 @@ public class ClassificationClassService implements FilterableCrudService<Classif
       }
    }//countAnyMatching
 
-   public Page<ClassificationClass> find(Pageable pageable)
+   public Page<Classification> find(Pageable pageable)
    {
       return claseRepository.findBy(ThothSession.getCurrentTenant(), pageable);
    }
 
-   @Override public JpaRepository<ClassificationClass, Long> getRepository()
+   @Override public JpaRepository<Classification, Long> getRepository()
    {
       return claseRepository;
    }
 
-   @Override public ClassificationClass createNew(User currentUser)
+   @Override public Classification createNew(User currentUser)
    {
-      ClassificationClass clase = new ClassificationClass();
-      clase.setTenant(ThothSession.getCurrentTenant()); 
+      Classification clase = new Classification();
+      clase.setTenant(ThothSession.getCurrentTenant());
       return clase;
    }//createNew
 
-   @Override public ClassificationClass save(User currentUser, ClassificationClass clazz)
+   @Override public Classification save(User currentUser, Classification clazz)
    {
       try {
          ObjectToProtect associatedObject = clazz.getObjectToProtect();
          if ( !associatedObject.isPersisted())
             objectToProtectRepository.saveAndFlush( associatedObject);
-         
-         ClassificationLevel level = clazz.getLevel();
+
+         Level level = clazz.getLevel();
          if ( !level.isPersisted())
-            classificationLevelRepository.saveAndFlush(level);
-         
+            levelRepository.saveAndFlush(level);
+
          return FilterableCrudService.super.save(currentUser, clazz);
       } catch (DataIntegrityViolationException e) {
          throw new UserFriendlyDataException("Ya hay una Clase con esa llave. Por favor escoja una llave única para la clase");
@@ -107,30 +107,30 @@ public class ClassificationClassService implements FilterableCrudService<Classif
 
 
    //  ----- implements HierarchicalService ------
-   @Override public List<ClassificationClass> findAll() { return claseRepository.findAll(ThothSession.getCurrentTenant()); }
+   @Override public List<Classification> findAll() { return claseRepository.findAll(ThothSession.getCurrentTenant()); }
 
-   @Override public Optional<ClassificationClass> findById(Long id)  { return claseRepository.findById( id);}
+   @Override public Optional<Classification> findById(Long id)  { return claseRepository.findById( id);}
 
-   @Override public List<ClassificationClass>  findByParent  ( ClassificationClass owner) { return claseRepository.findByParent(owner); }
-   @Override public int         countByParent ( ClassificationClass owner) { return claseRepository.countByParent (owner); }
-   @Override public boolean     hasChildren   ( ClassificationClass clase){ return claseRepository.countByChildren(clase) > 0; }
+   @Override public List<Classification>  findByParent  ( Classification owner) { return claseRepository.findByParent(owner); }
+   @Override public int         countByParent ( Classification owner) { return claseRepository.countByParent (owner); }
+   @Override public boolean     hasChildren   ( Classification clase){ return claseRepository.countByChildren(clase) > 0; }
 
-   @Override public List<ClassificationClass> findByNameLikeIgnoreCase (Tenant tenant, String name) 
+   @Override public List<Classification> findByNameLikeIgnoreCase (Tenant tenant, String name)
        { return claseRepository.findByNameLikeIgnoreCase (tenant, name); }
-   @Override public long  countByNameLikeIgnoreCase(Tenant tenant, String name) 
+   @Override public long  countByNameLikeIgnoreCase(Tenant tenant, String name)
        { return claseRepository.countByNameLikeIgnoreCase(tenant, name); }
 
    //  --------  Permission handling ---------------------
 
    @Override public List<Permission> findGrants( Role role)
-   { 
-      List<ClassificationClass> clases = claseRepository.findClasesGranted(role);
+   {
+      List<Classification> clases = claseRepository.findClasesGranted(role);
       List<ObjectToProtect>    objects = new ArrayList<>();
       clases.forEach( clas-> objects.add(clas.getObjectToProtect()));
       return  permissionRepository.findByObjects(objects);
    }//findGrants
-   
-   @Override public List<ClassificationClass> findObjectsGranted( Role role)
+
+   @Override public List<Classification> findObjectsGranted( Role role)
    {
       return claseRepository.findClasesGranted(role);
    }
@@ -141,24 +141,24 @@ public class ClassificationClassService implements FilterableCrudService<Classif
       revoke( currentUser, role, newRevokes);
 
    }//grantRevoke
-   
+
    public void grant( User currentUser, Role role, Set<Permission> newGrants)
    {
-      newGrants.forEach( newGrant-> 
+      newGrants.forEach( newGrant->
       {
          ObjectToProtect objectOfClass= newGrant.getObjectToProtect();
          if ( !newGrant.isPersisted())
             permissionRepository.saveAndFlush(newGrant);
-         
+
          objectOfClass.grant(newGrant);
          objectToProtectRepository.saveAndFlush(objectOfClass);
       });
    }//grant
 
-   
+
    public void revoke( User currentUser, Role role, Set<Permission> newRevokes)
    {
-      newRevokes.forEach( newRevoke-> 
+      newRevokes.forEach( newRevoke->
       {
          ObjectToProtect objectOfClass= newRevoke.getObjectToProtect();
          Permission toRevoke = permissionRepository.findByRoleObject(newRevoke.getRole(),objectOfClass);

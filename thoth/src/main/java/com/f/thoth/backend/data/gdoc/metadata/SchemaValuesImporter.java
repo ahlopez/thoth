@@ -1,6 +1,4 @@
-package com.f.thoth.backend.data.gdoc.metadata.vaadin;
-
-import com.f.thoth.backend.data.gdoc.metadata.Schema;
+package com.f.thoth.backend.data.gdoc.metadata;
 
 public interface SchemaValuesImporter
 {

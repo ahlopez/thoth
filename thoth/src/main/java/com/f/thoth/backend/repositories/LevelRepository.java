@@ -33,4 +33,8 @@ public interface LevelRepository extends JpaRepository<Level, Long>
    @Query("SELECT count(l) FROM Level l where l.tenant=?1 and l.name like ?2")
    long countByNameLikeIgnoreCase(Tenant tenant, String name);
 
+   @Query("SELECT l FROM Level l where l.orden=?1")
+   Level findByLevel(Integer order);
+
+
 }//LevelRepository

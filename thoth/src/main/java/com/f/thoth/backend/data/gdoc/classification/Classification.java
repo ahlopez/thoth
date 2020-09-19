@@ -24,6 +24,7 @@ import javax.validation.constraints.Size;
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
+import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
@@ -33,7 +34,7 @@ import com.f.thoth.backend.data.security.UserGroup;
 
 
 /**
- * Representa un nodo del esquema de clasificación documental
+ * Representa una clase del esquema de clasificación documental
  */
 
 /*
@@ -45,7 +46,7 @@ import com.f.thoth.backend.data.security.UserGroup;
  */
 @NamedEntityGraphs({
    @NamedEntityGraph(
-         name = ClassificationClass.BRIEF,
+         name = Classification.BRIEF,
          attributeNodes = {
             @NamedAttributeNode("tenant"),
             @NamedAttributeNode("code"),
@@ -62,13 +63,15 @@ import com.f.thoth.backend.data.security.UserGroup;
                })
          ),
    @NamedEntityGraph(
-         name = ClassificationClass.FULL,
+         name = Classification.FULL,
          attributeNodes = {
                @NamedAttributeNode("tenant"),
                @NamedAttributeNode("code"),
                @NamedAttributeNode("name"),
                @NamedAttributeNode("owner"),
-            //   @NamedAttributeNode("retentionSchedule"),
+               @NamedAttributeNode("level"),
+               @NamedAttributeNode("metadata"),
+               @NamedAttributeNode("retentionSchedule"),
                @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)
             },
             subgraphs = @NamedSubgraph(name = ObjectToProtect.FULL,
@@ -81,20 +84,19 @@ import com.f.thoth.backend.data.security.UserGroup;
                   })
             )
          })
-
 @Entity
-@Table(name = "CLASSIFICATION_CLASS", indexes = { @Index(columnList = "code") })
-public class ClassificationClass extends BaseEntity implements  NeedsProtection, HierarchicalEntity<ClassificationClass>, Comparable<ClassificationClass>
+@Table(name = "CLASSIFICATION", indexes = { @Index(columnList = "code") })
+public class Classification extends BaseEntity implements  NeedsProtection, HierarchicalEntity<Classification>, Comparable<Classification>
 {
-   public static final String BRIEF = "ClassificationClass.brief";
-   public static final String FULL  = "ClassificationClass.full";
+   public static final String BRIEF = "Classification.brief";
+   public static final String FULL  = "Classification.full";
 
    @NotNull  (message = "{evidentia.name.required}")
    @NotBlank (message = "{evidentia.name.required}")
    @NotEmpty (message = "{evidentia.name.required}")
    @Size(max = 255)
    @Column(unique = true)
-   protected String          name;                         // Node name
+   protected String          name;                         // Classification class name
 
    @NotNull(message = "{evidentia.objectToProtect.required}")
    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
@@ -102,24 +104,27 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
 
    @NotNull(message = "{evidentia.level.required}")
    @ManyToOne
-   protected ClassificationLevel    level;                 // Classification level
+   protected Level    level;                               // Classification level in the classification tree
+
+   @NotNull(message = "evidentia.metadata.required")
+   @ManyToOne
+   protected SchemaValues metadata;                        // Metadata values of the associated classification.level
 
    @NotNull(message = "{evidentia.dateopened.required}")
-   protected LocalDate  dateOpened;                        // Date level was opened
+   protected LocalDate  dateOpened;                        // Date classification class was opened
 
-   protected LocalDate  dateClosed;                        // Date level was closed
+   @NotNull(message = "{evidentia.dateclosed.required}")
+   protected LocalDate  dateClosed;                        // Date classification class was closed
 
-   /*
    @NotNull(message = "{evidentia.retention.required}")
    @ManyToOne
-   protected RetentionSchedule retentionSchedule;
-   */
+   protected Retention retentionSchedule;                  // Retention Calendar associated to the class
 
    @ManyToOne
-   protected ClassificationClass owner;                    //  Classification node to which this ClassificationClass belongs
+   protected Classification owner;                         //  Classification node to which this class belongs
 
    // ------------- Constructors ------------------
-   public ClassificationClass()
+   public Classification()
    {
       super();
       init();
@@ -127,7 +132,7 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
       buildCode();
    }
 
-   public ClassificationClass( ClassificationLevel level, String name, ClassificationClass owner, ObjectToProtect objectToProtect)
+   public Classification( Level level, String name, Classification owner, ObjectToProtect objectToProtect)
    {
 
       if ( !TextUtil.isValidName(name))
@@ -148,7 +153,7 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
       this.owner            = owner;
       this.objectToProtect  = objectToProtect;
       buildCode();
-   }//Clazz
+   }//Classification
 
    private void init()
    {
@@ -156,7 +161,8 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
       this.dateOpened        = now;
       this.dateClosed        = LocalDate.MAX;
       this.owner             = null;
-      // this.retentionSchedule = null;
+      this.retentionSchedule = Retention.DEFAULT;
+      this.metadata          = SchemaValues.EMPTY;
 
    }//init
 
@@ -176,23 +182,22 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
    }//buildCode
 
    // -------------- Getters & Setters ----------------
-   public void                      setName(String name)      { this.name  = (name != null ? name.trim() : "Anonima");}
-   public void                      setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect; }
-   public void                      setOwner(ClassificationClass owner){ this.owner = owner; }
+   public void       setName(String name)      { this.name  = (name != null ? name.trim() : "Anonima");}
+   public void       setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect; }
+   public void       setOwner(Classification owner){ this.owner = owner; }
 
-   public ClassificationLevel       getLevel(){ return level;}
-   public void                      setLevel(ClassificationLevel level){ this.level = level;}
+   public Level      getLevel(){ return level;}
+   public void       setLevel(Level level){ this.level = level;}
 
-   public LocalDate                 getDateOpened() { return dateOpened;}
-   public void                      setDateOpened( LocalDate dateOpened) { this.dateOpened = dateOpened;}
+   public LocalDate  getDateOpened() { return dateOpened;}
+   public void       setDateOpened( LocalDate dateOpened) { this.dateOpened = dateOpened;}
 
-   public LocalDate                 getDateClosed() { return dateClosed;}
-   public void                      setDateClosed( LocalDate dateClosed){ this.dateClosed = dateClosed;}
+   public LocalDate  getDateClosed() { return dateClosed;}
+   public void       setDateClosed( LocalDate dateClosed){ this.dateClosed = dateClosed;}
 
-   /*
-   public RetentionSchedule getRetentionSchedule() { return retentionSchedule;}
-   public void              setRetentionSchedule( RetentionSchedule retentionSchedule) {this.retentionSchedule = retentionSchedule;}
-   */
+   public Retention  getRetentionSchedule() { return retentionSchedule;}
+   public void       setRetentionSchedule( Retention retentionSchedule) {this.retentionSchedule = retentionSchedule;}
+
 
    // --------------- Object methods ---------------------
 
@@ -201,10 +206,10 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
       if (this == o)
          return true;
 
-      if (!(o instanceof ClassificationClass ))
+      if (!(o instanceof Classification ))
          return false;
 
-      ClassificationClass that = (ClassificationClass) o;
+      Classification that = (Classification) o;
         return this.id != null && this.id.equals(that.id);
 
    }//equals
@@ -215,13 +220,13 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
    public String toString()
    {
       StringBuilder s = new StringBuilder();
-      s.append( "ClassificationClass{")
+      s.append( "Classification{")
        .append(  super.toString())
        .append(  "name["+ name+ "]")
        .append( " ["+ level.toString()+ "]")
        .append( " dateOpened["+ TextUtil.formatDate(dateOpened)+ "]")
        .append( " dateClosed["+ TextUtil.formatDate(dateClosed)+ "]\n")
-       // .append( " retentionSchedule["+ retentionSchedule == null? "---" :  retentionSchedule.getCode()+ "]\n")
+       .append( " retentionSchedule["+ retentionSchedule == null? "---" :  retentionSchedule.getCode()+ "]\n")
        .append( " objectToProtect["+ objectToProtect.toString()+ "]")
        .append("\n     }\n");
 
@@ -229,7 +234,7 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
    }//toString
 
 
-   @Override  public int compareTo(ClassificationClass that)
+   @Override  public int compareTo(Classification that)
    {
       return this.equals(that)?  0 :
              that == null?       1 :
@@ -255,7 +260,7 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
    // --------------------------- Implements HierarchicalEntity ---------------------------------------
    @Override public String                getName()   { return name;}
 
-   @Override public ClassificationClass   getOwner()  { return owner;}
+   @Override public Classification   getOwner()  { return owner;}
 
    private String getOwnerCode(){ return (owner == null ? "" : owner.getOwnerCode())+ ":"+ name; }
 
@@ -286,4 +291,4 @@ public class ClassificationClass extends BaseEntity implements  NeedsProtection,
       return now.compareTo(dateOpened) >= 0 && now.compareTo(dateClosed) <= 0;
    }//isOpen
 
-}//ClassificationClass
+}//Classification

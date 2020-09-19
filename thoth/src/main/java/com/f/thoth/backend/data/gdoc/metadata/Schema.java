@@ -30,7 +30,9 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 @Entity
 @Table(name = "ESQUEMA", indexes = { @Index(columnList = "code")}) 
 public class Schema extends BaseEntity implements Comparable<Schema>
-{  
+{    
+   public static Schema EMPTY = new Schema("EMPTY", new TreeSet<>());
+   
    @NotBlank(message = "{evidentia.name.required}")
    @NotNull (message = "{evidentia.name.required}")
    @NotEmpty(message = "{evidentia.name.required}")
@@ -41,8 +43,6 @@ public class Schema extends BaseEntity implements Comparable<Schema>
    @JoinTable(name="SCHEMA_FIELDS", joinColumns=@JoinColumn(name="schema_id"), inverseJoinColumns=@JoinColumn(name="field_id"))
    @BatchSize(size = 30)
    private Set<Field>  fields;
-   
-   public static final Schema EMPTY = new Schema("EMPTY", new TreeSet<>());
 
 
    // ------------- Constructors ------------------

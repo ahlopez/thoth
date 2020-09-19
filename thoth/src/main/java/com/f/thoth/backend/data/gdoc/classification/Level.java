@@ -9,7 +9,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
@@ -17,24 +17,27 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 
 /**
- * Representa un nivel del esquema de clasificación
+ * Representa la definición de un nivel del esquema de clasificación
+ * Cada clase del esquema de clasificación está asociada con un nivel.
  */
 @Entity
 @Table(name = "NIVEL", indexes = { @Index(columnList = "code"), @Index(columnList= "name") })
 public class Level extends BaseEntity implements Comparable<Level>
 {
+   public static final Level DEFAULT = new Level("default", 99, Schema.EMPTY);
+   
    @NotBlank(message = "{evidentia.name.required}")
    @NotEmpty(message = "{evidentia.name.required}")
    @Size(max = 50)
-   private String name;
+   private String name;                                     // Nombre del nivel
    
    @NotNull (message="{evidentia.orden.required}")
-   @Positive(message="{evidentia.orden.positive}")
-   private Integer orden;
+   @PositiveOrZero(message="{evidentia.orden.positive}")
+   private Integer orden;                                  // Nivel en el árbol de clasificación. Raíz = 0, sigte=1, ...
    
    @NotNull(message="{evidentia.schema.notnull}")
    @ManyToOne
-   private Schema  schema;
+   private Schema  schema;                                 // Esquema de metadatos asociado con el nivel
 
    public Level()
    {
@@ -51,8 +54,8 @@ public class Level extends BaseEntity implements Comparable<Level>
       if ( !TextUtil.isValidName( name))
          throw new IllegalArgumentException("Nombre["+ name+ "] es inválido");
       
-      if ( orden == null || orden <= 0)
-         throw new IllegalArgumentException("Número del nivel debe ser un número positivo");
+      if ( orden == null || orden < 0)
+         throw new IllegalArgumentException("Número del nivel debe ser un número cero o positivo");
       
       if ( schema == null)
          throw new IllegalArgumentException("Esquema de metadatos del nivel no puede ser nulo");
@@ -71,7 +74,7 @@ public class Level extends BaseEntity implements Comparable<Level>
       buildCode();
    }//prepareData
 
-   @Override protected void buildCode(){ this.code = (tenant == null? "[Tenant]": tenant.getCode())+ ">"+ this.orden; }
+   @Override public void buildCode(){ this.code = (tenant == null? "[Tenant]": tenant.getCode())+ ">"+ this.orden; }
 
    // -------------- Getters & Setters ----------------
 
@@ -107,7 +110,7 @@ public class Level extends BaseEntity implements Comparable<Level>
    public String toString() { return "Level{"+ super.toString()+ 
                                      " name["+ name+ "]"+ 
                                      " orden["+ orden+ "]\n"+
-                                     "Schema["+ schema.toString()+ "]}\n";
+                                     "schema["+ schema.toString()+ "]}\n";
    }//toString
 
    @Override

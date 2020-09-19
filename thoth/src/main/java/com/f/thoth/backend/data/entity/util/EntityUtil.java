@@ -25,8 +25,7 @@ public final class EntityUtil
       className.put( "BranchClass",         "Rama");
       className.put( "LeafClass",           "Clase");
       className.put( "Retention",           "Calendario conservación");
-      className.put( "ClassificationClass", "Clase");
-      className.put( "ClassificationLevel", "Nivel");
+      className.put( "Classification",      "Clase");
 
    }//className
 

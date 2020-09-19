@@ -9,13 +9,14 @@ import javax.validation.constraints.NotNull;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
-import com.f.thoth.backend.data.gdoc.metadata.vaadin.SchemaValuesImporter;
+import com.f.thoth.ui.utils.Constant;
 
 @Entity
-@Table(name = "PROPERTY_VALUES")
-public class PropertyValues extends BaseEntity implements SchemaValuesImporter
+@Table(name = "FIELD_VALUES")
+public class SchemaValues extends BaseEntity implements SchemaValuesImporter
 {
-
+   public static SchemaValues EMPTY = new SchemaValues();
+   
    @NotNull(message="{evientia.schema.required}")
    @ManyToOne
    @JoinColumn(name="esquema_id")
@@ -26,13 +27,14 @@ public class PropertyValues extends BaseEntity implements SchemaValuesImporter
    @NotEmpty(message = "{evidentia.valores.required}")
    private String    valores;
 
-   public PropertyValues()
+   public SchemaValues()
    {
       super();
-      valores = "<valores><value/></valores>";
+      schema  = Schema.EMPTY;
+      valores = Constant.VALUE_SEPARATOR;
    }
 
-   public PropertyValues( PropertyValues.ImporterDirector importerDirector)
+   public SchemaValues( SchemaValues.ImporterDirector importerDirector)
    {
       super();
       valores = "";
@@ -76,7 +78,7 @@ public class PropertyValues extends BaseEntity implements SchemaValuesImporter
       public Object getProduct();
    }//Exporter
 
-   public Object export( PropertyValues.Exporter exporter)
+   public Object export( SchemaValues.Exporter exporter)
    {
       exporter.initExport();
       exporter.exportSchema(schema);

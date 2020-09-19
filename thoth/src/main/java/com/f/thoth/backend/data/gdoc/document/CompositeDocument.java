@@ -18,7 +18,7 @@ import org.hibernate.annotations.BatchSize;
 
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.DocType;
-import com.f.thoth.backend.data.gdoc.metadata.PropertyValues;
+import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.ui.utils.FormattingUtils;
 
 /**
@@ -37,7 +37,7 @@ public class CompositeDocument implements Document, CompositeDocumentImporter
    private DocType       docType;
 
    @NotNull (message = "{evidentia.metadata.required}")
-   private PropertyValues    metaValues;
+   private SchemaValues    metaValues;
 
    private boolean       record;
    private Publicity     publicity;
@@ -103,8 +103,8 @@ public class CompositeDocument implements Document, CompositeDocumentImporter
    public DocType         getDocType() { return docType;}
    @Override public void  setDocType( DocType docType) { this.docType = docType;}
 
-   public PropertyValues    getMetaValues() { return metaValues;}
-   @Override public void  setMetaValues( PropertyValues metaValues) { this.metaValues = metaValues;}
+   public SchemaValues    getMetaValues() { return metaValues;}
+   @Override public void  setMetaValues( SchemaValues metaValues) { this.metaValues = metaValues;}
 
    public boolean         getRecord() { return record;}
    @Override public void  setRecord( boolean record) { this.record = record;}
@@ -177,7 +177,7 @@ public class CompositeDocument implements Document, CompositeDocumentImporter
 
       public void   exportBasic (String id, DocType docType, boolean isRecord, Publicity publicity, LocalDateTime endClassification);
 
-      public void   exportMeta ( PropertyValues values);
+      public void   exportMeta ( SchemaValues values);
 
       public void   exportDocuments( Iterator<Document> docs);
 
