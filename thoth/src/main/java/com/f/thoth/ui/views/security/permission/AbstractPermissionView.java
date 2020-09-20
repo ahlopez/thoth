@@ -12,7 +12,7 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.service.PermissionService;
-import com.f.thoth.ui.components.AbstractHierarchicalSelector;
+import com.f.thoth.ui.components.HierarchicalSelector;
 import com.f.thoth.ui.components.Notifier;
 import com.f.thoth.ui.components.Period;
 import com.f.thoth.ui.utils.TemplateUtil;
@@ -62,7 +62,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
    private Binder<Period>           binder;
    private Button                   save         = new Button("Guardar");
    private Button                   close        = new Button("Cancelar");
-   private AbstractHierarchicalSelector<E, HasValue.ValueChangeEvent<E>> permissionSelector;
+   private HierarchicalSelector<E, HasValue.ValueChangeEvent<E>> permissionSelector;
 
    protected abstract String getBasePage();
 
@@ -182,7 +182,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
 
    private void setupSelector(PermissionService<E> service, CurrentUser currentUser, String name)
    {
-      permissionSelector = new AbstractHierarchicalSelector<>(service, Grid.SelectionMode.MULTI, name);
+      permissionSelector = new HierarchicalSelector<>(service, Grid.SelectionMode.MULTI, name, null);
       permissionSelector.getElement().setAttribute("colspan", "4");
       permissionLayout.add(permissionSelector);
 

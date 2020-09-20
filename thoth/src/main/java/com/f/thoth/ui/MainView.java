@@ -216,7 +216,7 @@ public class MainView extends AppLayout
          classificationMenu.addItem(createRoute(VaadinIcon.CALENDAR_O, Constant.TITLE_RETENCION, RetentionView.class));
 
       if (SecurityUtils.isAccessGranted(ClassificationView.class))
-         classificationMenu.addItem(createRoute(VaadinIcon.SPLIT, Constant.TITLE_ESQUEMAS_CLASIFICACIÓN, ClassificationView.class));
+         classificationMenu.addItem(createRoute(VaadinIcon.SPLIT, Constant.TITLE_ESQUEMAS_CLASIFICACION, ClassificationView.class));
 
       if ( classificationMenu.getItems().size() > 0)
          mainMenu.add(classification);

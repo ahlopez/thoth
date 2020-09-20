@@ -46,7 +46,7 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
    private static final Converter<LocalDate, LocalDate> DATE_CONVERTER   = new LocalDateToLocalDate();
    private static final Converter<String, String>       STRING_CONVERTER = new StringToString("");
    private static final Converter<String, Integer>    CATEGORY_CONVERTER =
-         new StringToIntegerConverter( Constant.DEFAULT_CATEGORY, "Categoría inválida");
+                    new StringToIntegerConverter( Constant.DEFAULT_CATEGORY, "Categoría inválida");
 
 
    private static Button groups = new Button("Grupos");

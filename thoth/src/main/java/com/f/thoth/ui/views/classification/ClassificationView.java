@@ -1,11 +1,8 @@
 package com.f.thoth.ui.views.classification;
 
-import static com.f.thoth.ui.utils.Constant.PAGE_ESQUEMAS_CLASIFICACION;
-import static com.f.thoth.ui.utils.Constant.TITLE_NIVELES;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import static com.f.thoth.ui.utils.Constant.PAGE_ESQUEMAS_CLASIFICACION;
+import static com.f.thoth.ui.utils.Constant.TITLE_ESQUEMAS_CLASIFICACION;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -13,37 +10,33 @@ import org.springframework.security.access.annotation.Secured;
 import com.f.thoth.backend.data.Role;
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
-import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.service.ClassificationService;
-import com.f.thoth.backend.service.HierarchicalService;
-import com.f.thoth.backend.service.LevelService;
-import com.f.thoth.backend.service.SchemaService;
 import com.f.thoth.ui.MainView;
+import com.f.thoth.ui.components.HierarchicalSelector;
+import com.f.thoth.ui.components.Notifier;
+import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.HasValue;
+import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
+import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.treegrid.TreeGrid;
-import com.vaadin.flow.data.provider.hierarchy.TreeData;
-import com.vaadin.flow.data.provider.hierarchy.TreeDataProvider;
-import com.vaadin.flow.data.value.ValueChangeMode;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 @Route(value = PAGE_ESQUEMAS_CLASIFICACION, layout = MainView.class)
-@PageTitle(TITLE_NIVELES)
+@PageTitle(TITLE_ESQUEMAS_CLASIFICACION)
 @Secured(Role.ADMIN)
 public class ClassificationView extends VerticalLayout
 {
-   private ClassificationForm             classificationForm;
-   private TextField             filterText = new TextField();
-   private Classification        owner;
-
-   private LevelService          levelService;
+   private ClassificationForm    classificationForm;
    private ClassificationService classificationService;
    private User                  currentUser;
 
@@ -51,19 +44,20 @@ public class ClassificationView extends VerticalLayout
    private VerticalLayout        content;
    private VerticalLayout        rightSection;
    
-   private TreeDataProvider<Classification>   dataProvider;
-   private TreeGrid<Classification> tGrid = new TreeGrid<>(Classification.class);
-   private List<Classification>   classNodes;
-
+   private HierarchicalSelector<Classification, HasValue.ValueChangeEvent<Classification>> ownerClass;
+   private Classification        currentClass= null;
+   
+   private Button add      = new Button("+ Nueva Clase");
+   private Button save     = new Button("Guardar clase");
+   private Button delete   = new Button("Eliminar clase");
+   private Button close    = new Button("Cancelar");
 
 
    @Autowired
-   public ClassificationView(LevelService levelService, ClassificationService classificationService, SchemaService schemaService)
+   public ClassificationView(ClassificationService classificationService)
    {
-      this.levelService          = levelService;
       this.classificationService = classificationService;
       this.currentUser           = ThothSession.getCurrentUser();
-      this.owner                 = null;
 
       addClassName("main-view");
       setSizeFull();
@@ -78,11 +72,11 @@ public class ClassificationView extends VerticalLayout
       content      = new VerticalLayout();
       content.addClassName      ("content");
       content.setSizeFull();
-      content.add(new H3("Niveles registrados"));
+      content.add(new H3("Clases registradas"));
 
-      content.add(configureToolBar(), configureGrid());
+      content.add( configureGrid(), configureButtons());
       rightSection.add(configureForm());
-      updateTree();
+      updateSelector();
       closeEditor();
 
       HorizontalLayout panel=  new HorizontalLayout(leftSection, content, rightSection);
@@ -93,96 +87,75 @@ public class ClassificationView extends VerticalLayout
 
    protected String getBasePage() { return PAGE_ESQUEMAS_CLASIFICACION; }
 
-   private HorizontalLayout configureToolBar()
-   {
-      filterText.setPlaceholder("Filtro...");
-      filterText.setWidthFull();
-      filterText.setClearButtonVisible(true);
-      filterText.setValueChangeMode(ValueChangeMode.LAZY);
-      filterText.addValueChangeListener(e -> updateTree());
-
-      Button addClassButton = new Button("+ Nueva clase", click -> addClass());
-      addClassButton.setWidth("40%");
-      addClassButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-
-      HorizontalLayout toolbar = new HorizontalLayout(filterText, addClassButton);
-      toolbar.setWidthFull();
-      toolbar.addClassName("toolbar");
-      return toolbar;
-   }//configureToolBar
-
    private void addClass()
    {
       Classification newClass = new Classification();
-      newClass.setOwner(owner);
+      newClass.setOwner(ownerClass.getValue());
       editClass(newClass);
    }//addClass
 
-   private TreeGrid<Classification> configureGrid()
+   private Component configureGrid()
    {
-      tGrid.addClassName("metadata-tGrid");
-      tGrid.setSizeFull();
-      tGrid.addHierarchyColumn(Classification::getName).setHeader("Nombre");
-      dataProvider = getDataProvider(classificationService);
-      tGrid.setDataProvider(dataProvider);
-      tGrid.asSingleSelect().addValueChangeListener(event -> 
-         {
-            owner = event.getValue();
-            editClass(event.getValue());
-         });
-      return tGrid;
+      ownerClass = new HierarchicalSelector<>(
+                           classificationService, 
+                           Grid.SelectionMode.SINGLE, 
+                           "Seleccione la clase padre", 
+                           e-> selectedClass(currentClass)
+                           );     
+      ownerClass.getElement().setAttribute("colspan", "4");
+
+      FormLayout form = new FormLayout(ownerClass);
+      form.setResponsiveSteps(
+            new ResponsiveStep("30em", 1),
+            new ResponsiveStep("30em", 2),
+            new ResponsiveStep("30em", 3),
+            new ResponsiveStep("30em", 4));
+
+      BeanValidationBinder<Classification> binder = new BeanValidationBinder<>(Classification.class);
+      binder.forField(ownerClass)
+            .bind("owner");
+      
+      return ownerClass;
 
    }//configureGrid
    
-
-   private  TreeDataProvider<Classification>  getDataProvider(HierarchicalService<Classification> service )
+   
+   private void selectedClass( Classification clasification)
    {
-      classNodes = service.findAll();
-      TreeData<Classification> treeData = new TreeData<Classification>();
-      addChildrenOf(null, treeData);
-      TreeDataProvider<Classification> dataProvider = new TreeDataProvider<>(treeData);
-      return dataProvider;
-
-   }//getDataProvider
+      this.currentClass = clasification;
+      editClass(currentClass);
+   }//selectedClass
    
 
-   private void addChildrenOf(Classification parent, TreeData<Classification> treeData)
-   {
-      List<Classification> children = getChildrenOf( parent);
-      children.forEach( child->
-      {
-         treeData.addItem(parent, child);
-         addChildrenOf(child, treeData);
-         classNodes.remove(child);
-      });
-   }//addChildrenOf
-   
+   private Component configureButtons()
+   {      
+      add.    addThemeVariants (ButtonVariant.LUMO_PRIMARY);
+      save.    addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+      delete.  addThemeVariants(ButtonVariant.LUMO_ERROR);
+      close.   addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+      
+      save.addClickShortcut (Key.ENTER);
+      close.addClickShortcut(Key.ESCAPE);
 
-   private List<Classification>getChildrenOf( Classification owner)
-   {
-      List<Classification> children = new ArrayList<>();
-      classNodes.forEach(item->
-      {
-         Classification parent =  item.getOwner();
-         if (parent == null)
-         {
-            if (owner == null)
-               children.add(item);
-         }
-         else if (parent.equals(owner))
-            children.add(item);
-      });
-      return children;
-   }//getChildrenOf
+      save.addClickListener  (click -> addClass());
+      delete.addClickListener(click -> deleteClass(currentClass));
+      close.addClickListener (click -> closeAll());
+      
+      save.getElement().getStyle().set("margin-left", "auto");
+      add .getElement().getStyle().set("margin-left", "auto");
 
-
+      HorizontalLayout buttons = new HorizontalLayout();
+      buttons.setWidthFull();
+      buttons.setPadding(true);
+      buttons.add( delete, save, close, add);
+      return buttons;
+   }//configureButtons
 
 
    private ClassificationForm configureForm()
    {
-      classificationForm = new ClassificationForm(availableSchemas);
-      classificationForm.addListener(ClassificationForm.SaveEvent.class,   this::saveLevel);
-      classificationForm.addListener(ClassificationForm.DeleteEvent.class, this::deleteLevel);
+      classificationForm = new ClassificationForm();
+      classificationForm.addListener(ClassificationForm.SaveEvent.class,   this::saveClassification);
       classificationForm.addListener(ClassificationForm.CloseEvent.class,  e -> closeEditor());
       return classificationForm;
 
@@ -212,31 +185,40 @@ public class ClassificationView extends VerticalLayout
       classificationForm.removeClassName("selected-item-form");
 
    }//closeEditor
-
-   private void updateTree()
+   
+   private void closeAll()
    {
-      Optional<String> filter = Optional.of(filterText.getValue());
-      List<Classification>      levels = levelService.findAnyMatching(filter);
-      tGrid.setItems(levels);
-   }//updateTree
-
-
-   private void deleteLevel(ClassificationForm.DeleteEvent event)
-   {
-      levelService.delete(currentUser, event.getLevel());
-      updateTree();
       closeEditor();
-   }//deleteLevel
+      currentClass = null;
+      ownerClass.resetSelector();      
+   }//closeAll
 
-   private void saveLevel(ClassificationForm.SaveEvent event)
+   private void updateSelector()
    {
-      levelService.save(currentUser, event.getLevel());
-      updateTree();
+     ownerClass.refresh();
+   }//updateSelector
+
+
+   private void deleteClass(Classification classification)
+   {
+      try
+      {
+         if( classification != null && classification.isPersisted())
+             classificationService.delete(currentUser, classification);
+      } catch (Exception e)
+      {
+         Notifier.error("Clase["+ classification.getName()+ "] tiene referencias. No puede ser borrada");
+      }
+      updateSelector();
       closeEditor();
-   }//saveLevel
+   }//deleteClass
+
+   private void saveClassification(ClassificationForm.SaveEvent event)
+   {
+      Classification classification = event.getClassification();
+      classificationService.save(currentUser, classification);
+      updateSelector();
+      closeEditor();
+   }//saveClassification
 
 }//ClassificationView
-
-
-
-

@@ -260,7 +260,7 @@ public class DataGenerator implements HasLogger
       Operation obj17 = createOperation( tenant1, Constant.TITLE_CLASIFICACION                           , null );  // Clasificacion
       Operation obj18 = createOperation( tenant1,    Constant.TITLE_NIVELES                              , obj17);  // Niveles
       Operation obj19 = createOperation( tenant1,    Constant.TITLE_RETENCION                            , obj17);  // Niveles
-      Operation obj20 = createOperation( tenant1,    Constant.TITLE_ESQUEMAS_CLASIFICACIÓN               , obj17);  // Esquemas de clasificación
+      Operation obj20 = createOperation( tenant1,    Constant.TITLE_ESQUEMAS_CLASIFICACION               , obj17);  // Esquemas de clasificación
       Operation obj21 = createOperation( tenant1, Constant.TITLE_ADMIN_EXPEDIENTES                       , null );  // Gestion expedientes
       Operation obj22 = createOperation( tenant1,    Constant.TITLE_EXPEDIENTES                          , obj21);  // Expedientes mayores
       Operation obj23 = createOperation( tenant1,    Constant.TITLE_SUBEXPEDIENTES                       , obj21);  // Sub-expedientes

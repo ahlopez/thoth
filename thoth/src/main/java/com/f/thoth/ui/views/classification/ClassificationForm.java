@@ -20,13 +20,14 @@ public class ClassificationForm extends VerticalLayout
 {
 
    private Classification  classification  = null;
+   private SchemaValues    schemaValues    = null; 
    private Button save   = new Button("Guardar campos");
    private Button close  = new Button("Cancelar");
 
    private Component       schemaFields;
    private Schema.Exporter schemaExporter = new SchemaToVaadinExporter();
 
-   public ClassificationForm(Schema schema) 
+   public ClassificationForm() 
    {  
       schemaExporter = new SchemaToVaadinExporter();
    }//ClassificationForm
@@ -37,9 +38,9 @@ public class ClassificationForm extends VerticalLayout
          return;
       
       removeAll();
-      this.classification   = classification;
-      SchemaValues schemaValues = classification.getMetadata();
-      Schema       classificationSchema = schemaValues.getSchema();
+      this.classification  = classification;
+      this.schemaValues    = classification.getMetadata();
+      Schema classificationSchema = schemaValues.getSchema();
       this.schemaFields = (Component)classificationSchema.export(schemaExporter);
       add(
             schemaFields,
@@ -73,14 +74,18 @@ public class ClassificationForm extends VerticalLayout
        StringBuilder values = new StringBuilder();
        schemaFields.getChildren().forEach( c->  
        {
+          int i =0;
           if (c instanceof HasValue<?,?>)
           {  
              Object val = ((HasValue<?,?>)c).getValue();
-             values.append(val == null? " ": val.toString());
-             values.append(Constant.VALUE_SEPARATOR);
+             if(i++ > 0)
+                values.append(Constant.VALUE_SEPARATOR);
+             
+            values.append(val == null? Constant.NULL_VALUE: val.toString());
           }
        });
-       fireEvent(new SaveEvent(this, classification, values.toString()));
+       schemaValues.setValues(values.toString());
+       fireEvent(new SaveEvent(this, classification));
    }//validateAndSave
    
    private void close()
@@ -108,14 +113,19 @@ public class ClassificationForm extends VerticalLayout
 
    public static class SaveEvent extends ClassificationFormEvent 
    {
-      private String values;
-      SaveEvent(ClassificationForm source, Classification classification, String values) 
+      SaveEvent(ClassificationForm source, Classification classification) 
       {
          super(source, classification);
-         this.values = values;
       }
-      public String getValues() { return values;}
    }//SaveEvent
+
+   public static class DeleteEvent extends ClassificationFormEvent 
+   {
+      DeleteEvent(ClassificationForm source, Classification classification) 
+      {
+         super(source, classification);
+      }
+   }//DeleteEvent
 
    public static class CloseEvent extends ClassificationFormEvent 
    {

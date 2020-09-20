@@ -21,42 +21,46 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.data.provider.hierarchy.TreeData;
 import com.vaadin.flow.data.provider.hierarchy.TreeDataProvider;
+import com.vaadin.flow.data.selection.MultiSelect;
 import com.vaadin.flow.shared.Registration;
 
-
-public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValue.ValueChangeEvent<T>>
-             extends  VerticalLayout
-             implements HasValue<E, T>
+public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends HasValue.ValueChangeEvent<T>>
+       extends  VerticalLayout
+       implements HasValue<E, T>
 {
    private TreeDataProvider<T>          dataProvider;
    private final Tenant                 tenant;
-   private final Set<T>                 result;  
+   private final Set<T>                 result;
    private SearchBar                    searchBar;
    private TreeGrid<T>                  treeGrid;
+   private MultiSelect<Grid<T>, T>      multiSelect;
    private List<T>                      gridNodes;
    private Grid<T>                      searchGrid;
    private final Grid.SelectionMode     selectionMode;
    private final HierarchicalService<T> service;
-   private final List<T>                emptyGrid = new ArrayList<>();
+   private final List<T>                emptyGrid     = new ArrayList<>();
+   private final Set<T>                 expandedNodes = new TreeSet<>();
+   private Consumer<T>                  actionOnSelect;
 
 
-   public TreeGridSelector ( HierarchicalService<T> service, Grid.SelectionMode selectionMode, String name)
+   public HierarchicalSelector ( HierarchicalService<T> service, Grid.SelectionMode selectionMode, String name, Consumer<T> action)
    {
       this.tenant         = ThothSession.getCurrentTenant();
       this.result         = new TreeSet<>();
       this.selectionMode  = selectionMode;
       this.service        = service;
+      this.actionOnSelect = action;
       setup(name);
 
-   }//TreeGridSelector constructor
+   }//AbstractHierarchicalSelector constructor
 
-   
+
    private void setup( String name)
    {
       add( new Label(name));
-      this.treeGrid = buildTreeGrid();
       HorizontalLayout  layout = new HorizontalLayout();
       layout.setWidthFull();
+      treeGrid = buildSelector();
       layout.add(treeGrid);
 
       if ( selectionMode != Grid.SelectionMode.NONE)
@@ -67,31 +71,67 @@ public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValu
          layout.add(searchGrid);
       }
       add( layout);
-      refresh();
 
    }//setup
-   
-   public void init( Collection<T> initialSelection)
-   {
-      initialSelection.forEach( val-> setValue(val));
-   }//init
 
 
-   private TreeGrid<T> buildTreeGrid()
+   private TreeGrid<T> buildSelector( )
    {
       TreeGrid<T>tGrid = new TreeGrid<>();
+      tGrid.addClassName("selector-tree");
       tGrid.setWidthFull();
       tGrid.addHierarchyColumn(T::getName).setHeader("Nombre");
-      
-      tGrid.addItemClickListener      ( e-> tGrid.select(e.getItem()));
-      tGrid.addItemDoubleClickListener( e-> tGrid.deselect(e.getItem()));
-      tGrid.addSelectionListener(      (e)->
+      tGrid.setSelectionMode(selectionMode);
+
+      dataProvider = getDataProvider(service);
+      tGrid.setDataProvider(dataProvider);
+      tGrid.addExpandListener            ( e-> expandedNodes.addAll(e.getItems()));
+
+      switch( selectionMode)
       {
-         Set<T> values = e.getAllSelectedItems();
-         values.forEach(value-> setValue(value));
-      });
+      case SINGLE:
+         tGrid.addItemClickListener      ( e-> tGrid.select(e.getItem()));
+         tGrid.addItemDoubleClickListener( e-> tGrid.deselect(e.getItem()));
+         tGrid.addSelectionListener      ( e-> 
+               {
+                  Optional<T> first = e.getFirstSelectedItem();
+                  if ( first.isPresent())
+                     setValue( first.get());
+               });
+         if (actionOnSelect != null)
+             tGrid.asSingleSelect().addValueChangeListener(e-> actionOnSelect.accept(e.getValue()));
+         break;
+      case MULTI:
+         multiSelect = tGrid.asMultiSelect();
+         multiSelect.addValueChangeListener(event ->
+         {
+            Set<T> values = event.getValue();
+            if ( values != null)
+               values.forEach( value-> result.add(value));
+         });
+         break;
+      default:
+
+      }//switch
 
       return tGrid;
+
+      /*
+         Alternatively you can use a grid-specific selection API. To get
+         the selected value or values in any selection model, you can
+         use a SelectionListener, with the provided generic
+         SelectionEvent, to get the selected value or values.
+         Example: Using addSelectionListener to get all selected
+         items.
+         Grid<Person> grid = new Grid<>();
+         // switch to multiselect mode
+         grid.setSelectionMode(SelectionMode.MULTI);
+         grid.addSelectionListener(event ->
+         {
+             Set<Person> selected = event.getAllSelectedItems();
+             message.setText(selected.size() + " items selected");
+         });
+       */
 
    }//buildTreeGrid
 
@@ -99,9 +139,11 @@ public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValu
    private Grid<T> buildSearchGrid(TreeGrid<T> tGrid)
    {
       Grid<T> sGrid = new Grid<>();
+      sGrid.addClassName("selector-list");
       sGrid.setVisible(false);
       sGrid.setWidthFull();
       sGrid.addColumn(T::getName).setHeader("Nombre").setFlexGrow(50);
+      //sGrid.addColumn(T::getCode).setHeader("ID").setFlexGrow(50);
       sGrid.setSelectionMode(selectionMode);
       addValueChangeListener(sGrid, tGrid);
 
@@ -125,6 +167,7 @@ public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValu
             if ( filteredItems.size() > 0)
             {
                searchGrid.setVisible(true);
+               treeGrid.setVisible(true);
                searchGrid.setItems(filteredItems);
             }
          }
@@ -141,34 +184,35 @@ public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValu
       switch (selectionMode)
       {
       case SINGLE:
+      {
+         registration = sGrid.asSingleSelect().addValueChangeListener(e ->
          {
-            registration = sGrid.asSingleSelect().addValueChangeListener(e ->
-                           {
-                              tGrid.deselectAll();
-                              T value = e.getValue();
-                              if (value != null)
-                              {
-                                 setValue(value);
-                                 tGrid.select(value);
-                                 backtrackParents(tGrid::expand, value);
-                              }
-                           });
-            break;
-         }
+            tGrid.deselectAll();
+            T value = e.getValue();
+            if (value != null)
+            {
+               setValue(value);
+               backtrackParents(tGrid::expand, value);
+               tGrid.select(value);
+            }
+         });
+         break;
+      }
       case MULTI:
+      {
+         registration = sGrid.asMultiSelect().addValueChangeListener(e ->
          {
-            registration = sGrid.asMultiSelect().addValueChangeListener(e ->
-                           {
-                              Set<T> vals= (Set<T>)e.getValue();
-                              tGrid.asMultiSelect().setValue(vals);
-                              for (T value: vals)
-                              {
-                                 setValue(value);
-                                 backtrackParents(tGrid::expand, value);
-                              }
-                           });
-            break;
-         }
+            Set<T> vals= (Set<T>)e.getValue();
+            multiSelect.setValue(vals);
+            for (T value: vals)
+            {
+               backtrackParents(tGrid::expand, value);
+               tGrid.select(value);
+            }
+            multiSelect.select(vals);
+         });
+         break;
+      }
       default:
          tGrid.deselectAll();
       }
@@ -176,7 +220,7 @@ public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValu
       return registration;
 
    }//addValueChangeListener
-   
+
 
    private void backtrackParents(Consumer<Collection<T>> fn, final T value)
    {
@@ -200,7 +244,7 @@ public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValu
 
    }//backtrackParents
 
-   
+
    private  TreeDataProvider<T>  getDataProvider(HierarchicalService<T> service )
    {
       gridNodes = service.findAll();
@@ -211,19 +255,19 @@ public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValu
 
    }//getDataProvider
 
-   
+
    private void addChildrenOf(T parent, TreeData<T> treeData)
    {
       List<T> children = getChildrenOf( parent);
       children.forEach( child->
       {
-          treeData.addItem(parent, child);
-          addChildrenOf(child, treeData);
-          gridNodes.remove(child);
+         treeData.addItem(parent, child);
+         addChildrenOf(child, treeData);
+         gridNodes.remove(child);
       });
    }//addChildrenOf
 
-   
+
    private List<T>getChildrenOf( T owner)
    {
       List<T> children = new ArrayList<>();
@@ -234,12 +278,39 @@ public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValu
          {
             if (owner == null)
                children.add(item);
-         }else if(parent.equals(owner))
+         }
+         else if (parent.equals(owner))
             children.add(item);
       });
       return children;
    }//getChildrenOf
 
+   //   --------------------------     init, reset, refresh -------------------------------
+   public void init( Collection<T> initialSelection)
+   {
+      resetSelector();
+      if (initialSelection != null)
+      {
+         result.clear();
+         initialSelection.forEach(value->
+         {
+            setValue(value);
+            backtrackParents(treeGrid::expand, value);
+         });
+      }
+   }//init
+
+
+   public void resetSelector()
+   {
+      searchBar.clear();
+      treeGrid.deselectAll();
+      treeGrid.collapse(expandedNodes);
+      expandedNodes.clear();
+      searchGrid.setItems(emptyGrid);
+      result.clear();
+
+   }//resetSelector
 
 
    public void refresh( )
@@ -252,7 +323,7 @@ public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValu
    }//refresh
 
 
-   
+
    // ---------- implements HasValue<E,T> --------------------
 
    //Resets the value to the empty one.
@@ -301,16 +372,19 @@ public class TreeGridSelector<T extends HierarchicalEntity<T>, E extends HasValu
 
    //Sets the value of this object.
    @Override public void  setValue(T value)
-   {  
+   {
       if (value == null)
          return;
-      
+
       if ( selectionMode != Grid.SelectionMode.MULTI)
          result.clear();
-      
+
       if ( selectionMode != Grid.SelectionMode.NONE)
+      {
+         treeGrid.select(value);
          result.add(value);
+      }
 
    }//setValue
 
-}//TreeGridSelector
+}//AbstractHierarchicalSelector

@@ -13,6 +13,7 @@ public class Constant
    public static final Integer MAX_CATEGORY = new Integer(5);
    public static final Integer DEFAULT_CATEGORY = MIN_CATEGORY;
    public static final String  VALUE_SEPARATOR = "||";
+   public static final String  NULL_VALUE = "*";
 
    public static final String PAGE_ROOT = "";
    public static final String PAGE_STOREFRONT = "storefront";
@@ -123,7 +124,7 @@ public class Constant
   public static final String  TITLE_CLASIFICACION                            = "Clasificacion";
   public static final String     TITLE_NIVELES                               = "Niveles";
   public static final String     TITLE_RETENCION                             = "Calendario de conservacion";
-  public static final String     TITLE_ESQUEMAS_CLASIFICACIÓN                = "Esquema de clasificacion";
+  public static final String     TITLE_ESQUEMAS_CLASIFICACION                = "Esquema de clasificacion";
   public static final String  TITLE_ADMIN_EXPEDIENTES                        = "Gestión de expedientes";
   public static final String     TITLE_EXPEDIENTES                           = "Expedientes mayores";
   public static final String     TITLE_SUBEXPEDIENTES                        = "Sub-expedientes";

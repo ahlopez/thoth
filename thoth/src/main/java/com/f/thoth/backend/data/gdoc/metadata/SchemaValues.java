@@ -65,7 +65,13 @@ public class SchemaValues extends BaseEntity implements SchemaValuesImporter
    
    public String         getValues() { return valores; }
    public void           setValues(String valores) { this.valores = valores; }
-   @Override public void addValue( String value) {  this.valores = this.valores+ ";"+ value; }
+   @Override public void addValue( String value) 
+   {  
+      if (valores == null)
+         valores = value;
+      else
+          valores = valores+ Constant.VALUE_SEPARATOR+ value; 
+   }//addValue
 
    // ------------------------   Builders ----------------------------
 

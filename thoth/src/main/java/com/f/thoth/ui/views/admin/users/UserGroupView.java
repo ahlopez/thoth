@@ -13,7 +13,7 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.security.UserGroup;
 import com.f.thoth.backend.service.UserGroupService;
 import com.f.thoth.ui.MainView;
-import com.f.thoth.ui.components.TreeGridSelector;
+import com.f.thoth.ui.components.HierarchicalSelector;
 import com.f.thoth.ui.crud.AbstractEvidentiaCrudView;
 import com.f.thoth.ui.crud.CrudEntityPresenter;
 import com.f.thoth.ui.utils.Constant;
@@ -43,7 +43,7 @@ public class UserGroupView extends AbstractEvidentiaCrudView<UserGroup>
    private static final Converter<String, Integer>    CATEGORY_CONVERTER =
                         new StringToIntegerConverter( Constant.DEFAULT_CATEGORY, "Número inválido");
 
-   private static TreeGridSelector<UserGroup, HasValue.ValueChangeEvent<UserGroup>> parentGroup;
+   private static HierarchicalSelector<UserGroup, HasValue.ValueChangeEvent<UserGroup>> parentGroup;
 
 
    @Autowired
@@ -100,7 +100,7 @@ public class UserGroupView extends AbstractEvidentiaCrudView<UserGroup>
       toDate.setRequiredIndicatorVisible(true);
       toDate.getElement().setAttribute("colspan", "2");
 
-      parentGroup = new TreeGridSelector<>(service, Grid.SelectionMode.SINGLE, "Grupo padre");
+      parentGroup = new HierarchicalSelector<>(service, Grid.SelectionMode.SINGLE, "Grupo padre", null);
       parentGroup.getElement().setAttribute("colspan", "4");
 
       FormLayout form = new FormLayout(name, blocked, category, fromDate, toDate, parentGroup);

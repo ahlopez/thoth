@@ -16,7 +16,7 @@ import com.f.thoth.backend.data.security.SingleUser;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.service.OperationService;
 import com.f.thoth.ui.MainView;
-import com.f.thoth.ui.components.TreeGridSelector;
+import com.f.thoth.ui.components.HierarchicalSelector;
 import com.f.thoth.ui.crud.AbstractEvidentiaCrudView;
 import com.f.thoth.ui.crud.CrudEntityPresenter;
 import com.f.thoth.ui.utils.Constant;
@@ -42,7 +42,7 @@ public class OperationView extends AbstractEvidentiaCrudView<Operation>
    private static final Converter<String, String>  STRING_CONVERTER  = new StringToString("");
    private static final Converter<String, Integer> CATEGORY_CONVERTER= new StringToIntegerConverter( Constant.DEFAULT_CATEGORY, "Número inválido");
 
-   private static TreeGridSelector<Operation, HasValue.ValueChangeEvent<Operation>> parentObject;
+   private static HierarchicalSelector<Operation, HasValue.ValueChangeEvent<Operation>> parentObject;
 
    @Autowired
    public OperationView(OperationService service, CurrentUser currentUser)
@@ -98,7 +98,7 @@ public class OperationView extends AbstractEvidentiaCrudView<Operation>
       roleOwner.setAllowCustomValue(true);
       roleOwner.setPageSize(20);
 
-      parentObject = new TreeGridSelector<>(service, Grid.SelectionMode.SINGLE, "Objeto padre");
+      parentObject = new HierarchicalSelector<>(service, Grid.SelectionMode.SINGLE, "Objeto padre", null);
       parentObject.getElement().setAttribute("colspan", "4");
 
       FormLayout form = new FormLayout( name, category, userOwner, roleOwner, parentObject);
