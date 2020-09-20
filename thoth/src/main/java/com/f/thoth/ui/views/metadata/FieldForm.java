@@ -25,7 +25,7 @@ import com.vaadin.flow.shared.Registration;
 
 public class FieldForm extends FormLayout 
 {
-   private static final Converter<String, Integer>    SORT_ORDER_CONVERTER =
+   private static final Converter<String, Integer>    INTEGER_CONVERTER =
                   new StringToIntegerConverter( 0, "Orden inválido");
 
    private Button save   = new Button("Guardar Campo");
@@ -62,6 +62,9 @@ public class FieldForm extends FormLayout
       TextField sortOrder = new TextField("Orden");
       sortOrder.setRequired(true);
       sortOrder.setRequiredIndicatorVisible(true);
+      TextField columns = new TextField("Columnas");
+      columns.setRequired(true);
+      columns.setRequiredIndicatorVisible(true);
 
        add(
             title,
@@ -71,6 +74,7 @@ public class FieldForm extends FormLayout
             readOnly,
             required,
             sortOrder,
+            columns,
             createButtonsLayout()
             );
        
@@ -81,9 +85,14 @@ public class FieldForm extends FormLayout
        binder.forField(required) .bind("required");
        binder.forField(sortOrder)
              .withValidator(text -> text.length() > 0, "Orden es un número positivo") //Validación del texto
-             .withConverter(SORT_ORDER_CONVERTER)
+             .withConverter(INTEGER_CONVERTER)
              .withValidator(order -> order >= 0, "El orden es un número positivo")    // Validación del número
              .bind("sortOrder");
+       binder.forField(columns)
+             .withValidator(text -> text.length() > 0, "Columnas un número positivo") //Validación del texto
+             .withConverter(INTEGER_CONVERTER)
+             .withValidator(order -> order >= 0, "Columnas es un número positivo")    // Validación del número
+             .bind("columns");
 
 
    }//FieldForm

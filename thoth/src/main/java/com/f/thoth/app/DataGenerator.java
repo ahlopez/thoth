@@ -209,6 +209,7 @@ public class DataGenerator implements HasLogger
       sedeSchema.addField(toField);
       sedeSchema.addField(colorField);
       sedeSchema.addField(securityField);
+      schemaRepository.saveAndFlush(sedeSchema);
 
       Schema   officeSchema = createSchema("Office");
       officeSchema.addField(nameField);
@@ -223,6 +224,7 @@ public class DataGenerator implements HasLogger
       seriesSchema.addField(fromField);
       seriesSchema.addField(toField);
       seriesSchema.addField(securityField);
+      schemaRepository.saveAndFlush(seriesSchema);
 
       Schema   otherSchema = createSchema("Other");
       otherSchema.addField(nameField);

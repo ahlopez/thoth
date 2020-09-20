@@ -63,6 +63,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
    private Button                   save         = new Button("Guardar");
    private Button                   close        = new Button("Cancelar");
    private HierarchicalSelector<E, HasValue.ValueChangeEvent<E>> permissionSelector;
+   //private TreeGridSelector<E, HasValue.ValueChangeEvent<E>> permissionSelector;
 
    protected abstract String getBasePage();
 
@@ -183,7 +184,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
    private void setupSelector(PermissionService<E> service, CurrentUser currentUser, String name)
    {
       permissionSelector = new HierarchicalSelector<>(service, Grid.SelectionMode.MULTI, name, null);
-      permissionSelector.getElement().setAttribute("colspan", "4");
+      permissionSelector.setWidthFull();
       permissionLayout.add(permissionSelector);
 
    }//setupSelector
@@ -264,7 +265,8 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
    private void clear()
    {
       roleSelector.clear();
-      permissionSelector.resetSelector();
+      //permissionSelector.resetSelector();
+      permissionSelector.refresh();
       permissionLayout.setVisible(false);
    }//clear
 

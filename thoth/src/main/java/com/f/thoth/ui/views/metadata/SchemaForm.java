@@ -65,10 +65,11 @@ public class SchemaForm extends VerticalLayout
       fieldGrid = new Grid<>();
       fieldGrid.setWidthFull();
       fieldGrid.addColumn(Field::getName)     .setHeader("Nombre")      .setFlexGrow(40);
-      fieldGrid.addColumn(Field::isVisible)   .setHeader("Visible")     .setFlexGrow(15);
-      fieldGrid.addColumn(Field::isReadOnly)  .setHeader("Solo lectura").setFlexGrow(15);
-      fieldGrid.addColumn(Field::isRequired)  .setHeader("Requerido")   .setFlexGrow(15);
-      fieldGrid.addColumn(Field::getSortOrder).setHeader("Orden")       .setFlexGrow(15);
+      fieldGrid.addColumn(Field::isVisible)   .setHeader("Visible")     .setFlexGrow(12);
+      fieldGrid.addColumn(Field::isReadOnly)  .setHeader("Solo lectura").setFlexGrow(12);
+      fieldGrid.addColumn(Field::isRequired)  .setHeader("Requerido")   .setFlexGrow(12);
+      fieldGrid.addColumn(Field::getSortOrder).setHeader("Orden")       .setFlexGrow(12);
+      fieldGrid.addColumn(Field::getSortOrder).setHeader("Columnas")    .setFlexGrow(12);
       fieldGrid.asSingleSelect().addValueChangeListener(e-> editField(e.getValue()));
       return fieldGrid;
    }//configureFieldGrid

@@ -88,11 +88,16 @@ public class OperationService implements FilterableCrudService<Operation>, Permi
    public Operation save(User currentUser, Operation operation)
    {
       try {
+         /*
          ObjectToProtect associatedObject = operation.getObjectToProtect();
          if ( !associatedObject.isPersisted())
+         {
             objectToProtectRepository.saveAndFlush(associatedObject);
-         
+            operation.setObjectToProtect(associatedObject);
+         }        
+         */
          return FilterableCrudService.super.save(currentUser, operation);
+         
       } catch (DataIntegrityViolationException e) {
          throw new UserFriendlyDataException("Ya hay un Objeto con esa llave. Por favor escoja una llave única para el objeto");
       }

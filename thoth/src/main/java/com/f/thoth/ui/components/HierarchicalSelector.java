@@ -71,6 +71,7 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
          layout.add(searchGrid);
       }
       add( layout);
+      refresh();
 
    }//setup
 
@@ -78,8 +79,8 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
    private TreeGrid<T> buildSelector( )
    {
       TreeGrid<T>tGrid = new TreeGrid<>();
-      tGrid.addClassName("selector-tree");
       tGrid.setWidthFull();
+
       tGrid.addHierarchyColumn(T::getName).setHeader("Nombre");
       tGrid.setSelectionMode(selectionMode);
 
@@ -90,25 +91,10 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
       switch( selectionMode)
       {
       case SINGLE:
-         tGrid.addItemClickListener      ( e-> tGrid.select(e.getItem()));
-         tGrid.addItemDoubleClickListener( e-> tGrid.deselect(e.getItem()));
-         tGrid.addSelectionListener      ( e-> 
-               {
-                  Optional<T> first = e.getFirstSelectedItem();
-                  if ( first.isPresent())
-                     setValue( first.get());
-               });
-         if (actionOnSelect != null)
-             tGrid.asSingleSelect().addValueChangeListener(e-> actionOnSelect.accept(e.getValue()));
+         buildSingleSelector(tGrid);
          break;
       case MULTI:
-         multiSelect = tGrid.asMultiSelect();
-         multiSelect.addValueChangeListener(event ->
-         {
-            Set<T> values = event.getValue();
-            if ( values != null)
-               values.forEach( value-> result.add(value));
-         });
+         buildMultiSelector(tGrid);
          break;
       default:
 
@@ -116,34 +102,40 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
 
       return tGrid;
 
-      /*
-         Alternatively you can use a grid-specific selection API. To get
-         the selected value or values in any selection model, you can
-         use a SelectionListener, with the provided generic
-         SelectionEvent, to get the selected value or values.
-         Example: Using addSelectionListener to get all selected
-         items.
-         Grid<Person> grid = new Grid<>();
-         // switch to multiselect mode
-         grid.setSelectionMode(SelectionMode.MULTI);
-         grid.addSelectionListener(event ->
-         {
-             Set<Person> selected = event.getAllSelectedItems();
-             message.setText(selected.size() + " items selected");
-         });
-       */
+   }//buildSelector
 
-   }//buildTreeGrid
+   private void buildSingleSelector(TreeGrid<T> tGrid)
+   {
+      tGrid.addItemClickListener      ( e-> tGrid.select(e.getItem()));
+      tGrid.addItemDoubleClickListener( e-> tGrid.deselect(e.getItem()));
+      tGrid.addSelectionListener      ( e->
+            {
+               Optional<T> first = e.getFirstSelectedItem();
+               if ( first.isPresent())
+                  setValue( first.get());
+            });
+      if (actionOnSelect != null)
+          tGrid.asSingleSelect().addValueChangeListener(e-> actionOnSelect.accept(e.getValue()));
+   }//buildSingleSelector
+
+   private void buildMultiSelector(TreeGrid<T> tGrid)
+   {
+      multiSelect = tGrid.asMultiSelect();
+      multiSelect.addValueChangeListener(event ->
+      {
+         Set<T> values = event.getValue();
+         if ( values != null)
+            values.forEach( value-> setValue(value));
+      });
+   }//buildMultiSelector
 
 
    private Grid<T> buildSearchGrid(TreeGrid<T> tGrid)
    {
       Grid<T> sGrid = new Grid<>();
-      sGrid.addClassName("selector-list");
       sGrid.setVisible(false);
       sGrid.setWidthFull();
-      sGrid.addColumn(T::getName).setHeader("Nombre").setFlexGrow(50);
-      //sGrid.addColumn(T::getCode).setHeader("ID").setFlexGrow(50);
+      sGrid.addColumn(T::getName).setHeader("Nombre");
       sGrid.setSelectionMode(selectionMode);
       addValueChangeListener(sGrid, tGrid);
 
@@ -167,7 +159,6 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
             if ( filteredItems.size() > 0)
             {
                searchGrid.setVisible(true);
-               treeGrid.setVisible(true);
                searchGrid.setItems(filteredItems);
             }
          }
@@ -185,32 +176,12 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
       {
       case SINGLE:
       {
-         registration = sGrid.asSingleSelect().addValueChangeListener(e ->
-         {
-            tGrid.deselectAll();
-            T value = e.getValue();
-            if (value != null)
-            {
-               setValue(value);
-               backtrackParents(tGrid::expand, value);
-               tGrid.select(value);
-            }
-         });
+         registration = setupSingleselectListener(sGrid, tGrid);
          break;
       }
       case MULTI:
       {
-         registration = sGrid.asMultiSelect().addValueChangeListener(e ->
-         {
-            Set<T> vals= (Set<T>)e.getValue();
-            multiSelect.setValue(vals);
-            for (T value: vals)
-            {
-               backtrackParents(tGrid::expand, value);
-               tGrid.select(value);
-            }
-            multiSelect.select(vals);
-         });
+         registration = setupMultiselectListener(sGrid, tGrid);
          break;
       }
       default:
@@ -220,6 +191,38 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
       return registration;
 
    }//addValueChangeListener
+
+
+   private Registration setupSingleselectListener( Grid<T> sGrid, TreeGrid<T> tGrid)
+   {
+      Registration registration = sGrid.asSingleSelect().addValueChangeListener(e ->
+      {
+         tGrid.deselectAll();
+         T value = e.getValue();
+         if (value != null)
+         {
+            setValue(value);
+            backtrackParents(tGrid::expand, value);
+            tGrid.select(value);
+         }
+      });
+      return registration;
+   }//setupSingleselectListener
+
+   private Registration setupMultiselectListener( Grid<T> sGrid, TreeGrid<T> tGrid)
+   {
+      Registration registration = sGrid.asMultiSelect().addValueChangeListener(e ->
+      {
+         Set<T> vals= (Set<T>)e.getValue();
+         multiSelect.setValue(vals);
+         for (T value: vals)
+         {
+            backtrackParents(tGrid::expand, value);
+            tGrid.select(value);
+         }
+      });
+      return registration;
+   }//setupMultiselectListener
 
 
    private void backtrackParents(Consumer<Collection<T>> fn, final T value)

@@ -1,6 +1,5 @@
 package com.f.thoth.ui.views.classification;
 
-import static com.f.thoth.ui.utils.Constant.PAGE_ESQUEMAS_CLASIFICACION;
 import static com.f.thoth.ui.utils.Constant.TITLE_ESQUEMAS_CLASIFICACION;
 
 import java.util.ArrayList;
