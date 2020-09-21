@@ -4,6 +4,8 @@ import static com.f.thoth.ui.utils.Constant.PAGE_SINGLE_USERS;
 import static com.f.thoth.ui.utils.Constant.TITLE_SINGLE_USERS;
 
 import java.time.LocalDate;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,22 +13,31 @@ import org.springframework.security.access.annotation.Secured;
 
 import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.entity.util.TextUtil;
+import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
+import com.f.thoth.backend.data.security.UserGroup;
+import com.f.thoth.backend.service.RoleService;
 import com.f.thoth.backend.service.SingleUserService;
+import com.f.thoth.backend.service.UserGroupService;
 import com.f.thoth.ui.MainView;
+import com.f.thoth.ui.components.HierarchicalSelector;
 import com.f.thoth.ui.crud.AbstractEvidentiaCrudView;
 import com.f.thoth.ui.crud.CrudEntityPresenter;
 import com.f.thoth.ui.utils.Constant;
 import com.f.thoth.ui.utils.converters.LocalDateToLocalDate;
 import com.f.thoth.ui.utils.converters.StringToString;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.crud.BinderCrudEditor;
 import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.Grid.SelectionMode;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
@@ -48,9 +59,19 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
    private static final Converter<String, Integer>    CATEGORY_CONVERTER =
                     new StringToIntegerConverter( Constant.DEFAULT_CATEGORY, "Categoría inválida");
 
-
-   private static Button groups = new Button("Grupos");
+   private static SingleUser       singleUser;
+   
+   private static Button           groups = new Button("Grupos");
+   private static Dialog           groupsDialog;
+   private static Set<UserGroup>   userGroups = new TreeSet<>();
+   private static UserGroupService userGService;
+   private static HierarchicalSelector<UserGroup,HasValue.ValueChangeEvent<UserGroup>> groupsSelector;
+   
    private static Button roles  = new Button("Roles");
+   private static Dialog           rolesDialog;
+   private static Set<Role>        userRoles = new TreeSet<>();
+   private static RoleService      roleSvice;
+   private static Grid<Role>       rolesSelector;
 
 
    /*
@@ -60,28 +81,14 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
 
 
    @Autowired
-   public SingleUserView(SingleUserService service, CurrentUser currentUser)
+   public SingleUserView(SingleUserService userGService, UserGroupService userGroupService, RoleService roleService, CurrentUser currentUser)
    {
-      super(SingleUser.class, service, new Grid<>(), createForm(), currentUser);
+      super(SingleUser.class, userGService, new Grid<>(), createForm(userGroupService, roleService), currentUser);
    }
 
    @Override
    protected void setupGrid(Grid<SingleUser> grid)
    {
-      /*
-      protected Tenant          tenant;         // Tenant the user belongs to
-      protected String          name;           // User first name
-      protected String          lastName;       // User last name
-      protected String          email;          // user email
-      protected boolean         locked;         // Is the user blocked?
-      protected Integer         category;       // security category
-      protected LocalDate       fromDate;       // initial date it can be used. default = now
-      protected LocalDate       toDate;         // final date it can be used. default = a year from now
-      protected String          passwordHash;   // user password
-      protected Set<Role>       roles;          // roles assigned to it
-      protected Set<UserGroup>  groups;         // groups it belongs
-       */
-
       grid.addColumn(user -> user.getName().toLowerCase()).setHeader("Nombre").setFlexGrow(13);
       grid.addColumn(user -> user.getLastName().toLowerCase()).setHeader("Apellido").setFlexGrow(13);
       grid.addColumn(user -> user.getEmail().toLowerCase()).setHeader("Correo").setFlexGrow(15);
@@ -89,25 +96,25 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
       grid.addColumn(user -> user.getCategory() == null? "0" : user.getCategory().toString()).setHeader("Categoría").setFlexGrow(8);
       grid.addColumn(SingleUser::getFromDate).setHeader("Fecha Desde").setFlexGrow(6);
       grid.addColumn(SingleUser::getToDate).setHeader("Fecha Hasta").setFlexGrow(6);
-      //grid.addColumn(user -> user.getParentUser()== null? "---" : user.getParentUser().getName()).setHeader("Grupo padre").setFlexGrow(30);
-      //grid.addColumn(user -> user.getParentUser()== null? "---" : user.getParentUser().getName()).setHeader("Grupo padre").setFlexGrow(30);
 
    }//setupGrid
 
    @Override
    protected String getBasePage() { return PAGE_SINGLE_USERS;}
 
-   private static BinderCrudEditor<SingleUser> createForm()
+   private static BinderCrudEditor<SingleUser> createForm(UserGroupService userGroupService, RoleService roleService)
    {
+      userGService = userGroupService;
+      roleSvice    = roleService;
       TextField name = new TextField("Nombre");
       name.setRequired(true);
-      name.setValue("--nombre--");
+      name.setPlaceholder("--nombre--");
       name.setRequiredIndicatorVisible(true);
       name.getElement().setAttribute("colspan", "3");
 
       TextField lastName = new TextField("Apellido");
       lastName.setRequired(true);
-      lastName.setValue("--apellido--");
+      lastName.setPlaceholder("--apellido--");
       lastName.setRequiredIndicatorVisible(true);
       lastName.getElement().setAttribute("colspan", "3");
 
@@ -117,9 +124,13 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
       password.getElement().setAttribute("colspan", "3");
 
       EmailField email = new EmailField("Correo electrónico");
-      //email.setRequired(true);
+      email.setPlaceholder("--dirección de correo--");
+      email.getElement().setAttribute("required", true);
       email.setRequiredIndicatorVisible(true);
       email.getElement().setAttribute("colspan", "3");
+      email.setClearButtonVisible(true);
+      email.setErrorMessage("Por favor ingrese una dirección válida de correo");
+
 
       Checkbox   blocked    = new Checkbox("Bloqueado?");
       blocked.setRequiredIndicatorVisible(true);
@@ -145,65 +156,53 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
       toDate.setValue(yearStart.plusYears(1));
       toDate.setRequiredIndicatorVisible(true);
       toDate.getElement().setAttribute("colspan", "2");
-
-      /*
-      ComboBox<SingleUser> parentGroup = new ComboBox<>();
-      parentCombo = parentGroup;
-      parentGroup.getElement().setAttribute("colspan", "6");
-      parentGroup.setLabel("Grupo Padre");
-      parentGroup.setDataProvider(getTenantGroups());
-      parentGroup.setItemLabelGenerator(createItemLabelGenerator(SingleUser::getFullName));
-      parentGroup.setAllowCustomValue(false);
-      parentGroup.setRequired(false);
-      parentGroup.setRequiredIndicatorVisible(false);
-      parentGroup.setClearButtonVisible(true);
-      parentGroup.setPageSize(20);
-       */
+      
       Component buttonsComponent = createButtons();
-
 
       FormLayout form = new FormLayout(name, lastName, password, email,  blocked, category, fromDate, toDate, buttonsComponent);
 
       BeanValidationBinder<SingleUser> binder = new BeanValidationBinder<>(SingleUser.class);
 
       binder.forField(name)
-      .withConverter(STRING_CONVERTER)
-      .withValidator(text -> TextUtil.isAlphaNumeric(text), "El nombre debe ser alfanumérico")
-      .bind("name");
+            .withConverter(STRING_CONVERTER)
+            .withValidator(text -> TextUtil.isAlphaNumeric(text), "El nombre debe ser alfanumérico")
+            .bind("name");
 
       binder.forField(lastName)
-      .withConverter(STRING_CONVERTER)
-      .withValidator(text -> TextUtil.isAlphaNumeric(text), "El apellido debe ser alfanumérico")
-      .bind("lastName");
+            .withConverter(STRING_CONVERTER)
+            .withValidator(text -> TextUtil.isAlphaNumeric(text), "El apellido debe ser alfanumérico")
+            .bind("lastName");
 
       binder.forField(password)
-      .withConverter(STRING_CONVERTER)
-      .bind("passwordHash");
+            .withConverter(STRING_CONVERTER)
+            .bind("passwordHash");
 
       binder.forField(email)
-      .withConverter(STRING_CONVERTER)
-      .withValidator(new EmailValidator("Ingrese un correo electrónico válido"))
-      .bind("email");
+            .withConverter(STRING_CONVERTER)
+            .withValidator(new EmailValidator("Ingrese un correo electrónico válido"))
+            .bind("email");
 
       binder.bind(blocked, "locked");
       binder.forField(category)
-      .withValidator(text -> text.length() == 1, "Categorías solo tienen un dígito") //Validación del texto
-      .withConverter(CATEGORY_CONVERTER)
-      .withValidator(cat -> cat >= Constant.MIN_CATEGORY && cat <= Constant.MAX_CATEGORY,
-      "La categoría debe estar entre "+ Constant.MIN_CATEGORY+ " y "+ Constant.MAX_CATEGORY) // Validación del número
-      .bind("category");
+            .withValidator(text -> text.length() == 1, "Categorías solo tienen un dígito") //Validación del texto
+            .withConverter(CATEGORY_CONVERTER)
+            .withValidator(cat -> cat >= Constant.MIN_CATEGORY && cat <= Constant.MAX_CATEGORY,
+                  "La categoría debe estar entre "+ Constant.MIN_CATEGORY+ " y "+ Constant.MAX_CATEGORY) // Validación del número
+            .bind("category");
 
       binder.forField(fromDate)
-      .withConverter(DATE_CONVERTER)
-      .withValidator( date -> date.compareTo(LocalDate.now()) <= 0, "Fecha desde no puede ser futura")
-      .bind("fromDate");
+            .withConverter(DATE_CONVERTER)
+            .withValidator( date -> date.compareTo(LocalDate.now()) <= 0, "Fecha desde no puede ser futura")
+            .bind("fromDate");
 
       binder.forField(toDate)
-      .withConverter(DATE_CONVERTER)
-      .withValidator( date -> date.compareTo(LocalDate.now()) > 0, "Fecha hasta debe ser futura")
-      .bind("toDate");
-
-      //  binder.bind(parentGroup, "parentGroup");
+            .withConverter(DATE_CONVERTER)
+            .withValidator( date -> date.compareTo(LocalDate.now()) > 0, "Fecha hasta debe ser futura")
+            .bind("toDate");
+      
+      groupsDialog = createGroupsSelector(userGService);
+      rolesDialog  = createRolesSelector(roleSvice);
+      singleUser = binder.getBean();
 
       return new BinderCrudEditor<SingleUser>(binder, form);
    }//BinderCrudEditor
@@ -223,7 +222,13 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
 
       addCancelListener(e -> navigateToEntity(null));
 
-      addSaveListener(e -> entityPresenter.save(e.getItem(), onSuccess, onFail));
+      addSaveListener(e -> 
+           {
+              singleUser = e.getItem();
+              singleUser.setGroups(userGroups);
+              singleUser.setRoles (userRoles);
+              entityPresenter.save(singleUser, onSuccess, onFail);
+           });
 
       addDeleteListener(e -> entityPresenter.delete(e.getItem(), onSuccess, onFail));
 
@@ -233,6 +238,8 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
    private static Component createButtons() 
    {
       groups.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+      groups.addClickListener(e -> groupsDialog.open());
+
       roles.addThemeVariants (ButtonVariant.LUMO_PRIMARY);
 
       groups.addClickListener(click -> selectGroups());
@@ -242,14 +249,74 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
 
    }//createButtonsLayout
    
+   private static Dialog createGroupsSelector(UserGroupService userGroupService)
+   {
+      groupsDialog   = new Dialog();
+      groupsDialog.setModal(true);
+      groupsDialog.setDraggable(true);
+      groupsDialog.setResizable(true);
+      groupsDialog.setWidth("1000px");
+      groupsDialog.setHeight("1300px");
+      
+      groupsSelector = new HierarchicalSelector<>( userGroupService, Grid.SelectionMode.MULTI, "Seleccione grupos", null);
+      Button close = new Button("Cerrar");     
+      close.addClickListener(e-> 
+           {
+              userGroups = groupsSelector.getValues();
+              if (singleUser != null)
+                  singleUser.setGroups(userGroups);
+              
+              groupsDialog.close();
+           });
+      groupsDialog.add( groupsSelector, close );
+
+      return groupsDialog;
+      
+   }//createGroupsSelector
+
+   
+   private static Dialog createRolesSelector( RoleService  roleService)
+   {
+      rolesDialog   = new Dialog();
+      rolesDialog.setModal(true);
+      rolesDialog.setDraggable(true);
+      rolesDialog.setResizable(true);
+      rolesDialog.setWidth ("400px");
+      rolesDialog.setHeight("700px");
+      
+      rolesSelector = new Grid<>();
+      rolesSelector.addColumn(Role::getName).setHeader("Rol");
+      rolesSelector.setSelectionMode(SelectionMode.MULTI);
+      rolesSelector.setItems(roleService.findAll());
+      
+      Button close = new Button("Cerrar");     
+      close.addClickListener(e-> 
+           {
+              userRoles = rolesSelector.asMultiSelect().getValue();
+              if( singleUser != null)
+                  singleUser.setRoles(userRoles);
+              
+              rolesDialog.close();
+           });
+      H3 title = new H3("Seleccione los roles");
+      rolesDialog.add( title, rolesSelector, close );
+
+      return rolesDialog;
+      
+   }//createRolesSelector
+   
    private static void selectGroups()
    {
-      System.out.println("))) En selectGroups");
-   }
+      groupsSelector.init(userGroups);
+      groupsDialog.open();
+   }//selectGroups
    
    private static void selectRoles()
    {     
-      System.out.println("))) En selectRoles");
-   }
+      rolesSelector.deselectAll();
+      userRoles = (singleUser == null? new TreeSet<>() : singleUser.getRoles());
+      rolesSelector.asMultiSelect().select(userRoles);
+      rolesDialog.open();
+   }//selectRoles
 
 }//SingleUserView

@@ -110,7 +110,7 @@ public class SingleUser extends Usuario
 
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
    @OrderColumn
-   @JoinColumn
+   @JoinColumn(name="group_id")
    @BatchSize(size = 10)
    @Valid
    protected Set<UserGroup>  groups; // groups it belongs

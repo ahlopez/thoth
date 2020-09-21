@@ -9,9 +9,10 @@ public class Constant
 
    public static final Locale  APP_LOCALE = new Locale("co");
    public static final String  TENANT= "TENANT";
-   public static final Integer MIN_CATEGORY = new Integer(0);
-   public static final Integer MAX_CATEGORY = new Integer(5);
+   public static final Integer MIN_CATEGORY     = new Integer(0);
+   public static final Integer MAX_CATEGORY     = new Integer(5);
    public static final Integer DEFAULT_CATEGORY = MIN_CATEGORY;
+   public static final Integer ADMIN_CATEGORY   = MAX_CATEGORY - 1;
    public static final String  VALUE_SEPARATOR = "||";
    public static final String  NULL_VALUE = "*";
 

@@ -23,7 +23,7 @@ import com.f.thoth.backend.data.gdoc.metadata.DocType;
 public class LeafExpediente extends Expediente
 {
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-   @JoinColumn
+   @JoinColumn(name="doctype_id")
    @BatchSize(size = 20)
    public Set<DocType>  admissibleTypes;
 
@@ -34,15 +34,15 @@ public class LeafExpediente extends Expediente
       admissibleTypes = new TreeSet<>();
    }//LeafExpediente
 
-   
+
    public LeafExpediente( String name, BranchExpediente owner, Set<DocType> admissibleTypes)
    {
       super(name, owner);
       if ( admissibleTypes == null || admissibleTypes.size() == 0)
          throw new IllegalArgumentException("Un expediente hoja no puede tener sus tipos documentales permitidos nulos ni vacios");
-      
+
       this.admissibleTypes = admissibleTypes;
-      
+
    }//LeafExpediente constructor
 
    // ---------------- Getters & Setters ---------------

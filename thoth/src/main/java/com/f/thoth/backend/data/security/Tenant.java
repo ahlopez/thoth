@@ -31,42 +31,42 @@ import com.f.thoth.backend.data.gdoc.metadata.DocType;
  *  dueña de sus propias definiciones y datos
  */
 @NamedEntityGraphs({
-	@NamedEntityGraph(
-			name = Tenant.BRIEF,
-			attributeNodes = {
-					@NamedAttributeNode("name"),
-					@NamedAttributeNode("administrator"),
-					@NamedAttributeNode("fromDate"),
-					@NamedAttributeNode("toDate"),
-					@NamedAttributeNode("locked")
-			}),
-	@NamedEntityGraph(
-			name = Tenant.FULL,
-			attributeNodes = {
-					@NamedAttributeNode("name"),
-					@NamedAttributeNode("administrator"),
-					@NamedAttributeNode("fromDate"),
-					@NamedAttributeNode("toDate"),
-					@NamedAttributeNode("locked")
-					/*
-					@NamedAttributeNode("roles"),
-					@NamedAttributeNode("singleUsers"),
-					@NamedAttributeNode("userGroups"),
-					@NamedAttributeNode("docTypes")
-					*/
-			}) })
+   @NamedEntityGraph(
+         name = Tenant.BRIEF,
+         attributeNodes = {
+               @NamedAttributeNode("name"),
+               @NamedAttributeNode("administrator"),
+               @NamedAttributeNode("fromDate"),
+               @NamedAttributeNode("toDate"),
+               @NamedAttributeNode("locked")
+         }),
+   @NamedEntityGraph(
+         name = Tenant.FULL,
+         attributeNodes = {
+               @NamedAttributeNode("name"),
+               @NamedAttributeNode("administrator"),
+               @NamedAttributeNode("fromDate"),
+               @NamedAttributeNode("toDate"),
+               @NamedAttributeNode("locked")
+               /*
+               @NamedAttributeNode("roles"),
+               @NamedAttributeNode("singleUsers"),
+               @NamedAttributeNode("userGroups"),
+               @NamedAttributeNode("docTypes")
+               */
+         }) })
 @Entity
 @Table(name = "TENANT", indexes = { @Index(columnList = "name") })
 public class Tenant extends AbstractEntity implements Comparable<Tenant>
 {
-	public static final String BRIEF = "Tenant.brief";
-	public static final String FULL  = "Tenant.full";
+   public static final String BRIEF = "Tenant.brief";
+   public static final String FULL  = "Tenant.full";
 
-	@NotBlank(message = "{evidentia.name.required}")
-	@NotEmpty(message = "{evidentia.name.required}")
-	@Size(min = 2, max = 255, message="{evidentia.name.minmaxlength}")
-	@Column(unique = true)
-	private String       name;
+   @NotBlank(message = "{evidentia.name.required}")
+   @NotEmpty(message = "{evidentia.name.required}")
+   @Size(min = 2, max = 255, message="{evidentia.name.minmaxlength}")
+   @Column(unique = true)
+   private String       name;
 
    @NotNull (message = "{evidentia.code.required}")
    @NotEmpty(message = "{evidentia.code.required}")
@@ -74,236 +74,236 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
    @Column(unique = true)
    protected String code;
 
-	@NotEmpty(message = "{evidentia.email.required}")
-	@Email
-	@Size(min=3, max = 255, message="{evidentia.email.length}")
-	private String       administrator;
+   @NotEmpty(message = "{evidentia.email.required}")
+   @Email
+   @Size(min=3, max = 255, message="{evidentia.email.length}")
+   private String       administrator;
 
-	@NotNull(message = "{evidentia.date.required}")
-	@PastOrPresent(message="{evidentia.date.pastorpresent}")
-	protected LocalDate  fromDate;
+   @NotNull(message = "{evidentia.date.required}")
+   @PastOrPresent(message="{evidentia.date.pastorpresent}")
+   protected LocalDate  fromDate;
 
-	@NotNull(message = "{evidentia.date.required}")
-	protected LocalDate  toDate;
+   @NotNull(message = "{evidentia.date.required}")
+   protected LocalDate  toDate;
 
-	protected boolean locked = false;
+   protected boolean locked = false;
 
-	/*
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-	@OrderColumn
-	@JoinColumn
-	@BatchSize(size = 50)
-	@Valid
-	
-	private Set<Role>     roles;
+   /*
+   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+   @OrderColumn
+   @JoinColumn(name="role_id")
+   @BatchSize(size = 50)
+   @Valid
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-	@OrderColumn
-	@JoinColumn
-	@BatchSize(size = 100)
-	@Valid
-	private Set<SingleUser>  singleUsers;
+   private Set<Role>     roles;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-	@OrderColumn
-	@JoinColumn
-	@BatchSize(size = 50)
-	@Valid
-	private Set<UserGroup>  userGroups;
+   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+   @OrderColumn
+   @JoinColumn(name="user_id")
+   @BatchSize(size = 100)
+   @Valid
+   private Set<SingleUser>  singleUsers;
 
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-	@OrderColumn
-	@JoinColumn
-	@BatchSize(size = 50)
-	@Valid
-	private Set<DocType>  docTypes;
-	*/
-	
-	@Transient
-	private Set<Role>        roles;
-	@Transient
-	private Set<SingleUser>  singleUsers;
-	@Transient
-	private Set<UserGroup>   userGroups;
-	@Transient
-	private Set<DocType>     docTypes;
+   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+   @OrderColumn
+   @JoinColumn(name="group_id")
+   @BatchSize(size = 50)
+   @Valid
+   private Set<UserGroup>  userGroups;
+
+   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+   @OrderColumn
+   @JoinColumn(name="doctype_id")
+   @BatchSize(size = 50)
+   @Valid
+   private Set<DocType>  docTypes;
+   */
+
+   @Transient
+   private Set<Role>        roles;
+   @Transient
+   private Set<SingleUser>  singleUsers;
+   @Transient
+   private Set<UserGroup>   userGroups;
+   @Transient
+   private Set<DocType>     docTypes;
 
 
-	// ------------- Constructors ----------------------
+   // ------------- Constructors ----------------------
 
-	public Tenant()
-	{
-		super();
-		init();
-	}
+   public Tenant()
+   {
+      super();
+      init();
+   }
 
-	public Tenant( String name, String code)
-	{
-		super();
+   public Tenant( String name, String code)
+   {
+      super();
 
-		if ( !TextUtil.isValidName(name))
-			throw new IllegalArgumentException("Nombre["+ name+ "] es inválido");
+      if ( !TextUtil.isValidName(name))
+         throw new IllegalArgumentException("Nombre["+ name+ "] es inválido");
 
       init();
-		this.name = TextUtil.nameTidy(name);
-		this.code = (code == null? name : code.toUpperCase());
-	}//Tenant
-
-	
-	@PrePersist
-	@PreUpdate
-	public void prepareData()
-	{
-		this.name     =  TextUtil.nameTidy(name);
-		buildCode();
-	}//prepareData
+      this.name = TextUtil.nameTidy(name);
+      this.code = (code == null? name : code.toUpperCase());
+   }//Tenant
 
 
-	protected void buildCode(){ this.code = (name == null? "[name]" : name);}
-
-	private void init()
-	{
-		LocalDate now = LocalDate.now();
-
-		administrator= "";
-		name         = "[name]";
-		code         = "[COD]";
-		fromDate     = now;  
-		toDate       = now.plusYears(1);
-		roles        = new TreeSet<>();
-		singleUsers  = new TreeSet<>();
-		userGroups   = new TreeSet<>();
-		docTypes     = new TreeSet<>();
-	}//allocate
-
-	// -------------- Getters & Setters ----------------
-
-	public boolean      isPersisted() { return id != null; }
-
-	public int          getVersion() { return version; }
-
-	public String       getCode() { return code; }
-	public void         setCode(String code) { this.code = code; }
+   @PrePersist
+   @PreUpdate
+   public void prepareData()
+   {
+      this.name     =  TextUtil.nameTidy(name);
+      buildCode();
+   }//prepareData
 
 
-	public String       getName()  { return name;}
-	public void         setName( String name)
-	{
-		this.name = name;
-		buildCode();
-	}
+   protected void buildCode(){ this.code = (name == null? "[name]" : name);}
 
-	public void           setLocked(boolean locked) { this.locked = locked;}
-	public boolean        isLocked()
-	{
-		if( locked)
-			return true;
-		else
-		{
-			LocalDate now = LocalDate.now();
-			return (fromDate != null && now.compareTo(fromDate) < 0) || (toDate != null && now.compareTo(toDate) > 0);
-		}
-	}//isLocked
+   private void init()
+   {
+      LocalDate now = LocalDate.now();
 
-	public String         getAdministrator() { return administrator;}
-	public void           setAdministrator( String administrator) { this.administrator = administrator;}
+      administrator= "";
+      name         = "[name]";
+      code         = "[COD]";
+      fromDate     = now;
+      toDate       = now.plusYears(1);
+      roles        = new TreeSet<>();
+      singleUsers  = new TreeSet<>();
+      userGroups   = new TreeSet<>();
+      docTypes     = new TreeSet<>();
+   }//allocate
 
-	public LocalDate      getFromDate() {  return fromDate;}
-	public void           setFromDate(LocalDate fromDate) { this.fromDate = fromDate;}
+   // -------------- Getters & Setters ----------------
 
-	public LocalDate      getToDate() { return toDate; }
-	public void           setToDate(LocalDate toDate) { this.toDate = toDate; }
+   public boolean      isPersisted() { return id != null; }
 
-	public Set<Role>      getRoles() { return roles;}
-	public void           setRoles( Set<Role> roles) { this.roles = roles;}
+   public int          getVersion() { return version; }
 
-	public Set<SingleUser>  getSingleUsers() { return singleUsers;}
-	public void             setUsers( Set<SingleUser> singleUsers){ this.singleUsers = singleUsers;}
+   public String       getCode() { return code; }
+   public void         setCode(String code) { this.code = code; }
 
-	public Set<UserGroup>   getUserGroups() { return userGroups;}
-	public void             setUserGroups( Set<UserGroup> userGroups){ this.userGroups = userGroups;}
 
-	public Set<DocType>   getDocTypes() { return docTypes;}
-	public void           setDocTypes( Set<DocType> docTypes){ this.docTypes = docTypes;}
+   public String       getName()  { return name;}
+   public void         setName( String name)
+   {
+      this.name = name;
+      buildCode();
+   }
 
-	// --------------- Object methods ------------------
+   public void           setLocked(boolean locked) { this.locked = locked;}
+   public boolean        isLocked()
+   {
+      if( locked)
+         return true;
+      else
+      {
+         LocalDate now = LocalDate.now();
+         return (fromDate != null && now.compareTo(fromDate) < 0) || (toDate != null && now.compareTo(toDate) > 0);
+      }
+   }//isLocked
 
-	@Override
-	public boolean equals(Object o)
-	{
-		if (this == o)
-			return true;
+   public String         getAdministrator() { return administrator;}
+   public void           setAdministrator( String administrator) { this.administrator = administrator;}
 
-		if (!(o instanceof Tenant )) 
-			return false;
+   public LocalDate      getFromDate() {  return fromDate;}
+   public void           setFromDate(LocalDate fromDate) { this.fromDate = fromDate;}
 
-		Tenant that = (Tenant) o;
+   public LocalDate      getToDate() { return toDate; }
+   public void           setToDate(LocalDate toDate) { this.toDate = toDate; }
+
+   public Set<Role>      getRoles() { return roles;}
+   public void           setRoles( Set<Role> roles) { this.roles = roles;}
+
+   public Set<SingleUser>  getSingleUsers() { return singleUsers;}
+   public void             setUsers( Set<SingleUser> singleUsers){ this.singleUsers = singleUsers;}
+
+   public Set<UserGroup>   getUserGroups() { return userGroups;}
+   public void             setUserGroups( Set<UserGroup> userGroups){ this.userGroups = userGroups;}
+
+   public Set<DocType>   getDocTypes() { return docTypes;}
+   public void           setDocTypes( Set<DocType> docTypes){ this.docTypes = docTypes;}
+
+   // --------------- Object methods ------------------
+
+   @Override
+   public boolean equals(Object o)
+   {
+      if (this == o)
+         return true;
+
+      if (!(o instanceof Tenant ))
+         return false;
+
+      Tenant that = (Tenant) o;
         return this.id != null && this.id.equals(that.id);
 
-	}// equals
+   }// equals
 
-	@Override
-	public int hashCode() { return id == null? 1023: id.hashCode(); }
+   @Override
+   public int hashCode() { return id == null? 1023: id.hashCode(); }
 
-	@Override
-	public String toString()
-	{
-		return "Tenant{ id["+ id+ "] version["+ version+ "] name["+ name+ "] code["+  code+ "] roles["+  roles.size()+
-				"] singleUsers["+ singleUsers.size()+ "] userGroups["+ userGroups.size()+ "] docTypes["+ docTypes.size()+ "]}";
-	}
+   @Override
+   public String toString()
+   {
+      return "Tenant{ id["+ id+ "] version["+ version+ "] name["+ name+ "] code["+  code+ "] roles["+  roles.size()+
+            "] singleUsers["+ singleUsers.size()+ "] userGroups["+ userGroups.size()+ "] docTypes["+ docTypes.size()+ "]}";
+   }
 
-	@Override
-	public int compareTo(Tenant that) 
+   @Override
+   public int compareTo(Tenant that)
    {
       return this.equals(that)?  0 :
          that ==  null        ?  1 :
-         this.name == null  && that.name == null?  0 :   
+         this.name == null  && that.name == null?  0 :
          this.name != null  && that.name == null?  1 :
-         this.name == null  && that.name != null? -1 :   
-         this.name.compareTo(that.name);     
+         this.name == null  && that.name != null? -1 :
+         this.name.compareTo(that.name);
 
    }// compareTo
 
 
-	// --------------- Logic ---------------------
+   // --------------- Logic ---------------------
 
-	public boolean contains( DocType type) { return docTypes.contains(type);}
+   public boolean contains( DocType type) { return docTypes.contains(type);}
 
-	public void addType( DocType type) { docTypes.add(type);}
+   public void addType( DocType type) { docTypes.add(type);}
 
-	public void addRole( Role role) { roles.add(role);}
-	
-	public void addUserGroup( UserGroup group) { userGroups.add(group); }
+   public void addRole( Role role) { roles.add(role);}
 
-	public SingleUser getSingleUserById( String userCode)
-	{
-		for ( SingleUser s: singleUsers )
-		{
-			if ( s.getCode().equals(userCode))
-				return s;
-		}
-		return null;
-	}//getSingleUserById
+   public void addUserGroup( UserGroup group) { userGroups.add(group); }
 
-	public UserGroup getUserGroupById( String groupCode)
-	{
-		for ( UserGroup ug: userGroups )
-		{
-			if ( ug.getCode().equals(groupCode))
-				return ug;
-		}
-		return null;
-	}//getUserGroupById
+   public SingleUser getSingleUserById( String userCode)
+   {
+      for ( SingleUser s: singleUsers )
+      {
+         if ( s.getCode().equals(userCode))
+            return s;
+      }
+      return null;
+   }//getSingleUserById
 
-	public DocType getTypeById( String code)
-	{
-		for (DocType dt: docTypes)
-		{
-			if( dt.getCode().equals(code))
-				return dt;
-		}
-		return null;
-	}//getTypeById
+   public UserGroup getUserGroupById( String groupCode)
+   {
+      for ( UserGroup ug: userGroups )
+      {
+         if ( ug.getCode().equals(groupCode))
+            return ug;
+      }
+      return null;
+   }//getUserGroupById
+
+   public DocType getTypeById( String code)
+   {
+      for (DocType dt: docTypes)
+      {
+         if( dt.getCode().equals(code))
+            return dt;
+      }
+      return null;
+   }//getTypeById
 
 
 

@@ -27,12 +27,12 @@ public class Volume extends Expediente
 {
    @ManyToOne
    public BranchExpediente    parent;
-   
+
    @Transient
    public Set<Document> documents;
 
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-   @JoinColumn
+   @JoinColumn(name="doctype_id")
    @BatchSize(size = 20)
    public Set<DocType > admissibleTypes;
 
