@@ -3,7 +3,6 @@ package com.f.thoth.backend.data.security;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -108,7 +107,7 @@ public class SingleUser extends Usuario
    @Size(min= 2, max = 255, message= "{evidentia.lastname.length}")
    protected String lastName;  // User last name
 
-   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+   @OneToMany(fetch = FetchType.EAGER)
    @OrderColumn
    @JoinColumn(name="group_id")
    @BatchSize(size = 10)

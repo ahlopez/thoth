@@ -10,7 +10,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.OrderColumn;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
@@ -55,7 +54,7 @@ public abstract class Usuario extends BaseEntity implements NeedsProtection, Com
    @NotNull(message = "{evidentia.date.required}")
    protected LocalDate      toDate;              // final date it can be used. default end of year
 
-   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+   @OneToMany( fetch = FetchType.EAGER)
    @JoinColumn(name="role_id")
    @BatchSize(size = 20)
    @Valid

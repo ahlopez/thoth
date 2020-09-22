@@ -37,6 +37,7 @@ import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Operation;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.data.security.UserGroup;
 import com.f.thoth.backend.repositories.ClassificationRepository;
 import com.f.thoth.backend.repositories.FieldRepository;
 import com.f.thoth.backend.repositories.LevelRepository;
@@ -50,6 +51,7 @@ import com.f.thoth.backend.repositories.RoleRepository;
 import com.f.thoth.backend.repositories.SchemaRepository;
 import com.f.thoth.backend.repositories.SchemaValuesRepository;
 import com.f.thoth.backend.repositories.TenantRepository;
+import com.f.thoth.backend.repositories.UserGroupRepository;
 import com.f.thoth.backend.repositories.UserRepository;
 import com.f.thoth.backend.service.TenantService;
 import com.f.thoth.ui.utils.Constant;
@@ -88,6 +90,7 @@ public class DataGenerator implements HasLogger
    private FieldRepository               fieldRepository;
    private SchemaValuesRepository        valuesRepository;
    private RetentionRepository           retentionRepository;
+   private UserGroupRepository           userGroupRepository;
 
    @Autowired
    public DataGenerator(TenantService tenantService, OrderRepository orderRepository, UserRepository userRepository,
@@ -95,7 +98,7 @@ public class DataGenerator implements HasLogger
          TenantRepository tenantRepository, RoleRepository roleRepository, OperationRepository operationRepository,
          ClassificationRepository claseRepository, MetadataRepository metadataRepository, FieldRepository fieldRepository,
          SchemaRepository schemaRepository, LevelRepository levelRepository, SchemaValuesRepository valuesRepository,
-         RetentionRepository retentionRepository, 
+         RetentionRepository retentionRepository, UserGroupRepository userGroupRepository,
          PasswordEncoder passwordEncoder)
    {
       this.tenantService                 = tenantService;
@@ -114,6 +117,7 @@ public class DataGenerator implements HasLogger
       this.passwordEncoder               = passwordEncoder;
       this.valuesRepository              = valuesRepository;
       this.retentionRepository           = retentionRepository;
+      this.userGroupRepository           = userGroupRepository;
 
    }//DataGenerator
 
@@ -648,6 +652,17 @@ public class DataGenerator implements HasLogger
       createAdmin(userRepository, passwordEncoder);
       // A set of products without constrains that can be deleted
       createDeletableUsers(userRepository, passwordEncoder);
+      
+      getLogger().info("...generating user groups");
+      LocalDate now = LocalDate.now();
+      LocalDate yearStart =  now.minusDays(now.getDayOfYear());
+      LocalDate yearEnd   =  yearStart.plusMonths(12);
+      UserGroup g0100 = createUserGroup(tenant1, "Grupo 0100", Constant.DEFAULT_CATEGORY, null,  yearStart, yearEnd, false);
+      UserGroup g0110 = createUserGroup(tenant1, "Grupo 0110", Constant.DEFAULT_CATEGORY, g0100, yearStart, yearEnd, false);
+      UserGroup g0120 = createUserGroup(tenant1, "Grupo 0120", Constant.DEFAULT_CATEGORY, g0100, yearStart, yearEnd, false);
+      UserGroup g0130 = createUserGroup(tenant1, "Grupo 0130", Constant.DEFAULT_CATEGORY, g0100, yearStart, yearEnd, false);
+      UserGroup g0200 = createUserGroup(tenant1, "Grupo 0200", Constant.DEFAULT_CATEGORY, null,  yearStart, yearEnd, false);
+      UserGroup g0210 = createUserGroup(tenant1, "Grupo 0210", Constant.DEFAULT_CATEGORY, g0200, yearStart, yearEnd, false);
 
       getLogger().info("... generating products");
       // A set of products that will be used for creating orders.
@@ -723,6 +738,20 @@ public class DataGenerator implements HasLogger
       schemaRepository.saveAndFlush(schema);
       return schema;
    }//createSchema
+   
+   private UserGroup createUserGroup(Tenant tenant, String name, Integer category, UserGroup owner, LocalDate dateFrom, LocalDate dateTo, boolean locked)
+   {
+      UserGroup userGroup = new UserGroup();
+      userGroup.setTenant(tenant);
+      userGroup.setName(name);
+      userGroup.setCategory(category);
+      userGroup.setOwner(owner);
+      userGroup.setFromDate(dateFrom);
+      userGroup.setToDate(dateTo);
+      userGroup.setLocked(locked);
+      userGroupRepository.save(userGroup);
+      return userGroup;
+   }//createUserGroup
 
 
 

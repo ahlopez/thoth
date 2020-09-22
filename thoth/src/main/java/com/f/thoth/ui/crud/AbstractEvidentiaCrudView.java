@@ -99,6 +99,5 @@ public abstract class AbstractEvidentiaCrudView<E extends AbstractEntity> extend
             setOpened(false);
         }
     }//setParameter
-
-
+    
 }//AbstractBakeryCrudView

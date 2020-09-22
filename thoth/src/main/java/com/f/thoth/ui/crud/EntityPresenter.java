@@ -79,8 +79,7 @@ public class EntityPresenter<T extends AbstractEntity, V extends EntityView<T>> 
 		}
 		catch (DataIntegrityViolationException e) {
 			// Commit failed because of validation errors
-			consumeError(
-					e, CrudErrorMessage.OPERATION_PREVENTED_BY_REFERENCES, true);
+			consumeError( e, CrudErrorMessage.OPERATION_PREVENTED_BY_REFERENCES, true);
 		}
 		catch (OptimisticLockingFailureException e) {
 			consumeError(e, CrudErrorMessage.CONCURRENT_UPDATE, true);

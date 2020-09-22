@@ -65,6 +65,7 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
    private static Dialog           groupsDialog;
    private static Set<UserGroup>   userGroups = new TreeSet<>();
    private static UserGroupService userGService;
+   private static SingleUserService singleUService;
    private static HierarchicalSelector<UserGroup,HasValue.ValueChangeEvent<UserGroup>> groupsSelector;
    
    private static Button roles  = new Button("Roles");
@@ -73,17 +74,10 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
    private static RoleService      roleSvice;
    private static Grid<Role>       rolesSelector;
 
-
-   /*
-   private static ComboBox<UserGroup> groupsItBelongs;
-   private static ComboBox<Role>      rolesItBelongs;
-    */
-
-
    @Autowired
-   public SingleUserView(SingleUserService userGService, UserGroupService userGroupService, RoleService roleService, CurrentUser currentUser)
+   public SingleUserView(SingleUserService singleUService, UserGroupService userGroupService, RoleService roleService, CurrentUser currentUser)
    {
-      super(SingleUser.class, userGService, new Grid<>(), createForm(userGroupService, roleService), currentUser);
+      super(SingleUser.class, singleUService, new Grid<>(), createForm(userGroupService, roleService), currentUser);
    }
 
    @Override
@@ -106,6 +100,8 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
    {
       userGService = userGroupService;
       roleSvice    = roleService;
+      
+      singleUser = new SingleUser();
       TextField name = new TextField("Nombre");
       name.setRequired(true);
       name.setPlaceholder("--nombre--");
@@ -202,13 +198,13 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
       
       groupsDialog = createGroupsSelector(userGService);
       rolesDialog  = createRolesSelector(roleSvice);
-      singleUser = binder.getBean();
+      binder.setBean(singleUser);
 
       return new BinderCrudEditor<SingleUser>(binder, form);
    }//BinderCrudEditor
 
 
-   protected void setupCrudEventListeners(CrudEntityPresenter<SingleUser> entityPresenter)
+   @Override protected void setupCrudEventListeners(CrudEntityPresenter<SingleUser> entityPresenter)
    {
       Consumer<SingleUser> onSuccess = entity -> navigateToEntity(null);
       Consumer<SingleUser> onFail = entity -> {
@@ -217,7 +213,15 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
 
       addEditListener(e ->
       {
-         entityPresenter.loadEntity(e.getItem().getId(), entity -> navigateToEntity(entity.getId().toString()));
+         singleUser = e.getItem();
+         if ( singleUser != null)
+         {
+            singleUser = singleUService.load(singleUser.getId());
+            userGroups = singleUser.getGroups();
+            userRoles  = singleUser.getRoles();
+            entityPresenter.loadEntity(singleUser.getId(), entity -> navigateToEntity(entity.getId().toString()));
+         }
+ 
       });
 
       addCancelListener(e -> navigateToEntity(null));
@@ -225,9 +229,12 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
       addSaveListener(e -> 
            {
               singleUser = e.getItem();
-              singleUser.setGroups(userGroups);
-              singleUser.setRoles (userRoles);
-              entityPresenter.save(singleUser, onSuccess, onFail);
+              if ( singleUser != null)
+              {
+                 singleUser.setGroups(userGroups);
+                 singleUser.setRoles (userRoles);
+                 entityPresenter.save(singleUser, onSuccess, onFail);
+              }
            });
 
       addDeleteListener(e -> entityPresenter.delete(e.getItem(), onSuccess, onFail));
@@ -285,6 +292,7 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
       rolesDialog.setHeight("700px");
       
       rolesSelector = new Grid<>();
+      rolesSelector.setPageSize(15);
       rolesSelector.addColumn(Role::getName).setHeader("Rol");
       rolesSelector.setSelectionMode(SelectionMode.MULTI);
       rolesSelector.setItems(roleService.findAll());
@@ -307,6 +315,7 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
    
    private static void selectGroups()
    {
+      userGroups = (singleUser == null? new TreeSet<>() : singleUser.getGroups());
       groupsSelector.init(userGroups);
       groupsDialog.open();
    }//selectGroups

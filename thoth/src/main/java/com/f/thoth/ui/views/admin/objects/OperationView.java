@@ -132,7 +132,7 @@ public class OperationView extends AbstractEvidentiaCrudView<Operation>
 
    }//BinderCrudEditor
 
-   protected void setupCrudEventListeners(CrudEntityPresenter<Operation> entityPresenter)
+   @Override protected void setupCrudEventListeners(CrudEntityPresenter<Operation> entityPresenter)
    {
       Consumer<Operation> onSuccess = entity -> navigateToEntity(null);
       Consumer<Operation> onFail = entity ->
