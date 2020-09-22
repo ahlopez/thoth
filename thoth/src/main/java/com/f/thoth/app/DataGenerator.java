@@ -653,16 +653,16 @@ public class DataGenerator implements HasLogger
       // A set of products without constrains that can be deleted
       createDeletableUsers(userRepository, passwordEncoder);
       
-      getLogger().info("...generating user groups");
+      getLogger().info("... generating user groups");
       LocalDate now = LocalDate.now();
       LocalDate yearStart =  now.minusDays(now.getDayOfYear());
       LocalDate yearEnd   =  yearStart.plusMonths(12);
       UserGroup g0100 = createUserGroup(tenant1, "Grupo 0100", Constant.DEFAULT_CATEGORY, null,  yearStart, yearEnd, false);
-      UserGroup g0110 = createUserGroup(tenant1, "Grupo 0110", Constant.DEFAULT_CATEGORY, g0100, yearStart, yearEnd, false);
-      UserGroup g0120 = createUserGroup(tenant1, "Grupo 0120", Constant.DEFAULT_CATEGORY, g0100, yearStart, yearEnd, false);
-      UserGroup g0130 = createUserGroup(tenant1, "Grupo 0130", Constant.DEFAULT_CATEGORY, g0100, yearStart, yearEnd, false);
+      UserGroup g0110 = createUserGroup(tenant1, "Grupo 0101", Constant.DEFAULT_CATEGORY, g0100, yearStart, yearEnd, false);
+      UserGroup g0120 = createUserGroup(tenant1, "Grupo 0102", Constant.DEFAULT_CATEGORY, g0100, yearStart, yearEnd, false);
+      UserGroup g0130 = createUserGroup(tenant1, "Grupo 0103", Constant.DEFAULT_CATEGORY, g0100, yearStart, yearEnd, false);
       UserGroup g0200 = createUserGroup(tenant1, "Grupo 0200", Constant.DEFAULT_CATEGORY, null,  yearStart, yearEnd, false);
-      UserGroup g0210 = createUserGroup(tenant1, "Grupo 0210", Constant.DEFAULT_CATEGORY, g0200, yearStart, yearEnd, false);
+      UserGroup g0210 = createUserGroup(tenant1, "Grupo 0201", Constant.DEFAULT_CATEGORY, g0200, yearStart, yearEnd, false);
 
       getLogger().info("... generating products");
       // A set of products that will be used for creating orders.

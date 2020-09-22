@@ -15,7 +15,7 @@ import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.service.HierarchicalService;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.treegrid.TreeGrid;
@@ -57,7 +57,7 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
 
    private void setup( String name)
    {
-      add( new Label(name));
+      add( new H3(name));
       HorizontalLayout  layout = new HorizontalLayout();
       layout.setWidthFull();
       treeGrid = buildSelector();
@@ -353,7 +353,12 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
       return result.isEmpty()? null: result.iterator().next() ;
    }
 
-   public Set<T> getValues(){ return result;}
+   public Set<T> getValues()
+   { 
+      Set<T> values = new TreeSet<>();
+      values.addAll(result);
+      return values;
+   }//getValues
 
    //Returns whether this HasValue is in read-only mode or not.
    @Override public boolean  isReadOnly() { return selectionMode == Grid.SelectionMode.NONE;}

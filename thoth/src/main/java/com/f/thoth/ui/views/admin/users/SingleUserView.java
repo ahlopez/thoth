@@ -59,15 +59,14 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
    private static final Converter<String, Integer>    CATEGORY_CONVERTER =
                     new StringToIntegerConverter( Constant.DEFAULT_CATEGORY, "Categoría inválida");
 
-   private static SingleUser       singleUser;
-   
-   private static Button           groups = new Button("Grupos");
-   private static Dialog           groupsDialog;
-   private static Set<UserGroup>   userGroups = new TreeSet<>();
-   private static UserGroupService userGService;
-   private static SingleUserService singleUService;
+   private static SingleUser        singleUser;
+
+   private static Button            groups = new Button("Grupos");
+   private static Dialog            groupsDialog;
+   private static Set<UserGroup>    userGroups = new TreeSet<>();
+   private static UserGroupService  userGService;
    private static HierarchicalSelector<UserGroup,HasValue.ValueChangeEvent<UserGroup>> groupsSelector;
-   
+
    private static Button roles  = new Button("Roles");
    private static Dialog           rolesDialog;
    private static Set<Role>        userRoles = new TreeSet<>();
@@ -75,33 +74,36 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
    private static Grid<Role>       rolesSelector;
 
    @Autowired
-   public SingleUserView(SingleUserService singleUService, UserGroupService userGroupService, RoleService roleService, CurrentUser currentUser)
+   public SingleUserView(SingleUserService singleUserService, UserGroupService userGroupService, RoleService roleService, CurrentUser currentUser)
    {
-      super(SingleUser.class, singleUService, new Grid<>(), createForm(userGroupService, roleService), currentUser);
+      super(SingleUser.class, singleUserService, new Grid<>(), createForm( userGroupService, roleService), currentUser);
    }
 
    @Override
    protected void setupGrid(Grid<SingleUser> grid)
    {
-      grid.addColumn(user -> user.getName().toLowerCase()).setHeader("Nombre").setFlexGrow(13);
+      grid.addColumn(user -> user.getName()    .toLowerCase()).setHeader("Nombre").setFlexGrow(13);
       grid.addColumn(user -> user.getLastName().toLowerCase()).setHeader("Apellido").setFlexGrow(13);
-      grid.addColumn(user -> user.getEmail().toLowerCase()).setHeader("Correo").setFlexGrow(15);
-      grid.addColumn(user -> user.isLocked() ? "SI" : "--").setHeader("Bloqueado?").setFlexGrow(8);
-      grid.addColumn(user -> user.getCategory() == null? "0" : user.getCategory().toString()).setHeader("Categoría").setFlexGrow(8);
-      grid.addColumn(SingleUser::getFromDate).setHeader("Fecha Desde").setFlexGrow(6);
-      grid.addColumn(SingleUser::getToDate).setHeader("Fecha Hasta").setFlexGrow(6);
+      grid.addColumn(user -> user.getEmail()   .toLowerCase()).setHeader("Correo").setFlexGrow(15);
+      grid.addColumn(user -> user.isLocked() ? "SI" : "--").setHeader("Bloqueado?").setFlexGrow(3);
+      grid.addColumn(user -> user.getCategory() == null? "0" : user.getCategory().toString()).setHeader("Categoría").setFlexGrow(6);
+      grid.addColumn(SingleUser::getFromDate).setHeader("Desde").setFlexGrow(10);
+      grid.addColumn(SingleUser::getToDate)  .setHeader("Hasta").setFlexGrow(10);
+      grid.addColumn(user -> ""+ user.getGroups().size()).setHeader("Grupos").setFlexGrow(5);
+      grid.addColumn(user -> ""+ user.getRoles() .size()).setHeader("Roles") .setFlexGrow(5);
 
    }//setupGrid
+
 
    @Override
    protected String getBasePage() { return PAGE_SINGLE_USERS;}
 
-   private static BinderCrudEditor<SingleUser> createForm(UserGroupService userGroupService, RoleService roleService)
+   private static BinderCrudEditor<SingleUser> createForm( UserGroupService userGroupService, RoleService roleService)
    {
-      userGService = userGroupService;
-      roleSvice    = roleService;
-      
-      singleUser = new SingleUser();
+      userGService   = userGroupService;
+      roleSvice      = roleService;
+
+      singleUser     = null;
       TextField name = new TextField("Nombre");
       name.setRequired(true);
       name.setPlaceholder("--nombre--");
@@ -152,7 +154,7 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
       toDate.setValue(yearStart.plusYears(1));
       toDate.setRequiredIndicatorVisible(true);
       toDate.getElement().setAttribute("colspan", "2");
-      
+
       Component buttonsComponent = createButtons();
 
       FormLayout form = new FormLayout(name, lastName, password, email,  blocked, category, fromDate, toDate, buttonsComponent);
@@ -195,10 +197,9 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
             .withConverter(DATE_CONVERTER)
             .withValidator( date -> date.compareTo(LocalDate.now()) > 0, "Fecha hasta debe ser futura")
             .bind("toDate");
-      
+
       groupsDialog = createGroupsSelector(userGService);
       rolesDialog  = createRolesSelector(roleSvice);
-      binder.setBean(singleUser);
 
       return new BinderCrudEditor<SingleUser>(binder, form);
    }//BinderCrudEditor
@@ -214,26 +215,31 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
       addEditListener(e ->
       {
          singleUser = e.getItem();
-         if ( singleUser != null)
-         {
-            singleUser = singleUService.load(singleUser.getId());
-            userGroups = singleUser.getGroups();
-            userRoles  = singleUser.getRoles();
-            entityPresenter.loadEntity(singleUser.getId(), entity -> navigateToEntity(entity.getId().toString()));
-         }
- 
+         Long id    = (singleUser == null? null: singleUser.getId());
+         if ( singleUser != null && id != null)
+             entityPresenter.loadEntity(id, entity -> navigateToEntity(entity.getId().toString()));
+
       });
 
-      addCancelListener(e -> navigateToEntity(null));
+      addCancelListener(e -> 
+      {
+         singleUser = null;
+         userGroups.clear();
+         userRoles.clear();
+         navigateToEntity(null);
+      });
 
-      addSaveListener(e -> 
+      addSaveListener(e ->
            {
               singleUser = e.getItem();
               if ( singleUser != null)
               {
                  singleUser.setGroups(userGroups);
-                 singleUser.setRoles (userRoles);
+                 singleUser.setRoles(userRoles);
                  entityPresenter.save(singleUser, onSuccess, onFail);
+                 singleUser = null;
+                 userGroups.clear();
+                 userRoles .clear();
               }
            });
 
@@ -242,20 +248,19 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
    }//setupCrudEventListeners
 
 
-   private static Component createButtons() 
+   private static Component createButtons()
    {
       groups.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-      groups.addClickListener(e -> groupsDialog.open());
-
       roles.addThemeVariants (ButtonVariant.LUMO_PRIMARY);
 
       groups.addClickListener(click -> selectGroups());
-      roles.addClickListener(click ->  selectRoles());
+      roles .addClickListener(click -> selectRoles());
 
       return new HorizontalLayout(groups, roles);
 
    }//createButtonsLayout
-   
+
+
    private static Dialog createGroupsSelector(UserGroupService userGroupService)
    {
       groupsDialog   = new Dialog();
@@ -264,24 +269,24 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
       groupsDialog.setResizable(true);
       groupsDialog.setWidth("1000px");
       groupsDialog.setHeight("1300px");
-      
+
       groupsSelector = new HierarchicalSelector<>( userGroupService, Grid.SelectionMode.MULTI, "Seleccione grupos", null);
-      Button close = new Button("Cerrar");     
-      close.addClickListener(e-> 
+      Button close = new Button("Cerrar");
+      close.addClickListener(e->
            {
               userGroups = groupsSelector.getValues();
               if (singleUser != null)
                   singleUser.setGroups(userGroups);
-              
+
               groupsDialog.close();
            });
       groupsDialog.add( groupsSelector, close );
 
       return groupsDialog;
-      
+
    }//createGroupsSelector
 
-   
+
    private static Dialog createRolesSelector( RoleService  roleService)
    {
       rolesDialog   = new Dialog();
@@ -290,40 +295,47 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
       rolesDialog.setResizable(true);
       rolesDialog.setWidth ("400px");
       rolesDialog.setHeight("700px");
-      
+
       rolesSelector = new Grid<>();
       rolesSelector.setPageSize(15);
       rolesSelector.addColumn(Role::getName).setHeader("Rol");
       rolesSelector.setSelectionMode(SelectionMode.MULTI);
       rolesSelector.setItems(roleService.findAll());
-      
-      Button close = new Button("Cerrar");     
-      close.addClickListener(e-> 
+
+      Button close = new Button("Cerrar");
+      close.addClickListener(e->
            {
-              userRoles = rolesSelector.asMultiSelect().getValue();
+              userRoles.clear();
+              userRoles.addAll(rolesSelector.asMultiSelect().getValue());
               if( singleUser != null)
                   singleUser.setRoles(userRoles);
-              
+
               rolesDialog.close();
            });
       H3 title = new H3("Seleccione los roles");
       rolesDialog.add( title, rolesSelector, close );
 
       return rolesDialog;
-      
+
    }//createRolesSelector
-   
+
+
    private static void selectGroups()
    {
-      userGroups = (singleUser == null? new TreeSet<>() : singleUser.getGroups());
+      if ( singleUser != null )
+          userGroups = singleUser.getGroups();
+
       groupsSelector.init(userGroups);
       groupsDialog.open();
    }//selectGroups
-   
+
+
    private static void selectRoles()
-   {     
+   {
       rolesSelector.deselectAll();
-      userRoles = (singleUser == null? new TreeSet<>() : singleUser.getRoles());
+      if ( singleUser != null )
+          userRoles =  singleUser.getRoles();
+
       rolesSelector.asMultiSelect().select(userRoles);
       rolesDialog.open();
    }//selectRoles
