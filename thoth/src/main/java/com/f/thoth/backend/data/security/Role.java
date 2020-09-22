@@ -80,7 +80,7 @@ public class Role extends BaseEntity implements Comparable<Role>
    public int hashCode() { return id == null? 13: id.hashCode(); }
 
    @Override
-   public String toString() { return "Role{"+ super.toString()+ " name["+ name+ "]}";}
+   public String toString() { return "Role{"+ super.toString()+ " name["+ name+ "]}\n";}
 
    @Override
    public int compareTo(Role that)

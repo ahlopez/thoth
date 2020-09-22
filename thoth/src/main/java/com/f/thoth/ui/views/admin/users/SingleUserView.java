@@ -59,18 +59,20 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
    private static final Converter<String, Integer>    CATEGORY_CONVERTER =
                     new StringToIntegerConverter( Constant.DEFAULT_CATEGORY, "Categoría inválida");
 
-   private static SingleUser        singleUser;
+   private static SingleUser        singleUser = null;
+   private static Set<UserGroup>    userGroups = new TreeSet<>();
+   private static Set<Role>         userRoles  = new TreeSet<>();
 
    private static Button            groups = new Button("Grupos");
-   private static Dialog            groupsDialog;
-   private static Set<UserGroup>    userGroups = new TreeSet<>();
-   private static UserGroupService  userGService;
-   private static HierarchicalSelector<UserGroup,HasValue.ValueChangeEvent<UserGroup>> groupsSelector;
+   private static Button            roles  = new Button("Roles");
 
-   private static Button roles  = new Button("Roles");
-   private static Dialog           rolesDialog;
-   private static Set<Role>        userRoles = new TreeSet<>();
-   private static RoleService      roleSvice;
+   private static Dialog            groupsDialog;
+   private static Dialog            rolesDialog;
+
+   private static UserGroupService  userGService;
+   private static RoleService       roleSvice;
+
+   private static HierarchicalSelector<UserGroup,HasValue.ValueChangeEvent<UserGroup>> groupsSelector;
    private static Grid<Role>       rolesSelector;
 
    @Autowired
@@ -103,7 +105,6 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
       userGService   = userGroupService;
       roleSvice      = roleService;
 
-      singleUser     = null;
       TextField name = new TextField("Nombre");
       name.setRequired(true);
       name.setPlaceholder("--nombre--");
@@ -208,9 +209,7 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
    @Override protected void setupCrudEventListeners(CrudEntityPresenter<SingleUser> entityPresenter)
    {
       Consumer<SingleUser> onSuccess = entity -> navigateToEntity(null);
-      Consumer<SingleUser> onFail = entity -> {
-         throw new RuntimeException("La operación no pudo ser ejecutada.");
-      };
+      Consumer<SingleUser> onFail    = entity -> {  throw new RuntimeException("La operación no pudo ser ejecutada."); };
 
       addEditListener(e ->
       {
@@ -221,11 +220,9 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
 
       });
 
-      addCancelListener(e -> 
+      addCancelListener(e ->
       {
-         singleUser = null;
-         userGroups.clear();
-         userRoles.clear();
+         resetSelectors();
          navigateToEntity(null);
       });
 
@@ -237,13 +234,15 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
                  singleUser.setGroups(userGroups);
                  singleUser.setRoles(userRoles);
                  entityPresenter.save(singleUser, onSuccess, onFail);
-                 singleUser = null;
-                 userGroups.clear();
-                 userRoles .clear();
+                 resetSelectors();
               }
            });
 
-      addDeleteListener(e -> entityPresenter.delete(e.getItem(), onSuccess, onFail));
+      addDeleteListener(e -> 
+           {
+              entityPresenter.delete(e.getItem(), onSuccess, onFail);
+              resetSelectors();
+           });
 
    }//setupCrudEventListeners
 
@@ -323,7 +322,10 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
    private static void selectGroups()
    {
       if ( singleUser != null )
-          userGroups = singleUser.getGroups();
+      {
+         userGroups.clear();
+         userGroups.addAll(singleUser.getGroups());
+      }
 
       groupsSelector.init(userGroups);
       groupsDialog.open();
@@ -334,10 +336,22 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
    {
       rolesSelector.deselectAll();
       if ( singleUser != null )
-          userRoles =  singleUser.getRoles();
+      {
+         userRoles.clear();
+         userRoles.addAll(singleUser.getRoles());
+      }
 
       rolesSelector.asMultiSelect().select(userRoles);
       rolesDialog.open();
    }//selectRoles
+
+
+   private void resetSelectors()
+   {
+      singleUser = null;
+      userGroups.clear();
+      userRoles .clear();
+
+   }//resetSelectors
 
 }//SingleUserView

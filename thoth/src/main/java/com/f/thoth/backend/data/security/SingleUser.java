@@ -197,7 +197,9 @@ public class SingleUser extends Usuario
    public int hashCode() { return id == null? 257: id.hashCode();}
 
    @Override
-   public String toString() { return "SingleUser{" + super.toString() + " lastName[" + lastName + "] email[" + email + "]}";}
+   public String toString() { return "SingleUser{" + super.toString() + 
+         " lastName[" + lastName + "] email[" + email + "]"+
+         " groups["+ groups.size()+ "] roles["+ roles.size()+ "]}\n";}
 
 
    // --------------- Logic ---------------------

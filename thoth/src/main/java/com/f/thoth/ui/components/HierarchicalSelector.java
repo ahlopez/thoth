@@ -306,23 +306,29 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
 
    public void resetSelector()
    {
-      searchBar.clear();
       treeGrid.deselectAll();
       treeGrid.collapse(expandedNodes);
       expandedNodes.clear();
-      searchGrid.setItems(emptyGrid);
+      resetSearch();
       result.clear();
 
    }//resetSelector
+   
+   private void resetSearch()
+   {
+      searchGrid.setItems(emptyGrid);
+      searchGrid.setVisible(false);
+      searchBar.clear();
+      searchBar.setVisible(false);
+   }//resetSearch
 
 
    public void refresh( )
    {
-      searchBar.clear();
+      resetSearch();
       dataProvider = getDataProvider(service);
       treeGrid.setDataProvider(dataProvider);
       dataProvider.refreshAll();
-      searchGrid.setItems(emptyGrid);
    }//refresh
 
 
