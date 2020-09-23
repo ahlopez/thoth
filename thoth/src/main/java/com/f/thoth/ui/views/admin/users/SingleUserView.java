@@ -214,9 +214,8 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
       addEditListener(e ->
       {
          singleUser = e.getItem();
-         Long id    = (singleUser == null? null: singleUser.getId());
-         if ( singleUser != null && id != null)
-             entityPresenter.loadEntity(id, entity -> navigateToEntity(entity.getId().toString()));
+         if ( singleUser != null && singleUser.isPersisted())
+             entityPresenter.loadEntity(singleUser.getId(), entity -> navigateToEntity(entity.getId().toString()));
 
       });
 
@@ -231,20 +230,36 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
               singleUser = e.getItem();
               if ( singleUser != null)
               {
-                 singleUser.setGroups(userGroups);
-                 singleUser.setRoles(userRoles);
+                 singleUser.setGroups(getGroups());
+                 singleUser.setRoles (getRoles());
                  entityPresenter.save(singleUser, onSuccess, onFail);
                  resetSelectors();
               }
            });
 
-      addDeleteListener(e -> 
+      addDeleteListener(e ->
            {
               entityPresenter.delete(e.getItem(), onSuccess, onFail);
               resetSelectors();
            });
 
    }//setupCrudEventListeners
+
+
+   private static Set<UserGroup> getGroups()
+   {
+     Set<UserGroup> theGroups  = new TreeSet<>();
+     theGroups.addAll(userGroups);
+     return theGroups;
+   }//getGroups
+
+
+   private static Set<Role> getRoles()
+   {
+     Set<Role> theRoles  = new TreeSet<>();
+     theRoles.addAll(userRoles);
+     return theRoles;
+   }//getRoles
 
 
    private static Component createButtons()
@@ -275,7 +290,7 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
            {
               userGroups = groupsSelector.getValues();
               if (singleUser != null)
-                  singleUser.setGroups(userGroups);
+                  singleUser.setGroups(getGroups());
 
               groupsDialog.close();
            });
@@ -307,7 +322,7 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
               userRoles.clear();
               userRoles.addAll(rolesSelector.asMultiSelect().getValue());
               if( singleUser != null)
-                  singleUser.setRoles(userRoles);
+                  singleUser.setRoles(getRoles());
 
               rolesDialog.close();
            });
