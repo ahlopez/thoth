@@ -63,7 +63,6 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
    private Button                   save         = new Button("Guardar");
    private Button                   close        = new Button("Cancelar");
    private HierarchicalSelector<E, HasValue.ValueChangeEvent<E>> permissionSelector;
-   //private TreeGridSelector<E, HasValue.ValueChangeEvent<E>> permissionSelector;
 
    protected abstract String getBasePage();
 
@@ -214,8 +213,8 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
 
    protected void setupEventListeners( PermissionPresenter<E> permissionPresenter)
    {
-      addListener(GrantRevokeEvent.class, this::saveGrants);
-      addListener(CloseEvent.class,       this::close);
+       addListener(GrantRevokeEvent.class, this::saveGrants);
+       addListener(CloseEvent.class,       this::close);
 
    }//setupEventListeners
 

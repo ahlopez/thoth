@@ -14,6 +14,7 @@ import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.service.HierarchicalService;
 import com.vaadin.flow.component.HasValue;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -24,6 +25,7 @@ import com.vaadin.flow.data.provider.hierarchy.TreeDataProvider;
 import com.vaadin.flow.data.selection.MultiSelect;
 import com.vaadin.flow.shared.Registration;
 
+@CssImport(value="./styles/grid-tree-toggle-adjust.css", themeFor="vaadin-grid-tree-toggle")
 public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends HasValue.ValueChangeEvent<T>>
        extends  VerticalLayout
        implements HasValue<E, T>
@@ -80,25 +82,23 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
    {
       TreeGrid<T>tGrid = new TreeGrid<>();
       tGrid.setWidthFull();
-
+      
       tGrid.addHierarchyColumn(T::getName).setHeader("Nombre");
       tGrid.setSelectionMode(selectionMode);
 
       dataProvider = getDataProvider(service);
       tGrid.setDataProvider(dataProvider);
-      tGrid.addExpandListener            ( e-> expandedNodes.addAll(e.getItems()));
 
-      switch( selectionMode)
-      {
-      case SINGLE:
+      tGrid.addExpandListener ( e->
+          {
+             Collection<T> items = e.getItems();
+             expandedNodes.addAll(items);
+          });
+
+      if( selectionMode == Grid.SelectionMode.SINGLE)
          buildSingleSelector(tGrid);
-         break;
-      case MULTI:
+      else if( selectionMode == Grid.SelectionMode.MULTI)
          buildMultiSelector(tGrid);
-         break;
-      default:
-
-      }//switch
 
       return tGrid;
 
@@ -106,7 +106,11 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
 
    private void buildSingleSelector(TreeGrid<T> tGrid)
    {
-      tGrid.addItemClickListener      ( e-> tGrid.select(e.getItem()));
+      tGrid.addItemClickListener      ( e->
+           {
+              T item = e.getItem();
+              tGrid.select(item);
+           });
       tGrid.addItemDoubleClickListener( e-> tGrid.deselect(e.getItem()));
       tGrid.addSelectionListener      ( e->
             {
@@ -172,21 +176,13 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
    private Registration addValueChangeListener( Grid<T> sGrid, TreeGrid<T> tGrid)
    {
       Registration registration = null;
-      switch (selectionMode)
-      {
-      case SINGLE:
-      {
+
+      if ( selectionMode == Grid.SelectionMode.SINGLE)
          registration = setupSingleselectListener(sGrid, tGrid);
-         break;
-      }
-      case MULTI:
-      {
+      else if( selectionMode == Grid.SelectionMode.MULTI)
          registration = setupMultiselectListener(sGrid, tGrid);
-         break;
-      }
-      default:
+      else
          tGrid.deselectAll();
-      }
 
       return registration;
 
@@ -313,13 +309,12 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
       result.clear();
 
    }//resetSelector
-   
+
    private void resetSearch()
    {
       searchGrid.setItems(emptyGrid);
       searchGrid.setVisible(false);
       searchBar.clear();
-      searchBar.setVisible(false);
    }//resetSearch
 
 
@@ -360,7 +355,7 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
    }
 
    public Set<T> getValues()
-   { 
+   {
       Set<T> values = new TreeSet<>();
       values.addAll(result);
       return values;

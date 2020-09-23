@@ -87,20 +87,13 @@ public class ClassificationView extends VerticalLayout
 
    protected String getBasePage() { return PAGE_ESQUEMAS_CLASIFICACION; }
 
-   private void addClass()
-   {
-      Classification newClass = new Classification();
-      newClass.setOwner(ownerClass.getValue());
-      editClass(newClass);
-   }//addClass
-
    private Component configureGrid()
    {
       ownerClass = new HierarchicalSelector<>(
                            classificationService, 
                            Grid.SelectionMode.SINGLE, 
                            "Seleccione la clase padre", 
-                           e-> selectedClass(currentClass)
+                           this::editOwner
                            );     
       ownerClass.getElement().setAttribute("colspan", "4");
 
@@ -118,26 +111,20 @@ public class ClassificationView extends VerticalLayout
       return ownerClass;
 
    }//configureGrid
-   
-   
-   private void selectedClass( Classification clasification)
-   {
-      this.currentClass = clasification;
-      editClass(currentClass);
-   }//selectedClass
-   
+     
 
    private Component configureButtons()
    {      
-      add.    addThemeVariants (ButtonVariant.LUMO_PRIMARY);
+      add.     addThemeVariants(ButtonVariant.LUMO_PRIMARY);
       save.    addThemeVariants(ButtonVariant.LUMO_PRIMARY);
       delete.  addThemeVariants(ButtonVariant.LUMO_ERROR);
       close.   addThemeVariants(ButtonVariant.LUMO_TERTIARY);
       
       save.addClickShortcut (Key.ENTER);
       close.addClickShortcut(Key.ESCAPE);
-
-      save.addClickListener  (click -> addClass());
+      
+      add .addClickListener  (click -> addClass());
+      save.addClickListener  (click -> saveClass(currentClass));
       delete.addClickListener(click -> deleteClass(currentClass));
       close.addClickListener (click -> closeAll());
       
@@ -161,6 +148,46 @@ public class ClassificationView extends VerticalLayout
 
    }//configureForm
 
+   
+   private void editOwner(Classification owner)
+   {
+      this.currentClass = owner;
+      editClass(currentClass);
+   }//editOwner
+   
+
+   private void addClass()
+   {
+      currentClass = new Classification();
+      currentClass.setOwner(ownerClass.getValue());
+      editClass(currentClass);
+   }//addClass
+   
+   
+   private void saveClass( Classification classification)
+   {
+      classificationService.save(currentUser, classification);
+      closeEditor();
+      currentClass = null;
+     
+   }//saveClass
+
+
+   private void deleteClass(Classification classification)
+   {
+      try
+      {
+         if( classification != null && classification.isPersisted())
+             classificationService.delete(currentUser, classification);
+      } catch (Exception e)
+      {
+         Notifier.error("Clase["+ classification.getName()+ "] tiene referencias. No puede ser borrada");
+      }
+      updateSelector();
+      closeEditor();
+   }//deleteClass
+   
+   
    private void editClass(Classification classification)
    {
       if (classification == null)
@@ -177,6 +204,7 @@ public class ClassificationView extends VerticalLayout
          classificationForm.addClassName("selected-item-form");
       }
    }//editClass
+   
 
    private void closeEditor()
    {
@@ -186,32 +214,20 @@ public class ClassificationView extends VerticalLayout
 
    }//closeEditor
    
+   
    private void closeAll()
    {
       closeEditor();
       currentClass = null;
       ownerClass.resetSelector();      
    }//closeAll
+   
 
    private void updateSelector()
    {
      ownerClass.refresh();
    }//updateSelector
 
-
-   private void deleteClass(Classification classification)
-   {
-      try
-      {
-         if( classification != null && classification.isPersisted())
-             classificationService.delete(currentUser, classification);
-      } catch (Exception e)
-      {
-         Notifier.error("Clase["+ classification.getName()+ "] tiene referencias. No puede ser borrada");
-      }
-      updateSelector();
-      closeEditor();
-   }//deleteClass
 
    private void saveClassification(ClassificationForm.SaveEvent event)
    {
