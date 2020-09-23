@@ -89,12 +89,6 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
       dataProvider = getDataProvider(service);
       tGrid.setDataProvider(dataProvider);
 
-      tGrid.addExpandListener ( e->
-          {
-             Collection<T> items = e.getItems();
-             expandedNodes.addAll(items);
-          });
-
       if( selectionMode == Grid.SelectionMode.SINGLE)
          buildSingleSelector(tGrid);
       else if( selectionMode == Grid.SelectionMode.MULTI)
@@ -106,31 +100,45 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
 
    private void buildSingleSelector(TreeGrid<T> tGrid)
    {
-      tGrid.addItemClickListener      ( e->
-           {
-              T item = e.getItem();
-              tGrid.select(item);
-           });
+      
       tGrid.addItemDoubleClickListener( e-> tGrid.deselect(e.getItem()));
+
+      tGrid.addExpandListener ( e-> expandedNodes.addAll(e.getItems()));
+
       tGrid.addSelectionListener      ( e->
             {
                Optional<T> first = e.getFirstSelectedItem();
                if ( first.isPresent())
                   setValue( first.get());
             });
+      
       if (actionOnSelect != null)
           tGrid.asSingleSelect().addValueChangeListener(e-> actionOnSelect.accept(e.getValue()));
+      
    }//buildSingleSelector
 
    private void buildMultiSelector(TreeGrid<T> tGrid)
    {
       multiSelect = tGrid.asMultiSelect();
+
+      tGrid.addExpandListener ( e-> expandedNodes.addAll(e.getItems()));
+
       multiSelect.addValueChangeListener(event ->
       {
          Set<T> values = event.getValue();
          if ( values != null)
             values.forEach( value-> setValue(value));
       });
+      
+      if (actionOnSelect != null)
+      {
+          multiSelect.addValueChangeListener(e-> 
+              {
+                 Set<T> values = e.getValue();
+                 values.forEach(val-> actionOnSelect.accept(val));                 
+              });
+     }
+
    }//buildMultiSelector
 
 
@@ -310,6 +318,7 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
 
    }//resetSelector
 
+   
    private void resetSearch()
    {
       searchGrid.setItems(emptyGrid);

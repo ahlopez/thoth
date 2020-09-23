@@ -4,14 +4,18 @@ package com.f.thoth.ui.views.classification;
 import static com.f.thoth.ui.utils.Constant.PAGE_ESQUEMAS_CLASIFICACION;
 import static com.f.thoth.ui.utils.Constant.TITLE_ESQUEMAS_CLASIFICACION;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
 import com.f.thoth.backend.data.Role;
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
+import com.f.thoth.backend.data.gdoc.classification.Level;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.service.ClassificationService;
+import com.f.thoth.backend.service.LevelService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.components.HierarchicalSelector;
 import com.f.thoth.ui.components.Notifier;
@@ -51,13 +55,17 @@ public class ClassificationView extends VerticalLayout
    private Button save     = new Button("Guardar clase");
    private Button delete   = new Button("Eliminar clase");
    private Button close    = new Button("Cancelar");
+   
+   private Level[] levels;
 
 
    @Autowired
-   public ClassificationView(ClassificationService classificationService)
+   public ClassificationView(ClassificationService classificationService, LevelService levelService)
    {
       this.classificationService = classificationService;
       this.currentUser           = ThothSession.getCurrentUser();
+      
+      levels = getAllLevels( levelService);
 
       addClassName("main-view");
       setSizeFull();
@@ -86,6 +94,18 @@ public class ClassificationView extends VerticalLayout
    }//ClassificationView
 
    protected String getBasePage() { return PAGE_ESQUEMAS_CLASIFICACION; }
+
+   
+   private Level[] getAllLevels( LevelService levelService)
+   {       
+      List<Level> allLevels      = levelService.findAll();
+      int nLevels    = allLevels.size();
+      Level[] levels = new Level[nLevels];
+      for( int i=0; i < nLevels; i++)
+         levels[i] = allLevels.get(i);
+      
+      return levels;
+   }//getAllLevels
 
    private Component configureGrid()
    {
@@ -159,9 +179,25 @@ public class ClassificationView extends VerticalLayout
    private void addClass()
    {
       currentClass = new Classification();
-      currentClass.setOwner(ownerClass.getValue());
+      Classification owner = ownerClass.getValue();
+      currentClass.setOwner(owner);
+      Level level = getCurrentLevel(owner);
+      currentClass.setLevel(level);
       editClass(currentClass);
    }//addClass
+   
+   private Level  getCurrentLevel( Classification owner)
+   {
+      Level level      = null;
+      int currentLevel = owner.getLevel().getOrden()+ 1;
+      if ( currentLevel >= levels.length)
+         Notifier.error("La clase del último nivel no puede tener hijos");       
+      else
+         level = levels[currentLevel];
+
+      return level;
+      
+   }//getCurrentLevel
    
    
    private void saveClass( Classification classification)

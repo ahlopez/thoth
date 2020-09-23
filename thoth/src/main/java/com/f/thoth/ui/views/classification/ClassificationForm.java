@@ -1,9 +1,11 @@
 package com.f.thoth.ui.views.classification;
 
 import com.f.thoth.backend.data.gdoc.classification.Classification;
+import com.f.thoth.backend.data.gdoc.classification.Level;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.gdoc.metadata.vaadin.SchemaToVaadinExporter;
+import com.f.thoth.ui.components.Notifier;
 import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
@@ -40,7 +42,13 @@ public class ClassificationForm extends VerticalLayout
       removeAll();
       this.classification  = classification;
       this.schemaValues    = classification.getMetadata();
-      Schema classificationSchema = schemaValues.getSchema();
+      Level level          = classification.getLevel();
+      if ( level ==  null)
+      {
+         Notifier.error("No hay un nivel definido");
+         return;
+      }
+      Schema classificationSchema = level.getSchema();
       this.schemaFields = (Component)classificationSchema.export(schemaExporter);
       add(
             schemaFields,
