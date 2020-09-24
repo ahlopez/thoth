@@ -13,9 +13,11 @@ import com.f.thoth.backend.data.Role;
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.classification.Level;
+import com.f.thoth.backend.data.gdoc.classification.Retention;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.service.ClassificationService;
 import com.f.thoth.backend.service.LevelService;
+import com.f.thoth.backend.service.RetentionService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.components.HierarchicalSelector;
 import com.f.thoth.ui.components.Notifier;
@@ -57,15 +59,17 @@ public class ClassificationView extends VerticalLayout
    private Button close    = new Button("Cancelar");
    
    private Level[] levels;
+   private List<Retention>  retentionSchedules;
 
 
    @Autowired
-   public ClassificationView(ClassificationService classificationService, LevelService levelService)
+   public ClassificationView(ClassificationService classificationService, LevelService levelService, RetentionService retentionService)
    {
       this.classificationService = classificationService;
       this.currentUser           = ThothSession.getCurrentUser();
       
       levels = getAllLevels( levelService);
+      retentionSchedules = retentionService.findAll();
 
       addClassName("main-view");
       setSizeFull();
@@ -83,7 +87,7 @@ public class ClassificationView extends VerticalLayout
       content.add(new H3("Clases registradas"));
 
       content.add( configureGrid(), configureButtons());
-      rightSection.add(configureForm());
+      rightSection.add(configureForm(retentionSchedules));
       updateSelector();
       closeEditor();
 
@@ -159,9 +163,9 @@ public class ClassificationView extends VerticalLayout
    }//configureButtons
 
 
-   private ClassificationForm configureForm()
+   private ClassificationForm configureForm(List<Retention >retentionSchedules)
    {
-      classificationForm = new ClassificationForm();
+      classificationForm = new ClassificationForm(retentionSchedules);
       classificationForm.addListener(ClassificationForm.SaveEvent.class,   this::saveClassification);
       classificationForm.addListener(ClassificationForm.CloseEvent.class,  e -> closeEditor());
       return classificationForm;

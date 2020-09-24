@@ -144,13 +144,13 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
 
       LocalDate now = LocalDate.now();
       LocalDate yearStart =now.minusDays(now.getDayOfYear());
-      DatePicker fromDate = new DatePicker("Desde");
+      DatePicker fromDate = new DatePicker("Válido Desde");
       fromDate.setRequired(true);
       fromDate.setValue(yearStart);
       fromDate.setRequiredIndicatorVisible(true);
       fromDate.getElement().setAttribute("colspan", "2");
 
-      DatePicker toDate   = new DatePicker("Hasta");
+      DatePicker toDate   = new DatePicker("Válido Hasta");
       toDate.setRequired(true);
       toDate.setValue(yearStart.plusYears(1));
       toDate.setRequiredIndicatorVisible(true);

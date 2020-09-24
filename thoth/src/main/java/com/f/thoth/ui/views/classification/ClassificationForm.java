@@ -1,59 +1,112 @@
 package com.f.thoth.ui.views.classification;
 
+import java.time.LocalDate;
+import java.util.List;
+
 import com.f.thoth.backend.data.gdoc.classification.Classification;
-import com.f.thoth.backend.data.gdoc.classification.Level;
-import com.f.thoth.backend.data.gdoc.metadata.Schema;
-import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
-import com.f.thoth.backend.data.gdoc.metadata.vaadin.SchemaToVaadinExporter;
-import com.f.thoth.ui.components.Notifier;
-import com.f.thoth.ui.utils.Constant;
+import com.f.thoth.backend.data.gdoc.classification.Retention;
+import com.f.thoth.ui.utils.converters.LocalDateToLocalDate;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datepicker.DatePicker;
+import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.data.converter.Converter;
 import com.vaadin.flow.shared.Registration;
 
-public class ClassificationForm extends VerticalLayout
+public class ClassificationForm extends FormLayout
 {
+   private static final Converter<LocalDate, LocalDate> DATE_CONVERTER   = new LocalDateToLocalDate();
 
-   private Classification  classification  = null;
-   private SchemaValues    schemaValues    = null; 
-   private Button save   = new Button("Guardar campos");
+   private Button save   = new Button("Guardar Clase");
    private Button close  = new Button("Cancelar");
 
-   private Component       schemaFields;
-   private Schema.Exporter schemaExporter = new SchemaToVaadinExporter();
+   Binder<Classification> binder       = new BeanValidationBinder<>(Classification.class);
+   
+   ClassificationValuesForm valuesForm = new ClassificationValuesForm();
 
-   public ClassificationForm() 
+   public ClassificationForm(List<Retention> availabeSchedules) 
    {  
-      schemaExporter = new SchemaToVaadinExporter();
+      addClassName("clase-form");
+      setResponsiveSteps(
+            new ResponsiveStep("30em", 1),
+            new ResponsiveStep("30em", 2),
+            new ResponsiveStep("30em", 3));
+
+      H3  title = new H3("Clase a actualizar");
+      title.getElement().setAttribute("colspan", "2");
+
+      TextField  clase    = new TextField("Nombre");
+      clase.setRequired(true);
+      clase.setRequiredIndicatorVisible(true);
+      clase.setWidth("70%");
+      clase.getElement().setAttribute("colspan", "2");
+
+      LocalDate now = LocalDate.now();
+      LocalDate yearStart =now.minusDays(now.getDayOfYear());
+      DatePicker fromDate = new DatePicker("Válida Desde");
+      fromDate.setRequired(true);
+      fromDate.setValue(now);
+      fromDate.setRequiredIndicatorVisible(true);
+      fromDate.setWidth("35%");
+      fromDate.getElement().setAttribute("colspan", "1");
+
+      DatePicker toDate   = new DatePicker("Válida Hasta");
+      toDate.setRequired(true);
+      toDate.setValue(yearStart.plusYears(1));
+      toDate.setRequiredIndicatorVisible(true);
+      toDate.setWidth("35%");
+      toDate.getElement().setAttribute("colspan", "1");
+      
+      ComboBox<Retention> schedule = new ComboBox<>("Programa de Retención");
+      schedule.setItems(availabeSchedules);
+      schedule.setItemLabelGenerator(Retention::getName);
+      schedule.setRequired(true);
+      schedule.getElement().setAttribute("colspan", "2");
+   
+      add(
+            title,
+            clase,
+            fromDate,
+            toDate,
+            schedule,
+            createButtonsLayout(),
+            valuesForm
+            );
+
+      binder.forField(clase).bind("name");
+
+      binder.forField(fromDate)
+            .withConverter(DATE_CONVERTER)
+            .withValidator( date -> date.compareTo(LocalDate.now()) <= 0, "Fecha de apertura no puede ser futura")
+            .bind("dateOpened");
+
+      binder.forField(toDate)
+            .withConverter(DATE_CONVERTER)
+            .withValidator( date -> fromDate == null || date == null || date.compareTo(fromDate.getValue()) > 0, "Fecha de cierre debe posterior a la de apertura")
+            .bind("dateClosed");
+      
+      binder.forField(schedule).bind("retentionSchedule");
+      
+      valuesForm.addListener(ClassificationValuesForm.SaveEvent.class, e->validateAndSave(e.getClassification()));
+
    }//ClassificationForm
    
-   public void setClassification( Classification classification)
+
+   public void setClassification(Classification clase) 
    {
-      if (classification == null)
-         return;
-      
-      removeAll();
-      this.classification  = classification;
-      this.schemaValues    = classification.getMetadata();
-      Level level          = classification.getLevel();
-      if ( level ==  null)
-      {
-         Notifier.error("No hay un nivel definido");
-         return;
-      }
-      Schema classificationSchema = level.getSchema();
-      this.schemaFields = (Component)classificationSchema.export(schemaExporter);
-      add(
-            schemaFields,
-            createButtonsLayout()
-            );
+      binder.setBean(clase);
+      valuesForm.setVisible(true);
+      valuesForm.setClassification(clase);
    }//setClassification
 
    private Component createButtonsLayout() 
@@ -65,73 +118,60 @@ public class ClassificationForm extends VerticalLayout
       close.addClickShortcut(Key.ESCAPE);
 
       save.  setWidth("20%");
+      save.getElement().getStyle().set("margin-left", "auto");
       close. setWidth("20%");
 
-      save.addClickListener  (click -> validateAndSave());
-      close.addClickListener (click -> close());
-      
-      HorizontalLayout buttons = new HorizontalLayout( save, close);
-      save.getElement().getStyle().set("margin-left", "auto");
-      buttons.setWidthFull();
+      save.addClickListener  (click -> validateAndSave(binder.getBean()));
+      close.addClickListener (click -> { close(); fireEvent(new CloseEvent(this));});
+
+      binder.addStatusChangeListener(evt -> save.setEnabled(binder.isValid()));
+      HorizontalLayout buttons = new HorizontalLayout(close, save);
+      buttons.getElement().setAttribute("colspan", "3");
 
       return buttons; 
    }//createButtonsLayout
-   
-   private void validateAndSave() 
+
+   private void validateAndSave(Classification clase) 
    {
-       StringBuilder values = new StringBuilder();
-       schemaFields.getChildren().forEach( c->  
-       {
-          int i =0;
-          if (c instanceof HasValue<?,?>)
-          {  
-             Object val = ((HasValue<?,?>)c).getValue();
-             if(i++ > 0)
-                values.append(Constant.VALUE_SEPARATOR);
-             
-            values.append(val == null? Constant.NULL_VALUE: val.toString());
-          }
-       });
-       schemaValues.setValues(values.toString());
-       fireEvent(new SaveEvent(this, classification));
+      if (binder.isValid()) 
+      {
+         close();
+         fireEvent(new SaveEvent(this, clase));
+      }
    }//validateAndSave
    
-   private void close()
-   {
-      fireEvent(new CloseEvent(this));
-   }//close   
-   
+   private void close() {  valuesForm.setVisible(false); }
 
    // --------------------- Events -----------------------
    public static abstract class ClassificationFormEvent extends ComponentEvent<ClassificationForm> 
    {
-      private Classification classification;
+      private Classification clase;
 
-      protected ClassificationFormEvent(ClassificationForm source, Classification classification) 
+      protected ClassificationFormEvent(ClassificationForm source, Classification clase) 
       {
          super(source, false);
-         this.classification = classification;
+         this.clase = clase;
       }//ClassificationFormEvent
 
       public Classification getClassification() 
       {
-         return classification;
+         return clase;
       }
    }//ClassificationFormEvent
 
    public static class SaveEvent extends ClassificationFormEvent 
    {
-      SaveEvent(ClassificationForm source, Classification classification) 
+      SaveEvent(ClassificationForm source, Classification clase) 
       {
-         super(source, classification);
+         super(source, clase);
       }
    }//SaveEvent
 
    public static class DeleteEvent extends ClassificationFormEvent 
    {
-      DeleteEvent(ClassificationForm source, Classification classification) 
+      DeleteEvent(ClassificationForm source, Classification clase) 
       {
-         super(source, classification);
+         super(source, clase);
       }
    }//DeleteEvent
 

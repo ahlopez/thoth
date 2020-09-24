@@ -47,7 +47,7 @@
 .main-view .right-section .selected-item-form {
       border: 1px ridge lightgray;
       background-color: ivory;
-      margin: 0px;
+      margin: 2px;
 }
 
 .main-view .right-section .selected-item-form .field-form {
