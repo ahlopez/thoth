@@ -3,6 +3,7 @@ package com.f.thoth.ui.views.security.permission;
 import static com.f.thoth.ui.dataproviders.DataProviderUtil.createItemLabelGenerator;
 
 import java.time.LocalDate;
+import java.util.Collection;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -268,6 +269,52 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
       permissionSelector.refresh();
       permissionLayout.setVisible(false);
    }//clear
+   
+   // -------------------------- Permission events -------------------------------------------
+   
+   public abstract class PermissionEvent<T>  extends ComponentEvent<AbstractPermissionView<E>> 
+   {
+      private Role      role;
+      private Period    period;
+      
+      protected PermissionEvent( AbstractPermissionView<E> source, Role role, Period period) 
+      { 
+         super(source, false);
+         this.role   = role;
+         this.period = period;
+         
+      }//PermissionEvent consructor
+      
+      // ------------------- Getters & Setters ---------------
+      public Role   getRole()    { return role;}
+      public Period getPeriod()  { return period;}
+
+   }//PermissionEvent
+   
+   public class GrantRevokeEvent<T> extends PermissionEvent<T> 
+   {
+      Collection<T> grants;
+      
+      protected GrantRevokeEvent(AbstractPermissionView<E> source, Collection<T> grants, Role role, Period period) 
+      {
+         super(source, role, period);
+         this.grants = grants;
+      }//GrantRevokeEvent
+      
+      public Collection<T> getGrants() { return grants;} 
+      
+   }//GrantRevokeEvent
+   
+   public class CloseEvent<T> extends PermissionEvent<T> 
+   {
+      protected CloseEvent(AbstractPermissionView<E> source) 
+      { 
+         super(source, null, null); 
+      }
+   }//CloseEvent
+
+   
+   // -------------------------- Period events -------------------------------------------
 
    public abstract class PeriodEvent extends ComponentEvent<AbstractPermissionView<E>>
    {

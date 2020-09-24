@@ -16,6 +16,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -36,7 +37,7 @@ public class ClassificationForm extends FormLayout
 
    public ClassificationForm(List<Retention> availabeSchedules) 
    {  
-      addClassName("clase-form");
+      setWidthFull();
       setResponsiveSteps(
             new ResponsiveStep("30em", 1),
             new ResponsiveStep("30em", 2),
@@ -48,7 +49,6 @@ public class ClassificationForm extends FormLayout
       TextField  clase    = new TextField("Nombre");
       clase.setRequired(true);
       clase.setRequiredIndicatorVisible(true);
-      clase.setWidth("70%");
       clase.getElement().setAttribute("colspan", "2");
 
       LocalDate now = LocalDate.now();
@@ -57,14 +57,14 @@ public class ClassificationForm extends FormLayout
       fromDate.setRequired(true);
       fromDate.setValue(now);
       fromDate.setRequiredIndicatorVisible(true);
-      fromDate.setWidth("35%");
+      fromDate.setWidth("40%");
       fromDate.getElement().setAttribute("colspan", "1");
 
       DatePicker toDate   = new DatePicker("Válida Hasta");
       toDate.setRequired(true);
       toDate.setValue(yearStart.plusYears(1));
       toDate.setRequiredIndicatorVisible(true);
-      toDate.setWidth("35%");
+      toDate.setWidth("40%");
       toDate.getElement().setAttribute("colspan", "1");
       
       ComboBox<Retention> schedule = new ComboBox<>("Programa de Retención");
@@ -76,6 +76,7 @@ public class ClassificationForm extends FormLayout
       add(
             title,
             clase,
+            new Label(" "),
             fromDate,
             toDate,
             schedule,
@@ -92,12 +93,14 @@ public class ClassificationForm extends FormLayout
 
       binder.forField(toDate)
             .withConverter(DATE_CONVERTER)
-            .withValidator( date -> fromDate == null || date == null || date.compareTo(fromDate.getValue()) > 0, "Fecha de cierre debe posterior a la de apertura")
+            .withValidator( date -> fromDate == null || date == null || 
+                            date.compareTo(fromDate.getValue()) > 0, "Fecha de cierre debe posterior a la de apertura")
             .bind("dateClosed");
       
       binder.forField(schedule).bind("retentionSchedule");
       
       valuesForm.addListener(ClassificationValuesForm.SaveEvent.class, e->validateAndSave(e.getClassification()));
+      valuesForm.getElement().setAttribute("colspan", "3");
 
    }//ClassificationForm
    

@@ -22,8 +22,8 @@ public class ClassificationValuesForm extends VerticalLayout
 {
    private Classification  classification  = null;
    private SchemaValues    schemaValues    = null; 
-   private Button save   = new Button("Guardar campos");
-   private Button close  = new Button("Cancelar");
+   private Button          save ;
+   private Button          close;
 
    private Component       schemaFields;
    private Schema.Exporter schemaExporter = new SchemaToVaadinExporter();
@@ -95,20 +95,23 @@ public class ClassificationValuesForm extends VerticalLayout
    
    private Component createButtonsLayout() 
    {
-      save.addThemeVariants  (ButtonVariant.LUMO_PRIMARY);
+      close=  new Button("Cancelar");
+      save =  new Button("Guardar clase");
+
       close.addThemeVariants (ButtonVariant.LUMO_TERTIARY);
+      save.addThemeVariants  (ButtonVariant.LUMO_PRIMARY);
 
-      save.addClickShortcut (Key.ENTER);
       close.addClickShortcut(Key.ESCAPE);
+      save.addClickShortcut (Key.ENTER);
 
-      save.  setWidth("20%");
       close. setWidth("20%");
+      save.  setWidth("20%");
 
-      save.addClickListener  (click -> validateAndSave());
       close.addClickListener (click -> close());
-      
-      HorizontalLayout buttons = new HorizontalLayout( save, close);
+      save .addClickListener (click -> validateAndSave());
       save.getElement().getStyle().set("margin-left", "auto");
+      
+      HorizontalLayout buttons = new HorizontalLayout( close, save);
       buttons.setWidthFull();
 
       return buttons; 

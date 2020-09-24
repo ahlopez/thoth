@@ -208,7 +208,6 @@ public class DataGenerator implements HasLogger
       Field    ratioField= createField("Razon", decMeta, true, false, true, 7, 1);
 
       Schema  sedeSchema = createSchema("Sede");
-      sedeSchema.addField(nameField);
       sedeSchema.addField(fromField);
       sedeSchema.addField(toField);
       sedeSchema.addField(colorField);
@@ -216,7 +215,6 @@ public class DataGenerator implements HasLogger
       schemaRepository.saveAndFlush(sedeSchema);
 
       Schema   officeSchema = createSchema("Office");
-      officeSchema.addField(nameField);
       officeSchema.addField(bossField);
       officeSchema.addField(fromField);
       officeSchema.addField(toField);
@@ -224,7 +222,6 @@ public class DataGenerator implements HasLogger
       schemaRepository.saveAndFlush(officeSchema);
 
       Schema   seriesSchema = createSchema("Series");
-      seriesSchema.addField(nameField);
       seriesSchema.addField(fromField);
       seriesSchema.addField(toField);
       seriesSchema.addField(securityField);
