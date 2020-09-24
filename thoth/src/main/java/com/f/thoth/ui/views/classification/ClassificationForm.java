@@ -86,15 +86,22 @@ public class ClassificationForm extends FormLayout
 
       binder.forField(clase).bind("name");
 
+      
       binder.forField(fromDate)
+            .asRequired()
             .withConverter(DATE_CONVERTER)
-            .withValidator( date -> date.compareTo(LocalDate.now()) <= 0, "Fecha de apertura no puede ser futura")
+            .withValidator( dateFrom ->
+                 {
+                       LocalDate dateTo = toDate.getValue();
+                       return dateTo != null && dateFrom.equals(dateTo) || dateFrom.isBefore(dateTo);
+                 }, "Fecha de cierre debe posterior a la de apertura")
             .bind("dateOpened");
 
       binder.forField(toDate)
+            .asRequired()
             .withConverter(DATE_CONVERTER)
-            .withValidator( date -> fromDate == null || date == null || 
-                            date.compareTo(fromDate.getValue()) > 0, "Fecha de cierre debe posterior a la de apertura")
+            .withValidator( dateTo -> dateTo.equals(fromDate.getValue()) || dateTo.isAfter(fromDate.getValue()), 
+                            "Fecha de cierre debe posterior a la de apertura")
             .bind("dateClosed");
       
       binder.forField(schedule).bind("retentionSchedule");

@@ -32,8 +32,8 @@ public class OperationService implements FilterableCrudService<Operation>, Permi
    private final ObjectToProtectRepository objectToProtectRepository;
 
    @Autowired
-   public OperationService(OperationRepository operationRepository, 
-                           ObjectToProtectRepository objectToProtectRepository, 
+   public OperationService(OperationRepository operationRepository,
+                           ObjectToProtectRepository objectToProtectRepository,
                            PermissionRepository permissionRepository)
    {
       this.operationRepository       = operationRepository;
@@ -80,7 +80,7 @@ public class OperationService implements FilterableCrudService<Operation>, Permi
    public Operation createNew(User currentUser)
    {
       Operation operation = new Operation();
-      operation.setTenant(ThothSession.getCurrentTenant()); 
+      operation.setTenant(ThothSession.getCurrentTenant());
       return operation;
    }
 
@@ -88,16 +88,8 @@ public class OperationService implements FilterableCrudService<Operation>, Permi
    public Operation save(User currentUser, Operation operation)
    {
       try {
-         /*
-         ObjectToProtect associatedObject = operation.getObjectToProtect();
-         if ( !associatedObject.isPersisted())
-         {
-            objectToProtectRepository.saveAndFlush(associatedObject);
-            operation.setObjectToProtect(associatedObject);
-         }        
-         */
          return FilterableCrudService.super.save(currentUser, operation);
-         
+
       } catch (DataIntegrityViolationException e) {
          throw new UserFriendlyDataException("Ya hay un Objeto con esa llave. Por favor escoja una llave única para el objeto");
       }
@@ -114,8 +106,8 @@ public class OperationService implements FilterableCrudService<Operation>, Permi
    @Override public int             countByParent ( Operation owner) { return operationRepository.countByParent (owner); }
    @Override public boolean         hasChildren   ( Operation object){ return operationRepository.countByChildren(object) > 0; }
 
-   @Override public List<Operation> findByNameLikeIgnoreCase (Tenant tenant, String name) 
-   { 
+   @Override public List<Operation> findByNameLikeIgnoreCase (Tenant tenant, String name)
+   {
          String repositoryFilter = "%" + name + "%";
          return operationRepository.findByNameLikeIgnoreCase(tenant, repositoryFilter);
    }
@@ -124,13 +116,13 @@ public class OperationService implements FilterableCrudService<Operation>, Permi
    //  --------  Permission handling ---------------------
 
    @Override public List<Permission> findGrants( Role role)
-   { 
+   {
       List<Operation> operations = operationRepository.findOperationsGranted(role);
       List<ObjectToProtect> associatedObjects = new ArrayList<>();
       operations.forEach(operation-> associatedObjects.add(operation.getObjectToProtect()));
       return  permissionRepository.findByObjects(associatedObjects);
    }//findGrants
-   
+
    @Override public List<Operation> findObjectsGranted( Role role)
    {
       List<Operation> granted = operationRepository.findOperationsGranted(role);
@@ -143,27 +135,27 @@ public class OperationService implements FilterableCrudService<Operation>, Permi
       revoke( currentUser, role, newRevokes);
 
    }//grantRevoke
-   
+
    @Override public void grant( User currentUser, Role role, Set<Permission> newGrants)
    {
-      newGrants.forEach( newGrant-> 
+      newGrants.forEach( newGrant->
       {
          if (!newGrant.isPersisted())
             permissionRepository.saveAndFlush(newGrant);
-         
+
          Operation operation= operationRepository.findByObjectToProtect(newGrant.getObjectToProtect());
          if ( operation != null)
          {
-            operation.grant(newGrant);            
+            operation.grant(newGrant);
             operationRepository.saveAndFlush(operation);
         }
       });
    }//grant
 
-   
+
    @Override public void revoke( User currentUser, Role role, Set<Permission> newRevokes)
    {
-      newRevokes.forEach( newRevoke-> 
+      newRevokes.forEach( newRevoke->
       {
          Operation operation= operationRepository.findByObjectToProtect(newRevoke.getObjectToProtect());
          if ( operation != null)

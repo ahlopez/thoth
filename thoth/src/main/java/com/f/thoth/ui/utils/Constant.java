@@ -7,7 +7,7 @@ import org.springframework.data.domain.Sort;
 public class Constant
 {
 
-   public static final Locale  APP_LOCALE = new Locale("co");
+   public static final Locale  APP_LOCALE = Locale.US;
    public static final String  TENANT= "TENANT";
    public static final Integer MIN_CATEGORY     = new Integer(0);
    public static final Integer MAX_CATEGORY     = new Integer(5);

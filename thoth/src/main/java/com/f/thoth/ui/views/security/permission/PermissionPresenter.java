@@ -19,38 +19,24 @@ import com.f.thoth.ui.views.HasNotifications;
 
 public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements HasLogger
 {
-   /*
-   public enum Message
-   {
-       DATA_INTEGRITY  ("La operación no puede ser ejecutada pues dañaría las referencias a otras entidades en la base de datos."),
-       CONCURRENCY     ("Alguien más ha actualizado la información. Por favor refresque y vuelva a intentarlo."),
-       NOT_FOUND       ("No se encontró la entidad solicitada."),
-       REQUIRED_FIELDS ("Por favor provea los campos marcados como requeridos antes de continuar.");
-
-       private String msg = "";
-       private Message( String msg) { this.msg = msg;}
-       private String text() { return msg;}
-
-   }//Message
-    */
-
    private final PermissionService<E>     service;
    private final User                     currentUser;
-   //private final HasNotifications       view;
 
    @Autowired
    public PermissionPresenter(PermissionService<E> service, CurrentUser currentUser, HasNotifications view)
    {
       this.service     = service;
       this.currentUser = currentUser.getUser();
-      //this.view        = view;
 
    }//PermissionPresenter
+   
 
    public List<E> loadGrants( Role role )
    {  
       return service.findObjectsGranted(role);
    }//loadGrants
+   
+   
    public void grantRevoke( Collection<E> objectsGranted, Role role, Period period )
    {
       List<Permission> oldGrants  = service.findGrants(role);
@@ -83,6 +69,7 @@ public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements Ha
       return newGrants;
       
    }//getNewGrants
+   
 
    private Set<Permission> getNewRevokes( Collection<E> objectsGranted, List<Permission> oldGrants, Role role, Period period)
    {

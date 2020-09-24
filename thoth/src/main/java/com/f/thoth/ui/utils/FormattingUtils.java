@@ -17,14 +17,12 @@ public class FormattingUtils {
    /**
     * 3 letter month name + day number E.g: Nov 20
     */
-   public static final DateTimeFormatter MONTH_AND_DAY_FORMATTER = DateTimeFormatter.ofPattern("MMM d",
-         Constant.APP_LOCALE);
+   public static final DateTimeFormatter MONTH_AND_DAY_FORMATTER = DateTimeFormatter.ofPattern("MMM d", Constant.APP_LOCALE);
 
    /**
     * Full day name. E.g: Monday.
     */
-   public static final DateTimeFormatter WEEKDAY_FULLNAME_FORMATTER = DateTimeFormatter.ofPattern("EEEE",
-         Constant.APP_LOCALE);
+   public static final DateTimeFormatter WEEKDAY_FULLNAME_FORMATTER = DateTimeFormatter.ofPattern("EEEE",Constant.APP_LOCALE);
 
    /**
     * For getting the week of the year from the local date.
@@ -34,20 +32,17 @@ public class FormattingUtils {
    /**
     * 3 letter day of the week + day number. E.g: Mon 20
     */
-   public static final DateTimeFormatter SHORT_DAY_FORMATTER = DateTimeFormatter.ofPattern("E d",
-         Constant.APP_LOCALE);
+   public static final DateTimeFormatter SHORT_DAY_FORMATTER = DateTimeFormatter.ofPattern("E d",Constant.APP_LOCALE);
 
    /**
     * Full date format. E.g: 03.03.2001
     */
-   public static final DateTimeFormatter FULL_DATE_FORMATTER = DateTimeFormatter
-         .ofPattern("dd.MM.yyyy", Constant.APP_LOCALE);
+   public static final DateTimeFormatter FULL_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy", Constant.APP_LOCALE);
 
    /**
     * Formats hours with am/pm. E.g: 2:00 PM
     */
-   public static final DateTimeFormatter HOUR_FORMATTER = DateTimeFormatter
-         .ofPattern("h:mm a", Constant.APP_LOCALE);
+   public static final DateTimeFormatter HOUR_FORMATTER = DateTimeFormatter.ofPattern("h:mm a", Constant.APP_LOCALE);
 
    /**
     * Returns the month name of the date, according to the application locale.

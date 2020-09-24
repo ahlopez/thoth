@@ -109,7 +109,6 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
       roleSelector.setItemLabelGenerator(createItemLabelGenerator(Role::getName));
       roleSelector.setRequired(false);
       roleSelector.setRequiredIndicatorVisible(false);
-      roleSelector.setClearButtonVisible(true);
       roleSelector.setAllowCustomValue(true);
       roleSelector.setPageSize(20);
 
@@ -141,7 +140,6 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
 
    private void setupPeriod()
    {
-
       HorizontalLayout periodLayout = new HorizontalLayout();
 
       permissionFrom = new DatePicker("Válidos desde");
@@ -197,7 +195,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
 
       close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
       close.addClickShortcut(Key.ESCAPE);
-      close.addClickListener(event -> fireEvent(new CloseEvent<>(this)));
+      close.addClickListener(event -> fireEvent(new CloseEvent(this)));
 
       save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
       save.addClickShortcut(Key.ENTER);
@@ -211,18 +209,35 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
 
    }//setupActions
 
-
+   @SuppressWarnings("unchecked")
    protected void setupEventListeners( PermissionPresenter<E> permissionPresenter)
    {
-       addListener(GrantRevokeEvent.class, this::saveGrants);
-       addListener(CloseEvent.class,       this::close);
-
+      //addListener(GrantRevokeEvent.class, this::saveGrants);
+      //addListener(CloseEvent.class,       this::close);
+      addListener(GrantRevokeEvent.class, e->saveGrants(e));
+      addListener(CloseEvent.class,       e->clean());
+ 
    }//setupEventListeners
 
 
-   public <T extends ComponentEvent<?>> Registration addListener(Class<T> eventType, ComponentEventListener<T> listener)
+   private void saveGrants( GrantRevokeEvent event)
    {
-      return getEventBus().addListener(eventType, listener);
+      permissionPresenter.grantRevoke( event.getGrants(), event.getRole(), event.getPeriod());
+      Notifier.accept("Permisos del rol "+ role.getName()+ " actualizados");
+      clear();
+
+   }//saveGrants
+
+
+   private void clean( )
+   {
+      clear();
+   }
+
+   
+   public <T extends ComponentEvent<?>> Registration addListener(Class<T> eventType, ComponentEventListener<T> listener) 
+   {
+         return getEventBus().addListener(eventType, listener);
    }//addListener
 
 
@@ -237,7 +252,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
        try
        {
           binder.writeBean(permissionPeriod);
-          fireEvent(new GrantRevokeEvent<>(this, permissionSelector.getValues(), role, permissionPeriod));
+          fireEvent(new GrantRevokeEvent(this, permissionSelector.getValues(), role, permissionPeriod));
        } catch (ValidationException e)
        {
           Notifier.error( "Período inválido "+
@@ -247,21 +262,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
        }
    }//validateAndSave
 
-
-   private void saveGrants( GrantRevokeEvent<E> event)
-   {
-      permissionPresenter.grantRevoke( event.getGrants(), event.getRole(), event.getPeriod());
-      Notifier.accept("Permisos del rol "+ role.getName()+ " actualizados");
-      clear();
-
-   }//saveGrants
-
-
-   private void close( CloseEvent<E> event)
-   {
-      clear();
-   }
-
+   
    private void clear()
    {
       roleSelector.clear();
@@ -271,45 +272,32 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
    }//clear
    
    // -------------------------- Permission events -------------------------------------------
-   
-   public abstract class PermissionEvent<T>  extends ComponentEvent<AbstractPermissionView<E>> 
+     
+   public class GrantRevokeEvent extends ComponentEvent<AbstractPermissionView<E>>  
    {
-      private Role      role;
-      private Period    period;
+      private Role          role;
+      private Period        period;
+      private Collection<E> grants;
       
-      protected PermissionEvent( AbstractPermissionView<E> source, Role role, Period period) 
-      { 
+      protected GrantRevokeEvent(AbstractPermissionView<E> source, Collection<E> grants, Role role, Period period) 
+      {
          super(source, false);
          this.role   = role;
          this.period = period;
-         
-      }//PermissionEvent consructor
-      
-      // ------------------- Getters & Setters ---------------
-      public Role   getRole()    { return role;}
-      public Period getPeriod()  { return period;}
-
-   }//PermissionEvent
-   
-   public class GrantRevokeEvent<T> extends PermissionEvent<T> 
-   {
-      Collection<T> grants;
-      
-      protected GrantRevokeEvent(AbstractPermissionView<E> source, Collection<T> grants, Role role, Period period) 
-      {
-         super(source, role, period);
          this.grants = grants;
       }//GrantRevokeEvent
       
-      public Collection<T> getGrants() { return grants;} 
+      public Role   getRole()          { return role;}
+      public Period getPeriod()        { return period;}
+      public Collection<E> getGrants() { return grants;} 
       
    }//GrantRevokeEvent
    
-   public class CloseEvent<T> extends PermissionEvent<T> 
+   public class CloseEvent extends ComponentEvent<AbstractPermissionView<E>>  
    {
       protected CloseEvent(AbstractPermissionView<E> source) 
       { 
-         super(source, null, null); 
+         super(source, false);
       }
    }//CloseEvent
 
