@@ -68,12 +68,15 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
       if ( selectionMode != Grid.SelectionMode.NONE)
       {
          this.searchGrid   = buildSearchGrid(treeGrid);
+         searchGrid.setWidth("79%");
          this.searchBar    = buildSearchBar(searchGrid);
          add(searchBar);
          layout.add(searchGrid);
+         layout.setFlexGrow(1, treeGrid);
       }
       add( layout);
       refresh();
+       
 
    }//setup
 
@@ -82,7 +85,7 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
    {
       TreeGrid<T>tGrid = new TreeGrid<>();
       tGrid.setWidthFull();
-      
+
       tGrid.addHierarchyColumn(T::getName).setHeader("Nombre");
       tGrid.setSelectionMode(selectionMode);
 
@@ -98,12 +101,12 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
 
    }//buildSelector
 
+
    private void buildSingleSelector(TreeGrid<T> tGrid)
    {
-      
-      tGrid.addItemDoubleClickListener( e-> tGrid.deselect(e.getItem()));
 
-      tGrid.addExpandListener ( e-> expandedNodes.addAll(e.getItems()));
+      tGrid.addItemDoubleClickListener( e-> tGrid.deselect(e.getItem()));
+      tGrid.addExpandListener         ( e-> expandedNodes.addAll(e.getItems()));
 
       tGrid.addSelectionListener      ( e->
             {
@@ -111,38 +114,33 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
                if ( first.isPresent())
                   setValue( first.get());
             });
-      
+
       if (actionOnSelect != null)
           tGrid.asSingleSelect().addValueChangeListener(e-> actionOnSelect.accept(e.getValue()));
-      
+
    }//buildSingleSelector
+
 
    private void buildMultiSelector(TreeGrid<T> tGrid)
    {
       multiSelect = tGrid.asMultiSelect();
-      
-      tGrid.addItemClickListener(event->
-      {
-         T  valueClicked = event.getItem();
-         if ( multiSelect.isSelected(valueClicked))
-            tGrid.deselect(valueClicked);
-      });
 
       tGrid.addExpandListener ( e-> expandedNodes.addAll(e.getItems()));
 
       multiSelect.addValueChangeListener(event ->
       {
          Set<T> values = event.getValue();
+         result.clear();
          if ( values != null)
             values.forEach( value-> setValue(value));
       });
-      
+
       if (actionOnSelect != null)
       {
-          multiSelect.addValueChangeListener(e-> 
+          multiSelect.addValueChangeListener(e->
               {
                  Set<T> values = e.getValue();
-                 values.forEach(val-> actionOnSelect.accept(val));                 
+                 values.forEach(val-> actionOnSelect.accept(val));
               });
      }
 
@@ -218,13 +216,15 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
          }
       });
       return registration;
-   }//setupSingleselectListener
+   }//setupSingleselectListener (in selection grid)
+
 
    private Registration setupMultiselectListener( Grid<T> sGrid, TreeGrid<T> tGrid)
    {
       Registration registration = sGrid.asMultiSelect().addValueChangeListener(e ->
       {
          Set<T> vals= (Set<T>)e.getValue();
+         multiSelect.deselectAll();
          multiSelect.setValue(vals);
          for (T value: vals)
          {
@@ -233,7 +233,7 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
          }
       });
       return registration;
-   }//setupMultiselectListener
+   }//setupMultiselectListener (in selection grid)
 
 
    private void backtrackParents(Consumer<Collection<T>> fn, final T value)
@@ -325,7 +325,7 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
 
    }//resetSelector
 
-   
+
    private void resetSearch()
    {
       searchGrid.setItems(emptyGrid);
