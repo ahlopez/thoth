@@ -68,7 +68,7 @@ public class OperationView extends AbstractEvidentiaCrudView<Operation>
    {
       TextField name = new TextField("Operación");
       name.setRequired(true);
-      name.setValue("--llave--");
+      name.setPlaceholder("--llave--");
       name.setRequiredIndicatorVisible(true);
       name.getElement().setAttribute("colspan", "3");
 
@@ -77,15 +77,6 @@ public class OperationView extends AbstractEvidentiaCrudView<Operation>
       category.setValue(Constant.DEFAULT_CATEGORY.toString());
       category.setRequiredIndicatorVisible(true);
       category.getElement().setAttribute("colspan", "1");
-
-      ComboBox<SingleUser> userOwner = new ComboBox<>();  // TODO: Definir el data provider y selección telescópica
-      userOwner.setLabel("Usuario dueño");
-      userOwner.getElement().setAttribute("colspan", "2");
-      userOwner.setRequired(false);
-      userOwner.setRequiredIndicatorVisible(false);
-      userOwner.setClearButtonVisible(true);
-      userOwner.setAllowCustomValue(true);
-      userOwner.setPageSize(20);
 
       ComboBox<Role> roleOwner = new ComboBox<>();
       roleOwner.getElement().setAttribute("colspan", "2");
@@ -97,6 +88,15 @@ public class OperationView extends AbstractEvidentiaCrudView<Operation>
       roleOwner.setClearButtonVisible(true);
       roleOwner.setAllowCustomValue(true);
       roleOwner.setPageSize(20);
+
+      ComboBox<SingleUser> userOwner = new ComboBox<>();  // TODO: Considerar el uso del HierarchicalSelector
+      userOwner.setLabel("Usuario dueño");
+      userOwner.getElement().setAttribute("colspan", "2");
+      userOwner.setRequired(false);
+      userOwner.setRequiredIndicatorVisible(false);
+      userOwner.setClearButtonVisible(true);
+      userOwner.setAllowCustomValue(true);
+      userOwner.setPageSize(20);
 
       parentObject = new HierarchicalSelector<>(service, Grid.SelectionMode.SINGLE, "Objeto padre", null);
       parentObject.getElement().setAttribute("colspan", "4");

@@ -18,8 +18,6 @@ import com.f.thoth.ui.components.Notifier;
 import com.f.thoth.ui.components.Period;
 import com.f.thoth.ui.utils.TemplateUtil;
 import com.f.thoth.ui.views.HasNotifications;
-import com.vaadin.flow.component.ComponentEvent;
-import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
@@ -38,7 +36,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
-import com.vaadin.flow.shared.Registration;
 
 /**
  * Representa la vista de actualización de permisos de ejecución/acceso a datos
@@ -179,6 +176,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
       binder.readBean(permissionPeriod);
    }//setupPeriod
 
+
    private void setupSelector(PermissionService<E> service, CurrentUser currentUser, String name)
    {
       permissionSelector = new HierarchicalSelector<>(service, Grid.SelectionMode.MULTI, name, null);
@@ -186,6 +184,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
       permissionLayout.add(permissionSelector);
 
    }//setupSelector
+
 
    private void setupActions()
    {
@@ -195,11 +194,9 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
 
       close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
       close.addClickShortcut(Key.ESCAPE);
-      close.addClickListener(event -> fireEvent(new CloseEvent(this)));
 
       save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
       save.addClickShortcut(Key.ENTER);
-      save.addClickListener(event -> validateAndSave());
 
       binder.addStatusChangeListener(e -> save.setEnabled(binder.isValid()));
 
@@ -209,20 +206,34 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
 
    }//setupActions
 
-   @SuppressWarnings("unchecked")
+
    protected void setupEventListeners( PermissionPresenter<E> permissionPresenter)
    {
-      //addListener(GrantRevokeEvent.class, this::saveGrants);
-      //addListener(CloseEvent.class,       this::close);
-      addListener(GrantRevokeEvent.class, e->saveGrants(e));
-      addListener(CloseEvent.class,       e->clean());
- 
+      save.addClickListener(event -> validateAndSave());
+      close.addClickListener(event -> clean());
+
    }//setupEventListeners
 
 
-   private void saveGrants( GrantRevokeEvent event)
+   private void validateAndSave()
    {
-      permissionPresenter.grantRevoke( event.getGrants(), event.getRole(), event.getPeriod());
+       try
+       {
+          binder.writeBean(permissionPeriod);
+          saveGrants(role, permissionPeriod, permissionSelector.getValues());
+       } catch (ValidationException e)
+       {
+          Notifier.error( "Período inválido "+
+                TextUtil.formatDate(permissionPeriod.getFromDate())+ " : "+
+                TextUtil.formatDate(permissionPeriod.getToDate())+ "]");
+          clear();
+       }
+   }//validateAndSave
+
+
+   private void saveGrants(Role role, Period period, Collection<E>grants)
+   {
+      permissionPresenter.grantRevoke( grants, role, period);
       Notifier.accept("Permisos del rol "+ role.getName()+ " actualizados");
       clear();
 
@@ -234,11 +245,6 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
       clear();
    }
 
-   
-   public <T extends ComponentEvent<?>> Registration addListener(Class<T> eventType, ComponentEventListener<T> listener) 
-   {
-         return getEventBus().addListener(eventType, listener);
-   }//addListener
 
 
    protected void navigateToEntity(String id)
@@ -247,22 +253,6 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
    }//navigateToEntity
 
 
-   private void validateAndSave()
-   {
-       try
-       {
-          binder.writeBean(permissionPeriod);
-          fireEvent(new GrantRevokeEvent(this, permissionSelector.getValues(), role, permissionPeriod));
-       } catch (ValidationException e)
-       {
-          Notifier.error( "Período inválido "+
-                TextUtil.formatDate(permissionPeriod.getFromDate())+ " : "+
-                TextUtil.formatDate(permissionPeriod.getToDate())+ "]");
-          clear();
-       }
-   }//validateAndSave
-
-   
    private void clear()
    {
       roleSelector.clear();
@@ -270,38 +260,48 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
       permissionSelector.refresh();
       permissionLayout.setVisible(false);
    }//clear
-   
+
    // -------------------------- Permission events -------------------------------------------
-     
-   public class GrantRevokeEvent extends ComponentEvent<AbstractPermissionView<E>>  
+
+   /*
+   [ERROR]AbstractPermissionView.java:[220,18] incompatible types: cannot infer type-variable(s) T
+   (argument mismatch; cannot infer functional interface descriptor for ComponentEventListener<GrantRevokeEvent>)
+   
+  public <T extends ComponentEvent<?>> Registration addListener(Class<T> eventType, ComponentEventListener<T> listener)
+  {
+        return getEventBus().addListener(eventType, listener);
+  }//addListener
+
+   public class GrantRevokeEvent extends ComponentEvent<AbstractPermissionView<E>>
    {
       private Role          role;
       private Period        period;
       private Collection<E> grants;
-      
-      protected GrantRevokeEvent(AbstractPermissionView<E> source, Collection<E> grants, Role role, Period period) 
+
+      protected GrantRevokeEvent(AbstractPermissionView<E> source, Collection<E> grants, Role role, Period period)
       {
          super(source, false);
          this.role   = role;
          this.period = period;
          this.grants = grants;
       }//GrantRevokeEvent
-      
-      public Role   getRole()          { return role;}
-      public Period getPeriod()        { return period;}
-      public Collection<E> getGrants() { return grants;} 
+
+      public Role          getRole()    { return role;}
+      public Period        getPeriod()  { return period;}
+      public Collection<E> getGrants()  { return grants;}
       
    }//GrantRevokeEvent
-   
-   public class CloseEvent extends ComponentEvent<AbstractPermissionView<E>>  
+
+
+   public class CloseEvent extends ComponentEvent<AbstractPermissionView<E>>
    {
-      protected CloseEvent(AbstractPermissionView<E> source) 
-      { 
+      protected CloseEvent(AbstractPermissionView<E> source)
+      {
          super(source, false);
       }
    }//CloseEvent
 
-   
+
    // -------------------------- Period events -------------------------------------------
 
    public abstract class PeriodEvent extends ComponentEvent<AbstractPermissionView<E>>
@@ -316,6 +316,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
 
    }//PeriodEvent
 
+
    public class SaveEvent extends PeriodEvent
    {
       SaveEvent(AbstractPermissionView<E> source, Period period)
@@ -323,5 +324,6 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
          super(source, period);
       }
    }//SaveEvent
+   */
 
 }//AbstractPermissionView

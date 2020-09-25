@@ -120,6 +120,13 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
    private void buildMultiSelector(TreeGrid<T> tGrid)
    {
       multiSelect = tGrid.asMultiSelect();
+      
+      tGrid.addItemClickListener(event->
+      {
+         T  valueClicked = event.getItem();
+         if ( multiSelect.isSelected(valueClicked))
+            tGrid.deselect(valueClicked);
+      });
 
       tGrid.addExpandListener ( e-> expandedNodes.addAll(e.getItems()));
 
