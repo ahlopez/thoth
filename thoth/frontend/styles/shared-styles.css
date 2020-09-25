@@ -48,14 +48,14 @@
       border: 1px ridge lightgray;
       background-color: ivory;
       margin: 2px;
-      padding: 2px;
+      padding: 10px;
 }
 
 .main-view .right-section .selected-item-form .field-form {
      border: 1px ridge lightgray;
      background-color: ivory;
-     padding:2px;
-     margin: 0px;
+     padding:10px;
+     margin: 10px;
 }
 
 
