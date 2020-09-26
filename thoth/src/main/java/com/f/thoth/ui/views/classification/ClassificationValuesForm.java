@@ -5,6 +5,7 @@ import com.f.thoth.backend.data.gdoc.classification.Level;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.gdoc.metadata.vaadin.SchemaToVaadinExporter;
+import com.f.thoth.backend.data.gdoc.metadata.vaadin.SchemaValuesToVaadinExporter;
 import com.f.thoth.ui.components.Notifier;
 import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.component.Component;
@@ -22,15 +23,18 @@ public class ClassificationValuesForm extends VerticalLayout
 {
    private Classification  classification  = null;
    private SchemaValues    schemaValues    = null; 
+   private Schema          schema          = null;
    private Button          save ;
    private Button          close;
 
    private Component       schemaFields;
-   private Schema.Exporter schemaExporter = new SchemaToVaadinExporter();
+   private Schema.Exporter schemaExporter       = new SchemaToVaadinExporter();
+   private SchemaValues.Exporter valuesExporter = new SchemaValuesToVaadinExporter();
 
    public ClassificationValuesForm() 
    {  
       schemaExporter = new SchemaToVaadinExporter();
+      valuesExporter = new SchemaValuesToVaadinExporter();
       setWidthFull();
    }//ClassificationValuesForm
 
@@ -42,20 +46,43 @@ public class ClassificationValuesForm extends VerticalLayout
       
       removeAll();
       this.classification  = classification;
+      this.schemaFields    = getFields( classification);
+      
+      if (schemaFields != null)
+         add( schemaFields);
+      
+      add(createButtonsLayout());
+      startEditing();
+   }//setClassification
+   
+   private Component getFields( Classification classification)
+   {
+      Component fields = null;
       this.schemaValues    = classification.getMetadata();
+      if ( schemaValues != null)
+      {   // If the classification has values, get the component from the values
+          this.schema = schemaValues.getSchema();
+          fields      = (Component)schemaValues.export(valuesExporter);
+      }
       Level level          = classification.getLevel();
       if ( level ==  null)
       {
          Notifier.error("No hay un nivel definido");
-         return;
+         return null;
       }
-      this.schemaFields = (Component)level.getSchema().export(schemaExporter);
-      add(
-            schemaFields,
-            createButtonsLayout()
-            );
-      startEditing();
-   }//setClassification
+      Schema levelSchema = level.getSchema();
+      if (!levelSchema.equals(schema) )
+      {
+         Notifier.error("Esquema del nivel["+ levelSchema.getCode()+ "] diferente del esquema de la clasificación["+ schema.getCode()+ "]");
+         return null;
+      }
+      if ( schemaValues == null)            // Else if the classification still has no values, get the component from the schema
+             fields = (Component)level.getSchema().export(schemaExporter);
+      
+      return fields;
+   }//getFields
+   
+   
    
    private void startEditing()
    {
@@ -86,8 +113,9 @@ public class ClassificationValuesForm extends VerticalLayout
             values.append(val == null? Constant.NULL_VALUE: val.toString());
           }
        });
-       schemaValues.setValues(values.toString());
-       classification.setSchemaValues(schemaValues);
+       
+       SchemaValues vals = new SchemaValues(schema, values.toString());
+       classification.setSchemaValues(vals);
        endEditing();
        fireEvent(new SaveEvent(this, classification));
    }//validateAndSave

@@ -286,6 +286,15 @@ public class TextUtil
 
        return sentenceCase(name);
     }//nameTidy
+    
+    public static boolean boolValue( String value)
+    {
+       if ( isEmpty(value)) 
+          return false;
+       
+       String val = value.toLowerCase();
+       return val.equals("t") || val.equals("true") || val.equals("y") || val.equals("yes");
+    }//boolValue
 
 
 }//TextUtil

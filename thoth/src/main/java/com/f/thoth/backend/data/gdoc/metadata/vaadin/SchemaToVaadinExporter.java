@@ -12,8 +12,8 @@ import com.vaadin.flow.component.html.H3;
  */
 public class SchemaToVaadinExporter implements Schema.Exporter
 {
-   FormLayout     layout;
-   Field.Exporter fieldExporter;
+   private FormLayout     layout;
+   private Field.Exporter fieldExporter;
    
    public SchemaToVaadinExporter()
    {      

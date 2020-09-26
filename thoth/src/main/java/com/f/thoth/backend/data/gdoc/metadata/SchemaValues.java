@@ -32,7 +32,17 @@ public class SchemaValues extends BaseEntity implements SchemaValuesImporter
       super();
       schema  = Schema.EMPTY;
       valores = Constant.VALUE_SEPARATOR;
-   }
+   }//SchemaValues constructor
+   
+   public SchemaValues( Schema schema, String values)
+   {
+      super();
+      if (schema == null)
+          throw new IllegalArgumentException("Esquema de los valores no puede ser nulo");
+      
+      this.schema = schema;
+   }//SchemaValues constructor
+   
 
    public SchemaValues( SchemaValues.ImporterDirector importerDirector)
    {
@@ -44,7 +54,8 @@ public class SchemaValues extends BaseEntity implements SchemaValuesImporter
          throw new IllegalStateException("Importación de valores construyó un esquema inconsistente. Razón\n"+ ok );
 
       buildCode();
-   }//SchemaValues
+   }//SchemaValues constructor
+   
 
    private String isValid()
    {
