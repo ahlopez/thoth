@@ -107,7 +107,7 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
    protected Level    level;                               // Classification level in the classification tree
 
    @NotNull(message = "evidentia.metadata.required")
-   @ManyToOne
+   @OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
    protected SchemaValues metadata;                        // Metadata values of the associated classification.level
 
    @NotNull(message = "{evidentia.dateopened.required}")
@@ -134,7 +134,6 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
 
    public Classification( Level level, String name, Classification owner, ObjectToProtect objectToProtect)
    {
-
       if ( !TextUtil.isValidName(name))
          throw new IllegalArgumentException("Nombre["+ name+ "] es invalido");
 
@@ -153,7 +152,7 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
       this.owner            = owner;
       this.objectToProtect  = objectToProtect;
       buildCode();
-   }//Classification
+   }//Classification constructor
 
    private void init()
    {
@@ -162,7 +161,7 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
       this.dateClosed        = LocalDate.MAX;
       this.owner             = null;
       this.retentionSchedule = Retention.DEFAULT;
-      this.metadata          = SchemaValues.EMPTY;
+      this.metadata          = null;
 
    }//init
 

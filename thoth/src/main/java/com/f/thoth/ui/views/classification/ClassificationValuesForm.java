@@ -47,6 +47,7 @@ public class ClassificationValuesForm extends VerticalLayout
       
       removeAll();
       this.classification  = classification;
+      this.schema          = classification.getLevel().getSchema();
       this.schemaFields    = getFields( classification);
       
       if (schemaFields != null)

@@ -44,6 +44,9 @@ public class SchemaValuesToVaadinExporter implements Exporter
    @Override
    public void exportValues(String valores)
    {
+      if ( valores == null)
+         return;
+      
       List<HasValue<?,?>> fields = new ArrayList<>();
       exportedSchema.getChildren().forEach( fld -> 
       {

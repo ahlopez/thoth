@@ -49,7 +49,6 @@ import com.f.thoth.backend.repositories.ProductRepository;
 import com.f.thoth.backend.repositories.RetentionRepository;
 import com.f.thoth.backend.repositories.RoleRepository;
 import com.f.thoth.backend.repositories.SchemaRepository;
-import com.f.thoth.backend.repositories.SchemaValuesRepository;
 import com.f.thoth.backend.repositories.TenantRepository;
 import com.f.thoth.backend.repositories.UserGroupRepository;
 import com.f.thoth.backend.repositories.UserRepository;
@@ -88,7 +87,6 @@ public class DataGenerator implements HasLogger
    private SchemaRepository              schemaRepository;
    private MetadataRepository            metadataRepository;
    private FieldRepository               fieldRepository;
-   private SchemaValuesRepository        valuesRepository;
    private RetentionRepository           retentionRepository;
    private UserGroupRepository           userGroupRepository;
 
@@ -97,7 +95,7 @@ public class DataGenerator implements HasLogger
          ProductRepository productRepository, PickupLocationRepository pickupLocationRepository,
          TenantRepository tenantRepository, RoleRepository roleRepository, OperationRepository operationRepository,
          ClassificationRepository claseRepository, MetadataRepository metadataRepository, FieldRepository fieldRepository,
-         SchemaRepository schemaRepository, LevelRepository levelRepository, SchemaValuesRepository valuesRepository,
+         SchemaRepository schemaRepository, LevelRepository levelRepository, 
          RetentionRepository retentionRepository, UserGroupRepository userGroupRepository,
          PasswordEncoder passwordEncoder)
    {
@@ -115,7 +113,6 @@ public class DataGenerator implements HasLogger
       this.fieldRepository               = fieldRepository;
       this.metadataRepository            = metadataRepository;
       this.passwordEncoder               = passwordEncoder;
-      this.valuesRepository              = valuesRepository;
       this.retentionRepository           = retentionRepository;
       this.userGroupRepository           = userGroupRepository;
 
@@ -175,14 +172,9 @@ public class DataGenerator implements HasLogger
       Level.DEFAULT.buildCode();
       levelRepository.saveAndFlush(Level.DEFAULT);
       
-      SchemaValues.EMPTY.setTenant(tenant1);
-      SchemaValues.EMPTY.buildCode();
-      valuesRepository.saveAndFlush(SchemaValues.EMPTY);
-      
       Retention.DEFAULT.setTenant(tenant1);
       Retention.DEFAULT.buildCode();
       retentionRepository.saveAndFlush(Retention.DEFAULT);
-      
       
 
       getLogger().info("... generating metadata");
@@ -692,6 +684,7 @@ public class DataGenerator implements HasLogger
       Classification classificationClass = new Classification( level, name, parent, new ObjectToProtect());
 
       classificationClass.setTenant(tenant);
+      Schema schema = null;
 
       Level nivel = classificationClass.getLevel();
       if ( !nivel.isPersisted())
@@ -700,7 +693,7 @@ public class DataGenerator implements HasLogger
          if( newLevel == null || !nivel.getOrden().equals(newLevel.getOrden()))
          {
             nivel.setTenant(tenant);
-            Schema schema = nivel.getSchema();
+            schema = nivel.getSchema();
             if ( !schema.isPersisted())
             {
                schema.setTenant(tenant);
@@ -709,8 +702,13 @@ public class DataGenerator implements HasLogger
             levelRepository.saveAndFlush(nivel);
          }else {
             classificationClass.setLevel(newLevel);
+            schema = newLevel.getSchema();
          }
+      }else {
+         schema = nivel.getSchema();
       }
+      SchemaValues values = new SchemaValues(schema,null);
+      classificationClass.setSchemaValues(values);
       claseRepository.saveAndFlush(classificationClass);
       return classificationClass;
    }//createClass
