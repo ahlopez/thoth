@@ -13,7 +13,7 @@ public class Constant
    public static final Integer MAX_CATEGORY     = new Integer(5);
    public static final Integer DEFAULT_CATEGORY = MIN_CATEGORY;
    public static final Integer ADMIN_CATEGORY   = MAX_CATEGORY - 1;
-   public static final String  VALUE_SEPARATOR = "||";
+   public static final String  VALUE_SEPARATOR = ";";
    public static final String  NULL_VALUE = "*";
 
    public static final String PAGE_ROOT = "";

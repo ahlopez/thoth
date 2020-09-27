@@ -190,7 +190,7 @@ public class DataGenerator implements HasLogger
       Field    colorField = createField("Colores",   enumMeta, true, false, true, 5, 1);
 
       Metadata claseMeta     = createMeta("Security", Type.ENUM, "Restringido;Confidencial;Interno;Público");
-      Field    securityField = createField("Seguridad", enumMeta, true, false, true, 5, 1);
+      Field    securityField = createField("Seguridad", claseMeta, true, false, true, 5, 1);
 
       Metadata intMeta   = createMeta("Entero", Type.INTEGER, " >0; < 100");
       Field    cantField = createField("Cantidad", intMeta, true, false, true, 5, 1);

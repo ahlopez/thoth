@@ -53,6 +53,7 @@ public class ClassificationForm extends FormLayout
 
       LocalDate now = LocalDate.now();
       LocalDate yearStart =now.minusDays(now.getDayOfYear());
+      
       DatePicker fromDate = new DatePicker("Válida Desde");
       fromDate.setRequired(true);
       fromDate.setValue(now);
@@ -92,15 +93,21 @@ public class ClassificationForm extends FormLayout
             .withConverter(DATE_CONVERTER)
             .withValidator( dateFrom ->
                  {
-                       LocalDate dateTo = toDate.getValue();
-                       return dateTo != null && dateFrom.equals(dateTo) || dateFrom.isBefore(dateTo);
-                 }, "Fecha de cierre debe posterior a la de apertura")
+                    LocalDate dateTo = toDate.getValue();
+                    return dateTo == null || (dateFrom != null && dateFrom.equals(dateTo) || dateFrom.isBefore(dateTo));
+                 },         "Fecha de cierre debe posterior a la de apertura")
             .bind("dateOpened");
+            
 
       binder.forField(toDate)
             .asRequired()
             .withConverter(DATE_CONVERTER)
-            .withValidator( dateTo -> dateTo.equals(fromDate.getValue()) || dateTo.isAfter(fromDate.getValue()), 
+            .withValidator( dateTo -> 
+                            {
+                               LocalDate dateFrom = fromDate.getValue();
+                               boolean ok =  dateFrom != null && dateTo != null && ( dateTo.equals(dateFrom) || dateTo.isAfter(dateFrom));
+                               return ok;
+                            },
                             "Fecha de cierre debe posterior a la de apertura")
             .bind("dateClosed");
       

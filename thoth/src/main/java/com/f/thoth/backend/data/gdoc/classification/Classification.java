@@ -37,13 +37,6 @@ import com.f.thoth.backend.data.security.UserGroup;
  * Representa una clase del esquema de clasificación documental
  */
 
-/*
- * @NamedEntityGraph(name = "graph.module.projects.contractors",
-        attributeNodes = @NamedAttributeNode(value = "projects", subgraph = "projects.contractors"),
-        subgraphs = @NamedSubgraph(name = "projects.contractors",
-                attributeNodes = @NamedAttributeNode(value = "contractors")))
-
- */
 @NamedEntityGraphs({
    @NamedEntityGraph(
          name = Classification.BRIEF,
@@ -52,6 +45,8 @@ import com.f.thoth.backend.data.security.UserGroup;
             @NamedAttributeNode("code"),
             @NamedAttributeNode("name"),
             @NamedAttributeNode("owner"),
+            @NamedAttributeNode("dateOpened"),
+            @NamedAttributeNode("dateClosed"),
             @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF)
          },
          subgraphs = @NamedSubgraph(name = ObjectToProtect.BRIEF,
@@ -70,6 +65,8 @@ import com.f.thoth.backend.data.security.UserGroup;
                @NamedAttributeNode("name"),
                @NamedAttributeNode("owner"),
                @NamedAttributeNode("level"),
+               @NamedAttributeNode("dateOpened"),
+               @NamedAttributeNode("dateClosed"),
                @NamedAttributeNode("metadata"),
                @NamedAttributeNode("retentionSchedule"),
                @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)

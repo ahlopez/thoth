@@ -1,5 +1,8 @@
 package com.f.thoth.ui.views.classification;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.classification.Level;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
@@ -86,25 +89,39 @@ public class ClassificationValuesForm extends VerticalLayout
    
    private void validateAndSave() 
    {
-       StringBuilder values = new StringBuilder();
-       schemaFields.getChildren().forEach( c->  
-       {
-          int i =0;
-          if (c instanceof HasValue<?,?>)
-          {  
-             Object val = ((HasValue<?,?>)c).getValue();
-             if(i++ > 0)
-                values.append(Constant.VALUE_SEPARATOR);
-             
-            values.append(val == null? Constant.NULL_VALUE: val.toString());
-          }
-       });
-       
-       SchemaValues vals = new SchemaValues(schema, values.toString());
+       String values = getValuesFromFields(schemaFields);
+       SchemaValues vals = new SchemaValues(schema, values);
        classification.setSchemaValues(vals);
        endEditing();
        fireEvent(new SaveEvent(this, classification));
    }//validateAndSave
+   
+   private String getValuesFromFields( Component schemaFields)
+   {
+      List<Component> fields = new ArrayList<>();
+      schemaFields.getChildren().forEach( c -> 
+      {           
+       if (c instanceof HasValue<?,?>) 
+          fields.add(c);
+      });
+      
+      int i= 0;
+      StringBuilder values = null;
+      for (Component field: fields)
+      {
+         Object val = ((HasValue<?,?>)field).getValue();
+         if(i++ == 0)
+            values = new StringBuilder();
+         else
+            values.append(Constant.VALUE_SEPARATOR);
+            
+         values.append(val == null? Constant.NULL_VALUE: val.toString());
+      }
+      
+      return values == null? null: values.toString();
+      
+   }//getValuesFromFields
+   
 
    
    private Component createButtonsLayout() 
