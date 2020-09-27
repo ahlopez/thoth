@@ -6,7 +6,6 @@ import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.gdoc.metadata.vaadin.SchemaToVaadinExporter;
 import com.f.thoth.backend.data.gdoc.metadata.vaadin.SchemaValuesToVaadinExporter;
-import com.f.thoth.ui.components.Notifier;
 import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
@@ -15,21 +14,23 @@ import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.shared.Registration;
 
 public class ClassificationValuesForm extends VerticalLayout
 {
-   private Classification  classification  = null;
-   private SchemaValues    schemaValues    = null; 
-   private Schema          schema          = null;
+   private Classification        classification = null;
+   private SchemaValues          schemaValues   = null; 
+   private Schema                schema         = null;
+
+   private Component             schemaFields   = null;
+   private Schema.Exporter       schemaExporter = new SchemaToVaadinExporter();
+   private SchemaValues.Exporter valuesExporter = new SchemaValuesToVaadinExporter();
+   
    private Button          save ;
    private Button          close;
-
-   private Component       schemaFields;
-   private Schema.Exporter schemaExporter       = new SchemaToVaadinExporter();
-   private SchemaValues.Exporter valuesExporter = new SchemaValuesToVaadinExporter();
 
    public ClassificationValuesForm() 
    {  
@@ -55,33 +56,17 @@ public class ClassificationValuesForm extends VerticalLayout
       startEditing();
    }//setClassification
    
+   
    private Component getFields( Classification classification)
    {
-      Component fields = null;
       this.schemaValues    = classification.getMetadata();
       if ( schemaValues != null)
-      {   // If the classification has values, get the component from the values
-          this.schema = schemaValues.getSchema();
-          fields      = (Component)schemaValues.export(valuesExporter);
-      }
-      Level level          = classification.getLevel();
-      if ( level ==  null)
-      {
-         Notifier.error("No hay un nivel definido");
-         return null;
-      }
-      Schema levelSchema = level.getSchema();
-      if (!levelSchema.equals(schema) )
-      {
-         Notifier.error("Esquema del nivel["+ levelSchema.getCode()+ "] diferente del esquema de la clasificación["+ schema.getCode()+ "]");
-         return null;
-      }
-      if ( schemaValues == null)            // Else if the classification still has no values, get the component from the schema
-             fields = (Component)level.getSchema().export(schemaExporter);
+          return (Component)schemaValues.export(valuesExporter);
       
-      return fields;
-   }//getFields
-   
+      Level level  = classification.getLevel();
+      return ( level !=  null)? (Component)level.getSchema().export(schemaExporter): new FormLayout();
+
+   }//getFields  
    
    
    private void startEditing()

@@ -67,6 +67,7 @@ public class SchemaValuesToVaadinExporter implements Exporter
    @Override
    public Object getProduct() { return exportedSchema; }
    
+   
    @SuppressWarnings("unchecked")
    private void setValue( HasValue<?,?> field, String value)
    {
@@ -74,7 +75,7 @@ public class SchemaValuesToVaadinExporter implements Exporter
          ((TextField)field).setValue(value);
       else if (field instanceof DateTimePicker)
       {
-         LocalDateTime dateTime = (TextUtil.isEmpty(value) || value.toLowerCase().equals("now"))? 
+         LocalDateTime dateTime = (TextUtil.isEmpty(value) || value.trim().toLowerCase().equals("now"))? 
                                   LocalDateTime.now(): 
                                   LocalDateTime.parse(value);
          ((DateTimePicker)field).setValue(dateTime);
