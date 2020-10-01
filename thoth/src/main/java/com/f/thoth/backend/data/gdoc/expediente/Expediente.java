@@ -18,7 +18,7 @@ import javax.validation.constraints.Size;
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
-import com.f.thoth.backend.data.gdoc.metadata.DocType;
+import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
@@ -53,7 +53,7 @@ public abstract class Expediente extends BaseEntity implements NeedsProtection, 
    private FileIndex          index;
 
    @ManyToOne
-   private DocType            attributes;
+   private DocumentType            attributes;
 
    @NotNull(message = "{evidentia.dateopened.required}")
    private LocalDateTime      openingDate;
@@ -107,8 +107,8 @@ public abstract class Expediente extends BaseEntity implements NeedsProtection, 
    public FileIndex getIndex() {return index;}
    public void setIndex(FileIndex index) {this.index = index;}
 
-   public DocType getAttributes() {return attributes;}
-   public void setAttributes(DocType attributes) {this.attributes = attributes;}
+   public DocumentType getAttributes() {return attributes;}
+   public void setAttributes(DocumentType attributes) {this.attributes = attributes;}
 
    public LocalDateTime getOpeningDate() {return openingDate;}
    public void setOpeningDate(LocalDateTime openingDate) {this.openingDate = openingDate;}

@@ -12,7 +12,7 @@ import com.f.thoth.backend.data.gdoc.document.CompositeDocument;
 import com.f.thoth.backend.data.gdoc.document.Document;
 import com.f.thoth.backend.data.gdoc.document.Publicity;
 import com.f.thoth.backend.data.gdoc.document.SimpleDocument;
-import com.f.thoth.backend.data.gdoc.metadata.DocType;
+import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.ui.utils.FormattingUtils;
 
@@ -56,7 +56,7 @@ public class CompositeDocumentToJackExporter implements CompositeDocument.Export
 
    }//initExport
 
-   @Override public void   exportBasic (String id, DocType docType, boolean isRecord, Publicity  publicity, LocalDateTime endClassification)
+   @Override public void   exportBasic (String id, DocumentType docType, boolean isRecord, Publicity  publicity, LocalDateTime endClassification)
    {
       try {
          node.setProperty("evid:radicado",  id);

@@ -32,9 +32,6 @@ public class ClassificationService implements FilterableCrudService<Classificati
    private final PermissionRepository           permissionRepository;
    private final ObjectToProtectRepository      objectToProtectRepository;
    private final LevelRepository                levelRepository;
-   {
-      // TODO Auto-generated constructor stub
-   }
 
    @Autowired
    public ClassificationService(ClassificationRepository     claseRepository,
@@ -170,8 +167,8 @@ public class ClassificationService implements FilterableCrudService<Classificati
          }
       });
 
-   }//grant
+   }//revoke
 
 
 
-}//ClaseService
+}//ClassificcationService

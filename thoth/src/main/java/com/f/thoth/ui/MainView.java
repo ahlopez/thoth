@@ -20,6 +20,7 @@ import com.f.thoth.ui.views.classification.ClassificationView;
 import com.f.thoth.ui.views.classification.LevelView;
 import com.f.thoth.ui.views.classification.RetentionView;
 import com.f.thoth.ui.views.dashboard.DashboardView;
+import com.f.thoth.ui.views.metadata.DocumentTypeView;
 import com.f.thoth.ui.views.metadata.MetadataSchemaView;
 import com.f.thoth.ui.views.metadata.MetadataView;
 import com.f.thoth.ui.views.security.permission.AccessPermissionView;
@@ -195,8 +196,8 @@ public class MainView extends AppLayout
       if (SecurityUtils.isAccessGranted(MetadataSchemaView.class))
          propertiesMenu.addItem(createRoute(VaadinIcon.CUBES, Constant.TITLE_ESQUEMAS_METADATA, MetadataSchemaView.class));
 
-      if (SecurityUtils.isAccessGranted(MetadataSchemaView.class))
-         propertiesMenu.addItem(createRoute(VaadinIcon.GRID_BIG_O, Constant.TITLE_TIPOS_DOCUMENTALES, MetadataSchemaView.class));
+      if (SecurityUtils.isAccessGranted(DocumentTypeView.class))
+         propertiesMenu.addItem(createRoute(VaadinIcon.GRID_BIG_O, Constant.TITLE_TIPOS_DOCUMENTALES, DocumentTypeView.class));
 
       if ( propertiesMenu.getItems().size() > 0)
          mainMenu.add(properties);

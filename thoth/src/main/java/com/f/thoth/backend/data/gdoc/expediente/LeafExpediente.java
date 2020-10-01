@@ -13,7 +13,7 @@ import javax.persistence.Table;
 
 import org.hibernate.annotations.BatchSize;
 
-import com.f.thoth.backend.data.gdoc.metadata.DocType;
+import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 
 /**
  * Representa un sub-Expediente hoja
@@ -25,7 +25,7 @@ public class LeafExpediente extends Expediente
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
    @JoinColumn(name="doctype_id")
    @BatchSize(size = 20)
-   public Set<DocType>  admissibleTypes;
+   public Set<DocumentType>  admissibleTypes;
 
    // --------------- Constructors --------------------
    public LeafExpediente()
@@ -35,7 +35,7 @@ public class LeafExpediente extends Expediente
    }//LeafExpediente
 
 
-   public LeafExpediente( String name, BranchExpediente owner, Set<DocType> admissibleTypes)
+   public LeafExpediente( String name, BranchExpediente owner, Set<DocumentType> admissibleTypes)
    {
       super(name, owner);
       if ( admissibleTypes == null || admissibleTypes.size() == 0)
@@ -47,8 +47,8 @@ public class LeafExpediente extends Expediente
 
    // ---------------- Getters & Setters ---------------
 
-   public Set<DocType> getAdmissibleTypes(){ return admissibleTypes;}
-   public void         setAdmissibleTypes(Set<DocType> admissibleTypes){ this.admissibleTypes = admissibleTypes;}
+   public Set<DocumentType> getAdmissibleTypes(){ return admissibleTypes;}
+   public void         setAdmissibleTypes(Set<DocumentType> admissibleTypes){ this.admissibleTypes = admissibleTypes;}
 
    // ---------------- Object Methods ------------------
 

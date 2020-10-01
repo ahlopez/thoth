@@ -2,7 +2,7 @@ package com.f.thoth.backend.data.gdoc.document;
 
 import java.time.LocalDateTime;
 
-import com.f.thoth.backend.data.gdoc.metadata.DocType;
+import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 
 /**
@@ -15,7 +15,7 @@ public interface SimpleDocumentImporter
 
    public void    setId( String id);
 
-   public void    setDocType( DocType docType);
+   public void    setDocType( DocumentType docType);
 
    public void    setMetaValues( SchemaValues metaValues);
 

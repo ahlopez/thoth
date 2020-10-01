@@ -16,7 +16,7 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.BatchSize;
 
 import com.f.thoth.backend.data.gdoc.document.Document;
-import com.f.thoth.backend.data.gdoc.metadata.DocType;
+import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 
 /**
  * Representa un volumen documental (segun Moreq)
@@ -34,7 +34,7 @@ public class Volume extends Expediente
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
    @JoinColumn(name="doctype_id")
    @BatchSize(size = 20)
-   public Set<DocType > admissibleTypes;
+   public Set<DocumentType > admissibleTypes;
 
    public Volume()
    {
@@ -44,7 +44,7 @@ public class Volume extends Expediente
    }//Volume
 
 
-   public Volume( Set<Document> documents, Set<DocType> admissibleTypes, BranchExpediente parent)
+   public Volume( Set<Document> documents, Set<DocumentType> admissibleTypes, BranchExpediente parent)
    {
       super();
       if ( admissibleTypes == null || admissibleTypes.size() == 0)
@@ -64,8 +64,8 @@ public class Volume extends Expediente
    public Set<Document> getDocuments() {return documents;}
    public void setDocuments(Set<Document> documents) {   this.documents = documents;}
 
-   public Set<DocType> getAdmissibleTypes() {return admissibleTypes;}
-   public void setAdmissibleTypes(Set<DocType> admissibleTypes) {this.admissibleTypes = admissibleTypes;}
+   public Set<DocumentType> getAdmissibleTypes() {return admissibleTypes;}
+   public void setAdmissibleTypes(Set<DocumentType> admissibleTypes) {this.admissibleTypes = admissibleTypes;}
 
    // ------------------- Object ---------------------------------
 

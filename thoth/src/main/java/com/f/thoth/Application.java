@@ -16,7 +16,7 @@ import com.f.thoth.backend.data.gdoc.classification.Retention;
 import com.f.thoth.backend.data.gdoc.expediente.Expediente;
 import com.f.thoth.backend.data.gdoc.expediente.FileIndex;
 import com.f.thoth.backend.data.gdoc.expediente.IndexEntry;
-import com.f.thoth.backend.data.gdoc.metadata.DocType;
+import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.gdoc.metadata.Metadata;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
@@ -67,7 +67,7 @@ import com.f.thoth.ui.MainView;
             Schema.class,
             SchemaValues.class,
             Metadata.class,
-            DocType.class,
+            DocumentType.class,
             Retention.class
          },
            exclude = ErrorMvcAutoConfiguration.class
@@ -100,7 +100,7 @@ import com.f.thoth.ui.MainView;
            Schema.class,
            Metadata.class,
            SchemaValues.class,
-           DocType.class,
+           DocumentType.class,
            Retention.class,
          }
       )

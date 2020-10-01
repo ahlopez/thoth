@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 import com.f.thoth.backend.data.entity.util.TextUtil;
-import com.f.thoth.backend.data.gdoc.metadata.DocType;
+import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.ui.utils.FormattingUtils;
 
@@ -26,7 +26,7 @@ public class SimpleDocument implements Document, SimpleDocumentImporter
    private String        id;
 
    @NotNull (message = "{evidentia.type.required}")
-   private DocType       docType;
+   private DocumentType       docType;
 
    @NotNull (message = "{evidentia.metadata.required}")
    private SchemaValues    metaValues;
@@ -47,7 +47,7 @@ public class SimpleDocument implements Document, SimpleDocumentImporter
       super();
    }
 
-   public SimpleDocument( String id, DocType docType, Publicity publicity, boolean record, LocalDateTime endClassification)
+   public SimpleDocument( String id, DocumentType docType, Publicity publicity, boolean record, LocalDateTime endClassification)
    {
       if (id == null)
          throw new IllegalArgumentException("Identificador del documento no puede ser nulo");
@@ -86,8 +86,8 @@ public class SimpleDocument implements Document, SimpleDocumentImporter
    public String          getId()  { return id;}
    @Override public void  setId( String id) { this.id = id;}
 
-   public DocType         getDocType() { return docType;}
-   @Override public void  setDocType( DocType docType) { this.docType = docType;}
+   public DocumentType         getDocType() { return docType;}
+   @Override public void  setDocType( DocumentType docType) { this.docType = docType;}
 
    public SchemaValues    getMetaValues() { return metaValues;}
    @Override public void  setMetaValues( SchemaValues metaValues) { this.metaValues = metaValues;}
@@ -160,7 +160,7 @@ public class SimpleDocument implements Document, SimpleDocumentImporter
    {
       public void   initExport();
 
-      public void   exportBasic (String id, DocType docType, boolean isRecord, Publicity publicity, LocalDateTime endClassification);
+      public void   exportBasic (String id, DocumentType docType, boolean isRecord, Publicity publicity, LocalDateTime endClassification);
 
       public void   exportMeta ( SchemaValues values);
 

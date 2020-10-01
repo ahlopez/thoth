@@ -23,7 +23,7 @@ import javax.validation.constraints.Size;
 
 import com.f.thoth.backend.data.entity.AbstractEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
-import com.f.thoth.backend.data.gdoc.metadata.DocType;
+import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 
 
 /**
@@ -126,7 +126,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
    @Transient
    private Set<UserGroup>   userGroups;
    @Transient
-   private Set<DocType>     docTypes;
+   private Set<DocumentType>     docTypes;
 
 
    // ------------- Constructors ----------------------
@@ -223,8 +223,8 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
    public Set<UserGroup>   getUserGroups() { return userGroups;}
    public void             setUserGroups( Set<UserGroup> userGroups){ this.userGroups = userGroups;}
 
-   public Set<DocType>   getDocTypes() { return docTypes;}
-   public void           setDocTypes( Set<DocType> docTypes){ this.docTypes = docTypes;}
+   public Set<DocumentType>   getDocTypes() { return docTypes;}
+   public void           setDocTypes( Set<DocumentType> docTypes){ this.docTypes = docTypes;}
 
    // --------------- Object methods ------------------
 
@@ -267,9 +267,9 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 
    // --------------- Logic ---------------------
 
-   public boolean contains( DocType type) { return docTypes.contains(type);}
+   public boolean contains( DocumentType type) { return docTypes.contains(type);}
 
-   public void addType( DocType type) { docTypes.add(type);}
+   public void addType( DocumentType type) { docTypes.add(type);}
 
    public void addRole( Role role) { roles.add(role);}
 
@@ -295,9 +295,9 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
       return null;
    }//getUserGroupById
 
-   public DocType getTypeById( String code)
+   public DocumentType getTypeById( String code)
    {
-      for (DocType dt: docTypes)
+      for (DocumentType dt: docTypes)
       {
          if( dt.getCode().equals(code))
             return dt;

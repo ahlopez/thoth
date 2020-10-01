@@ -11,7 +11,7 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.document.Content;
 import com.f.thoth.backend.data.gdoc.document.Publicity;
 import com.f.thoth.backend.data.gdoc.document.SimpleDocument;
-import com.f.thoth.backend.data.gdoc.metadata.DocType;
+import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.ui.utils.FormattingUtils;
@@ -56,7 +56,7 @@ public class SimpleDocumentToJackExporter implements SimpleDocument.Exporter
 
    }//initExport
 
-   @Override public void   exportBasic (String id, DocType docType, boolean isRecord, Publicity  publicity, LocalDateTime endClassification)
+   @Override public void   exportBasic (String id, DocumentType docType, boolean isRecord, Publicity  publicity, LocalDateTime endClassification)
    {
       try
       {

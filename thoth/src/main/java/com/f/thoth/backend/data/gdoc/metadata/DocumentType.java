@@ -32,7 +32,7 @@ import com.f.thoth.backend.data.security.UserGroup;
  */
 @NamedEntityGraphs({
    @NamedEntityGraph(
-         name = DocType.BRIEF,
+         name = DocumentType.BRIEF,
          attributeNodes = {
                @NamedAttributeNode("tenant"),
                @NamedAttributeNode("code"),
@@ -51,7 +51,7 @@ import com.f.thoth.backend.data.security.UserGroup;
                })
          ),
    @NamedEntityGraph(
-         name = DocType.FULL,
+         name = DocumentType.FULL,
          attributeNodes = {
                @NamedAttributeNode("tenant"),
                @NamedAttributeNode("code"),
@@ -72,8 +72,8 @@ import com.f.thoth.backend.data.security.UserGroup;
             )
          })
 @Entity
-@Table(name = "DOC_TYPE", indexes = { @Index(columnList = "code") })
-public class DocType extends BaseEntity implements NeedsProtection, HierarchicalEntity<DocType>, Comparable<DocType>
+@Table(name = "DOCUMENT_TYPE", indexes = { @Index(columnList = "code") })
+public class DocumentType extends BaseEntity implements NeedsProtection, HierarchicalEntity<DocumentType>, Comparable<DocumentType>
 {
    public static final String BRIEF = "DocType.brief";
    public static final String FULL  = "DocType.full";
@@ -88,7 +88,7 @@ public class DocType extends BaseEntity implements NeedsProtection, Hierarchical
    protected ObjectToProtect  objectToProtect;
 
    @ManyToOne
-   protected DocType          owner;
+   protected DocumentType     owner;
 
    @ManyToOne
    @NotNull (message = "{evidentia.schema.required}")
@@ -99,7 +99,7 @@ public class DocType extends BaseEntity implements NeedsProtection, Hierarchical
 
 
    // ------------- Constructors ------------------
-   public DocType()
+   public DocumentType()
    {
       super();
       name = "[name]";
@@ -107,7 +107,7 @@ public class DocType extends BaseEntity implements NeedsProtection, Hierarchical
       buildCode();
    }// DocType constructor
 
-   public DocType( String name, Schema schema, DocType owner, boolean requiresContent)
+   public DocumentType( String name, Schema schema, DocumentType owner, boolean requiresContent)
    {
       super();
       if( TextUtil.isEmpty(name))
@@ -129,10 +129,11 @@ public class DocType extends BaseEntity implements NeedsProtection, Hierarchical
 
    private void init()
    {
-      this.name     = "[name]";
-      this.owner    = null;
-      this.schema   = Schema.EMPTY;
+      this.name            = "[nombre]";
+      this.owner           = null;
+      this.schema          = Schema.EMPTY;
       this.requiresContent = false;
+      this.objectToProtect = new ObjectToProtect();
    }//init
 
    @PrePersist
@@ -158,7 +159,7 @@ public class DocType extends BaseEntity implements NeedsProtection, Hierarchical
 
    public void        setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect; }
 
-   public void        setOwner(DocType owner) { this.owner = owner;}
+   public void        setOwner(DocumentType owner) { this.owner = owner;}
 
    public Schema      getSchema() { return schema;}
    public void        setSchema( Schema schema){ this.schema = schema;}
@@ -169,7 +170,7 @@ public class DocType extends BaseEntity implements NeedsProtection, Hierarchical
    // --------------------------- Implements HierarchicalEntity ---------------------------------------
    @Override public String      getName()   { return name;}
 
-   @Override public DocType     getOwner()  { return owner;}
+   @Override public DocumentType     getOwner()  { return owner;}
 
    private String getOwnerCode(){ return (owner == null ? "" : owner.getOwnerCode())+ ":"+ name; }
 
@@ -198,10 +199,10 @@ public class DocType extends BaseEntity implements NeedsProtection, Hierarchical
       if (this == o)
          return true;
 
-      if (!(o instanceof DocType ))
+      if (!(o instanceof DocumentType ))
          return false;
 
-      DocType that = (DocType) o;
+      DocumentType that = (DocumentType) o;
       return this.id != null && this.id.equals(that.id);
 
    }//equals
@@ -225,7 +226,7 @@ public class DocType extends BaseEntity implements NeedsProtection, Hierarchical
 
    }//toString
 
-   @Override  public int compareTo(DocType that)
+   @Override  public int compareTo(DocumentType that)
    {
       return this.equals(that)?  0 :
              that == null?       1 :
