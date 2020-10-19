@@ -253,7 +253,7 @@
 
         <!-- JackRabbit y MongoDB -->
 
-        <!-- https://mvnrepository.com/artifact/javax.jcr/jcr -->
+        <!-- https://mvnrepository.com/artifact/javax.jcr/jcr ...(JackRabbit)-->
         <dependency>
             <groupId>javax.jcr</groupId>
             <artifactId>jcr</artifactId>
@@ -275,6 +275,7 @@
             <groupId>org.reactivestreams</groupId>
             <artifactId>reactive-streams</artifactId>
         </dependency>
+        
         <!-- Testing -->
         <dependency>
             <groupId>com.vaadin</groupId>

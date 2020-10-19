@@ -207,7 +207,6 @@ public class DocumentTypeView extends VerticalLayout
       documentTypeForm.setDocumentType(null);
       documentTypeForm.setVisible(false);
       documentTypeForm.removeClassName("selected-item-form");
-
    }//closeEditor
    
    

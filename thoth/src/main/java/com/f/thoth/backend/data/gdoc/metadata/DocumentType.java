@@ -95,7 +95,17 @@ public class DocumentType extends BaseEntity implements NeedsProtection, Hierarc
    protected Schema           schema;
 
    protected boolean          requiresContent;
-
+   
+   // Considerar definirlo como "Abstract"    boolean according to JCR pag 39 &3.7.1.3
+   // Considerar definirlo como "Mixin"       boolean according to JCR pag 39 &3.7.1.4
+   // Considerar definirlo como "Queryable"   boolean according to JCR pag 39 &3.7.1.5
+   // Considerar definirlo como "Orderable"   boolean according to JCR pag 39 &3.7.1.6 (para expedientes)
+   // Considerar definirlo como "Autocreated" boolean according to JCR pag 42 &3.7.2.3
+   // Considerar definirlo como "Mandatory"   boolean according to JCR pag 42 &3.7.2.4
+   
+   // Properties can be defined as "Full-text searchable"  boolean according to JCR pag 44 &3.7.3.4
+   // Properties can be defined as "Query-orderable"       boolean according to JCR pag 44 &3.7.3.5 Requires node be "Queryable"  &3.7.1.5
+   // Properties have value constraints (array of Strings)
 
 
    // ------------- Constructors ------------------
