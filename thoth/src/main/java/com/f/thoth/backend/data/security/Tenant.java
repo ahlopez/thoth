@@ -66,27 +66,28 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
    @NotEmpty(message = "{evidentia.name.required}")
    @Size(min = 2, max = 255, message="{evidentia.name.minmaxlength}")
    @Column(unique = true)
-   private String       name;
+   private String       name;                        // Nombre del Tenant
 
    @NotNull (message = "{evidentia.code.required}")
    @NotEmpty(message = "{evidentia.code.required}")
    @Size(max = 255, message="{evidentia.code.maxlength}")
    @Column(unique = true)
-   protected String code;
+   protected String code;                            // Código del workspace del Tenant
 
    @NotEmpty(message = "{evidentia.email.required}")
    @Email
    @Size(min=3, max = 255, message="{evidentia.email.length}")
-   private String       administrator;
+   private String       administrator;               // Administrador general del Tenant
 
    @NotNull(message = "{evidentia.date.required}")
    @PastOrPresent(message="{evidentia.date.pastorpresent}")
-   protected LocalDate  fromDate;
+   protected LocalDate  fromDate;                    // Fecha desde la cual puede usar el sistema (inclusive)
 
    @NotNull(message = "{evidentia.date.required}")
-   protected LocalDate  toDate;
+   protected LocalDate  toDate;                      // Fecha hasta la cual puede usar el sistema (inclusive)
 
-   protected boolean locked = false;
+   protected boolean locked = false;                 // Está el Tenant bloqueado? (No puede usar el sistema)
+      
 
    /*
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
@@ -120,11 +121,14 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
    */
 
    @Transient
-   private Set<Role>        roles;
+   private Set<Role>             roles;
+   
    @Transient
-   private Set<SingleUser>  singleUsers;
+   private Set<SingleUser>       singleUsers;
+   
    @Transient
-   private Set<UserGroup>   userGroups;
+   private Set<UserGroup>        userGroups;
+   
    @Transient
    private Set<DocumentType>     docTypes;
 

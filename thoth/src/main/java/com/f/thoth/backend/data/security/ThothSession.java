@@ -19,9 +19,9 @@ public class ThothSession
    public  static Tenant getTenant() { return tenant;}
    public  static void   setTenant(Tenant currentTenant) { tenant = currentTenant;}
    
-   private static User user;
-   public static User getUser(){ return user;   }
-   public static void setUser(User currentUser) { user = currentUser; }
+   private static User   user;
+   public  static User   getUser(){ return user;   }
+   public  static void   setUser(User currentUser) { user = currentUser; }
    
 
    public ThothSession( @Autowired TenantService tService)

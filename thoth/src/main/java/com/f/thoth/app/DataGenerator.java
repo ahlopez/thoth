@@ -1,5 +1,6 @@
 package com.f.thoth.app;
 
+import java.net.UnknownHostException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -12,7 +13,16 @@ import java.util.TreeSet;
 import java.util.function.Supplier;
 
 import javax.annotation.PostConstruct;
+import javax.jcr.Node;
+import javax.jcr.Repository;
+import javax.jcr.RepositoryException;
+import javax.jcr.Session;
+import javax.jcr.SimpleCredentials;
 
+import org.apache.jackrabbit.oak.Oak;
+import org.apache.jackrabbit.oak.jcr.Jcr;
+import org.apache.jackrabbit.oak.plugins.document.DocumentMK;
+import org.apache.jackrabbit.oak.plugins.document.DocumentNodeStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -85,6 +95,9 @@ public class DataGenerator implements HasLogger
    private FieldRepository               fieldRepository;
    private RetentionRepository           retentionRepository;
    private UserGroupRepository           userGroupRepository;
+   private Repository                    repo;
+   private Session                       jcrSession;
+   private Node                          workspace;
 
    @Autowired
    public DataGenerator(TenantService tenantService, OrderRepository orderRepository, UserRepository userRepository,
@@ -116,164 +129,229 @@ public class DataGenerator implements HasLogger
 
    @SuppressWarnings("unused")
    @PostConstruct
-   public void loadData() {
-      if (userRepository.count() != 0L)
+   public void loadData() 
+   {
+      try
       {
-         getLogger().info("Using existing database");
-         return;
+         if (userRepository.count() != 0L)
+         {
+            getLogger().info("Using existing database");
+            return;
+         }      
+
+         getLogger().info("Generating demo data");
+
+         getLogger().info("... generating tenants");
+         ThothSession session = new ThothSession(tenantService);
+         Tenant tenant1 = createTenant(tenantRepository, "FCN");
+         ThothSession.setTenant(tenant1);
+
+         Tenant tenant2 = createTenant(tenantRepository,"SEI");
+         getLogger().info("... generating roles");
+         com.f.thoth.backend.data.security.Role role1 = createRole(tenant1, "Gerente");
+         com.f.thoth.backend.data.security.Role role2 = createRole(tenant1, "Admin");
+         com.f.thoth.backend.data.security.Role role3 = createRole(tenant1, "Supervisor");
+         com.f.thoth.backend.data.security.Role role4 = createRole(tenant1, "Operador");
+         com.f.thoth.backend.data.security.Role role5 = createRole(tenant1, "Publico");
+
+         tenant1.addRole(role1);
+         tenant1.addRole(role2);
+         tenant1.addRole(role3);
+         tenant1.addRole(role4);
+         tenant1.addRole(role5);
+
+         com.f.thoth.backend.data.security.Role role6  = createRole(tenant2, "CEO");
+         com.f.thoth.backend.data.security.Role role7  = createRole(tenant2, "Admin2");
+         com.f.thoth.backend.data.security.Role role8  = createRole(tenant2, "CFO");
+         com.f.thoth.backend.data.security.Role role9  = createRole(tenant2, "CIO");
+         com.f.thoth.backend.data.security.Role role10 = createRole(tenant2, "COO");
+
+         tenant2.addRole(role6);
+         tenant2.addRole(role7);
+         tenant2.addRole(role8);
+         tenant2.addRole(role9);
+         tenant2.addRole(role10);
+         
+         // ----------- Inicialice el repositorio documental ----------------------
+         getLogger().info("Initializing jcr repository");  
+         
+         initJCRRepo();
+         
+         getLogger().info("...Acquiring a repo session");
+         jcrSession = loginToRepo(repo, "admin", "admin");
+         
+         getLogger().info("...Creating default workspace");
+         initWorkspace("FCN");
+         
+         // ----------- Respetar este orden para la inicialización de estos default -------------
+         getLogger().info("... generating defaults");
+         
+         Schema.EMPTY.setTenant(tenant1);
+         Schema.EMPTY.buildCode();
+         schemaRepository.saveAndFlush(Schema.EMPTY);
+         
+         Level.DEFAULT.setTenant(tenant1);
+         Level.DEFAULT.buildCode();
+         levelRepository.saveAndFlush(Level.DEFAULT);
+         
+         Retention.DEFAULT.setTenant(tenant1);
+         Retention.DEFAULT.buildCode();
+         retentionRepository.saveAndFlush(Retention.DEFAULT);
+         
+
+         getLogger().info("... generating metadata");
+         Metadata nameMeta  = createMeta("String", Type.STRING, "length > 0");
+         Field    nameField = createField("Nombre", nameMeta, true, false, true, 1, 2);
+         Field    bossField = createField("Jefe",   nameMeta, true, false, true, 2, 2);
+
+         Metadata dateMeta  = createMeta("Fecha", Type.DATETIME, "not null");
+         Field    fromField = createField("Desde", dateMeta, true, false, true, 3, 2);
+         Field    toField   = createField("Hasta", dateMeta, true, false, true, 4, 2);
+
+         Metadata enumMeta   = createMeta("Color",    Type.ENUM, "Verde;Rojo;Azul;Magenta;Cyan");
+         Field    colorField = createField("Colores",   enumMeta, true, false, true, 5, 1);
+
+         Metadata claseMeta     = createMeta("Security", Type.ENUM, "Restringido;Confidencial;Interno;Público");
+         Field    securityField = createField("Seguridad", claseMeta, true, false, true, 5, 1);
+
+         Metadata intMeta   = createMeta("Entero", Type.INTEGER, " >0; < 100");
+         Field    cantField = createField("Cantidad", intMeta, true, false, true, 5, 1);
+         Field    edadField = createField("Edad",     intMeta, true, true,  true, 6, 1);
+
+         Metadata decMeta   = createMeta("Decimal", Type.DECIMAL," >= 0.0");
+         Field    ratioField= createField("Razon", decMeta, true, false, true, 7, 1);
+
+         Schema  sedeSchema = createSchema("Sede");
+         sedeSchema.addField(fromField);
+         sedeSchema.addField(toField);
+         sedeSchema.addField(colorField);
+         sedeSchema.addField(securityField);
+         schemaRepository.saveAndFlush(sedeSchema);
+
+         Schema   officeSchema = createSchema("Office");
+         officeSchema.addField(bossField);
+         officeSchema.addField(fromField);
+         officeSchema.addField(toField);
+         officeSchema.addField(colorField);
+         schemaRepository.saveAndFlush(officeSchema);
+
+         Schema   seriesSchema = createSchema("Series");
+         seriesSchema.addField(fromField);
+         seriesSchema.addField(toField);
+         seriesSchema.addField(securityField);
+         schemaRepository.saveAndFlush(seriesSchema);
+
+         Schema   otherSchema = createSchema("Other");
+         otherSchema.addField(nameField);
+         otherSchema.addField(bossField);
+         otherSchema.addField(fromField);
+         otherSchema.addField(toField);
+         otherSchema.addField(cantField);
+         otherSchema.addField(edadField);
+         otherSchema.addField(ratioField);
+         schemaRepository.saveAndFlush(otherSchema);
+
+         Level level0 = new Level("Sede",     0, sedeSchema);
+         Level level1 = new Level("Oficina",  1, officeSchema);
+         Level level2 = new Level("Serie",    2, seriesSchema);
+         Level level3 = new Level("Subserie", 3, seriesSchema);
+         
+         Level levels[]  = { level0, level1, level2, level3};
+
+         getLogger().info("... generating Operations" );
+         OperationGenerator  opGenerator = new OperationGenerator(operationRepository);
+         opGenerator.registerOperations(tenant1);
+
+         getLogger().info("... generating Classification classes" );
+         ClassificationGenerator classificationGenerator = new ClassificationGenerator(claseRepository, levelRepository, schemaRepository, levels);
+         classificationGenerator.registerClasses(tenant1);
+         
+
+         getLogger().info("... generating users");
+         User baker = createBaker(userRepository, passwordEncoder);
+         User barista = createBarista(userRepository, passwordEncoder);
+         createAdmin(userRepository, passwordEncoder);
+         // A set of products without constrains that can be deleted
+         createDeletableUsers(userRepository, passwordEncoder);
+         
+         getLogger().info("... generating user groups");
+         LocalDate now = LocalDate.now();
+         LocalDate yearStart =  now.minusDays(now.getDayOfYear());
+         LocalDate yearEnd   =  yearStart.plusMonths(12);
+         UserGroup g0100 = createUserGroup(tenant1, "Grupo 0100", Constant.DEFAULT_CATEGORY, null,  yearStart, yearEnd, false);
+         UserGroup g0110 = createUserGroup(tenant1, "Grupo 0101", Constant.DEFAULT_CATEGORY, g0100, yearStart, yearEnd, false);
+         UserGroup g0120 = createUserGroup(tenant1, "Grupo 0102", Constant.DEFAULT_CATEGORY, g0100, yearStart, yearEnd, false);
+         UserGroup g0130 = createUserGroup(tenant1, "Grupo 0103", Constant.DEFAULT_CATEGORY, g0100, yearStart, yearEnd, false);
+         UserGroup g0200 = createUserGroup(tenant1, "Grupo 0200", Constant.DEFAULT_CATEGORY, null,  yearStart, yearEnd, false);
+         UserGroup g0210 = createUserGroup(tenant1, "Grupo 0201", Constant.DEFAULT_CATEGORY, g0200, yearStart, yearEnd, false);
+
+         getLogger().info("... generating products");
+         // A set of products that will be used for creating orders.
+         Supplier<Product> productSupplier = createProducts(productRepository, 8);
+         // A set of products without relationships that can be deleted
+         createProducts(productRepository, 4);
+
+         getLogger().info("... generating pickup locations");
+         Supplier<PickupLocation> pickupLocationSupplier = createPickupLocations(pickupLocationRepository);
+
+         getLogger().info("... generating orders");
+         createOrders(orderRepository, productSupplier, pickupLocationSupplier, barista, baker);
+
+         getLogger().info("Generated demo data");
+         
+      } catch (Exception e)
+      {
+         getLogger().error("*** No pudo inicializar la aplicación. Causa\n"+ e.getMessage());
+         System.exit(-1);
       }
-      
-
-      getLogger().info("Generating demo data");
-
-      getLogger().info("... generating tenants");
-      ThothSession session = new ThothSession(tenantService);
-      Tenant tenant1 = createTenant(tenantRepository, "FCN");
-      ThothSession.setTenant(tenant1);
-
-      Tenant tenant2 = createTenant(tenantRepository,"SEI");
-      getLogger().info("... generating roles");
-      com.f.thoth.backend.data.security.Role role1 = createRole(tenant1, "Gerente");
-      com.f.thoth.backend.data.security.Role role2 = createRole(tenant1, "Admin");
-      com.f.thoth.backend.data.security.Role role3 = createRole(tenant1, "Supervisor");
-      com.f.thoth.backend.data.security.Role role4 = createRole(tenant1, "Operador");
-      com.f.thoth.backend.data.security.Role role5 = createRole(tenant1, "Publico");
-
-      tenant1.addRole(role1);
-      tenant1.addRole(role2);
-      tenant1.addRole(role3);
-      tenant1.addRole(role4);
-      tenant1.addRole(role5);
-
-      com.f.thoth.backend.data.security.Role role6  = createRole(tenant2, "CEO");
-      com.f.thoth.backend.data.security.Role role7  = createRole(tenant2, "Admin2");
-      com.f.thoth.backend.data.security.Role role8  = createRole(tenant2, "CFO");
-      com.f.thoth.backend.data.security.Role role9  = createRole(tenant2, "CIO");
-      com.f.thoth.backend.data.security.Role role10 = createRole(tenant2, "COO");
-
-      tenant2.addRole(role6);
-      tenant2.addRole(role7);
-      tenant2.addRole(role8);
-      tenant2.addRole(role9);
-      tenant2.addRole(role10);
-      
-      // ----------- Respetar este orden para la inicialización de estos default -------------
-      getLogger().info("... generating defaults");
-      
-      Schema.EMPTY.setTenant(tenant1);
-      Schema.EMPTY.buildCode();
-      schemaRepository.saveAndFlush(Schema.EMPTY);
-      
-      Level.DEFAULT.setTenant(tenant1);
-      Level.DEFAULT.buildCode();
-      levelRepository.saveAndFlush(Level.DEFAULT);
-      
-      Retention.DEFAULT.setTenant(tenant1);
-      Retention.DEFAULT.buildCode();
-      retentionRepository.saveAndFlush(Retention.DEFAULT);
-      
-
-      getLogger().info("... generating metadata");
-      Metadata nameMeta  = createMeta("String", Type.STRING, "length > 0");
-      Field    nameField = createField("Nombre", nameMeta, true, false, true, 1, 2);
-      Field    bossField = createField("Jefe",   nameMeta, true, false, true, 2, 2);
-
-      Metadata dateMeta  = createMeta("Fecha", Type.DATETIME, "not null");
-      Field    fromField = createField("Desde", dateMeta, true, false, true, 3, 2);
-      Field    toField   = createField("Hasta", dateMeta, true, false, true, 4, 2);
-
-      Metadata enumMeta   = createMeta("Color",    Type.ENUM, "Verde;Rojo;Azul;Magenta;Cyan");
-      Field    colorField = createField("Colores",   enumMeta, true, false, true, 5, 1);
-
-      Metadata claseMeta     = createMeta("Security", Type.ENUM, "Restringido;Confidencial;Interno;Público");
-      Field    securityField = createField("Seguridad", claseMeta, true, false, true, 5, 1);
-
-      Metadata intMeta   = createMeta("Entero", Type.INTEGER, " >0; < 100");
-      Field    cantField = createField("Cantidad", intMeta, true, false, true, 5, 1);
-      Field    edadField = createField("Edad",     intMeta, true, true,  true, 6, 1);
-
-      Metadata decMeta   = createMeta("Decimal", Type.DECIMAL," >= 0.0");
-      Field    ratioField= createField("Razon", decMeta, true, false, true, 7, 1);
-
-      Schema  sedeSchema = createSchema("Sede");
-      sedeSchema.addField(fromField);
-      sedeSchema.addField(toField);
-      sedeSchema.addField(colorField);
-      sedeSchema.addField(securityField);
-      schemaRepository.saveAndFlush(sedeSchema);
-
-      Schema   officeSchema = createSchema("Office");
-      officeSchema.addField(bossField);
-      officeSchema.addField(fromField);
-      officeSchema.addField(toField);
-      officeSchema.addField(colorField);
-      schemaRepository.saveAndFlush(officeSchema);
-
-      Schema   seriesSchema = createSchema("Series");
-      seriesSchema.addField(fromField);
-      seriesSchema.addField(toField);
-      seriesSchema.addField(securityField);
-      schemaRepository.saveAndFlush(seriesSchema);
-
-      Schema   otherSchema = createSchema("Other");
-      otherSchema.addField(nameField);
-      otherSchema.addField(bossField);
-      otherSchema.addField(fromField);
-      otherSchema.addField(toField);
-      otherSchema.addField(cantField);
-      otherSchema.addField(edadField);
-      otherSchema.addField(ratioField);
-      schemaRepository.saveAndFlush(otherSchema);
-
-      Level level0 = new Level("Sede",     0, sedeSchema);
-      Level level1 = new Level("Oficina",  1, officeSchema);
-      Level level2 = new Level("Serie",    2, seriesSchema);
-      Level level3 = new Level("Subserie", 3, seriesSchema);
-      
-      Level levels[]  = { level0, level1, level2, level3};
-
-      getLogger().info("... generating Operations" );
-      OperationGenerator  opGenerator = new OperationGenerator(operationRepository);
-      opGenerator.registerOperations(tenant1);
-
-      getLogger().info("... generating Classification classes" );
-      ClassificationGenerator classificationGenerator = new ClassificationGenerator(claseRepository, levelRepository, schemaRepository, levels);
-      classificationGenerator.registerClasses(tenant1);
-      
-
-      getLogger().info("... generating users");
-      User baker = createBaker(userRepository, passwordEncoder);
-      User barista = createBarista(userRepository, passwordEncoder);
-      createAdmin(userRepository, passwordEncoder);
-      // A set of products without constrains that can be deleted
-      createDeletableUsers(userRepository, passwordEncoder);
-      
-      getLogger().info("... generating user groups");
-      LocalDate now = LocalDate.now();
-      LocalDate yearStart =  now.minusDays(now.getDayOfYear());
-      LocalDate yearEnd   =  yearStart.plusMonths(12);
-      UserGroup g0100 = createUserGroup(tenant1, "Grupo 0100", Constant.DEFAULT_CATEGORY, null,  yearStart, yearEnd, false);
-      UserGroup g0110 = createUserGroup(tenant1, "Grupo 0101", Constant.DEFAULT_CATEGORY, g0100, yearStart, yearEnd, false);
-      UserGroup g0120 = createUserGroup(tenant1, "Grupo 0102", Constant.DEFAULT_CATEGORY, g0100, yearStart, yearEnd, false);
-      UserGroup g0130 = createUserGroup(tenant1, "Grupo 0103", Constant.DEFAULT_CATEGORY, g0100, yearStart, yearEnd, false);
-      UserGroup g0200 = createUserGroup(tenant1, "Grupo 0200", Constant.DEFAULT_CATEGORY, null,  yearStart, yearEnd, false);
-      UserGroup g0210 = createUserGroup(tenant1, "Grupo 0201", Constant.DEFAULT_CATEGORY, g0200, yearStart, yearEnd, false);
-
-      getLogger().info("... generating products");
-      // A set of products that will be used for creating orders.
-      Supplier<Product> productSupplier = createProducts(productRepository, 8);
-      // A set of products without relationships that can be deleted
-      createProducts(productRepository, 4);
-
-      getLogger().info("... generating pickup locations");
-      Supplier<PickupLocation> pickupLocationSupplier = createPickupLocations(pickupLocationRepository);
-
-      getLogger().info("... generating orders");
-      createOrders(orderRepository, productSupplier, pickupLocationSupplier, barista, baker);
-
-      getLogger().info("Generated demo data");
 
    }//loadData
+   
+   private Repository initJCRRepo()throws UnknownHostException
+   {
+      Repository repo = initRepo("127.0.0.1", 27017, "evidentia");
+      // Gets an in-memory repo
+      // repo = new Jcr(new Oak()).createRepository(); 
+      return repo;
+      
+   }//initJCRRepo
+   
+   private Repository initRepo (String host, final int port, String dbName) throws UnknownHostException
+   {   
+        String uri = "mongodb://" + host + ":" + port;
+        getLogger().info("... "+ uri+ "  db="+ dbName);
+        System.setProperty("oak.documentMK.disableLeaseCheck", "true");
+        getLogger().info("... get the node store");
+        DocumentNodeStore ns = new DocumentMK.Builder().setMongoDB(uri, "evidentia", 16).getNodeStore();
+        getLogger().info("... create the Oak repository");
+        Repository repo = new Jcr(new Oak(ns)).createRepository();
+        getLogger().info("oak.documentMK.disableLeaseCheck=" + System.getProperty("oak.documentMK.disableLeaseCheck"));
+        return repo;
+     
+   }//initRepo
+   
+   
+   private Session loginToRepo(Repository jcrRepo, String userCode, String passwordHash) throws RepositoryException
+   {
+      if (jcrRepo != null)
+         return jcrRepo.login(new SimpleCredentials(userCode, passwordHash.toCharArray()));
+     else
+         throw new NullPointerException("Repositorio no inicializado");
+
+      //   jcr spec:    return  Repository.login(Credentials credentials, workspaceName);
+   }//loginToRepo
+   
+   private void initWorkspace(String name) throws RepositoryException
+   {
+      String path = "/"+name;
+      if (jcrSession.nodeExists(path))
+         return;
+      
+      Node node = jcrSession.getNode("/");
+      workspace = node.addNode(name);
+      
+   }//initWorkspace
+
 
    private Metadata createMeta(String name, Type type, String range)
    {
