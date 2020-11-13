@@ -38,7 +38,8 @@ import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
                @NamedAttributeNode("administrator"),
                @NamedAttributeNode("fromDate"),
                @NamedAttributeNode("toDate"),
-               @NamedAttributeNode("locked")
+               @NamedAttributeNode("locked"),
+               @NamedAttributeNode("workspace")
          }),
    @NamedEntityGraph(
          name = Tenant.FULL,
@@ -47,7 +48,8 @@ import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
                @NamedAttributeNode("administrator"),
                @NamedAttributeNode("fromDate"),
                @NamedAttributeNode("toDate"),
-               @NamedAttributeNode("locked")
+               @NamedAttributeNode("locked"),
+               @NamedAttributeNode("workspace")
                /*
                @NamedAttributeNode("roles"),
                @NamedAttributeNode("singleUsers"),
@@ -72,7 +74,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
    @NotEmpty(message = "{evidentia.code.required}")
    @Size(max = 255, message="{evidentia.code.maxlength}")
    @Column(unique = true)
-   protected String code;                            // Código del workspace del Tenant
+   protected String code;                            // Código del Tenant
 
    @NotEmpty(message = "{evidentia.email.required}")
    @Email
@@ -85,6 +87,8 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 
    @NotNull(message = "{evidentia.date.required}")
    protected LocalDate  toDate;                      // Fecha hasta la cual puede usar el sistema (inclusive)
+   
+   protected String  workspace;                      // Raíz del workspace del repositorio asignado al Tenant
 
    protected boolean locked = false;                 // Está el Tenant bloqueado? (No puede usar el sistema)
       
@@ -174,6 +178,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
       code         = "[COD]";
       fromDate     = now;
       toDate       = now.plusYears(1);
+      workspace    = "/";
       roles        = new TreeSet<>();
       singleUsers  = new TreeSet<>();
       userGroups   = new TreeSet<>();
@@ -209,26 +214,29 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
       }
    }//isLocked
 
-   public String         getAdministrator() { return administrator;}
-   public void           setAdministrator( String administrator) { this.administrator = administrator;}
+   public String             getAdministrator() { return administrator;}
+   public void               setAdministrator( String administrator) { this.administrator = administrator;}
 
-   public LocalDate      getFromDate() {  return fromDate;}
-   public void           setFromDate(LocalDate fromDate) { this.fromDate = fromDate;}
+   public LocalDate          getFromDate() {  return fromDate;}
+   public void               setFromDate(LocalDate fromDate) { this.fromDate = fromDate;}
 
-   public LocalDate      getToDate() { return toDate; }
-   public void           setToDate(LocalDate toDate) { this.toDate = toDate; }
+   public LocalDate          getToDate() { return toDate; }
+   public void               setToDate(LocalDate toDate) { this.toDate = toDate; }
 
-   public Set<Role>      getRoles() { return roles;}
-   public void           setRoles( Set<Role> roles) { this.roles = roles;}
+   public String             getWorkspace() { return workspace; }
+   public void               setWorkspace(String workspace) { this.workspace = workspace; }
 
-   public Set<SingleUser>  getSingleUsers() { return singleUsers;}
-   public void             setUsers( Set<SingleUser> singleUsers){ this.singleUsers = singleUsers;}
+   public Set<Role>          getRoles() { return roles;}
+   public void               setRoles( Set<Role> roles) { this.roles = roles;}
 
-   public Set<UserGroup>   getUserGroups() { return userGroups;}
-   public void             setUserGroups( Set<UserGroup> userGroups){ this.userGroups = userGroups;}
+   public Set<SingleUser>    getSingleUsers() { return singleUsers;}
+   public void               setUsers( Set<SingleUser> singleUsers){ this.singleUsers = singleUsers;}
 
-   public Set<DocumentType>   getDocTypes() { return docTypes;}
-   public void           setDocTypes( Set<DocumentType> docTypes){ this.docTypes = docTypes;}
+   public Set<UserGroup>     getUserGroups() { return userGroups;}
+   public void               setUserGroups( Set<UserGroup> userGroups){ this.userGroups = userGroups;}
+
+   public Set<DocumentType>  getDocTypes() { return docTypes;}
+   public void               setDocTypes( Set<DocumentType> docTypes){ this.docTypes = docTypes;}
 
    // --------------- Object methods ------------------
 
@@ -252,9 +260,11 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
    @Override
    public String toString()
    {
-      return "Tenant{ id["+ id+ "] version["+ version+ "] name["+ name+ "] code["+  code+ "] roles["+  roles.size()+
-            "] singleUsers["+ singleUsers.size()+ "] userGroups["+ userGroups.size()+ "] docTypes["+ docTypes.size()+ "]}";
-   }
+      return "Tenant{ id["+ id+ "] version["+ version+ "] name["+ name+ "] "+ 
+             "code["+  code+ "] workspace["+ workspace+ "] "+ 
+             "roles["+  roles.size()+ "] singleUsers["+ singleUsers.size()+ "] "+
+             "userGroups["+ userGroups.size()+ "] docTypes["+ docTypes.size()+ "]}";
+   }//toString
 
    @Override
    public int compareTo(Tenant that)

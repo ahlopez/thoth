@@ -398,7 +398,7 @@ public class ClassificationGenerator
          schema = nivel.getSchema();
       }
       SchemaValues values = new SchemaValues(schema,null);
-      classificationClass.setSchemaValues(values);
+      classificationClass.setMetadata(values);
       claseRepository.saveAndFlush(classificationClass);
       return classificationClass;
    }//createClass

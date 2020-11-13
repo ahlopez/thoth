@@ -175,13 +175,13 @@ public class DataGenerator implements HasLogger
          // ----------- Inicialice el repositorio documental ----------------------
          getLogger().info("Initializing jcr repository");  
          
-         initJCRRepo();
+         repo = initJCRRepo();
          
-         getLogger().info("...Acquiring a repo session");
+         getLogger().info("... acquiring a repo session");
          jcrSession = loginToRepo(repo, "admin", "admin");
          
-         getLogger().info("...Creating default workspace");
-         initWorkspace("FCN");
+         getLogger().info("... creating default workspace");
+         initWorkspace("FCN", tenant1);
          
          // ----------- Respetar este orden para la inicialización de estos default -------------
          getLogger().info("... generating defaults");
@@ -323,7 +323,7 @@ public class DataGenerator implements HasLogger
         System.setProperty("oak.documentMK.disableLeaseCheck", "true");
         getLogger().info("... get the node store");
         DocumentNodeStore ns = new DocumentMK.Builder().setMongoDB(uri, "evidentia", 16).getNodeStore();
-        getLogger().info("... create the Oak repository");
+        getLogger().info("... create the Oak repository["+ dbName+ "]");
         Repository repo = new Jcr(new Oak(ns)).createRepository();
         getLogger().info("oak.documentMK.disableLeaseCheck=" + System.getProperty("oak.documentMK.disableLeaseCheck"));
         return repo;
@@ -333,15 +333,19 @@ public class DataGenerator implements HasLogger
    
    private Session loginToRepo(Repository jcrRepo, String userCode, String passwordHash) throws RepositoryException
    {
+      
       if (jcrRepo != null)
-         return jcrRepo.login(new SimpleCredentials(userCode, passwordHash.toCharArray()));
-     else
+      {
+         Session session = jcrRepo.login(new SimpleCredentials(userCode, passwordHash.toCharArray()));
+         getLogger().info("... acquired session to repo["+ jcrRepo.toString()+ "], user["+ userCode+ "], pwd["+ passwordHash+ "]");
+         return session;
+      } else
          throw new NullPointerException("Repositorio no inicializado");
 
       //   jcr spec:    return  Repository.login(Credentials credentials, workspaceName);
    }//loginToRepo
    
-   private void initWorkspace(String name) throws RepositoryException
+   private void initWorkspace(String name, Tenant tenant) throws RepositoryException
    {
       String path = "/"+name;
       if (jcrSession.nodeExists(path))
@@ -349,6 +353,9 @@ public class DataGenerator implements HasLogger
       
       Node node = jcrSession.getNode("/");
       workspace = node.addNode(name);
+      String workspaceId = workspace.getIdentifier();
+      tenant.setWorkspace(workspaceId);
+      getLogger().info("... workspace["+ workspaceId+ "]");
       
    }//initWorkspace
 

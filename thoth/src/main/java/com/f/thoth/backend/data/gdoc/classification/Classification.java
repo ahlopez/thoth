@@ -47,6 +47,7 @@ import com.f.thoth.backend.data.security.UserGroup;
             @NamedAttributeNode("owner"),
             @NamedAttributeNode("dateOpened"),
             @NamedAttributeNode("dateClosed"),
+            @NamedAttributeNode("path"),
             @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF)
          },
          subgraphs = @NamedSubgraph(name = ObjectToProtect.BRIEF,
@@ -67,6 +68,7 @@ import com.f.thoth.backend.data.security.UserGroup;
                @NamedAttributeNode("level"),
                @NamedAttributeNode("dateOpened"),
                @NamedAttributeNode("dateClosed"),
+               @NamedAttributeNode("path"),
                @NamedAttributeNode("metadata"),
                @NamedAttributeNode("retentionSchedule"),
                @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)
@@ -119,6 +121,8 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
 
    @ManyToOne
    protected Classification owner;                         //  Classification node to which this class belongs
+   
+   protected String    path;                               //  Classification node path in document repository
 
    // ------------- Constructors ------------------
    public Classification()
@@ -159,6 +163,7 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
       this.owner             = null;
       this.retentionSchedule = Retention.DEFAULT;
       this.metadata          = null;
+      this.path              = "/";
 
    }//init
 
@@ -172,7 +177,7 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
 
    @Override protected void buildCode()
    {
-      this.code = (tenant == null? "[tenant]": tenant.getCode())+"[CLS]"+
+      this.code = (tenant == null? "[tenant]": tenant.getWorkspace())+"[CLS]"+
                   (owner == null? ":": owner.getOwnerCode())+ ">"+
                   (name == null? "[name]" : name);
    }//buildCode
@@ -195,7 +200,10 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
    public void       setRetentionSchedule( Retention retentionSchedule) {this.retentionSchedule = retentionSchedule;}
    
    public SchemaValues getMetadata() { return metadata;}
-   public void         setSchemaValues ( SchemaValues metadata) { this.metadata = metadata;}
+   public void         setMetadata ( SchemaValues metadata) { this.metadata = metadata;}
+   
+   public String       getPath() { return path;}
+   public void         setPath ( String path) { this.path = path;}
 
 
    // --------------- Object methods ---------------------
@@ -223,6 +231,7 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
        .append(  super.toString())
        .append(  "name["+ name+ "]")
        .append( " ["+ level.toString()+ "]")
+       .append( " path["+ path+ "]")
        .append( " dateOpened["+ TextUtil.formatDate(dateOpened)+ "]")
        .append( " dateClosed["+ TextUtil.formatDate(dateClosed)+ "]\n")
        .append( " retentionSchedule["+ retentionSchedule == null? "---" :  retentionSchedule.getCode()+ "]\n")
@@ -257,7 +266,7 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
    public void                  setRestrictedTo(UserGroup restrictedTo) {objectToProtect.setRestrictedTo(restrictedTo);}
 
    // --------------------------- Implements HierarchicalEntity ---------------------------------------
-   @Override public String                getName()   { return name;}
+   @Override public String           getName()   { return name;}
 
    @Override public Classification   getOwner()  { return owner;}
 
