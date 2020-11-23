@@ -60,6 +60,8 @@ import com.f.thoth.backend.repositories.UserGroupRepository;
 import com.f.thoth.backend.repositories.UserRepository;
 import com.f.thoth.backend.service.TenantService;
 import com.f.thoth.ui.utils.Constant;
+import com.mongodb.DB;
+import com.mongodb.MongoClient;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
 @SpringComponent
@@ -309,23 +311,22 @@ public class DataGenerator implements HasLogger
    
    private Repository initJCRRepo()throws UnknownHostException
    {
-      Repository repo = initRepo("127.0.0.1", 27017, "evidentia");
+      // Repository repo = initRepo("127.0.0.1", 27017, "evidentia");
       // Gets an in-memory repo
-      // repo = new Jcr(new Oak()).createRepository(); 
+      repo = new Jcr(new Oak()).createRepository(); 
+      getLogger().info("... Got an in-memory repo");
       return repo;
       
    }//initJCRRepo
    
+   @SuppressWarnings({"deprecation","resource", "unused"})
    private Repository initRepo (String host, final int port, String dbName) throws UnknownHostException
    {   
+	    DB db = new MongoClient(host, port).getDB(dbName);
+	    DocumentNodeStore ns = new DocumentMK.Builder().setMongoDB(db).getNodeStore();
+	    Repository repo = new Jcr(new Oak(ns)).createRepository();
         String uri = "mongodb://" + host + ":" + port;
-        getLogger().info("... "+ uri+ "  db="+ dbName);
-        System.setProperty("oak.documentMK.disableLeaseCheck", "true");
-        getLogger().info("... get the node store");
-        DocumentNodeStore ns = new DocumentMK.Builder().setMongoDB(uri, "evidentia", 16).getNodeStore();
-        getLogger().info("... create the Oak repository["+ dbName+ "]");
-        Repository repo = new Jcr(new Oak(ns)).createRepository();
-        getLogger().info("oak.documentMK.disableLeaseCheck=" + System.getProperty("oak.documentMK.disableLeaseCheck"));
+	    getLogger().info("... Got repo at "+ uri+ "/"+ dbName );
         return repo;
      
    }//initRepo
