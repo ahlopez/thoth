@@ -27,6 +27,7 @@ public class StorefrontViewIT extends AbstractIT<StorefrontViewElement> {
    }
 
    @Test
+   @SuppressWarnings("deprecation")
    public void editOrder() {
       StorefrontViewElement storefrontPage = openView();
 

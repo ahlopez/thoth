@@ -91,7 +91,7 @@ public class ClassificationValuesForm extends VerticalLayout
    {
        String values = getValuesFromFields(schemaFields);
        SchemaValues vals = new SchemaValues(schema, values);
-       classification.setSchemaValues(vals);
+       classification.setMetadata(vals);
        endEditing();
        fireEvent(new SaveEvent(this, classification));
    }//validateAndSave
