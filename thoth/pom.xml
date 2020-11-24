@@ -33,7 +33,7 @@
 		
 
     <!--jackrabbit.oak.version>1.36</jackrabbit.oak.version-->
-    <jackrabbit.oak.version>1.0.0</jackrabbit.oak.version>
+    <jackrabbit.oak.version>1.36</jackrabbit.oak.version>
     <jcr.version>2.0</jcr.version>
     <mongodb.driver.version>3.12.7</mongodb.driver.version>
 
@@ -302,6 +302,14 @@
       <artifactId>mongo-java-driver</artifactId>
       <version>${mongodb.driver.version}</version>
     </dependency>
+    
+    <!-- https://mvnrepository.com/artifact/org.apache.jackrabbit/oak-store-document -->
+<dependency>
+    <groupId>org.apache.jackrabbit</groupId>
+    <artifactId>oak-store-document</artifactId>
+    <version>1.36</version>
+</dependency>
+    
 
     <!-- ::::::::::::::::::::::::::::::::::End jackrabbit, Oak, Mongodb:::::::::::::::::::::::::::::::::;;; -->
 
