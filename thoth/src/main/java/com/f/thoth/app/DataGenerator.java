@@ -79,6 +79,8 @@ public class DataGenerator implements HasLogger
 
 	private final Random random = new Random(1L);
 
+	private ThothSession                  session;
+	private Tenant                        tenant1, tenant2;
 	private TenantService                 tenantService;
 	private TenantRepository              tenantRepository;
 	private RoleRepository                roleRepository;
@@ -98,6 +100,7 @@ public class DataGenerator implements HasLogger
 	private Repository                    repo;
 	private Session                       jcrSession;
 	private Node                          workspace;
+	private Level[]                       levels;
 
 	@Autowired
 	public DataGenerator(TenantService tenantService, OrderRepository orderRepository, UserRepository userRepository,
@@ -141,40 +144,19 @@ public class DataGenerator implements HasLogger
 
 			getLogger().info("Generating demo data");
 
-			getLogger().info("... generating tenants");
-			ThothSession session = new ThothSession(tenantService);
-			Tenant tenant1 = createTenant(tenantRepository, "FCN");
-			ThothSession.setTenant(tenant1);
-
-			Tenant tenant2 = createTenant(tenantRepository,"SEI");
+			// ------------ Cree los tenants y sus roles ----------------------------
+			getLogger().info("... generating tenants");			
+			createTenants(tenantService);
+			
 			getLogger().info("... generating roles");
-			com.f.thoth.backend.data.security.Role role1 = createRole(tenant1, "Gerente");
-			com.f.thoth.backend.data.security.Role role2 = createRole(tenant1, "Admin");
-			com.f.thoth.backend.data.security.Role role3 = createRole(tenant1, "Supervisor");
-			com.f.thoth.backend.data.security.Role role4 = createRole(tenant1, "Operador");
-			com.f.thoth.backend.data.security.Role role5 = createRole(tenant1, "Publico");
+			String[] roles1 = {"Gerente", "Admin", "Supervisor", "Operador", "Público"};
+			createRoles(tenant1, roles1);
 
-			tenant1.addRole(role1);
-			tenant1.addRole(role2);
-			tenant1.addRole(role3);
-			tenant1.addRole(role4);
-			tenant1.addRole(role5);
-
-			com.f.thoth.backend.data.security.Role role6  = createRole(tenant2, "CEO");
-			com.f.thoth.backend.data.security.Role role7  = createRole(tenant2, "Admin2");
-			com.f.thoth.backend.data.security.Role role8  = createRole(tenant2, "CFO");
-			com.f.thoth.backend.data.security.Role role9  = createRole(tenant2, "CIO");
-			com.f.thoth.backend.data.security.Role role10 = createRole(tenant2, "COO");
-
-			tenant2.addRole(role6);
-			tenant2.addRole(role7);
-			tenant2.addRole(role8);
-			tenant2.addRole(role9);
-			tenant2.addRole(role10);
+			String[] roles2 = {"CEO", "Admin2", "CFO", "CIO", "COO"};
+			createRoles(tenant2, roles2);
 
 			// ----------- Inicialice el repositorio documental ----------------------
 			getLogger().info("Initializing jcr repository");  
-
 			repo = initJCRRepo();
 
 			getLogger().info("... acquiring a repo session");
@@ -198,75 +180,22 @@ public class DataGenerator implements HasLogger
 			Retention.DEFAULT.buildCode();
 			retentionRepository.saveAndFlush(Retention.DEFAULT);
 
-
+            // ----------------------- Cree un conjunto de metadatos, campos y esquemas de metadatos ----------------------
 			getLogger().info("... generating metadata");
-			Metadata nameMeta  = createMeta("String", Type.STRING, "length > 0");
-			Field    nameField = createField("Nombre", nameMeta, true, false, true, 1, 2);
-			Field    bossField = createField("Jefe",   nameMeta, true, false, true, 2, 2);
+			levels = createMetadata();
 
-			Metadata dateMeta  = createMeta("Fecha", Type.DATETIME, "not null");
-			Field    fromField = createField("Desde", dateMeta, true, false, true, 3, 2);
-			Field    toField   = createField("Hasta", dateMeta, true, false, true, 4, 2);
-
-			Metadata enumMeta   = createMeta("Color",    Type.ENUM, "Verde;Rojo;Azul;Magenta;Cyan");
-			Field    colorField = createField("Colores",   enumMeta, true, false, true, 5, 1);
-
-			Metadata claseMeta     = createMeta("Security", Type.ENUM, "Restringido;Confidencial;Interno;Público");
-			Field    securityField = createField("Seguridad", claseMeta, true, false, true, 5, 1);
-
-			Metadata intMeta   = createMeta("Entero", Type.INTEGER, " >0; < 100");
-			Field    cantField = createField("Cantidad", intMeta, true, false, true, 5, 1);
-			Field    edadField = createField("Edad",     intMeta, true, true,  true, 6, 1);
-
-			Metadata decMeta   = createMeta("Decimal", Type.DECIMAL," >= 0.0");
-			Field    ratioField= createField("Razon", decMeta, true, false, true, 7, 1);
-
-			Schema  sedeSchema = createSchema("Sede");
-			sedeSchema.addField(fromField);
-			sedeSchema.addField(toField);
-			sedeSchema.addField(colorField);
-			sedeSchema.addField(securityField);
-			schemaRepository.saveAndFlush(sedeSchema);
-
-			Schema   officeSchema = createSchema("Office");
-			officeSchema.addField(bossField);
-			officeSchema.addField(fromField);
-			officeSchema.addField(toField);
-			officeSchema.addField(colorField);
-			schemaRepository.saveAndFlush(officeSchema);
-
-			Schema   seriesSchema = createSchema("Series");
-			seriesSchema.addField(fromField);
-			seriesSchema.addField(toField);
-			seriesSchema.addField(securityField);
-			schemaRepository.saveAndFlush(seriesSchema);
-
-			Schema   otherSchema = createSchema("Other");
-			otherSchema.addField(nameField);
-			otherSchema.addField(bossField);
-			otherSchema.addField(fromField);
-			otherSchema.addField(toField);
-			otherSchema.addField(cantField);
-			otherSchema.addField(edadField);
-			otherSchema.addField(ratioField);
-			schemaRepository.saveAndFlush(otherSchema);
-
-			Level level0 = new Level("Sede",     0, sedeSchema);
-			Level level1 = new Level("Oficina",  1, officeSchema);
-			Level level2 = new Level("Serie",    2, seriesSchema);
-			Level level3 = new Level("Subserie", 3, seriesSchema);
-
-			Level levels[]  = { level0, level1, level2, level3};
-
+			// -----------------  Registre las operaciones posibles en el sistema ----------------------------
 			getLogger().info("... generating Operations" );
 			OperationGenerator  opGenerator = new OperationGenerator(operationRepository);
 			opGenerator.registerOperations(tenant1);
 
+			// -----------------  Inicialice el árbol de clasificación documental -----------------------------
 			getLogger().info("... generating Classification classes" );
 			ClassificationGenerator classificationGenerator = new ClassificationGenerator(claseRepository, levelRepository, schemaRepository, levels);
 			classificationGenerator.registerClasses(tenant1);
 
 
+			// ------------------ Genere un conjunto de usuarios y grupos de usuarios -------------------------------
 			getLogger().info("... generating users");
 			User baker = createBaker(userRepository, passwordEncoder);
 			User barista = createBarista(userRepository, passwordEncoder);
@@ -306,6 +235,26 @@ public class DataGenerator implements HasLogger
 		}
 
 	}//loadData
+	
+	
+	private void createTenants (TenantService tenantService)
+	{
+		session = new ThothSession(tenantService);
+		tenant1 = createTenant(tenantRepository, "FCN");
+		ThothSession.setTenant(tenant1);
+		tenant2 = createTenant(tenantRepository,"SEI");		
+	}//createTenants
+	
+	
+	private void createRoles( Tenant tenant, String[] roleName)
+	{
+		for( String r: roleName)
+		{
+			com.f.thoth.backend.data.security.Role role = createRole(tenant, r);
+			tenant.addRole(role);			
+		}	
+	}//createRoles
+	
 
 	private Repository initJCRRepo()throws UnknownHostException
 	{
@@ -356,6 +305,70 @@ public class DataGenerator implements HasLogger
 		getLogger().info("... workspace["+ workspaceId+ "]");
 
 	}//initWorkspace
+	
+	
+	private Level[] createMetadata()
+	{
+		Metadata nameMeta  = createMeta("String", Type.STRING, "length > 0");
+		Field    nameField = createField("Nombre", nameMeta, true, false, true, 1, 2);
+		Field    bossField = createField("Jefe",   nameMeta, true, false, true, 2, 2);
+
+		Metadata dateMeta  = createMeta("Fecha", Type.DATETIME, "not null");
+		Field    fromField = createField("Desde", dateMeta, true, false, true, 3, 2);
+		Field    toField   = createField("Hasta", dateMeta, true, false, true, 4, 2);
+
+		Metadata enumMeta   = createMeta("Color",    Type.ENUM, "Verde;Rojo;Azul;Magenta;Cyan");
+		Field    colorField = createField("Colores",   enumMeta, true, false, true, 5, 1);
+
+		Metadata claseMeta     = createMeta("Security", Type.ENUM, "Restringido;Confidencial;Interno;Público");
+		Field    securityField = createField("Seguridad", claseMeta, true, false, true, 5, 1);
+
+		Metadata intMeta   = createMeta("Entero", Type.INTEGER, " >0; < 100");
+		Field    cantField = createField("Cantidad", intMeta, true, false, true, 5, 1);
+		Field    edadField = createField("Edad",     intMeta, true, true,  true, 6, 1);
+
+		Metadata decMeta   = createMeta("Decimal", Type.DECIMAL," >= 0.0");
+		Field    ratioField= createField("Razon", decMeta, true, false, true, 7, 1);
+
+		Schema  sedeSchema = createSchema("Sede");
+		sedeSchema.addField(fromField);
+		sedeSchema.addField(toField);
+		sedeSchema.addField(colorField);
+		sedeSchema.addField(securityField);
+		schemaRepository.saveAndFlush(sedeSchema);
+
+		Schema   officeSchema = createSchema("Office");
+		officeSchema.addField(bossField);
+		officeSchema.addField(fromField);
+		officeSchema.addField(toField);
+		officeSchema.addField(colorField);
+		schemaRepository.saveAndFlush(officeSchema);
+
+		Schema   seriesSchema = createSchema("Series");
+		seriesSchema.addField(fromField);
+		seriesSchema.addField(toField);
+		seriesSchema.addField(securityField);
+		schemaRepository.saveAndFlush(seriesSchema);
+
+		Schema   otherSchema = createSchema("Other");
+		otherSchema.addField(nameField);
+		otherSchema.addField(bossField);
+		otherSchema.addField(fromField);
+		otherSchema.addField(toField);
+		otherSchema.addField(cantField);
+		otherSchema.addField(edadField);
+		otherSchema.addField(ratioField);
+		schemaRepository.saveAndFlush(otherSchema);
+
+		Level level0 = new Level("Sede",     0, sedeSchema);
+		Level level1 = new Level("Oficina",  1, officeSchema);
+		Level level2 = new Level("Serie",    2, seriesSchema);
+		Level level3 = new Level("Subserie", 3, seriesSchema);
+
+		Level levels[]  = { level0, level1, level2, level3};
+		return levels;
+		
+	}//createMeta
 
 
 	private Metadata createMeta(String name, Type type, String range)
