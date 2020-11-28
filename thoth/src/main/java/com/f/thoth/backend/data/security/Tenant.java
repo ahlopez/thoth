@@ -143,7 +143,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
    {
       super();
       init();
-   }
+   }//Tenant null constructor
 
    public Tenant( String name, String code)
    {
@@ -153,9 +153,10 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
          throw new IllegalArgumentException("Nombre["+ name+ "] es inválido");
 
       init();
-      this.name = TextUtil.nameTidy(name);
-      this.code = (code == null? name : code.toUpperCase());
-   }//Tenant
+      this.name      = TextUtil.nameTidy(name);
+      this.code      = (code == null? name : "/"+ code.toUpperCase());
+      this.workspace = code;
+   }//Tenant constructor
 
 
    @PrePersist
@@ -167,7 +168,11 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
    }//prepareData
 
 
-   protected void buildCode(){ this.code = (name == null? "[name]" : name);}
+   protected void buildCode()
+   { 
+	   this.code = this.code == null? (name == null? "/COD" : "/"+ name): this.code;
+	   this.workspace = code;
+   }//buildCode
 
    private void init()
    {
@@ -175,10 +180,10 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 
       administrator= "";
       name         = "[name]";
-      code         = "[COD]";
+      code         = "/COD";
       fromDate     = now;
       toDate       = now.plusYears(1);
-      workspace    = "/";
+      workspace    = code;
       roles        = new TreeSet<>();
       singleUsers  = new TreeSet<>();
       userGroups   = new TreeSet<>();
