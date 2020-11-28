@@ -47,6 +47,7 @@ import com.f.thoth.backend.data.security.UserGroup;
             @NamedAttributeNode("owner"),
             @NamedAttributeNode("dateOpened"),
             @NamedAttributeNode("dateClosed"),
+            @NamedAttributeNode("classCode"),
             @NamedAttributeNode("path"),
             @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF)
          },
@@ -68,6 +69,7 @@ import com.f.thoth.backend.data.security.UserGroup;
                @NamedAttributeNode("level"),
                @NamedAttributeNode("dateOpened"),
                @NamedAttributeNode("dateClosed"),
+               @NamedAttributeNode("classCode"),
                @NamedAttributeNode("path"),
                @NamedAttributeNode("metadata"),
                @NamedAttributeNode("retentionSchedule"),
@@ -122,6 +124,9 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
    @ManyToOne
    protected Classification owner;                         //  Classification node to which this class belongs
    
+   @NotNull(message = "{evidentia.classcode.required}")
+   protected String    classCode;                          //  Unique business code of the classification node (includes level codes+ class code)
+   
    protected String    path;                               //  Classification node path in document repository
 
    // ------------- Constructors ------------------
@@ -133,7 +138,7 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
       buildCode();
    }
 
-   public Classification( Level level, String name, Classification owner, ObjectToProtect objectToProtect)
+   public Classification( Level level, String name, String classCode, Classification owner, ObjectToProtect objectToProtect)
    {
       if ( !TextUtil.isValidName(name))
          throw new IllegalArgumentException("Nombre["+ name+ "] es invalido");
@@ -150,6 +155,7 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
       init();
       this.level            = level;
       this.name             = TextUtil.nameTidy(name);
+      this.classCode        = classCode;
       this.owner            = owner;
       this.objectToProtect  = objectToProtect;
       buildCode();
@@ -163,6 +169,7 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
       this.owner             = null;
       this.retentionSchedule = Retention.DEFAULT;
       this.metadata          = null;
+      this.classCode         = null;
       this.path              = "/";
 
    }//init
@@ -177,9 +184,13 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
 
    @Override protected void buildCode()
    {
-      this.code = (tenant == null? "[tenant]": tenant.getWorkspace())+"[CLS]"+
-                  (owner == null? ":": owner.getOwnerCode())+ ">"+
-                  (name == null? "[name]" : name);
+	  System.out.println("tenant path["+ (tenant == null? "null": tenant.getWorkspace())+ "] owner["+ owner+ "] class code["+ classCode+ "]");
+      this.path = (tenant    == null? "[tenant]": tenant.getWorkspace())+"/CLS"+
+                  ((owner     == null || owner.getPath().equals("/"))? "/":  owner.getOwnerPath()+ "/")+
+                  (classCode == null? "[classCode]" : classCode);
+      this.code = this.path;
+      System.out.println("... owner.path["+ ((owner == null? "/": owner.getOwnerPath())+ "/")+ "] classCode["+ classCode+ "]");
+      
    }//buildCode
 
    // -------------- Getters & Setters ----------------
@@ -201,6 +212,9 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
    
    public SchemaValues getMetadata() { return metadata;}
    public void         setMetadata ( SchemaValues metadata) { this.metadata = metadata;}
+   
+   public String       getClassCode() { return classCode;}
+   public void         setClassCode ( String classCode) { this.classCode = classCode;}
    
    public String       getPath() { return path;}
    public void         setPath ( String path) { this.path = path;}
@@ -231,6 +245,7 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
        .append(  super.toString())
        .append(  "name["+ name+ "]")
        .append( " ["+ level.toString()+ "]")
+       .append( " classCode["+ classCode+ "]")
        .append( " path["+ path+ "]")
        .append( " dateOpened["+ TextUtil.formatDate(dateOpened)+ "]")
        .append( " dateClosed["+ TextUtil.formatDate(dateClosed)+ "]\n")
@@ -270,7 +285,7 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
 
    @Override public Classification   getOwner()  { return owner;}
 
-   private String getOwnerCode(){ return (owner == null ? "" : owner.getOwnerCode())+ ":"+ name; }
+   private String getOwnerPath(){ return (owner == null ? "" : owner.getOwnerPath())+ "/"+ classCode; }
 
    // -----------------  Implements NeedsProtection ----------------
 

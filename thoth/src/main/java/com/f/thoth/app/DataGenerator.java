@@ -65,13 +65,15 @@ import com.vaadin.flow.spring.annotation.SpringComponent;
 @SpringComponent
 public class DataGenerator implements HasLogger
 {
-	private static final String[] FILLING = new String[] { "Strawberry", "Chocolate", "Blueberry", "Raspberry",
-	"Vanilla" };
+	private static final String[] FILLING = new String[] { "Strawberry", "Chocolate", "Blueberry", "Raspberry",	"Vanilla" };
+
 	private static final String[] TYPE = new String[] { "Cake", "Pastry", "Tart", "Muffin", "Biscuit", "Bread", "Bagel",
 			"Bun", "Brownie", "Cookie", "Cracker", "Cheese Cake" };
+
 	private static final String[] FIRST_NAME = new String[] { "Ori", "Amanda", "Octavia", "Laurel", "Lael", "Delilah",
 			"Jason", "Skyler", "Arsenio", "Haley", "Lionel", "Sylvia", "Jessica", "Lester", "Ferdinand", "Elaine",
 			"Griffin", "Kerry", "Dominique" };
+
 	private static final String[] LAST_NAME = new String[] { "Carter", "Castro", "Rich", "Irwin", "Moore", "Hendricks",
 			"Huber", "Patton", "Wilkinson", "Thornton", "Nunez", "Macias", "Gallegos", "Blevins", "Mejia", "Pickett",
 			"Whitney", "Farmer", "Henry", "Chen", "Macias", "Rowland", "Pierce", "Cortez", "Noble", "Howard", "Nixon",
@@ -79,6 +81,7 @@ public class DataGenerator implements HasLogger
 
 	private final Random random = new Random(1L);
 
+	@SuppressWarnings("unused")
 	private ThothSession                  session;
 	private Tenant                        tenant1, tenant2;
 	private TenantService                 tenantService;
@@ -99,7 +102,6 @@ public class DataGenerator implements HasLogger
 	private UserGroupRepository           userGroupRepository;
 	private Repository                    repo;
 	private Session                       jcrSession;
-	private Node                          workspace;
 	private Level[]                       levels;
 
 	@Autowired
@@ -144,17 +146,6 @@ public class DataGenerator implements HasLogger
 
 			getLogger().info("Generating demo data");
 
-			// ------------ Cree los tenants y sus roles ----------------------------
-			getLogger().info("... generating tenants");			
-			createTenants(tenantService);
-			
-			getLogger().info("... generating roles");
-			String[] roles1 = {"Gerente", "Admin", "Supervisor", "Operador", "Público"};
-			createRoles(tenant1, roles1);
-
-			String[] roles2 = {"CEO", "Admin2", "CFO", "CIO", "COO"};
-			createRoles(tenant2, roles2);
-
 			// ----------- Inicialice el repositorio documental ----------------------
 			getLogger().info("Initializing jcr repository");  
 			repo = initJCRRepo();
@@ -162,8 +153,16 @@ public class DataGenerator implements HasLogger
 			getLogger().info("... acquiring a repo session");
 			jcrSession = loginToRepo(repo, "admin", "admin");
 
-			getLogger().info("... creating default workspace");
-			initWorkspace("FCN", tenant1);
+			// ------------ Cree los tenants y sus roles ----------------------------
+			getLogger().info("... generating tenants");			
+			createTenants(tenantService);
+
+			getLogger().info("... generating roles");
+			String[] roles1 = {"Gerente", "Admin", "Supervisor", "Operador", "Público"};
+			createRoles(tenant1, roles1);
+
+			String[] roles2 = {"CEO", "Admin2", "CFO", "CIO", "COO"};
+			createRoles(tenant2, roles2);
 
 			// ----------- Respetar este orden para la inicialización de estos default -------------
 			getLogger().info("... generating defaults");
@@ -180,23 +179,23 @@ public class DataGenerator implements HasLogger
 			Retention.DEFAULT.buildCode();
 			retentionRepository.saveAndFlush(Retention.DEFAULT);
 
-            // ----------------------- Cree un conjunto de metadatos, campos y esquemas de metadatos ----------------------
+			// ----------------------- Cree un conjunto de metadatos, campos y esquemas de metadatos ----------------------
 			getLogger().info("... generating metadata");
 			levels = createMetadata();
 
 			// -----------------  Registre las operaciones posibles en el sistema ----------------------------
-			getLogger().info("... generating Operations" );
+			getLogger().info("... generating operations" );
 			OperationGenerator  opGenerator = new OperationGenerator(operationRepository);
 			opGenerator.registerOperations(tenant1);
 
 			// -----------------  Inicialice el árbol de clasificación documental -----------------------------
-			getLogger().info("... generating Classification classes" );
-			ClassificationGenerator classificationGenerator = new ClassificationGenerator(claseRepository, levelRepository, schemaRepository, levels);
+			getLogger().info("... generating classification classes" );
+			ClassificationGenerator classificationGenerator = new ClassificationGenerator(claseRepository, levelRepository, schemaRepository, levels, jcrSession);
 			classificationGenerator.registerClasses(tenant1);
 
 
 			// ------------------ Genere un conjunto de usuarios y grupos de usuarios -------------------------------
-			getLogger().info("... generating users");
+			getLogger().info("... generating users");			
 			User baker = createBaker(userRepository, passwordEncoder);
 			User barista = createBarista(userRepository, passwordEncoder);
 			createAdmin(userRepository, passwordEncoder);
@@ -235,17 +234,17 @@ public class DataGenerator implements HasLogger
 		}
 
 	}//loadData
-	
-	
-	private void createTenants (TenantService tenantService)
+
+
+	private void createTenants (TenantService tenantService) throws RepositoryException
 	{
 		session = new ThothSession(tenantService);
-		tenant1 = createTenant(tenantRepository, "FCN");
+		tenant1 = createTenant(tenantRepository, "FCN", "FCN");
 		ThothSession.setTenant(tenant1);
-		tenant2 = createTenant(tenantRepository,"SEI");		
+		tenant2 = createTenant(tenantRepository,"SEI", "SEI");		
 	}//createTenants
-	
-	
+
+
 	private void createRoles( Tenant tenant, String[] roleName)
 	{
 		for( String r: roleName)
@@ -254,7 +253,7 @@ public class DataGenerator implements HasLogger
 			tenant.addRole(role);			
 		}	
 	}//createRoles
-	
+
 
 	private Repository initJCRRepo()throws UnknownHostException
 	{
@@ -291,22 +290,21 @@ public class DataGenerator implements HasLogger
 
 		//   jcr spec:    return  Repository.login(Credentials credentials, workspaceName);
 	}//loginToRepo
+	
 
-	private void initWorkspace(String name, Tenant tenant) throws RepositoryException
+	private void initWorkspace(String workspacePath, String name, Tenant tenant) throws RepositoryException
 	{
-		String path = "/"+name;
-		if (jcrSession.nodeExists(path))
-			return;
-
-		Node node = jcrSession.getNode("/");
-		workspace = node.addNode(name);
-		String workspaceId = workspace.getIdentifier();
-		tenant.setWorkspace(workspaceId);
-		getLogger().info("... workspace["+ workspaceId+ "]");
-
+		if ( !jcrSession.nodeExists(workspacePath))
+		{
+			Node node         = jcrSession.getNode("/");
+			Node jcrWorkspace = node.addNode(workspacePath.substring(1));
+			getLogger().info("... creó workspace["+ name+ "], path["+ jcrWorkspace.getPath()+ "]");
+			if ( !workspacePath.equals( jcrWorkspace.getPath()))
+				throw new RepositoryException("Workspace path["+ workspacePath+ "] diferente del path en repositorio["+ jcrWorkspace.getPath()+ "]");
+		} 
 	}//initWorkspace
-	
-	
+
+
 	private Level[] createMetadata()
 	{
 		Metadata nameMeta  = createMeta("String", Type.STRING, "length > 0");
@@ -367,7 +365,7 @@ public class DataGenerator implements HasLogger
 
 		Level levels[]  = { level0, level1, level2, level3};
 		return levels;
-		
+
 	}//createMeta
 
 
@@ -409,16 +407,17 @@ public class DataGenerator implements HasLogger
 
 
 
-	private Tenant createTenant(TenantRepository tenantRepository, String name)
+	private Tenant createTenant(TenantRepository tenantRepository, String name, String code) throws RepositoryException
 	{
-		Tenant tenant = new Tenant();
-		tenant.setName(name);
+		Tenant tenant = new Tenant(name, code);
 		tenant.setLocked(false);
 		tenant.setAdministrator("admin@vaadin.com");
 		LocalDate now = LocalDate.now();
 		tenant.setFromDate( now.minusMonths(random.nextInt(36)));
 		tenant.setToDate(now.plusYears(random.nextInt(10)));
 		tenantRepository.save(tenant);
+		initWorkspace(tenant.getWorkspace(), name, tenant);
+
 
 		return tenant;
 	}//createTenant
