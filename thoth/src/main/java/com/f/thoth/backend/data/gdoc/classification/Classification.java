@@ -24,6 +24,7 @@ import javax.validation.constraints.Size;
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
+import com.f.thoth.backend.data.gdoc.document.jackrabbit.NodeType;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
@@ -184,13 +185,9 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
 
    @Override protected void buildCode()
    {
-	  System.out.println("tenant path["+ (tenant == null? "null": tenant.getWorkspace())+ "] owner["+ owner+ "] class code["+ classCode+ "]");
-      this.path = (tenant    == null? "[tenant]": tenant.getWorkspace())+"/CLS"+
-                  ((owner     == null || owner.getPath().equals("/"))? "/":  owner.getOwnerPath()+ "/")+
-                  (classCode == null? "[classCode]" : classCode);
+      this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ "/"+ NodeType.CLASSIFICATION.getCode()+ "/"+
+    		      getOwnerPath(owner)+ (classCode == null? "[classCode]" : classCode);
       this.code = this.path;
-      System.out.println("... owner.path["+ ((owner == null? "/": owner.getOwnerPath())+ "/")+ "] classCode["+ classCode+ "]");
-      
    }//buildCode
 
    // -------------- Getters & Setters ----------------
@@ -285,7 +282,16 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
 
    @Override public Classification   getOwner()  { return owner;}
 
-   private String getOwnerPath(){ return (owner == null ? "" : owner.getOwnerPath())+ "/"+ classCode; }
+   private String getOwnerPath(Classification owner)
+   {   	
+	   String path = "";
+	   while (owner != null)
+	   {
+		   path = owner.classCode+ "/"+ path;
+		   owner = owner.owner;
+	   }
+	   return  path;
+   }//getOwnerPath
 
    // -----------------  Implements NeedsProtection ----------------
 

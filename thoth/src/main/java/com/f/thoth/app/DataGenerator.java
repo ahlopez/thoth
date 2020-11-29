@@ -296,9 +296,9 @@ public class DataGenerator implements HasLogger
 	{
 		if ( !jcrSession.nodeExists(workspacePath))
 		{
-			Node node         = jcrSession.getNode("/");
+			Node node         = jcrSession.getRootNode();
 			Node jcrWorkspace = node.addNode(workspacePath.substring(1));
-			getLogger().info("... creó workspace["+ name+ "], path["+ jcrWorkspace.getPath()+ "]");
+			getLogger().info("    ... tenant["+ tenant.getName()+ "] creó workspace["+ name+ "], path["+ jcrWorkspace.getPath()+ "]");
 			if ( !workspacePath.equals( jcrWorkspace.getPath()))
 				throw new RepositoryException("Workspace path["+ workspacePath+ "] diferente del path en repositorio["+ jcrWorkspace.getPath()+ "]");
 		} 

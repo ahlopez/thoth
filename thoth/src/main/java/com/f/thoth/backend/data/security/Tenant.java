@@ -154,7 +154,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 
       init();
       this.name      = TextUtil.nameTidy(name);
-      this.code      = (code == null? name : "/"+ code.toUpperCase());
+      this.code      = "/"+ (code == null? name : code.toUpperCase());
       this.workspace = code;
    }//Tenant constructor
 
