@@ -37,7 +37,6 @@ import com.f.thoth.backend.data.security.UserGroup;
 /**
  * Representa una clase del esquema de clasificación documental
  */
-
 @NamedEntityGraphs({
    @NamedEntityGraph(
          name = Classification.BRIEF,

@@ -127,7 +127,7 @@ public class Constant
   public static final String     TITLE_RETENCION                             = "Calendario de conservacion";
   public static final String     TITLE_ESQUEMAS_CLASIFICACION                = "Esquema de clasificacion";
   public static final String  TITLE_ADMIN_EXPEDIENTES                        = "Gestión de expedientes";
-  public static final String     TITLE_EXPEDIENTES                           = "Expedientes mayores";
+  public static final String     TITLE_EXPEDIENTES                           = "Expedientes";
   public static final String     TITLE_SUBEXPEDIENTES                        = "Sub-expedientes";
   public static final String     TITLE_VOLUMENES                             = "Volúmenes";
   public static final String     TITLE_INDICE                                = "Índice de expedientes";

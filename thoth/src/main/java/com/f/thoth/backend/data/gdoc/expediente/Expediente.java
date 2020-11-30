@@ -50,7 +50,7 @@ public abstract class Expediente extends BaseEntity implements NeedsProtection, 
    protected BranchExpediente  owner;            // Expediente al que pertenece este expediente
 
    @OneToOne(fetch = FetchType.LAZY, orphanRemoval = true)
-   private FileIndex          index;
+   private ExpedienteIndex          index;
 
    @ManyToOne
    private DocumentType            attributes;
@@ -104,8 +104,8 @@ public abstract class Expediente extends BaseEntity implements NeedsProtection, 
 
    public void setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect; }
 
-   public FileIndex getIndex() {return index;}
-   public void setIndex(FileIndex index) {this.index = index;}
+   public ExpedienteIndex getIndex() {return index;}
+   public void setIndex(ExpedienteIndex index) {this.index = index;}
 
    public DocumentType getAttributes() {return attributes;}
    public void setAttributes(DocumentType attributes) {this.attributes = attributes;}

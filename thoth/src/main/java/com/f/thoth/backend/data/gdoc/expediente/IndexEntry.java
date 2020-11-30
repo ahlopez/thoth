@@ -29,13 +29,13 @@ public class IndexEntry extends BaseEntity implements Comparable<IndexEntry>
    private Action entryType;
    
    @ManyToOne
-   private FileIndex     index;
+   private ExpedienteIndex     index;
    
    @ManyToOne
    private SchemaValues  attributes;
    
    @ManyToOne
-   private FileIndex     expediente;
+   private ExpedienteIndex     expediente;
    
    @ManyToOne
    private SingleUser    user;
@@ -52,7 +52,7 @@ public class IndexEntry extends BaseEntity implements Comparable<IndexEntry>
       buildCode();
    }
 
-   public IndexEntry(Action entryType, FileIndex expediente, SingleUser user, LocalDate date, String reference)
+   public IndexEntry(Action entryType, ExpedienteIndex expediente, SingleUser user, LocalDate date, String reference)
    {
       if( entryType == null)
          throw new IllegalArgumentException("Tipo de entrada del índice no puede ser nula");
@@ -80,8 +80,8 @@ public class IndexEntry extends BaseEntity implements Comparable<IndexEntry>
    public Action           getEntryType() { return entryType; }
    public void             setEntryType(Action entryType) { this.entryType = entryType; }
 
-   public FileIndex        getExpediente() {  return expediente;}
-   public void             setExpediente(FileIndex expediente) {this.expediente = expediente;}
+   public ExpedienteIndex        getExpediente() {  return expediente;}
+   public void             setExpediente(ExpedienteIndex expediente) {this.expediente = expediente;}
 
    public SingleUser       getUser() {return user;}
    public void             setUser(SingleUser user) {this.user = user;}
