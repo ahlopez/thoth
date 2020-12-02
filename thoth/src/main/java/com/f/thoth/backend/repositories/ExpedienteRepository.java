@@ -50,6 +50,6 @@ public interface ExpedienteRepository extends JpaRepository<ExpedienteIndex, Lon
 
    //   ----------- ACL handling ----------------
    @Query("SELECT DISTINCT e FROM ExpedienteIndex e, Permission p  WHERE e.objectToProtect = p.objectToProtect and p.role = ?1")
-   List<ExpedienteIndex> findClasesGranted( Role role);
+   List<ExpedienteIndex> findExpedientesGranted( Role role);
 
 }//ExpedienteRepository

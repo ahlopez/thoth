@@ -6,6 +6,8 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
@@ -74,13 +76,11 @@ import com.f.thoth.backend.data.security.UserGroup;
                @NamedAttributeNode("code"),
                @NamedAttributeNode("name"),
                @NamedAttributeNode("owner"),
-               @NamedAttributeNode("level"),
                @NamedAttributeNode("dateOpened"),
                @NamedAttributeNode("dateClosed"),
                @NamedAttributeNode("classCode"),
                @NamedAttributeNode("path"),
                @NamedAttributeNode("metadata"),
-               @NamedAttributeNode("retentionSchedule"),
                @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)
             },
             subgraphs = @NamedSubgraph(name = ObjectToProtect.FULL,
@@ -113,8 +113,8 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
 	   protected ObjectToProtect  objectToProtect;             // Associated security object
 
 	   @NotNull(message = "{evidentia.level.required}")
-	   @ManyToOne
-	   protected NodeType  type;                               // Node type: {EXPEDIENTE, SUB_EXPEDIENTE, VOLUMEN}
+	   @Enumerated(EnumType.STRING)
+	   protected NodeType  type;                               // Node type: {EXPEDIENTE}
 
 	   @NotNull(message = "evidentia.metadata.required")
 	   @OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
@@ -130,7 +130,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
 	   protected ExpedienteIndex owner;                        //  Expediente to which this SUBEXPEDIENTE/VOLUMEN belongs
 	   
 	   @NotNull(message = "{evidentia.classcode.required}")
-	   protected String    classCode;                          //  code of the classification node to which the expediente tree belongs
+	   protected String    classCode;                          //  Code of the Classification node to which the expediente tree belongs
 	   
 	   @NotNull(message = "{evidentia.expedientecode.required}")
 	   protected String    expedienteCode;                     //  expediente code

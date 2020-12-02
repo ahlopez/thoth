@@ -16,8 +16,8 @@ import com.f.thoth.backend.data.gdoc.classification.Level;
 import com.f.thoth.backend.data.gdoc.classification.Retention;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.service.ClassificationService;
+import com.f.thoth.backend.service.ExpedienteService;
 import com.f.thoth.backend.service.LevelService;
-import com.f.thoth.backend.service.RetentionService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.components.HierarchicalSelector;
 import com.f.thoth.ui.components.Notifier;
@@ -31,7 +31,6 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -59,13 +58,18 @@ public class ExpedienteView extends VerticalLayout
    private Button save     = new Button("Guardar expediente");
    private Button delete   = new Button("Eliminar expediente");
    private Button close    = new Button("Cancelar");
-   
-   private Level[] levels;
-   private List<Retention>  retentionSchedules;
 
+   
+   /**********
+    *  1. Considerar utilizar solo dos páneles fijos y uno flotante Left-> Class selector right-> expediente selector  float-> edit expediente
+    *  2. Adicionar la columna de id al hierarchicalSelector
+    *  3. Ir por pasos. a) construir y probar el Class selector, b) construir el expediente selector c) Construir el expediente editor
+    *  4. Crear la configuración de debug del proyecto ver https://www.baeldung.com/spring-debugging
+    *  
+    */
 
    @Autowired
-   public ClassificationView(ClassificationService classificationService, ExpedienteService expedienteService)
+   public ExpedienteView(ClassificationService classificationService, ExpedienteService expedienteService)
    {
 	  this.classificationService = classificationService;
       this.expedienteService     = expedienteService;
@@ -85,10 +89,10 @@ public class ExpedienteView extends VerticalLayout
       content      = new VerticalLayout();
       content.addClassName ("content");
       content.setSizeFull();
-      content.add(new H3("Expedientes, subexpedientes, volúmenes"));
-      content.add(configureExpedienteSelector(), configureExpedienteActions());
+      content.add(new H3("Expedientes, Subexpedientes y Volúmenes"));
+      //content.add(configureExpedienteSelector(), configureExpedienteActions());
 
-      rightSection.add(configureForm(expedienteForm ));
+      //rightSection.add(configureForm(expedienteForm ));
       updateSelector();
       closeEditor();
 
@@ -98,26 +102,15 @@ public class ExpedienteView extends VerticalLayout
 
    }//ClassificationView
 
-   protected String getBasePage() { return PAGE_ESQUEMAS_CLASIFICACION; }
+   protected String getBasePage() { return PAGE_EXPEDIENTES; }
 
-   
-   private Level[] getAllLevels( LevelService levelService)
-   {       
-      List<Level> allLevels      = levelService.findAll();
-      int nLevels    = allLevels.size();
-      Level[] levels = new Level[nLevels];
-      for( int i=0; i < nLevels; i++)
-         levels[i] = allLevels.get(i);
-      
-      return levels;
-   }//getAllLevels
 
-   private Component configureGrid()
+   private Component configureClassSelector()
    {
       ownerClass = new HierarchicalSelector<>(
-                           expedienteService, 
+                           classificationService, 
                            Grid.SelectionMode.SINGLE, 
-                           "Seleccione la clase padre", 
+                           "Seleccione la clase del expediente", 
                            this::editOwner
                            );     
       ownerClass.getElement().setAttribute("colspan", "4");
@@ -135,9 +128,9 @@ public class ExpedienteView extends VerticalLayout
       
       return ownerClass;
 
-   }//configureGrid
+   }//configureClassSelector
      
-
+   /*
    private Component configureButtons()
    {      
       add.     addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -162,7 +155,7 @@ public class ExpedienteView extends VerticalLayout
       buttons.add( delete, save, close, add);
       return buttons;
    }//configureButtons
-
+    
 
    private ClassificationForm configureForm(List<Retention >retentionSchedules)
    {
@@ -172,7 +165,7 @@ public class ExpedienteView extends VerticalLayout
       return expedienteForm;
 
    }//configureForm
-
+   */
    
    private void editOwner(Classification owner)
    {
@@ -180,7 +173,7 @@ public class ExpedienteView extends VerticalLayout
       editClass(currentClass);
    }//editOwner
    
-
+    /*
    private void addClass()
    {
       currentClass = new Classification();
@@ -191,18 +184,6 @@ public class ExpedienteView extends VerticalLayout
       editClass(currentClass);
    }//addClass
    
-   private Level  getCurrentLevel( Classification owner)
-   {
-      Level level      = null;
-      int currentLevel = owner.getLevel().getOrden()+ 1;
-      if ( currentLevel >= levels.length)
-         Notifier.error("La clase del último nivel no puede tener hijos");       
-      else
-         level = levels[currentLevel];
-
-      return level;
-      
-   }//getCurrentLevel
    
    
    private void saveClass( Classification expediente)
@@ -227,15 +208,17 @@ public class ExpedienteView extends VerticalLayout
       updateSelector();
       closeEditor();
    }//deleteClass
+    */
    
-   
-   private void editClass(Classification expediente)
+    
+   private void editClass(Classification ownerClass)
    {
-      if (expediente == null)
+      if (ownerClass == null)
       {
          closeEditor();
       } else
       {
+    	  /*
          if( expediente.isPersisted())
             expediente = expedienteService.load(expediente.getId());
 
@@ -243,15 +226,18 @@ public class ExpedienteView extends VerticalLayout
          expedienteForm.setClassification(expediente);
          rightSection.setVisible(true);
          expedienteForm.addClassName("selected-item-form");
+         */
       }
    }//editClass
    
 
    private void closeEditor()
    {
+	   /*
       expedienteForm.setClassification(null);
       expedienteForm.setVisible(false);
       expedienteForm.removeClassName("selected-item-form");
+      */
 
    }//closeEditor
    
@@ -269,7 +255,7 @@ public class ExpedienteView extends VerticalLayout
      ownerClass.refresh();
    }//updateSelector
 
-
+   /*
    private void saveClassification(ClassificationForm.SaveEvent event)
    {
       Classification expediente = event.getClassification();
@@ -277,5 +263,6 @@ public class ExpedienteView extends VerticalLayout
       updateSelector();
       closeEditor();
    }//saveClassification
+   */
 
-}//ClassificationView
+}//ExpedienteView
