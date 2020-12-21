@@ -122,6 +122,14 @@ public abstract class Expediente extends BaseEntity implements NeedsProtection, 
    @Override public String      getName()   { return name;}
 
    @Override public BranchExpediente getOwner()  { return owner;}
+   
+   @Override public String      formatCode() 
+   { 
+       int i = TextUtil.indexOf(code, "/", 3);
+       String id = code.substring(i);
+       id = TextUtil.replace(id, "/", "-");
+       return id;
+   }//formatCode
 
    protected String getOwnerCode(){ return (owner == null ? "" : owner.getOwnerCode())+ ":"+ name; }
 

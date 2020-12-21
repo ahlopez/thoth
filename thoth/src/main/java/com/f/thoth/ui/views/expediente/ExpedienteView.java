@@ -4,29 +4,21 @@ package com.f.thoth.ui.views.expediente;
 import static com.f.thoth.ui.utils.Constant.PAGE_EXPEDIENTES;
 import static com.f.thoth.ui.utils.Constant.TITLE_EXPEDIENTES;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
 import com.f.thoth.backend.data.Role;
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
-import com.f.thoth.backend.data.gdoc.classification.Level;
-import com.f.thoth.backend.data.gdoc.classification.Retention;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.service.ClassificationService;
 import com.f.thoth.backend.service.ExpedienteService;
-import com.f.thoth.backend.service.LevelService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.components.HierarchicalSelector;
-import com.f.thoth.ui.components.Notifier;
 import com.f.thoth.ui.views.classification.ClassificationForm;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasValue;
-import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
@@ -111,6 +103,7 @@ public class ExpedienteView extends VerticalLayout
                            classificationService, 
                            Grid.SelectionMode.SINGLE, 
                            "Seleccione la clase del expediente", 
+                           true,
                            this::editOwner
                            );     
       ownerClass.getElement().setAttribute("colspan", "4");

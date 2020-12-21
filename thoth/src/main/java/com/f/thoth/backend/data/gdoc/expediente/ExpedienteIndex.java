@@ -290,7 +290,16 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
 	   @Override public String           getName()   { return name;}
 
 	   @Override public ExpedienteIndex   getOwner()  { return owner;}
+	   
+	   @Override public String      formatCode() 
+	   { 
+	       int i = TextUtil.indexOf(code, "/", 3);
+	       String id = code.substring(i);
+	       id = TextUtil.replace(id, "/", "-");
+	       return id;
+	   }//formatCode
 
+	   
 	   private String getOwnerPath(ExpedienteIndex owner)
 	   {   	
 		   String path = "";

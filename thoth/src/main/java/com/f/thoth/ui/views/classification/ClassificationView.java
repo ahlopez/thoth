@@ -76,6 +76,7 @@ public class ClassificationView extends VerticalLayout
 
       leftSection  = new VerticalLayout();
       leftSection.addClassName  ("left-section");
+      leftSection.setWidth("20%");
       leftSection.add(new Label (" "));
 
       rightSection = new VerticalLayout();
@@ -83,11 +84,13 @@ public class ClassificationView extends VerticalLayout
 
       content      = new VerticalLayout();
       content.addClassName      ("content");
+      content.setWidth("50%");
       content.setSizeFull();
       content.add(new H3("Clases registradas"));
 
       content.add( configureGrid(), configureButtons());
       rightSection.add(configureForm(retentionSchedules));
+      rightSection.setWidth("30%");
       updateSelector();
       closeEditor();
 
@@ -117,7 +120,9 @@ public class ClassificationView extends VerticalLayout
                            classificationService, 
                            Grid.SelectionMode.SINGLE, 
                            "Seleccione la clase padre", 
+                           true,
                            this::editOwner
+                           
                            );     
       ownerClass.getElement().setAttribute("colspan", "4");
 

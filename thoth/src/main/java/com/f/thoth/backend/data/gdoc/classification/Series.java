@@ -136,6 +136,8 @@ public class Series extends BaseEntity implements NeedsProtection, HierarchicalE
    @Override public String       getName()   { return name;}
 
    @Override public BranchSeries getOwner()  { return owner;}
+   
+   @Override public String       formatCode() { return code;}
 
    // -----------------  Implements NeedsProtection ----------------
 

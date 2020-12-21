@@ -150,6 +150,15 @@ public class Clazz extends BaseEntity implements NeedsProtection, HierarchicalEn
 
    @Override public BranchClass     getOwner() { return owner;}
 
+   @Override public String      formatCode()
+   {
+       int i = TextUtil.indexOf(code, "/", 3);
+       String id = code.substring(i);
+       id = TextUtil.replace(id, "/", "-");
+       return id;
+   }//formatCode
+
+
 
    // --------------- Object methods ---------------------
 

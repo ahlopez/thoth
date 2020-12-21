@@ -45,29 +45,29 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
    private Consumer<T>                  actionOnSelect;
 
 
-   public HierarchicalSelector ( HierarchicalService<T> service, Grid.SelectionMode selectionMode, String name, Consumer<T> action)
+   public HierarchicalSelector ( HierarchicalService<T> service, Grid.SelectionMode selectionMode, String name, boolean showId, Consumer<T> action)
    {
       this.tenant         = ThothSession.getCurrentTenant();
       this.result         = new TreeSet<>();
       this.selectionMode  = selectionMode;
       this.service        = service;
       this.actionOnSelect = action;
-      setup(name);
+      setup(name, showId);
 
    }//AbstractHierarchicalSelector constructor
 
 
-   private void setup( String name)
+   private void setup( String name, boolean showId)
    {
       add( new H3(name));
       HorizontalLayout  layout = new HorizontalLayout();
       layout.setWidthFull();
-      treeGrid = buildSelector();
+      treeGrid = buildSelector(showId);
       layout.add(treeGrid);
 
       if ( selectionMode != Grid.SelectionMode.NONE)
       {
-         this.searchGrid   = buildSearchGrid(treeGrid);
+         this.searchGrid   = buildSearchGrid(treeGrid, showId);
          searchGrid.setWidth("79%");
          this.searchBar    = buildSearchBar(searchGrid);
          add(searchBar);
@@ -81,12 +81,15 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
    }//setup
 
 
-   private TreeGrid<T> buildSelector( )
+   private TreeGrid<T> buildSelector(boolean showId)
    {
       TreeGrid<T>tGrid = new TreeGrid<>();
       tGrid.setWidthFull();
-
+      
       tGrid.addHierarchyColumn(T::getName).setHeader("Nombre");
+      if (showId)
+          tGrid.addColumn(T::formatCode).setHeader("Id");
+
       tGrid.setSelectionMode(selectionMode);
 
       dataProvider = getDataProvider(service);
@@ -147,12 +150,15 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
    }//buildMultiSelector
 
 
-   private Grid<T> buildSearchGrid(TreeGrid<T> tGrid)
+   private Grid<T> buildSearchGrid(TreeGrid<T> tGrid, boolean showId)
    {
       Grid<T> sGrid = new Grid<>();
       sGrid.setVisible(false);
       sGrid.setWidthFull();
       sGrid.addColumn(T::getName).setHeader("Nombre");
+      if (showId)
+          sGrid.addColumn(T::formatCode).setHeader("Id");
+    	  
       sGrid.setSelectionMode(selectionMode);
       addValueChangeListener(sGrid, tGrid);
 

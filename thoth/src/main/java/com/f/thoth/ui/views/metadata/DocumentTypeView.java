@@ -99,7 +99,8 @@ public class DocumentTypeView extends VerticalLayout
       ownerDocType = new HierarchicalSelector<>(
                            documentTypeService, 
                            Grid.SelectionMode.SINGLE, 
-                           "Seleccione el tipo padre", 
+                           "Seleccione el tipo padre",
+                           true,
                            this::editOwner
                            );     
       ownerDocType.getElement().setAttribute("colspan", "4");

@@ -98,7 +98,7 @@ public class OperationView extends AbstractEvidentiaCrudView<Operation>
       userOwner.setAllowCustomValue(true);
       userOwner.setPageSize(20);
 
-      parentObject = new HierarchicalSelector<>(service, Grid.SelectionMode.SINGLE, "Objeto padre", null);
+      parentObject = new HierarchicalSelector<>(service, Grid.SelectionMode.SINGLE, "Objeto padre", false, null);
       parentObject.getElement().setAttribute("colspan", "4");
 
       FormLayout form = new FormLayout( name, category, userOwner, roleOwner, parentObject);

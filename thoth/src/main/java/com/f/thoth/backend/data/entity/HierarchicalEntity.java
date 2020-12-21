@@ -7,6 +7,8 @@ public interface HierarchicalEntity<T>
    public Long            getId();
    public ObjectToProtect getObjectToProtect();
    public String          getName();   
+   public String          getCode();
+   public String          formatCode();
    public T               getOwner();
 
 }//HierarchicalEntity

@@ -112,6 +112,8 @@ public class UserGroup extends Usuario implements HierarchicalEntity<UserGroup>
    @Override public String      getName()   { return name;}
 
    @Override public UserGroup   getOwner()  { return owner;}
+   
+   @Override public String      formatCode() { return getCode();}
 
    private String getOwnerCode(){ return (owner == null ? "" : owner.getOwnerCode())+ ":"+ name; }
 

@@ -179,7 +179,7 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
    public void prepareData()
    {
       objectToProtect.prepareData();
-      buildCode();
+      buildCode();      
    }
 
    @Override protected void buildCode()
@@ -280,6 +280,14 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
    @Override public String           getName()   { return name;}
 
    @Override public Classification   getOwner()  { return owner;}
+      
+   @Override public String      formatCode() 
+   { 
+       int i = TextUtil.indexOf(code, "/", 3);
+       String id = i >= 0? code.substring(i): "";
+       id = TextUtil.replace(id, "/", "-");
+       return id;
+   }//formatCode
 
    private String getOwnerPath(Classification owner)
    {   	
