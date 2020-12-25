@@ -30,7 +30,6 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -46,7 +45,6 @@ public class ClassificationView extends VerticalLayout
    private ClassificationService classificationService;
    private User                  currentUser;
 
-   private VerticalLayout        leftSection;
    private VerticalLayout        content;
    private VerticalLayout        rightSection;
    
@@ -74,27 +72,19 @@ public class ClassificationView extends VerticalLayout
       addClassName("main-view");
       setSizeFull();
 
-      leftSection  = new VerticalLayout();
-      leftSection.addClassName  ("left-section");
-      leftSection.setWidth("20%");
-      leftSection.add(new Label (" "));
-
       rightSection = new VerticalLayout();
       rightSection.addClassName ("right-section");
 
       content      = new VerticalLayout();
-      content.addClassName      ("content");
-      content.setWidth("50%");
-      content.setSizeFull();
+      content.addClassName ("selector");
       content.add(new H3("Clases registradas"));
 
       content.add( configureGrid(), configureButtons());
       rightSection.add(configureForm(retentionSchedules));
-      rightSection.setWidth("30%");
       updateSelector();
       closeEditor();
 
-      HorizontalLayout panel=  new HorizontalLayout(leftSection, content, rightSection);
+      HorizontalLayout panel=  new HorizontalLayout(content, rightSection);
       panel.setSizeFull();
       add( panel);
 
@@ -124,7 +114,7 @@ public class ClassificationView extends VerticalLayout
                            this::editOwner
                            
                            );     
-      ownerClass.getElement().setAttribute("colspan", "4");
+      ownerClass.getElement().setAttribute("colspan", "3");
 
       FormLayout form = new FormLayout(ownerClass);
       form.setResponsiveSteps(
@@ -211,6 +201,9 @@ public class ClassificationView extends VerticalLayout
    
    private void saveClass( Classification classification)
    {
+	  if (classification == null)
+		  return;
+	  
       classificationService.save(currentUser, classification);
       closeEditor();
       currentClass = null;
