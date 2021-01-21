@@ -283,7 +283,7 @@ public class DataGenerator implements HasLogger
 		if (jcrRepo != null)
 		{
 			Session session = jcrRepo.login(new SimpleCredentials(userCode, passwordHash.toCharArray()));
-			getLogger().info("... acquired session to repo["+ jcrRepo.toString()+ "], user["+ userCode+ "], pwd["+ passwordHash+ "]");
+			getLogger().info("... acquired session to jcr(JackRabbit) repo, user["+ userCode+ "], pwd["+ passwordHash+ "]");
 			return session;
 		} else
 			throw new NullPointerException("Repositorio no inicializado");

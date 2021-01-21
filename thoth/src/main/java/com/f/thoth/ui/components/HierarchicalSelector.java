@@ -115,14 +115,13 @@ implements HasValue<E, T>
 
 		tGrid.addItemDoubleClickListener( e-> tGrid.deselect(e.getItem()));
 		tGrid.addExpandListener         ( e-> expandedNodes.addAll(e.getItems()));
-
 		tGrid.addSelectionListener      ( e->
 		{
 			Optional<T> first = e.getFirstSelectedItem();
 			if ( first.isPresent())
 				setValue( first.get());
 		});
-
+		
 		if (actionOnSelect != null)
 			tGrid.asSingleSelect().addValueChangeListener(e-> actionOnSelect.accept(e.getValue()));
 
@@ -170,7 +169,7 @@ implements HasValue<E, T>
 		}
 
 		sGrid.setSelectionMode(selectionMode);
-		addValueChangeListener(sGrid, tGrid);
+		//addValueChangeListener(sGrid, tGrid);
 
 		return sGrid;
 
@@ -205,7 +204,6 @@ implements HasValue<E, T>
 	private Registration addValueChangeListener( Grid<T> sGrid, TreeGrid<T> tGrid)
 	{
 		Registration registration = null;
-
 		if ( selectionMode == Grid.SelectionMode.SINGLE)
 			registration = setupSingleselectListener(sGrid, tGrid);
 		else if( selectionMode == Grid.SelectionMode.MULTI)
@@ -228,7 +226,6 @@ implements HasValue<E, T>
 			{
 				setValue(value);
 				backtrackParents(tGrid::expand, value);
-				tGrid.select(value);
 			}
 		});
 		return registration;

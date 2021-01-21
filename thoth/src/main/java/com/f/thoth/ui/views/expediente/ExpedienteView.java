@@ -23,6 +23,7 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -54,8 +55,8 @@ public class ExpedienteView extends VerticalLayout
    
    /**********
     *  1. Considerar utilizar solo dos páneles fijos y uno flotante Left-> Class selector right-> expediente selector  float-> edit expediente
-    *  2. Adicionar la columna de id al hierarchicalSelector
-    *  3. Ir por pasos. a) construir y probar el Class selector, b) construir el expediente selector c) Construir el expediente editor
+    *  2. >>>DONE-> Adicionar la columna de id al hierarchicalSelector
+    *  3. Ir por pasos. a) >>>DONE-> construir y probar el Class selector, b) construir el expediente selector c) Construir el expediente editor
     *  4. Crear la configuración de debug del proyecto ver https://www.baeldung.com/spring-debugging
     *  
     */
@@ -69,7 +70,20 @@ public class ExpedienteView extends VerticalLayout
       
       addClassName("main-view");
       setSizeFull();
+      
+      content      = new VerticalLayout();
+      content.addClassName ("selector");
+      content.add(new H3 ("Clasificación del expediente"));
+      content.add( configureClassSelector());
+      
+      updateSelector();
+      closeEditor();
 
+      content.setSizeFull();
+      add( content);
+    
+        
+/*
       leftSection  = new VerticalLayout();
       leftSection.addClassName  ("left-section");
       leftSection.add(new H3 ("Clasificación del expediente"));
@@ -88,10 +102,10 @@ public class ExpedienteView extends VerticalLayout
       updateSelector();
       closeEditor();
 
-      HorizontalLayout panel=  new HorizontalLayout(leftSection, content, rightSection);
+      HorizontalLayout panel=  new HorizontalLayout( content, rightSection);
       panel.setSizeFull();
       add( panel);
-
+*/
    }//ClassificationView
 
    protected String getBasePage() { return PAGE_EXPEDIENTES; }
@@ -104,9 +118,9 @@ public class ExpedienteView extends VerticalLayout
                            Grid.SelectionMode.SINGLE, 
                            "Seleccione la clase del expediente", 
                            true,
-                           this::editOwner
+                           this::selectedOwnerClass
                            );     
-      ownerClass.getElement().setAttribute("colspan", "4");
+      ownerClass.getElement().setAttribute("colspan", "3");
 
       FormLayout form = new FormLayout(ownerClass);
       form.setResponsiveSteps(
@@ -160,11 +174,18 @@ public class ExpedienteView extends VerticalLayout
    }//configureForm
    */
    
-   private void editOwner(Classification owner)
+   private void selectedOwnerClass(Classification owner)
    {
+	  /*
+	   * 1. Guarde la clase en el estado de la sesión
+	   * 2. Ejecute el routing interno
+	   * 
+	   * (Las clases intermedias no pueden contener expedientes)
+	   */
       this.currentClass = owner;
-      editClass(currentClass);
-   }//editOwner
+      if (currentClass != null)
+         editClass(currentClass);
+   }//selectedOwnerClass
    
     /*
    private void addClass()
@@ -206,11 +227,18 @@ public class ExpedienteView extends VerticalLayout
     
    private void editClass(Classification ownerClass)
    {
+	  
       if (ownerClass == null)
       {
+    	 System.out.println("Owner class = null");
+    	 Notification.show("Owner class = null");
          closeEditor();
       } else
       {
+    	  System.out.println("Selected class["+ownerClass.getClassCode()+ "-> "+ ownerClass.formatCode()+ "->"+  ownerClass.getPath()+ "]");
+    	  Notification.show("Selected class["+ownerClass.getClassCode()+ "-> "+ ownerClass.formatCode()+ "->"+  ownerClass.getPath()+ "]");
+         //content.removeClassName("selector");
+
     	  /*
          if( expediente.isPersisted())
             expediente = expedienteService.load(expediente.getId());
