@@ -24,7 +24,6 @@ import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.router.PageTitle;
@@ -237,6 +236,9 @@ public class ExpedienteView extends VerticalLayout
       {
     	  System.out.println("Selected class["+ownerClass.getClassCode()+ "-> "+ ownerClass.formatCode()+ "->"+  ownerClass.getPath()+ "]");
     	  Notification.show("Selected class["+ownerClass.getClassCode()+ "-> "+ ownerClass.formatCode()+ "->"+  ownerClass.getPath()+ "]");
+    	  
+    	  
+    	  getUI().ifPresent(ui -> ui.navigate(ExpedienteHierarchyView.class, ownerClass.formatCode()));
          //content.removeClassName("selector");
 
     	  /*
@@ -251,6 +253,7 @@ public class ExpedienteView extends VerticalLayout
       }
    }//editClass
    
+  
 
    private void closeEditor()
    {

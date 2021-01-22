@@ -61,6 +61,7 @@ public class Constant
   public static final String     PAGE_ESQUEMAS_CLASIFICACION                = "esquema_clasificacion";
   public static final String  PAGE_ADMIN_EXPEDIENTES                        = "admin_expediente";
   public static final String     PAGE_EXPEDIENTES                           = "expediente";
+  public static final String     PAGE_JERARQUIA_EXPEDIENTES                 = "jerarquia_expedientes";
   public static final String     PAGE_SUBEXPEDIENTES                        = "sub_expediente";
   public static final String     PAGE_VOLUMENES                             = "volumen";
   public static final String     PAGE_INDICE                                = "indice";
@@ -128,6 +129,7 @@ public class Constant
   public static final String     TITLE_ESQUEMAS_CLASIFICACION                = "Esquema de clasificacion";
   public static final String  TITLE_ADMIN_EXPEDIENTES                        = "Gestión de expedientes";
   public static final String     TITLE_EXPEDIENTES                           = "Expedientes";
+  public static final String     TITLE_JERARQUIA_EXPEDIENTES                 = "Expedientes de la clase";
   public static final String     TITLE_SUBEXPEDIENTES                        = "Sub-expedientes";
   public static final String     TITLE_VOLUMENES                             = "Volúmenes";
   public static final String     TITLE_INDICE                                = "Índice de expedientes";

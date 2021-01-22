@@ -55,368 +55,368 @@ import com.vaadin.flow.server.VaadinServlet;
 
 @Viewport(VIEWPORT)
 @PWA(name = "Evidentia", shortName = "Evidentia",
-     startPath = "login",
-     backgroundColor = "#227aef", themeColor = "#227aef",
-     offlinePath = "offline-page.html",
-     offlineResources = {"images/offline-login-banner.jpg"},
-     enableInstallPrompt = false)
+startPath = "login",
+backgroundColor = "#227aef", themeColor = "#227aef",
+offlinePath = "offline-page.html",
+offlineResources = {"images/offline-login-banner.jpg"},
+enableInstallPrompt = false)
 public class MainView extends AppLayout
 {
-   private final ConfirmDialog confirmDialog = new ConfirmDialog();
-   private VerticalLayout mainMenu;
-   private final Tabs menu;
-
-   public MainView()
-   {
-      confirmDialog.setCancelable(true);
-      confirmDialog.setConfirmButtonTheme("raised tertiary error");
-      confirmDialog.setCancelButtonTheme ("raised tertiary");
-      createHeader();
-      createDrawer();
-      this.setDrawerOpened(false);
-
-      menu = createMenuTabs();
-
-      this.addToNavbar(true, menu);
-      getElement().appendChild(confirmDialog.getElement());
-      getElement().addEventListener("search-focus", e -> getElement().getClassList().add("hide-navbar") );
-      getElement().addEventListener("search-blur",  e -> getElement().getClassList().remove("hide-navbar"));
-
-   }//MainView
-
-   private void createHeader()
-   {
-      H2 logo = new H2("Evidentia");
-      logo.addClassName("hide-on-mobile");
-      HorizontalLayout header = new HorizontalLayout(new DrawerToggle(), logo);
-
-      header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
-      header.setWidth("100%");
-      header.addClassName("header");
-      addToNavbar(header);
-   }//createHeader
-
-   private void createDrawer()
-   {
-      mainMenu = new VerticalLayout();
-      createClientsMenu();
-      createSecurityMenu();
-      createAdminMenu();
-      createPropertiesMenu();
-      createClasificationMenu();
-      createExpedientesMenu();
-      createTramiteMenu();
-      createRecepcionMenu();
-      createMailMenu();
-      createSearchMenu();
-      createProcessMenu();
-      createArchiveMenu();
-      final String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
-      mainMenu.add(createLogoutLink(contextPath));
-      addToDrawer(mainMenu);
-
-   }//createDrawer
-
-
-   private RouterLink createRoute(VaadinIcon icon, String title, Class<? extends Component> viewClass)
-   {
-      RouterLink  route = populateLink(new RouterLink(null, viewClass), icon, title);
-      route.setHighlightCondition(HighlightConditions.sameLocation());
-      return route;
-   }//createRoute
-
-   private void createClientsMenu()
-   {
-      Div clients = new Div(VaadinIcon.HOSPITAL.create(), new Label(Constant.TITLE_CLIENTES));
-      ContextMenu clientsMenu = new ContextMenu(clients);
-      clientsMenu.setOpenOnClick(true);
-      if (SecurityUtils.isAccessGranted(TenantsView.class))
-         clientsMenu.addItem(createRoute(VaadinIcon.BUILDING, Constant.TITLE_TENANTS, TenantsView.class));
-
-      if ( clientsMenu.getItems().size() > 0)
-         mainMenu.add(clients);
-
-   }//createClientsMenu
-
-
-   private void createSecurityMenu( )
-   {
-      Div security = new Div(VaadinIcon.KEY.create(), new Label(Constant.TITLE_SEGURIDAD));
-      ContextMenu securityMenu = new ContextMenu(security);
-      securityMenu.setOpenOnClick(true);
-
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         securityMenu.addItem(createRoute(VaadinIcon.COG, Constant.TITLE_OPERATIONS, OperationView.class));
-
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         securityMenu.addItem(createRoute(VaadinIcon.BOOK, Constant.TITLE_INFORMACION, OperationView.class));
-
-      if (SecurityUtils.isAccessGranted(RoleView.class))
-         securityMenu.addItem(createRoute(VaadinIcon.ACADEMY_CAP, Constant.TITLE_ROLES, RoleView.class));
-
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         securityMenu.addItem(createRoute(VaadinIcon.CHECK_CIRCLE, Constant.TITLE_PERMISOS_EJECUCION, ExecutePermissionView.class));
-
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         securityMenu.addItem(createRoute(VaadinIcon.CHECK_SQUARE, Constant.TITLE_PERMISOS_ACCESO,AccessPermissionView.class));
-
-      if ( securityMenu.getItems().size() > 0)
-         mainMenu.add(security);
+	private final ConfirmDialog confirmDialog = new ConfirmDialog();
+	private VerticalLayout mainMenu;
+	private final Tabs menu;
+
+	public MainView()
+	{
+		confirmDialog.setCancelable(true);
+		confirmDialog.setConfirmButtonTheme("raised tertiary error");
+		confirmDialog.setCancelButtonTheme ("raised tertiary");
+		createHeader();
+		createDrawer();
+		this.setDrawerOpened(false);
+
+		menu = createMenuTabs();
+
+		this.addToNavbar(true, menu);
+		getElement().appendChild(confirmDialog.getElement());
+		getElement().addEventListener("search-focus", e -> getElement().getClassList().add("hide-navbar") );
+		getElement().addEventListener("search-blur",  e -> getElement().getClassList().remove("hide-navbar"));
+
+	}//MainView
+
+	private void createHeader()
+	{
+		H2 logo = new H2("Evidentia");
+		logo.addClassName("hide-on-mobile");
+		HorizontalLayout header = new HorizontalLayout(new DrawerToggle(), logo);
+
+		header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
+		header.setWidth("100%");
+		header.addClassName("header");
+		addToNavbar(header);
+	}//createHeader
+
+	private void createDrawer()
+	{
+		mainMenu = new VerticalLayout();
+		createClientsMenu();
+		createSecurityMenu();
+		createAdminMenu();
+		createPropertiesMenu();
+		createClasificationMenu();
+		createExpedientesMenu();
+		createTramiteMenu();
+		createRecepcionMenu();
+		createMailMenu();
+		createSearchMenu();
+		createProcessMenu();
+		createArchiveMenu();
+		final String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
+		mainMenu.add(createLogoutLink(contextPath));
+		addToDrawer(mainMenu);
+
+	}//createDrawer
+
+
+	private RouterLink createRoute(VaadinIcon icon, String title, Class<? extends Component> viewClass)
+	{
+		RouterLink  route = populateLink(new RouterLink(null, viewClass), icon, title);
+		route.setHighlightCondition(HighlightConditions.sameLocation());
+		return route;
+	}//createRoute
+
+	private void createClientsMenu()
+	{
+		Div clients = new Div(VaadinIcon.HOSPITAL.create(), new Label(Constant.TITLE_CLIENTES));
+		ContextMenu clientsMenu = new ContextMenu(clients);
+		clientsMenu.setOpenOnClick(true);
+		if (SecurityUtils.isAccessGranted(TenantsView.class))
+			clientsMenu.addItem(createRoute(VaadinIcon.BUILDING, Constant.TITLE_TENANTS, TenantsView.class));
+
+		if ( clientsMenu.getItems().size() > 0)
+			mainMenu.add(clients);
+
+	}//createClientsMenu
 
-   }//createSecurityMenu
 
-   private void createAdminMenu()
-   {
-      Div admin = new Div(VaadinIcon.ASTERISK.create(), new Label(Constant.TITLE_ADMINISTRACION));
-      ContextMenu adminMenu = new ContextMenu(admin);
-      adminMenu.setOpenOnClick(true);
+	private void createSecurityMenu( )
+	{
+		Div security = new Div(VaadinIcon.KEY.create(), new Label(Constant.TITLE_SEGURIDAD));
+		ContextMenu securityMenu = new ContextMenu(security);
+		securityMenu.setOpenOnClick(true);
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         adminMenu.addItem(createRoute(VaadinIcon.TABLE, Constant.TITLE_PARAMETROS, OperationView.class));
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			securityMenu.addItem(createRoute(VaadinIcon.COG, Constant.TITLE_OPERATIONS, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(SingleUserView.class))
-         adminMenu.addItem(createRoute(VaadinIcon.USER, Constant.TITLE_USUARIOS, SingleUserView.class));
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			securityMenu.addItem(createRoute(VaadinIcon.BOOK, Constant.TITLE_INFORMACION, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(UserGroupView.class))
-         adminMenu.addItem(createRoute(VaadinIcon.GROUP, Constant.TITLE_GRUPOS_USUARIOS, UserGroupView.class));
+		if (SecurityUtils.isAccessGranted(RoleView.class))
+			securityMenu.addItem(createRoute(VaadinIcon.ACADEMY_CAP, Constant.TITLE_ROLES, RoleView.class));
 
-      if ( adminMenu.getItems().size() > 0)
-         mainMenu.add(admin);
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			securityMenu.addItem(createRoute(VaadinIcon.CHECK_CIRCLE, Constant.TITLE_PERMISOS_EJECUCION, ExecutePermissionView.class));
 
-   }//createAdminMenu
-   
-   private void createPropertiesMenu()
-   {
-      Div properties = new Div(VaadinIcon.ABACUS.create(), new Label(Constant.TITLE_PROPIEDADES));
-      ContextMenu propertiesMenu = new ContextMenu(properties);
-      propertiesMenu.setOpenOnClick(true);
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			securityMenu.addItem(createRoute(VaadinIcon.CHECK_SQUARE, Constant.TITLE_PERMISOS_ACCESO,AccessPermissionView.class));
 
-      if (SecurityUtils.isAccessGranted(MetadataView.class))
-         propertiesMenu.addItem(createRoute(VaadinIcon.CUBE, Constant.TITLE_METADATA, MetadataView.class));
+		if ( securityMenu.getItems().size() > 0)
+			mainMenu.add(security);
 
-      if (SecurityUtils.isAccessGranted(MetadataSchemaView.class))
-         propertiesMenu.addItem(createRoute(VaadinIcon.CUBES, Constant.TITLE_ESQUEMAS_METADATA, MetadataSchemaView.class));
+	}//createSecurityMenu
 
-      if (SecurityUtils.isAccessGranted(DocumentTypeView.class))
-         propertiesMenu.addItem(createRoute(VaadinIcon.GRID_BIG_O, Constant.TITLE_TIPOS_DOCUMENTALES, DocumentTypeView.class));
+	private void createAdminMenu()
+	{
+		Div admin = new Div(VaadinIcon.ASTERISK.create(), new Label(Constant.TITLE_ADMINISTRACION));
+		ContextMenu adminMenu = new ContextMenu(admin);
+		adminMenu.setOpenOnClick(true);
 
-      if ( propertiesMenu.getItems().size() > 0)
-         mainMenu.add(properties);
-      
-   }//createPropertiesMenu
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			adminMenu.addItem(createRoute(VaadinIcon.TABLE, Constant.TITLE_PARAMETROS, OperationView.class));
 
-   private void createClasificationMenu()
-   {
-      Div classification = new Div(VaadinIcon.SITEMAP.create(), new Label(Constant.TITLE_CLASIFICACION));
-      ContextMenu classificationMenu = new ContextMenu(classification);
-      classificationMenu.setOpenOnClick(true);
+		if (SecurityUtils.isAccessGranted(SingleUserView.class))
+			adminMenu.addItem(createRoute(VaadinIcon.USER, Constant.TITLE_USUARIOS, SingleUserView.class));
 
-      if (SecurityUtils.isAccessGranted(LevelView.class))
-         classificationMenu.addItem(createRoute(VaadinIcon.LEVEL_RIGHT_BOLD, Constant.TITLE_NIVELES, LevelView.class));
+		if (SecurityUtils.isAccessGranted(UserGroupView.class))
+			adminMenu.addItem(createRoute(VaadinIcon.GROUP, Constant.TITLE_GRUPOS_USUARIOS, UserGroupView.class));
 
-      if (SecurityUtils.isAccessGranted(RetentionView.class))
-         classificationMenu.addItem(createRoute(VaadinIcon.CALENDAR_O, Constant.TITLE_RETENCION, RetentionView.class));
+		if ( adminMenu.getItems().size() > 0)
+			mainMenu.add(admin);
 
-      if (SecurityUtils.isAccessGranted(ClassificationView.class))
-         classificationMenu.addItem(createRoute(VaadinIcon.SPLIT, Constant.TITLE_ESQUEMAS_CLASIFICACION, ClassificationView.class));
+	}//createAdminMenu
 
-      if ( classificationMenu.getItems().size() > 0)
-         mainMenu.add(classification);
+	private void createPropertiesMenu()
+	{
+		Div properties = new Div(VaadinIcon.ABACUS.create(), new Label(Constant.TITLE_PROPIEDADES));
+		ContextMenu propertiesMenu = new ContextMenu(properties);
+		propertiesMenu.setOpenOnClick(true);
 
-   }//createClasificationMenu
+		if (SecurityUtils.isAccessGranted(MetadataView.class))
+			propertiesMenu.addItem(createRoute(VaadinIcon.CUBE, Constant.TITLE_METADATA, MetadataView.class));
 
-   private void createExpedientesMenu()
-   {
-      Div expediente = new Div(VaadinIcon.FOLDER.create(), new Label(Constant.TITLE_ADMIN_EXPEDIENTES));
-      ContextMenu expedienteMenu = new ContextMenu(expediente);
-      expedienteMenu.setOpenOnClick(true);
+		if (SecurityUtils.isAccessGranted(MetadataSchemaView.class))
+			propertiesMenu.addItem(createRoute(VaadinIcon.CUBES, Constant.TITLE_ESQUEMAS_METADATA, MetadataSchemaView.class));
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         expedienteMenu.addItem(createRoute(VaadinIcon.FOLDER_O, Constant.TITLE_EXPEDIENTES, ExpedienteView.class));
+		if (SecurityUtils.isAccessGranted(DocumentTypeView.class))
+			propertiesMenu.addItem(createRoute(VaadinIcon.GRID_BIG_O, Constant.TITLE_TIPOS_DOCUMENTALES, DocumentTypeView.class));
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         expedienteMenu.addItem(createRoute(VaadinIcon.FILE_TREE_SMALL, Constant.TITLE_SUBEXPEDIENTES, OperationView.class));
+		if ( propertiesMenu.getItems().size() > 0)
+			mainMenu.add(properties);
 
-      if (SecurityUtils.isAccessGranted(RoleView.class))
-         expedienteMenu.addItem(createRoute(VaadinIcon.FILE_TREE, Constant.TITLE_VOLUMENES, RoleView.class));
+	}//createPropertiesMenu
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         expedienteMenu.addItem(createRoute(VaadinIcon.LIST_OL, Constant.TITLE_INDICE, OperationView.class));
+	private void createClasificationMenu()
+	{
+		Div classification = new Div(VaadinIcon.SITEMAP.create(), new Label(Constant.TITLE_CLASIFICACION));
+		ContextMenu classificationMenu = new ContextMenu(classification);
+		classificationMenu.setOpenOnClick(true);
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         expedienteMenu.addItem(createRoute(VaadinIcon.DOWNLOAD, Constant.TITLE_EXPORTACION,OperationView.class));
+		if (SecurityUtils.isAccessGranted(LevelView.class))
+			classificationMenu.addItem(createRoute(VaadinIcon.LEVEL_RIGHT_BOLD, Constant.TITLE_NIVELES, LevelView.class));
 
-      if (SecurityUtils.isAccessGranted(RoleView.class))
-         expedienteMenu.addItem(createRoute(VaadinIcon.UPLOAD, Constant.TITLE_IMPORTACION, RoleView.class));
+		if (SecurityUtils.isAccessGranted(RetentionView.class))
+			classificationMenu.addItem(createRoute(VaadinIcon.CALENDAR_O, Constant.TITLE_RETENCION, RetentionView.class));
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         expedienteMenu.addItem(createRoute(VaadinIcon.COPY_O, Constant.TITLE_COPIA_DOCUMENTOS, OperationView.class));
+		if (SecurityUtils.isAccessGranted(ClassificationView.class))
+			classificationMenu.addItem(createRoute(VaadinIcon.SPLIT, Constant.TITLE_ESQUEMAS_CLASIFICACION, ClassificationView.class));
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         expedienteMenu.addItem(createRoute(VaadinIcon.PASTE, Constant.TITLE_TRANSER_DOCUMENTOS,OperationView.class));
+		if ( classificationMenu.getItems().size() > 0)
+			mainMenu.add(classification);
 
-      if ( expedienteMenu.getItems().size() > 0)
-         mainMenu.add(expediente);
+	}//createClasificationMenu
 
-   }//createExpedientesMenu
+	private void createExpedientesMenu()
+	{
+		Div expediente = new Div(VaadinIcon.FOLDER.create(), new Label(Constant.TITLE_ADMIN_EXPEDIENTES));
+		ContextMenu expedienteMenu = new ContextMenu(expediente);
+		expedienteMenu.setOpenOnClick(true);
 
-   private void createTramiteMenu()
-   {
-      Div tramite = new Div(VaadinIcon.TOOLS.create(), new Label(Constant.TITLE_TRAMITE));
-      ContextMenu tramiteMenu = new ContextMenu(tramite);
-      tramiteMenu.setOpenOnClick(true);
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			expedienteMenu.addItem(createRoute(VaadinIcon.FOLDER_O, Constant.TITLE_EXPEDIENTES, ExpedienteView.class));
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         tramiteMenu.addItem(createRoute(VaadinIcon.LINES, Constant.TITLE_BANDEJA, OperationView.class));
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			expedienteMenu.addItem(createRoute(VaadinIcon.FILE_TREE_SMALL, Constant.TITLE_SUBEXPEDIENTES, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         tramiteMenu.addItem(createRoute(VaadinIcon.SPLIT, Constant.TITLE_CLASIFICACION_DOCUMENTOS, OperationView.class));
+		if (SecurityUtils.isAccessGranted(RoleView.class))
+			expedienteMenu.addItem(createRoute(VaadinIcon.FILE_TREE, Constant.TITLE_VOLUMENES, RoleView.class));
 
-      if (SecurityUtils.isAccessGranted(RoleView.class))
-         tramiteMenu.addItem(createRoute(VaadinIcon.ARROW_BACKWARD, Constant.TITLE_RETORNO, RoleView.class));
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			expedienteMenu.addItem(createRoute(VaadinIcon.LIST_OL, Constant.TITLE_INDICE, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         tramiteMenu.addItem(createRoute(VaadinIcon.ROAD_BRANCH, Constant.TITLE_RE_ENVIO, OperationView.class));
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			expedienteMenu.addItem(createRoute(VaadinIcon.DOWNLOAD, Constant.TITLE_EXPORTACION,OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         tramiteMenu.addItem(createRoute(VaadinIcon.CLIPBOARD_TEXT, Constant.TITLE_BORRADORES,OperationView.class));
+		if (SecurityUtils.isAccessGranted(RoleView.class))
+			expedienteMenu.addItem(createRoute(VaadinIcon.UPLOAD, Constant.TITLE_IMPORTACION, RoleView.class));
 
-      if (SecurityUtils.isAccessGranted(RoleView.class))
-         tramiteMenu.addItem(createRoute(VaadinIcon.KEY_O, Constant.TITLE_FIRMA, RoleView.class));
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			expedienteMenu.addItem(createRoute(VaadinIcon.COPY_O, Constant.TITLE_COPIA_DOCUMENTOS, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         tramiteMenu.addItem(createRoute(VaadinIcon.ARROW_FORWARD, Constant.TITLE_ENVIO, OperationView.class));
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			expedienteMenu.addItem(createRoute(VaadinIcon.PASTE, Constant.TITLE_TRANSER_DOCUMENTOS,OperationView.class));
 
-      if ( tramiteMenu.getItems().size() > 0)
-         mainMenu.add(tramite);
+		if ( expedienteMenu.getItems().size() > 0)
+			mainMenu.add(expediente);
 
-   }//createTramiteMenu
+	}//createExpedientesMenu
 
-   private void createRecepcionMenu()
-   {
-      Div recepcion = new Div(VaadinIcon.ANGLE_DOUBLE_LEFT.create(), new Label(Constant.TITLE_RECEPCION));
-      ContextMenu recepcionMenu = new ContextMenu(recepcion);
-      recepcionMenu.setOpenOnClick(true);
+	private void createTramiteMenu()
+	{
+		Div tramite = new Div(VaadinIcon.TOOLS.create(), new Label(Constant.TITLE_TRAMITE));
+		ContextMenu tramiteMenu = new ContextMenu(tramite);
+		tramiteMenu.setOpenOnClick(true);
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         recepcionMenu.addItem(createRoute(VaadinIcon.LEVEL_DOWN_BOLD, Constant.TITLE_RECEPCION_DOCUMENTOS, OperationView.class));
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			tramiteMenu.addItem(createRoute(VaadinIcon.LINES, Constant.TITLE_BANDEJA, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         recepcionMenu.addItem(createRoute(VaadinIcon.ENVELOPE, Constant.TITLE_RECEPCION_E_MAIL, OperationView.class));
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			tramiteMenu.addItem(createRoute(VaadinIcon.SPLIT, Constant.TITLE_CLASIFICACION_DOCUMENTOS, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(RoleView.class))
-         recepcionMenu.addItem(createRoute(VaadinIcon.BARCODE, Constant.TITLE_DIGITALIZACION, RoleView.class));
+		if (SecurityUtils.isAccessGranted(RoleView.class))
+			tramiteMenu.addItem(createRoute(VaadinIcon.ARROW_BACKWARD, Constant.TITLE_RETORNO, RoleView.class));
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         recepcionMenu.addItem(createRoute(VaadinIcon.ROAD_BRANCH, Constant.TITLE_DIRECCIONAMIENTO, OperationView.class));
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			tramiteMenu.addItem(createRoute(VaadinIcon.ROAD_BRANCH, Constant.TITLE_RE_ENVIO, OperationView.class));
 
-      if ( recepcionMenu.getItems().size() > 0)
-         mainMenu.add(recepcion);
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			tramiteMenu.addItem(createRoute(VaadinIcon.CLIPBOARD_TEXT, Constant.TITLE_BORRADORES,OperationView.class));
 
-   }//createRecepcionMenu
+		if (SecurityUtils.isAccessGranted(RoleView.class))
+			tramiteMenu.addItem(createRoute(VaadinIcon.KEY_O, Constant.TITLE_FIRMA, RoleView.class));
 
-   private void createMailMenu()
-   {
-      Div envio = new Div(VaadinIcon.ANGLE_DOUBLE_RIGHT.create(), new Label(Constant.TITLE_CORRESPONDENCIA_EXTERNA));
-      ContextMenu envioMenu = new ContextMenu(envio);
-      envioMenu.setOpenOnClick(true);
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			tramiteMenu.addItem(createRoute(VaadinIcon.ARROW_FORWARD, Constant.TITLE_ENVIO, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         envioMenu.addItem(createRoute(VaadinIcon.BULLETS, Constant.TITLE_REGISTRO_ENVIOS, OperationView.class));
+		if ( tramiteMenu.getItems().size() > 0)
+			mainMenu.add(tramite);
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         envioMenu.addItem(createRoute(VaadinIcon.FLIGHT_TAKEOFF, Constant.TITLE_ENVIO_EXTERNO, OperationView.class));
+	}//createTramiteMenu
 
-      if (SecurityUtils.isAccessGranted(RoleView.class))
-         envioMenu.addItem(createRoute(VaadinIcon.CHECK_CIRCLE_O, Constant.TITLE_CONFIRMACION_ENVIO, RoleView.class));
+	private void createRecepcionMenu()
+	{
+		Div recepcion = new Div(VaadinIcon.ANGLE_DOUBLE_LEFT.create(), new Label(Constant.TITLE_RECEPCION));
+		ContextMenu recepcionMenu = new ContextMenu(recepcion);
+		recepcionMenu.setOpenOnClick(true);
 
-      if ( envioMenu.getItems().size() > 0)
-         mainMenu.add(envio);
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			recepcionMenu.addItem(createRoute(VaadinIcon.LEVEL_DOWN_BOLD, Constant.TITLE_RECEPCION_DOCUMENTOS, OperationView.class));
 
-   }//createMailMenu
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			recepcionMenu.addItem(createRoute(VaadinIcon.ENVELOPE, Constant.TITLE_RECEPCION_E_MAIL, OperationView.class));
 
-   private void createSearchMenu()
-   {
-      Div consulta = new Div(VaadinIcon.SEARCH.create(), new Label(Constant.TITLE_CONSULTA));
-      ContextMenu consultaMenu = new ContextMenu(consulta);
-      consultaMenu.setOpenOnClick(true);
+		if (SecurityUtils.isAccessGranted(RoleView.class))
+			recepcionMenu.addItem(createRoute(VaadinIcon.BARCODE, Constant.TITLE_DIGITALIZACION, RoleView.class));
 
-      MenuItem docsMenu = consultaMenu.addItem(new Div(VaadinIcon.COPY_O.create(), new Label(Constant.TITLE_DOCUMENTOS)));
-      SubMenu consultaDocsMenu = docsMenu.getSubMenu();
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			recepcionMenu.addItem(createRoute(VaadinIcon.ROAD_BRANCH, Constant.TITLE_DIRECCIONAMIENTO, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         consultaDocsMenu.addItem(createRoute(VaadinIcon.BUTTON, Constant.TITLE_CONSULTA_LIBRE, OperationView.class));
+		if ( recepcionMenu.getItems().size() > 0)
+			mainMenu.add(recepcion);
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         consultaDocsMenu.addItem(createRoute(VaadinIcon.FORM, Constant.TITLE_CONSULTA_METADATOS, OperationView.class));
+	}//createRecepcionMenu
 
-      MenuItem expedienteMenu = consultaMenu.addItem(new Div(VaadinIcon.FILE_O.create(), new Label(Constant.TITLE_CONSULTA_EXPEDIENTES)));
-      SubMenu consultaExpedienteMenu = expedienteMenu.getSubMenu();
+	private void createMailMenu()
+	{
+		Div envio = new Div(VaadinIcon.ANGLE_DOUBLE_RIGHT.create(), new Label(Constant.TITLE_CORRESPONDENCIA_EXTERNA));
+		ContextMenu envioMenu = new ContextMenu(envio);
+		envioMenu.setOpenOnClick(true);
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         consultaExpedienteMenu.addItem(createRoute(VaadinIcon.NATIVE_BUTTON, Constant.TITLE_CONSULTA_EXPEDIENTES_LIBRE, OperationView.class));
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			envioMenu.addItem(createRoute(VaadinIcon.BULLETS, Constant.TITLE_REGISTRO_ENVIOS, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         consultaExpedienteMenu.addItem(createRoute(VaadinIcon.BULLETS, Constant.TITLE_CONSULTA_EXPEDIENTES_METADATOS, OperationView.class));
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			envioMenu.addItem(createRoute(VaadinIcon.FLIGHT_TAKEOFF, Constant.TITLE_ENVIO_EXTERNO, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         consultaExpedienteMenu.addItem(createRoute(VaadinIcon.CONNECT, Constant.TITLE_CONSULTA_EXPEDIENTES_CLASIFICACION, OperationView.class));
+		if (SecurityUtils.isAccessGranted(RoleView.class))
+			envioMenu.addItem(createRoute(VaadinIcon.CHECK_CIRCLE_O, Constant.TITLE_CONFIRMACION_ENVIO, RoleView.class));
 
-      if ( consultaMenu.getItems().size() > 0)
-         mainMenu.add(consulta);
+		if ( envioMenu.getItems().size() > 0)
+			mainMenu.add(envio);
 
-   }//createSearchMenu
+	}//createMailMenu
 
-   private void createProcessMenu()
-   {
-      Div procesos = new Div(VaadinIcon.COGS.create(), new Label(Constant.TITLE_PROCESOS));
-      ContextMenu procesosMenu = new ContextMenu(procesos);
-      procesosMenu.setOpenOnClick(true);
+	private void createSearchMenu()
+	{
+		Div consulta = new Div(VaadinIcon.SEARCH.create(), new Label(Constant.TITLE_CONSULTA));
+		ContextMenu consultaMenu = new ContextMenu(consulta);
+		consultaMenu.setOpenOnClick(true);
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         procesosMenu.addItem(createRoute(VaadinIcon.BOLT, Constant.TITLE_EJECUCION_PROCESO, OperationView.class));
+		MenuItem docsMenu = consultaMenu.addItem(new Div(VaadinIcon.COPY_O.create(), new Label(Constant.TITLE_DOCUMENTOS)));
+		SubMenu consultaDocsMenu = docsMenu.getSubMenu();
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         procesosMenu.addItem(createRoute(VaadinIcon.ABACUS, Constant.TITLE_DEFINICION_PROCESO, OperationView.class));
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			consultaDocsMenu.addItem(createRoute(VaadinIcon.BUTTON, Constant.TITLE_CONSULTA_LIBRE, OperationView.class));
 
-      if ( procesosMenu.getItems().size() > 0)
-         mainMenu.add(procesos);
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			consultaDocsMenu.addItem(createRoute(VaadinIcon.FORM, Constant.TITLE_CONSULTA_METADATOS, OperationView.class));
 
-   }//createProcessMenu
+		MenuItem expedienteMenu = consultaMenu.addItem(new Div(VaadinIcon.FILE_O.create(), new Label(Constant.TITLE_CONSULTA_EXPEDIENTES)));
+		SubMenu consultaExpedienteMenu = expedienteMenu.getSubMenu();
 
-   private void createArchiveMenu()
-   {
-      Div archivo = new Div(VaadinIcon.ARCHIVES.create(), new Label(Constant.TITLE_ARCHIVO));
-      ContextMenu archivoMenu = new ContextMenu(archivo);
-      archivoMenu.setOpenOnClick(true);
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			consultaExpedienteMenu.addItem(createRoute(VaadinIcon.NATIVE_BUTTON, Constant.TITLE_CONSULTA_EXPEDIENTES_LIBRE, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         archivoMenu.addItem(createRoute(VaadinIcon.CUBES, Constant.TITLE_LOCALES, OperationView.class));
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			consultaExpedienteMenu.addItem(createRoute(VaadinIcon.BULLETS, Constant.TITLE_CONSULTA_EXPEDIENTES_METADATOS, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         archivoMenu.addItem(createRoute(VaadinIcon.STEP_FORWARD, Constant.TITLE_TRANSFERENCIA, OperationView.class));
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			consultaExpedienteMenu.addItem(createRoute(VaadinIcon.CONNECT, Constant.TITLE_CONSULTA_EXPEDIENTES_CLASIFICACION, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(RoleView.class))
-         archivoMenu.addItem(createRoute(VaadinIcon.STEP_BACKWARD, Constant.TITLE_RECIBO_TRANSFERENCIA, RoleView.class));
+		if ( consultaMenu.getItems().size() > 0)
+			mainMenu.add(consulta);
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         archivoMenu.addItem(createRoute(VaadinIcon.LOCATION_ARROW, Constant.TITLE_LOCALIZACION, OperationView.class));
+	}//createSearchMenu
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         archivoMenu.addItem(createRoute(VaadinIcon.LEVEL_DOWN_BOLD, Constant.TITLE_PRESTAMO_EXPEDIENTE,OperationView.class));
+	private void createProcessMenu()
+	{
+		Div procesos = new Div(VaadinIcon.COGS.create(), new Label(Constant.TITLE_PROCESOS));
+		ContextMenu procesosMenu = new ContextMenu(procesos);
+		procesosMenu.setOpenOnClick(true);
 
-      if (SecurityUtils.isAccessGranted(RoleView.class))
-         archivoMenu.addItem(createRoute(VaadinIcon.LEVEL_UP_BOLD, Constant.TITLE_DEVOLUCION, RoleView.class));
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			procesosMenu.addItem(createRoute(VaadinIcon.BOLT, Constant.TITLE_EJECUCION_PROCESO, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         archivoMenu.addItem(createRoute(VaadinIcon.LINES_LIST, Constant.TITLE_INDICES_ARCHIVO, OperationView.class));
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			procesosMenu.addItem(createRoute(VaadinIcon.ABACUS, Constant.TITLE_DEFINICION_PROCESO, OperationView.class));
 
-      if ( archivoMenu.getItems().size() > 0)
-         mainMenu.add(archivo);
+		if ( procesosMenu.getItems().size() > 0)
+			mainMenu.add(procesos);
 
-   }//createArchiveMenu
+	}//createProcessMenu
 
-/*
+	private void createArchiveMenu()
+	{
+		Div archivo = new Div(VaadinIcon.ARCHIVES.create(), new Label(Constant.TITLE_ARCHIVO));
+		ContextMenu archivoMenu = new ContextMenu(archivo);
+		archivoMenu.setOpenOnClick(true);
+
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			archivoMenu.addItem(createRoute(VaadinIcon.CUBES, Constant.TITLE_LOCALES, OperationView.class));
+
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			archivoMenu.addItem(createRoute(VaadinIcon.STEP_FORWARD, Constant.TITLE_TRANSFERENCIA, OperationView.class));
+
+		if (SecurityUtils.isAccessGranted(RoleView.class))
+			archivoMenu.addItem(createRoute(VaadinIcon.STEP_BACKWARD, Constant.TITLE_RECIBO_TRANSFERENCIA, RoleView.class));
+
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			archivoMenu.addItem(createRoute(VaadinIcon.LOCATION_ARROW, Constant.TITLE_LOCALIZACION, OperationView.class));
+
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			archivoMenu.addItem(createRoute(VaadinIcon.LEVEL_DOWN_BOLD, Constant.TITLE_PRESTAMO_EXPEDIENTE,OperationView.class));
+
+		if (SecurityUtils.isAccessGranted(RoleView.class))
+			archivoMenu.addItem(createRoute(VaadinIcon.LEVEL_UP_BOLD, Constant.TITLE_DEVOLUCION, RoleView.class));
+
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			archivoMenu.addItem(createRoute(VaadinIcon.LINES_LIST, Constant.TITLE_INDICES_ARCHIVO, OperationView.class));
+
+		if ( archivoMenu.getItems().size() > 0)
+			mainMenu.add(archivo);
+
+	}//createArchiveMenu
+
+	/*
    private void createLink(VaadinIcon icon, String title, Class<? extends Component> viewClass, VerticalLayout mainMenu)
    {
       if (SecurityUtils.isAccessGranted(viewClass))
@@ -426,44 +426,46 @@ public class MainView extends AppLayout
          mainMenu.add(link);
       }
    }//createLink
-*/
+	 */
 
-   @Override
-   protected void afterNavigation()
-   {
-      super.afterNavigation();
-      confirmDialog.setOpened(false);
-      if (getContent() instanceof HasConfirmation)
-         ((HasConfirmation) getContent()).setConfirmDialog(confirmDialog);
+	@Override
+	protected void afterNavigation()
+	{
+		super.afterNavigation();
+		confirmDialog.setOpened(false);
+		if (getContent() instanceof HasConfirmation)
+			((HasConfirmation) getContent()).setConfirmDialog(confirmDialog);
 
-      RouteConfiguration configuration = RouteConfiguration.forSessionScope();
-      if (configuration.isRouteRegistered(this.getContent().getClass()))
-      {
-         String target = configuration.getUrl(this.getContent().getClass());
-         Optional<Component> tabToSelect = menu.getChildren().filter(tab ->
-                                                                     {
-                                                                        Component child = tab.getChildren().findFirst().get();
-                                                                        return child instanceof RouterLink && ((RouterLink) child).getHref().equals(target);
-                                                                     }).findFirst();
-         tabToSelect.ifPresent(tab -> menu.setSelectedTab((Tab) tab));
-      }
-      else
-      {
-         menu.setSelectedTab(null);
-      }
-   }//afterNavigation
+        /*
+		RouteConfiguration configuration = RouteConfiguration.forSessionScope();
+		if (configuration.isRouteRegistered(this.getContent().getClass()))
+		{
+			String target = configuration.getUrl(this.getContent().getClass());
+			Optional<Component> tabToSelect = menu.getChildren().filter(tab ->
+			{
+				Component child = tab.getChildren().findFirst().get();
+				return child instanceof RouterLink && ((RouterLink) child).getHref().equals(target);
+			}).findFirst();
+			tabToSelect.ifPresent(tab -> menu.setSelectedTab((Tab) tab));
+		}
+		else
+		{
+			menu.setSelectedTab(null);
+		}
+		*/
+	}//afterNavigation
 
-   private static Tabs createMenuTabs()
-   {
-      final Tabs tabs = new Tabs();
-      tabs.setOrientation(Tabs.Orientation.HORIZONTAL);
-      tabs.add(getAvailableTabs());
-      return tabs;
-   }//createMenuTabs
+	private static Tabs createMenuTabs()
+	{
+		final Tabs tabs = new Tabs();
+		tabs.setOrientation(Tabs.Orientation.HORIZONTAL);
+		tabs.add(getAvailableTabs());
+		return tabs;
+	}//createMenuTabs
 
-   private static Tab[] getAvailableTabs()
-   {
-      /*
+	private static Tab[] getAvailableTabs()
+	{
+		/*
       PAGE_CLIENTES                                 = "cliente";
          PAGE_TENANTS                               = "tenants";
       PAGE_SEGURIDAD                                = "seguridad";
@@ -621,71 +623,71 @@ public class MainView extends AppLayout
           account.getSubMenu().addItem("Privacy Settings",
                   e -> selected.setText("Privacy Settings"));
           add(menuBar, message);
-       */
-      final List<Tab> tabs = new ArrayList<>(6);
-      tabs.add(createTab(VaadinIcon.EDIT, Constant.TITLE_STOREFRONT, StorefrontView.class));
-      tabs.add(createTab(VaadinIcon.CLOCK,Constant.TITLE_DASHBOARD, DashboardView.class));
+		 */
+		final List<Tab> tabs = new ArrayList<>(6);
+		tabs.add(createTab(VaadinIcon.EDIT, Constant.TITLE_STOREFRONT, StorefrontView.class));
+		tabs.add(createTab(VaadinIcon.CLOCK,Constant.TITLE_DASHBOARD, DashboardView.class));
 
-      if (SecurityUtils.isAccessGranted(UsersView.class))
-         tabs.add(createTab(VaadinIcon.KEY,Constant.TITLE_ADMINISTRATION, UsersView.class));
+		if (SecurityUtils.isAccessGranted(UsersView.class))
+			tabs.add(createTab(VaadinIcon.KEY,Constant.TITLE_ADMINISTRATION, UsersView.class));
 
-      if (SecurityUtils.isAccessGranted(ProductsView.class))
-         tabs.add(createTab(VaadinIcon.CALENDAR, Constant.TITLE_PRODUCTS, ProductsView.class));
+		if (SecurityUtils.isAccessGranted(ProductsView.class))
+			tabs.add(createTab(VaadinIcon.CALENDAR, Constant.TITLE_PRODUCTS, ProductsView.class));
 
-      if (SecurityUtils.isAccessGranted(TenantsView.class))
-         tabs.add(createTab(VaadinIcon.HOSPITAL, Constant.TITLE_TENANTS, TenantsView.class));
+		if (SecurityUtils.isAccessGranted(TenantsView.class))
+			tabs.add(createTab(VaadinIcon.HOSPITAL, Constant.TITLE_TENANTS, TenantsView.class));
 
-      if (SecurityUtils.isAccessGranted(OperationView.class))
-         tabs.add(createTab(VaadinIcon.COG, Constant.TITLE_OBJECT_TO_PROTECT, OperationView.class));
+		if (SecurityUtils.isAccessGranted(OperationView.class))
+			tabs.add(createTab(VaadinIcon.COG, Constant.TITLE_OBJECT_TO_PROTECT, OperationView.class));
 
-      if (SecurityUtils.isAccessGranted(RoleView.class))
-         tabs.add(createTab(VaadinIcon.ACADEMY_CAP, Constant.TITLE_ROLES, RoleView.class));
+		if (SecurityUtils.isAccessGranted(RoleView.class))
+			tabs.add(createTab(VaadinIcon.ACADEMY_CAP, Constant.TITLE_ROLES, RoleView.class));
 
-      if (SecurityUtils.isAccessGranted(UserGroupView.class))
-         tabs.add(createTab(VaadinIcon.USERS, Constant.TITLE_USER_GROUPS, UserGroupView.class));
+		if (SecurityUtils.isAccessGranted(UserGroupView.class))
+			tabs.add(createTab(VaadinIcon.USERS, Constant.TITLE_USER_GROUPS, UserGroupView.class));
 
-      if (SecurityUtils.isAccessGranted(SingleUserView.class))
-         tabs.add(createTab(VaadinIcon.USER, Constant.TITLE_SINGLE_USERS, SingleUserView.class));
+		if (SecurityUtils.isAccessGranted(SingleUserView.class))
+			tabs.add(createTab(VaadinIcon.USER, Constant.TITLE_SINGLE_USERS, SingleUserView.class));
 
-      final String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
-      final Tab logoutTab = createTab(createLogoutLink(contextPath));
-      tabs.add(logoutTab);
-      return tabs.toArray(new Tab[tabs.size()]);
+		final String contextPath = VaadinServlet.getCurrent().getServletContext().getContextPath();
+		final Tab logoutTab = createTab(createLogoutLink(contextPath));
+		tabs.add(logoutTab);
+		return tabs.toArray(new Tab[tabs.size()]);
 
-   }//getAvailableTabs
+	}//getAvailableTabs
 
-   private static Tab createTab(VaadinIcon icon, String title, Class<? extends Component> viewClass)
-   {
-      return createTab(populateLink(new RouterLink(null, viewClass), icon, title));
-   }//createTab
+	private static Tab createTab(VaadinIcon icon, String title, Class<? extends Component> viewClass)
+	{
+		return createTab(populateLink(new RouterLink(null, viewClass), icon, title));
+	}//createTab
 
-   private static Tab createTab(Component content)
-   {
-      final Tab tab = new Tab();
-      tab.addThemeVariants(TabVariant.LUMO_ICON_ON_TOP);
-      tab.add(content);
-      return tab;
-   }//createTab
+	private static Tab createTab(Component content)
+	{
+		final Tab tab = new Tab();
+		tab.addThemeVariants(TabVariant.LUMO_ICON_ON_TOP);
+		tab.add(content);
+		return tab;
+	}//createTab
 
-   private static Anchor createLogoutLink(String contextPath)
-   {
-      final Anchor a = populateLink(new Anchor(), VaadinIcon.ARROW_RIGHT, Constant.TITLE_LOGOUT);
-      a.setHref(contextPath + "/logout");
-      return a;
-   }//createLogoutLink
+	private static Anchor createLogoutLink(String contextPath)
+	{
+		final Anchor a = populateLink(new Anchor(), VaadinIcon.ARROW_RIGHT, Constant.TITLE_LOGOUT);
+		a.setHref(contextPath + "/logout");
+		return a;
+	}//createLogoutLink
 
-   private static <T extends HasComponents> T populateLink(T a, VaadinIcon icon, String title)
-   {
-      a.add(icon.create());
-      if (title.equals(Constant.TITLE_ADMINISTRATION) )
-         a.add(Constant.TITLE_USERS);
-      else
-         a.add(title);
+	private static <T extends HasComponents> T populateLink(T a, VaadinIcon icon, String title)
+	{
+		a.add(icon.create());
+		if (title.equals(Constant.TITLE_ADMINISTRATION) )
+			a.add(Constant.TITLE_USERS);
+		else
+			a.add(title);
 
-      return a;
-   }//populateLink
+		return a;
+	}//populateLink
 
-   /*
+	/*
    Ejemplo de menu jerarquico usando ContextMenu
 
          ContextMenu contextMenu = new ContextMenu();
@@ -708,7 +710,7 @@ public class MainView extends AppLayout
          subMenu.addItem("Third menu item",
                  event -> message.setText("Clicked on the third item"));
          add(target, message);
-    */
+	 */
 
 
 
