@@ -15,6 +15,8 @@ import com.f.thoth.ui.MainView;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.AfterNavigationEvent;
+import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
@@ -23,39 +25,38 @@ import com.vaadin.flow.router.Route;
 @Route(value = PAGE_JERARQUIA_EXPEDIENTES, layout = MainView.class)
 @PageTitle(TITLE_JERARQUIA_EXPEDIENTES)
 @Secured(Role.ADMIN)
-class ExpedienteHierarchyView extends VerticalLayout implements HasUrlParameter<String>
+class ExpedienteHierarchyView extends VerticalLayout implements HasUrlParameter<String>, AfterNavigationObserver
 {
-	   private ClassificationService classificationService;
-	   private ExpedienteService     expedienteService;
-	   private User                  currentUser;
-	   private String                classCode;
-	   
-	   private VerticalLayout        content;
-	   
-	   @Autowired
-	   public ExpedienteHierarchyView(ClassificationService classificationService, ExpedienteService expedienteService)
-	   {
-		  this.classificationService = classificationService;
-	      this.expedienteService     = expedienteService;
-	      this.currentUser           = ThothSession.getCurrentUser();
-	      
-	      addClassName("main-view");
-	      setSizeFull();
-	      
-	      content      = new VerticalLayout();
-	      content.addClassName ("selector");
-	      content.add(new H3 ("Expedientes de la clase"));
-	      //content.add( configureClassSelector());
-	      
-	     // updateSelector();
-	     // closeEditor();
+	private ClassificationService classificationService;
+	private ExpedienteService     expedienteService;
+	private User                  currentUser;
+	private String                classCode;
 
-	      content.setSizeFull();
-	      add( content);
-	   //   Notification.show("LLequé a jerarquía de expedientes");
-	    
-	        
-	/*
+	private VerticalLayout        content;
+
+	@Autowired
+	public ExpedienteHierarchyView(ClassificationService classificationService, ExpedienteService expedienteService)
+	{
+		this.classificationService = classificationService;
+		this.expedienteService     = expedienteService;
+		this.currentUser           = ThothSession.getCurrentUser();
+
+		addClassName("main-view");
+		setSizeFull();
+
+		content      = new VerticalLayout();
+		content.addClassName ("selector");
+		//content.add( configureClassSelector());
+
+		// updateSelector();
+		// closeEditor();
+
+		content.setSizeFull();
+		add( content);
+		//   Notification.show("LLequé a jerarquía de expedientes");
+
+
+		/*
 	      leftSection  = new VerticalLayout();
 	      leftSection.addClassName  ("left-section");
 	      leftSection.add(new H3 ("Clasificación del expediente"));
@@ -77,14 +78,21 @@ class ExpedienteHierarchyView extends VerticalLayout implements HasUrlParameter<
 	      HorizontalLayout panel=  new HorizontalLayout( content, rightSection);
 	      panel.setSizeFull();
 	      add( panel);
-	*/
-	   }//ClassificationView
+		 */
+	}//ExpedienteHierarchyView
+
+	
+	public void	afterNavigation(AfterNavigationEvent event)
+	{
+		content.add(new H3 ("Expedientes de la clase "+ classCode));		   
+	}//afterNavigation
 
 	@Override
 	public void setParameter(BeforeEvent event, String parameter) 
 	{
 		Notification.show("Voy a navegar con parámetro["+ parameter+ "]");
+		this.classCode = parameter;
 	}
-	
+
 
 }//ExpedienteHierarchyView

@@ -4,7 +4,6 @@ import static com.f.thoth.ui.utils.Constant.VIEWPORT;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import com.f.thoth.app.security.SecurityUtils;
 import com.f.thoth.ui.utils.Constant;
@@ -48,7 +47,6 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.TabVariant;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.router.HighlightConditions;
-import com.vaadin.flow.router.RouteConfiguration;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.server.VaadinServlet;

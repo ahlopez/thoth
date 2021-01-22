@@ -105,7 +105,7 @@ public class ExpedienteView extends VerticalLayout
       panel.setSizeFull();
       add( panel);
 */
-   }//ClassificationView
+   }//ExpedienteView
 
    protected String getBasePage() { return PAGE_EXPEDIENTES; }
 
