@@ -179,7 +179,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
 
    private void setupSelector(PermissionService<E> service, CurrentUser currentUser, String name)
    {
-      permissionSelector = new HierarchicalSelector<>(service, Grid.SelectionMode.MULTI, name, false, null);
+      permissionSelector = new HierarchicalSelector<>(service, Grid.SelectionMode.MULTI, name, false, false, null);
       permissionSelector.setWidthFull();
       permissionLayout.add(permissionSelector);
 

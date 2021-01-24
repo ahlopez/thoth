@@ -81,7 +81,7 @@ class ExpedienteHierarchyView extends VerticalLayout implements HasUrlParameter<
 		 */
 	}//ExpedienteHierarchyView
 
-	
+	@Override
 	public void	afterNavigation(AfterNavigationEvent event)
 	{
 		content.add(new H3 ("Expedientes de la clase "+ classCode));		   

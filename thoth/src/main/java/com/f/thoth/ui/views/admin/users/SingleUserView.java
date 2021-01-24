@@ -284,7 +284,7 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
       groupsDialog.setWidth("1000px");
       groupsDialog.setHeight("1300px");
 
-      groupsSelector = new HierarchicalSelector<>( userGroupService, Grid.SelectionMode.MULTI, "Seleccione grupos", false, null);
+      groupsSelector = new HierarchicalSelector<>( userGroupService, Grid.SelectionMode.MULTI, "Seleccione grupos", false, false, null);
       Button close = new Button("Cerrar");
       close.addClickListener(e->
            {

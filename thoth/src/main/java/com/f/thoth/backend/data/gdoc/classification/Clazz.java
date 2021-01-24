@@ -63,6 +63,7 @@ public class Clazz extends BaseEntity implements NeedsProtection, HierarchicalEn
    @ManyToOne
    protected Retention retentionSchedule;
 
+
    // ------------- Constructors ------------------
    public Clazz()
    {
@@ -76,13 +77,13 @@ public class Clazz extends BaseEntity implements NeedsProtection, HierarchicalEn
       super();
 
       if ( !TextUtil.isValidName(name))
-         throw new IllegalArgumentException("Nombre["+ name+ "] es inv�lido");
+         throw new IllegalArgumentException("Nombre["+ name+ "] es inválido");
 
       if ( schema == null)
          throw new IllegalArgumentException("Esquema de metadatos no puede ser nulo");
 
       if ( category < 0 || category > 5)
-         throw new IllegalArgumentException("Categor�a de seguridad inv�lida");
+         throw new IllegalArgumentException("Categoría de seguridad inválida");
 
       if (dateOpened ==  null || dateClosed == null || dateOpened.isAfter(dateClosed))
          throw new IllegalArgumentException("Fechas de apertura["+ dateOpened+ "] y de cierre["+ dateClosed+ "] inconsistentes");
@@ -110,8 +111,8 @@ public class Clazz extends BaseEntity implements NeedsProtection, HierarchicalEn
    @Override protected void buildCode()
    {
       this.code = (tenant == null? "[tenant]": tenant.getCode())+"[CLZ]"+
-                  (owner == null? ":": owner.getOwnerCode())+ ">"+
-                  (name == null? "[name]" : name);
+                  (owner  == null? ":": owner.getOwnerCode())+ ">"+
+                  (name   == null? "[name]" : name);
    }//buildCode
 
    protected String getOwnerCode(){ return (owner == null ? "" : owner.getOwnerCode())+ ":"+ name; }
@@ -150,7 +151,7 @@ public class Clazz extends BaseEntity implements NeedsProtection, HierarchicalEn
 
    @Override public BranchClass     getOwner() { return owner;}
 
-   @Override public String      formatCode()
+   @Override public String          formatCode()
    {
        int i = TextUtil.indexOf(code, "/", 3);
        String id = code.substring(i);

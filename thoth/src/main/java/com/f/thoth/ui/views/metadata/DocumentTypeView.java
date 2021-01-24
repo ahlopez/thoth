@@ -101,6 +101,7 @@ public class DocumentTypeView extends VerticalLayout
                            Grid.SelectionMode.SINGLE, 
                            "Seleccione el tipo padre",
                            true,
+                           false,
                            this::editOwner
                            );     
       ownerDocType.getElement().setAttribute("colspan", "4");

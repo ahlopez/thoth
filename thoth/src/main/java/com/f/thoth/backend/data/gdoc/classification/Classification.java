@@ -123,10 +123,10 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
 
    @ManyToOne
    protected Classification owner;                         //  Classification node to which this class belongs
-   
+
    @NotNull(message = "{evidentia.classcode.required}")
    protected String    classCode;                          //  Unique business code of the classification node (includes level codes+ class code)
-   
+
    protected String    path;                               //  Classification node path in document repository
 
    // ------------- Constructors ------------------
@@ -179,13 +179,13 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
    public void prepareData()
    {
       objectToProtect.prepareData();
-      buildCode();      
+      buildCode();
    }
 
    @Override protected void buildCode()
    {
       this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ "/"+ NodeType.CLASSIFICATION.getCode()+ "/"+
-    		      getOwnerPath(owner)+ (classCode == null? "[classCode]" : classCode);
+                      getOwnerPath(owner)+ (classCode == null? "[classCode]" : classCode);
       this.code = this.path;
    }//buildCode
 
@@ -205,13 +205,13 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
 
    public Retention  getRetentionSchedule() { return retentionSchedule;}
    public void       setRetentionSchedule( Retention retentionSchedule) {this.retentionSchedule = retentionSchedule;}
-   
+
    public SchemaValues getMetadata() { return metadata;}
    public void         setMetadata ( SchemaValues metadata) { this.metadata = metadata;}
-   
+
    public String       getClassCode() { return classCode;}
    public void         setClassCode ( String classCode) { this.classCode = classCode;}
-   
+
    public String       getPath() { return path;}
    public void         setPath ( String path) { this.path = path;}
 
@@ -280,9 +280,9 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
    @Override public String           getName()   { return name;}
 
    @Override public Classification   getOwner()  { return owner;}
-      
-   @Override public String      formatCode() 
-   { 
+
+   @Override public String      formatCode()
+   {
        int i = TextUtil.indexOf(code, "/", 3);
        String id = i >= 0? code.substring(i): "";
        id = TextUtil.replace(id, "/", "-");
@@ -290,15 +290,16 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
    }//formatCode
 
    private String getOwnerPath(Classification owner)
-   {   	
-	   String path = "";
-	   while (owner != null)
-	   {
-		   path = owner.classCode+ "/"+ path;
-		   owner = owner.owner;
-	   }
-	   return  path;
+   {
+           String path = "";
+           while (owner != null)
+           {
+                   path = owner.classCode+ "/"+ path;
+                   owner = owner.owner;
+           }
+           return  path;
    }//getOwnerPath
+
 
    // -----------------  Implements NeedsProtection ----------------
 

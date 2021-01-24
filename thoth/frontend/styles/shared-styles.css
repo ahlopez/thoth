@@ -35,7 +35,7 @@
    align-items: flex-start;
 }
 .main-view .left-section {
-   max-width: 400px;
+   max-width: 200px;
    flex: 1;
 }
 .main-view .content {
@@ -45,13 +45,13 @@
 }
 .main-view .selector {
    align-items: flex-start;
-   min-width: 700px;
+   min-width: 800px;
    max-width: 800px;
    flex: 2;
 }
 
 .main-view .right-section {
-   min-width: 460px;
+   min-width: 200px;
    max-width: 650px;
    flex: 1;
 }

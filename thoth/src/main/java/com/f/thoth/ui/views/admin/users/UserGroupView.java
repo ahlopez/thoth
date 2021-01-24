@@ -100,7 +100,7 @@ public class UserGroupView extends AbstractEvidentiaCrudView<UserGroup>
       toDate.setRequiredIndicatorVisible(true);
       toDate.getElement().setAttribute("colspan", "2");
 
-      parentGroup = new HierarchicalSelector<>(service, Grid.SelectionMode.SINGLE, "Grupo padre", false, null);
+      parentGroup = new HierarchicalSelector<>(service, Grid.SelectionMode.SINGLE, "Grupo padre", false, false, null);
       parentGroup.getElement().setAttribute("colspan", "4");
 
       FormLayout form = new FormLayout(name, blocked, category, fromDate, toDate, parentGroup);

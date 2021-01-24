@@ -111,6 +111,7 @@ public class ClassificationView extends VerticalLayout
                            Grid.SelectionMode.SINGLE, 
                            "Seleccione la clase padre", 
                            true,
+                           false,
                            this::editOwner
                            
                            );     

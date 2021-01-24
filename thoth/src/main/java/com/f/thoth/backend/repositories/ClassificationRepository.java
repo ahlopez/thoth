@@ -43,7 +43,7 @@ public interface ClassificationRepository extends JpaRepository<Classification, 
    @Query("SELECT count(c) FROM Classification c WHERE (c.owner is null and ?1 is null) or (c.owner=?1)")
    int countByParent( Classification parent);
 
-   @Query("SELECT count(c) FROM Classification c WHERE (c.owner is null and ?1 is null) or (c.owner=?1)")
+   @Query("SELECT count(c) FROM Classification c WHERE c.owner=?1")
    int countByChildren(Classification group);
 
    @EntityGraph(value = Classification.BRIEF, type = EntityGraphType.FETCH)
@@ -52,7 +52,7 @@ public interface ClassificationRepository extends JpaRepository<Classification, 
 
    @Query("SELECT count(c) FROM Classification c WHERE c.tenant=?1 and lower(c.name) like lower(concat('%', ?2,'%'))")
    long countByNameLikeIgnoreCase(Tenant tenant, String name);
-
+   
    //   ----------- ACL handling ----------------
    @EntityGraph(value = Classification.FULL, type = EntityGraphType.LOAD)
    @Query("SELECT DISTINCT c FROM Classification c, Permission p  WHERE c.objectToProtect = p.objectToProtect and p.role = ?1")

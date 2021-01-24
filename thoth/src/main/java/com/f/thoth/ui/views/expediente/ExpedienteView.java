@@ -23,7 +23,9 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.router.PageTitle;
@@ -32,7 +34,7 @@ import com.vaadin.flow.router.Route;
 @Route(value = PAGE_EXPEDIENTES, layout = MainView.class)
 @PageTitle(TITLE_EXPEDIENTES)
 @Secured(Role.ADMIN)
-public class ExpedienteView extends VerticalLayout
+public class ExpedienteView extends HorizontalLayout
 {
    private ClassificationForm    expedienteForm;
    private ClassificationService classificationService;
@@ -69,17 +71,25 @@ public class ExpedienteView extends VerticalLayout
       
       addClassName("main-view");
       setSizeFull();
-      
+
+      leftSection  = new VerticalLayout();
+      leftSection.addClassName  ("left-section");
+      leftSection.add(new H3 ("Gestión de Expedientes"));
+
       content      = new VerticalLayout();
       content.addClassName ("selector");
-      content.add(new H3 ("Clasificación del expediente"));
       content.add( configureClassSelector());
+      content.setSizeFull();
+      
+      rightSection = new VerticalLayout();
+      rightSection.addClassName ("right-section");
+      rightSection.add(new Label("  "));
+
+      add(leftSection, content, rightSection);
       
       updateSelector();
       closeEditor();
 
-      content.setSizeFull();
-      add( content);
     
         
 /*
@@ -115,7 +125,8 @@ public class ExpedienteView extends VerticalLayout
       ownerClass = new HierarchicalSelector<>(
                            classificationService, 
                            Grid.SelectionMode.SINGLE, 
-                           "Seleccione la clase del expediente", 
+                           "Seleccione la clase a la que pertenece", 
+                           true,
                            true,
                            this::selectedOwnerClass
                            );     
