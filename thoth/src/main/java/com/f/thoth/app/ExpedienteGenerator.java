@@ -22,25 +22,24 @@ public class ExpedienteGenerator
    
    public void registerExpedientes( Tenant tenant)
    {
-	   // 1. Para cada clase hoja
+	   // 1. Para cada clase hoja CLASE
 	   //    int numExpedientes =  random(1,10);
 	   //    for ( int i= 0; i < numExpedientes; i++)
-	   //        Genere expediente
+	   //        Genere expediente con clase CLASE, padre = null
 	   //        Para cada expediente i
 	   //           int depthExpedientes = random(1,4);
-	   //           genereExpedientesHijos( depthExpedientes, expediente)
+	   //           genereExpedientesHijos( depthExpedientes, expediente, CLASE)
 	   //    endFor
 	   
-	   //    private void genereExpedientesHijos( int depth, Expediente Padre)
+	   //    private void genereExpedientesHijos( int depth, Expediente Padre, Classification CLASE)
 	   //       si depth = 0 
 	   //           termine
-	   //       Cree sub-Expediente currentExpediente con padre Padre
+	   //       Cree sub-Expediente currentExpediente con padre Padre, clase CLASE
 	   //       if depth = 1 
 	   //           volumen = random(0,1)
 	   //       else
 	   //          int numHijos = random(1,5)
 	   //          for(int j= 0; j< numHijos; j++)
-	   //              int depthExpedientes = random(1,4);
 	   //              genereExpedientesHijos( depth-1, currentExpediente)
 	   //          endFor
 	   //       endif
