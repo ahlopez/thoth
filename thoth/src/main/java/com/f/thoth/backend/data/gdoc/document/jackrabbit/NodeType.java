@@ -5,7 +5,7 @@ package com.f.thoth.backend.data.gdoc.document.jackrabbit;
  */
 public enum NodeType
 {
-    CLASSIFICATION ("CLS") ,EXPEDIENTE("EXP"), FILE("FIL") ;
+    CLASSIFICATION ("CLS") ,EXPEDIENTE("EXP"), VOLUME("VOL"), DOCUMENT("DOC") ;
 	
 	private String code;
 	
@@ -21,13 +21,12 @@ public enum NodeType
 		
 		for ( NodeType type: values())
 		{
-			if ( type.code.equals(code.trim().toLowerCase()))
+			if ( type.code.equals(code.trim().toUpperCase()))
 				return type;
 		}
 		return null;
 	}//typeOf
 	
 	public String getCode() { return code;}
-	
 	
 }//NodeType

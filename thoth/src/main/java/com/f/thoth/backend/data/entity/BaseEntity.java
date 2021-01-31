@@ -13,9 +13,9 @@ import com.f.thoth.backend.data.security.ThothSession;
 @MappedSuperclass
 public abstract class BaseEntity extends AbstractEntity
 {
-	@ManyToOne
-	@NotNull (message = "{evidentia.tenant.required}")
-	protected Tenant tenant;
+   @ManyToOne
+   @NotNull (message = "{evidentia.tenant.required}")
+   protected Tenant tenant;
 
    @NotNull (message = "{evidentia.code.required}")
    @NotEmpty(message = "{evidentia.code.required}")

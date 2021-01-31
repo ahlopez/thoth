@@ -22,14 +22,14 @@ import com.f.thoth.backend.data.security.SingleUser;
 @Table(name = "INDEX_ENTRY", indexes = { @Index(columnList = "code") })
 public class IndexEntry extends BaseEntity implements Comparable<IndexEntry>
 {
-   public enum Action { ADD, COPY, TRANSFER, REMOVE}
+   public enum Action {CREATE, ADD, READ, COPY, TRANSFER, REMOVE, OPEN, CLOSE, REOPEN}
    
    @NotNull     (message= "{evidentia.action.required}")
    @Enumerated(EnumType.STRING)
-   private Action entryType;
+   private Action               entryType;      // Tipo de operación realizada sobre el expediente
    
    @ManyToOne
-   private ExpedienteIndex     index;
+   private ExpedienteIndex     index;           
    
    @ManyToOne
    private SchemaValues  attributes;

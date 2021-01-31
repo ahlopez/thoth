@@ -45,6 +45,7 @@ import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.UserGroup;
 import com.f.thoth.backend.repositories.ClassificationRepository;
+import com.f.thoth.backend.repositories.ExpedienteRepository;
 import com.f.thoth.backend.repositories.FieldRepository;
 import com.f.thoth.backend.repositories.LevelRepository;
 import com.f.thoth.backend.repositories.MetadataRepository;
@@ -70,14 +71,14 @@ public class DataGenerator implements HasLogger
 	private static final String[] TYPE = new String[] { "Cake", "Pastry", "Tart", "Muffin", "Biscuit", "Bread", "Bagel",
 			"Bun", "Brownie", "Cookie", "Cracker", "Cheese Cake" };
 
-	private static final String[] FIRST_NAME = new String[] { "Ori", "Amanda", "Octavia", "Laurel", "Lael", "Delilah",
-			"Jason", "Skyler", "Arsenio", "Haley", "Lionel", "Sylvia", "Jessica", "Lester", "Ferdinand", "Elaine",
-			"Griffin", "Kerry", "Dominique" };
+	private static final String[] FIRST_NAME = new String[] { "Olga", "Amanda", "Octavia", "Cristina", "Marta", "Luis",
+			"Eduardo", "Alvaro", "Arsenio", "German", "Daniel", "Silvia", "Angela", "Maria", "Fernando", "Patricio",
+			"David", "Lino", "Rafael" };
 
-	private static final String[] LAST_NAME = new String[] { "Carter", "Castro", "Rich", "Irwin", "Moore", "Hendricks",
-			"Huber", "Patton", "Wilkinson", "Thornton", "Nunez", "Macias", "Gallegos", "Blevins", "Mejia", "Pickett",
-			"Whitney", "Farmer", "Henry", "Chen", "Macias", "Rowland", "Pierce", "Cortez", "Noble", "Howard", "Nixon",
-			"Mcbride", "Leblanc", "Russell", "Carver", "Benton", "Maldonado", "Lyons" };
+	private static final String[] LAST_NAME = new String[] { "Biden", "Castro", "Duque", "Lopez", "Perez", "Parias",
+			"Umana", "Rueda", "Vergara", "Gonzalez", "Nunez", "Macias", "Gallegos", "Duarte", "Mejia", "Petro",
+			"Gutierrez", "Vargas", "Puentes", "Holmes", "Macias", "Ospina", "Mutis", "Cortes", "Noble", "Rodriguez", "Arenas",
+			"Trump", "Mogollon", "Samper", "Estrada", "Heredia", "Maldonado", "Reyes" };
 
 	private final Random random = new Random(1L);
 
@@ -100,6 +101,7 @@ public class DataGenerator implements HasLogger
 	private FieldRepository               fieldRepository;
 	private RetentionRepository           retentionRepository;
 	private UserGroupRepository           userGroupRepository;
+	private ExpedienteRepository          expedienteRepository;
 	private Repository                    repo;
 	private Session                       jcrSession;
 	private Level[]                       levels;
@@ -109,7 +111,7 @@ public class DataGenerator implements HasLogger
 			ProductRepository productRepository, PickupLocationRepository pickupLocationRepository,
 			TenantRepository tenantRepository, RoleRepository roleRepository, OperationRepository operationRepository,
 			ClassificationRepository claseRepository, MetadataRepository metadataRepository, FieldRepository fieldRepository,
-			SchemaRepository schemaRepository, LevelRepository levelRepository, 
+			SchemaRepository schemaRepository, LevelRepository levelRepository, ExpedienteRepository expedienteRepository,
 			RetentionRepository retentionRepository, UserGroupRepository userGroupRepository,
 			PasswordEncoder passwordEncoder)
 	{
@@ -129,6 +131,7 @@ public class DataGenerator implements HasLogger
 		this.passwordEncoder               = passwordEncoder;
 		this.retentionRepository           = retentionRepository;
 		this.userGroupRepository           = userGroupRepository;
+		this.expedienteRepository          = expedienteRepository;
 
 	}//DataGenerator
 
@@ -192,6 +195,11 @@ public class DataGenerator implements HasLogger
 			getLogger().info("... generating classification classes" );
 			ClassificationGenerator classificationGenerator = new ClassificationGenerator(claseRepository, levelRepository, schemaRepository, levels, jcrSession);
 			classificationGenerator.registerClasses(tenant1);
+			
+			// -----------------  Generando expedientes y documentos de prueba
+			getLogger().info("... generating expedientes and documents");
+			ExpedienteGenerator  expedienteGenerator = new ExpedienteGenerator(claseRepository, jcrSession, expedienteRepository);
+			expedienteGenerator.registerExpedientes(tenant1);
 
 
 			// ------------------ Genere un conjunto de usuarios y grupos de usuarios -------------------------------
