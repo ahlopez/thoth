@@ -2,6 +2,7 @@ package com.f.thoth.backend.data.entity.util;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -19,7 +20,8 @@ public class TextUtil
    */
   private static final Locale APP_LOCALE = Locale.US;
   private static final SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-  private static final DateTimeFormatter FULL_DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy", APP_LOCALE);
+  private static final DateTimeFormatter FULL_DATE_FORMATTER     = DateTimeFormatter.ofPattern("yyyy.MM.dd", APP_LOCALE);
+  private static final DateTimeFormatter FULL_DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy.MM.dd:mm.ss", APP_LOCALE);
 
   /**
    * Decide si el texto presentado es nulo, o vacio
@@ -183,6 +185,21 @@ public class TextUtil
     date.equals(LocalDate.MIN)? "-MIN-":
     date.format(FULL_DATE_FORMATTER);
   }//formatDate
+
+  /**
+   * Obtiene la fecha-hora formateada dd.mm.yyyy:mm.ss
+   * @param dateTime Fecha-hora a formatear
+   * @return String fecha-hora en formato dd.mm.yyyy:mm.ss
+   */
+  public static String formatDateTime( LocalDateTime dateTime)
+  {
+    return dateTime == null? "---":
+    	   dateTime.equals(LocalDateTime.MAX)? "-MAX-":
+    	   dateTime.equals(LocalDateTime.MIN)? "-MIN-":
+           dateTime.format(FULL_DATETIME_FORMATTER);
+  }//formatDateTime
+  
+  
 
   /**
    * Obtiene una fecha formateada AAA/MM/DD

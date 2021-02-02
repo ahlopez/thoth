@@ -1,90 +1,167 @@
 package com.f.thoth.backend.data.gdoc.expediente;
 
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
+import java.time.LocalDateTime;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.Index;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
-import javax.persistence.Transient;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
-import org.hibernate.annotations.BatchSize;
-
-import com.f.thoth.backend.data.gdoc.document.Document;
-import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
+import com.f.thoth.backend.data.entity.BaseEntity;
 
 /**
  * Representa un volumen documental (segun Moreq)
  */
 @Entity
-@Table(name = "VOLUME_EXPEDIENTE")
-public class Volume extends Expediente
+@Table(name = "VOLUME", indexes = { @Index(columnList = "code")})
+public class Volume extends BaseEntity implements  Comparable<Volume>
 {
-   @ManyToOne
-   public BranchExpediente    parent;
+	@NotNull  (message = "{evidentia.volume.required}")
+	protected Long          currentVolume;                                // Index of the current volume
 
-   @Transient
-   public Set<Document> documents;
+	@NotNull  (message = "{evidentia.expediente.required}")
+	protected Expediente    expediente;                                   // Expediente that owns the volume
 
-   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-   @JoinColumn(name="doctype_id")
-   @BatchSize(size = 20)
-   public Set<DocumentType > admissibleTypes;
+	@NotNull  (message = "{evidentia.repopath.required}")
+	@NotBlank (message = "{evidentia.repopath.required}")
+	@NotEmpty (message = "{evidentia.repopath.required}")
+	@Size(max = 255)
+	protected String         path;                                        //  Node path in document repository
 
-   public Volume()
-   {
-      super();
-      documents       = new TreeSet<>();
-      admissibleTypes = new TreeSet<>();
-   }//Volume
+	@NotNull(message = "{evidentia.dateopened.required}")
+	protected LocalDateTime  dateOpened;                                  // Date volume was opened
 
+	@NotNull(message = "{evidentia.dateclosed.required}")
+	protected LocalDateTime  dateClosed;                                  // Date volume was closed
 
-   public Volume( Set<Document> documents, Set<DocumentType> admissibleTypes, BranchExpediente parent)
-   {
-      super();
-      if ( admissibleTypes == null || admissibleTypes.size() == 0)
-         throw new IllegalArgumentException("Un volumen no puede tener sus tipos documentales permitidos nulos ni vacios");
+	@NotNull(message = "{evidentia.open.required}")
+	protected Boolean        open;                                        // Is the volume currently open?
 
-      this.documents       = documents == null? new TreeSet<>() : documents;
-      this.admissibleTypes = admissibleTypes;
-      this.parent          = parent;
-   }//Volume
-
-   // ------------------ Getters & Setters ----------------------
+	// ---------------- Constructors -------------
+	public Volume()
+	{
+		super();
+		this.currentVolume = 0L;
+		buildCode();
+	}//Volume
 
 
-   public BranchExpediente getParent() {return parent;}
-   public void setParent(BranchExpediente parent) {this.parent = parent;}
+	public Volume(Expediente expediente, Long currentVolume, LocalDateTime  dateOpened, LocalDateTime  dateClosed)
+	{
+		super();
 
-   public Set<Document> getDocuments() {return documents;}
-   public void setDocuments(Set<Document> documents) {   this.documents = documents;}
+		if ( expediente == null)
+			throw new IllegalArgumentException("Expediente padre del volumen no puede ser nulo");
 
-   public Set<DocumentType> getAdmissibleTypes() {return admissibleTypes;}
-   public void setAdmissibleTypes(Set<DocumentType> admissibleTypes) {this.admissibleTypes = admissibleTypes;}
+		if ( currentVolume == null)
+			throw new IllegalArgumentException("Indice del volumen no puede ser nulo");
 
-   // ------------------- Object ---------------------------------
+		if ( dateOpened == null)
+			throw new IllegalArgumentException("Fecha de apertura del volumen no puede ser nula");
 
-   public boolean equals( Object other) { return super.equals(other);}
+		if ( dateClosed == null)
+			throw new IllegalArgumentException("Fecha de cierre del volumen no puede ser nula");
 
-   public int hashCode()  { return super.hashCode();}
+		this.expediente    = expediente;
+		this.currentVolume = currentVolume;
+		this.dateOpened    = dateOpened;
+		this.dateClosed    = dateClosed;
+		buildCode();
+	}//Volume
 
-   public String toString()
-   {
-      return "Volume{"+ super.toString()+ " n documents["+ documents.size()+ "]}";
-   }
+	@PrePersist
+	@PreUpdate
+	public void prepareData()
+	{
+		buildCode();
+	}
 
-   // ------------------- Logic  -------------------------------
-   public Iterator<Document> iterator(){ return documents.iterator();}
+	@Override protected void buildCode()
+	{ 
+		if (expediente != null)
+			this.path =  expediente.getCode()+ "/"+ currentVolume;
+		else 
+			this.path = "[expediente]/"+ currentVolume;	
 
-   public boolean isBranch(){ return false;}
+		this.code = this.path;
+	}//buildCode
 
-   public boolean isLeaf(){ return false;}
+	// ------------------ Getters & Setters ----------------------
 
-   public boolean isVolume(){ return true;}
+	public Long          getCurrentVolume() {	return currentVolume; }
+	public void          setCurrentVolume(Long currentVolume) {	this.currentVolume = currentVolume;}
+
+	public Expediente    getExpediente() {	return expediente;}
+	public void          setExpediente(Expediente expediente) {	this.expediente = expediente;}
+
+	public String        getPath() { return path;}
+	public void          setPath ( String path) { this.path = path;}
+
+	public LocalDateTime getDateOpened() {	return dateOpened;}
+	public void          setDateOpened(LocalDateTime dateOpened) {	this.dateOpened = dateOpened;}
+
+	public LocalDateTime getDateClosed() {	return dateClosed;}
+	public void          setDateClosed(LocalDateTime dateClosed) {	this.dateClosed = dateClosed;}
+
+	public Boolean       getOpen() {	return open;}
+	public void          setOpen(Boolean open) {	this.open = open;}
+
+	// ------------------- Object ---------------------------------
+
+	@Override public boolean equals( Object o)
+	{
+		if (this == o)
+			return true;
+
+		if (!(o instanceof Expediente ))
+			return false;
+
+		Volume that = (Volume) o;
+		return this.id != null && this.id.equals(that.id);
+	}//equals
+
+
+	@Override public int hashCode() { return id == null? 7027: id.hashCode();}
+
+	public String toString()
+	{
+		StringBuilder s = new StringBuilder();
+		s.append( "Volumen{")
+		.append( super.toString())
+		.append( expediente.toString())
+		.append( " currentVolume["+ currentVolume+ "]")
+		.append( " date opened["+ dateOpened+ "]")
+		.append( " date closed["+ dateClosed+ "]")
+		.append( " open["+ open+ "]}\n");
+
+		return s.toString();
+	}//toString
+
+
+	@Override  public int compareTo(Volume that)
+	{
+		if (that == null)
+			return 1;
+		
+		int expedienteOrder = this.expediente.compareTo(that.expediente);
+		return this.equals(that)?       0 :
+			   expedienteOrder  != 0?  expedienteOrder:
+			   this.code.compareTo(that.code);
+	}// compareTo
+
+
+	// ------------------- Logic  -------------------------------
+	public boolean isOpen()
+	{
+		LocalDateTime now = LocalDateTime.now();
+		return open &&
+				((now.equals(dateOpened) || now.equals(dateClosed)) ||
+						(now.isAfter(dateOpened) && now.isBefore(dateClosed))) ;
+	}//isOpen
 
 }//Volume
