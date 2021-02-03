@@ -199,7 +199,8 @@ public class DataGenerator implements HasLogger
 			// -----------------  Generando expedientes y documentos de prueba
 			getLogger().info("... generating expedientes and documents");
 			ExpedienteGenerator  expedienteGenerator = new ExpedienteGenerator(claseRepository, jcrSession, expedienteRepository);
-			expedienteGenerator.registerExpedientes(tenant1);
+			int nExpedientes = expedienteGenerator.registerExpedientes(tenant1);
+			getLogger().info("... "+ nExpedientes+ " expedientes generated");
 
 
 			// ------------------ Genere un conjunto de usuarios y grupos de usuarios -------------------------------

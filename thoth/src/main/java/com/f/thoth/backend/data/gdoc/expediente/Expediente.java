@@ -57,6 +57,7 @@ import com.f.thoth.backend.data.security.UserGroup;
 					@NamedAttributeNode("classificationClass"),
 					@NamedAttributeNode("owner"),
 					@NamedAttributeNode("open"),
+					@NamedAttributeNode("admissibleTypes"),
 					@NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF)
 			},
 			subgraphs = @NamedSubgraph(name = ObjectToProtect.BRIEF,
@@ -84,6 +85,7 @@ import com.f.thoth.backend.data.security.UserGroup;
 					@NamedAttributeNode("classCode"),
 					@NamedAttributeNode("metadata"),
 					@NamedAttributeNode("open"),
+					@NamedAttributeNode("admissibleTypes"),
 					@NamedAttributeNode("currentVolume"),
 					@NamedAttributeNode("keywords"),
 					@NamedAttributeNode("entries"),
@@ -137,13 +139,13 @@ public class Expediente extends BaseEntity implements  NeedsProtection, Hierarch
 
 	@NotNull(message = "{evidentia.class.required}")
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	protected Classification    classificationClass;        // Classification class to which this expediente belongs (Subserie si TRD)
+	protected Classification  classificationClass;          // Classification class to which this expediente belongs (Subserie si TRD)
 
 	@OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-	protected SchemaValues metadata;                        // Metadata values of the associated expediente
+	protected SchemaValues    metadata;                     // Metadata values of the associated expediente
 
 	@NotNull(message = "{evidentia.dateopened.required}")
-	protected LocalDateTime  dateOpened;                   // Date expediente was opened
+	protected LocalDateTime  dateOpened;                    // Date expediente was opened
 
 	@NotNull(message = "{evidentia.dateclosed.required}")
 	protected LocalDateTime  dateClosed;                   // Date expediente was closed
@@ -165,7 +167,7 @@ public class Expediente extends BaseEntity implements  NeedsProtection, Hierarch
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
 	@JoinColumn(name="doctype_id")
 	@BatchSize(size = 20)
-	public Set<DocumentType > admissibleTypes;              // Admisible document types that can be included in the expediente
+	protected Set<DocumentType> admissibleTypes;            // Admisible document types that can be included in the expediente
 
 	@ManyToMany
 	protected Set<String>       keywords;                   // Search keywords
@@ -296,6 +298,9 @@ public class Expediente extends BaseEntity implements  NeedsProtection, Hierarch
 
 	public String           getPath() { return path;}
 	public void             setPath ( String path) { this.path = path;}
+	
+	public Set<DocumentType> getAdmissibleTypes() { return admissibleTypes;}
+	public void              setAdmissibleTypes(Set<DocumentType> admissibleTypes) { this.admissibleTypes = admissibleTypes;}
 
 	public Set<IndexEntry>  getEntries(){ return entries;}
 	public void             setEntries(Set<IndexEntry> entries){ this.entries = entries;}

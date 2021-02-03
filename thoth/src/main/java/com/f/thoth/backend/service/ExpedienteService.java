@@ -13,7 +13,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import com.f.thoth.backend.data.entity.User;
-import com.f.thoth.backend.data.gdoc.expediente.ExpedienteIndex;
+import com.f.thoth.backend.data.gdoc.expediente.Expediente;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
@@ -24,7 +24,7 @@ import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
 
 @Service
-public class ExpedienteService implements FilterableCrudService<ExpedienteIndex>, PermissionService<ExpedienteIndex>
+public class ExpedienteService implements FilterableCrudService<Expediente>, PermissionService<Expediente>
 {
    private final ExpedienteRepository           expedienteRepository;
    private final PermissionRepository           permissionRepository;
@@ -40,7 +40,7 @@ public class ExpedienteService implements FilterableCrudService<ExpedienteIndex>
       this.objectToProtectRepository   = objectToProtectRepository;
    }
 
-   @Override public Page<ExpedienteIndex> findAnyMatching(Optional<String> filter, Pageable pageable)
+   @Override public Page<Expediente> findAnyMatching(Optional<String> filter, Pageable pageable)
    {
       if (filter.isPresent())
       {
@@ -62,31 +62,31 @@ public class ExpedienteService implements FilterableCrudService<ExpedienteIndex>
       }
    }//countAnyMatching
 
-   public Page<ExpedienteIndex> find(Pageable pageable)
+   public Page<Expediente> find(Pageable pageable)
    {
       return expedienteRepository.findBy(ThothSession.getCurrentTenant(), pageable);
    }
 
-   @Override public JpaRepository<ExpedienteIndex, Long> getRepository()
+   @Override public JpaRepository<Expediente, Long> getRepository()
    {
       return expedienteRepository;
    }
 
-   @Override public ExpedienteIndex createNew(User currentUser)
+   @Override public Expediente createNew(User currentUser)
    {
-      ExpedienteIndex expedienteIndex = new ExpedienteIndex();
-      expedienteIndex.setTenant(ThothSession.getCurrentTenant());
-      return expedienteIndex;
+      Expediente Expediente = new Expediente();
+      Expediente.setTenant(ThothSession.getCurrentTenant());
+      return Expediente;
    }//createNew
 
-   @Override public ExpedienteIndex save(User currentUser, ExpedienteIndex expedienteIndex)
+   @Override public Expediente save(User currentUser, Expediente Expediente)
    {
       try {
-         ObjectToProtect associatedObject = expedienteIndex.getObjectToProtect();
+         ObjectToProtect associatedObject = Expediente.getObjectToProtect();
          if ( !associatedObject.isPersisted())
             objectToProtectRepository.saveAndFlush( associatedObject);
 
-         return FilterableCrudService.super.save(currentUser, expedienteIndex);
+         return FilterableCrudService.super.save(currentUser, Expediente);
       } catch (DataIntegrityViolationException e) {
          throw new UserFriendlyDataException("Ya hay un expediente con esa identificación. Por favor escoja un identificador único para el expediente");
       }
@@ -95,15 +95,15 @@ public class ExpedienteService implements FilterableCrudService<ExpedienteIndex>
 
 
    //  ----- implements HierarchicalService ------
-   @Override public List<ExpedienteIndex> findAll() { return expedienteRepository.findAll(ThothSession.getCurrentTenant()); }
+   @Override public List<Expediente> findAll() { return expedienteRepository.findAll(ThothSession.getCurrentTenant()); }
 
-   @Override public Optional<ExpedienteIndex> findById(Long id)  { return expedienteRepository.findById( id);}
+   @Override public Optional<Expediente> findById(Long id)  { return expedienteRepository.findById( id);}
 
-   @Override public List<ExpedienteIndex>  findByParent ( ExpedienteIndex owner) { return expedienteRepository.findByParent(owner); }
-   @Override public int         countByParent ( ExpedienteIndex owner) { return expedienteRepository.countByParent (owner); }
-   @Override public boolean     hasChildren   ( ExpedienteIndex expedienteIndex){ return expedienteRepository.countByChildren(expedienteIndex) > 0; }
+   @Override public List<Expediente>  findByParent ( Expediente owner) { return expedienteRepository.findByParent(owner); }
+   @Override public int         countByParent ( Expediente owner) { return expedienteRepository.countByParent (owner); }
+   @Override public boolean     hasChildren   ( Expediente Expediente){ return expedienteRepository.countByChildren(Expediente) > 0; }
 
-   @Override public List<ExpedienteIndex> findByNameLikeIgnoreCase (Tenant tenant, String name)
+   @Override public List<Expediente> findByNameLikeIgnoreCase (Tenant tenant, String name)
                           { return expedienteRepository.findByNameLikeIgnoreCase (tenant, name); }
    @Override public long  countByNameLikeIgnoreCase(Tenant tenant, String name)
                           { return expedienteRepository.countByNameLikeIgnoreCase(tenant, name); }
@@ -112,13 +112,13 @@ public class ExpedienteService implements FilterableCrudService<ExpedienteIndex>
 
    @Override public List<Permission> findGrants( Role role)
    {
-      List<ExpedienteIndex> expedientes = expedienteRepository.findExpedientesGranted(role);
+      List<Expediente> expedientes = expedienteRepository.findExpedientesGranted(role);
       List<ObjectToProtect>     objects = new ArrayList<>();
       expedientes.forEach( expediente-> objects.add(expediente.getObjectToProtect()));
       return  permissionRepository.findByObjects(objects);
    }//findGrants
 
-   @Override public List<ExpedienteIndex> findObjectsGranted( Role role)
+   @Override public List<Expediente> findObjectsGranted( Role role)
    {
       return expedienteRepository.findExpedientesGranted(role);
    }
