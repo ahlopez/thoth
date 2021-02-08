@@ -153,7 +153,7 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>${h2.version}</version>
+      <!-- version>${h2.version}</version>  -->
     </dependency>
 
     <!-- Vaadin -->
@@ -266,7 +266,7 @@
     <dependency>
       <groupId>org.springframework.data</groupId>
       <artifactId>spring-data-mongodb</artifactId>
-      <version>${spring.data.mongodb.version}</version>
+      <!--  version>${spring.data.mongodb.version}</version>-->
     </dependency>
     
 
@@ -313,7 +313,7 @@
     <dependency>
       <groupId>org.mongodb</groupId>
       <artifactId>mongodb-driver-core</artifactId>
-      <version>${mongodb.driver.core.version}</version>
+      <!-- version>${mongodb.driver.core.version}</version> -->
     </dependency>
     
     
@@ -420,7 +420,7 @@
       <plugin>
         <groupId>com.vaadin</groupId>
         <artifactId>vaadin-maven-plugin</artifactId>
-        <version>${vaadin.version}</version>
+        <!--  version>${vaadin.version}</version> -->
         <configuration>
            <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
         </configuration>

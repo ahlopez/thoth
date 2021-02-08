@@ -72,7 +72,7 @@ public class DataGenerator implements HasLogger
 			"Bun", "Brownie", "Cookie", "Cracker", "Cheese Cake" };
 
 	private static final String[] FIRST_NAME = new String[] { "Olga", "Amanda", "Octavia", "Cristina", "Marta", "Luis",
-			"Eduardo", "Alvaro", "Arsenio", "German", "Daniel", "Silvia", "Angela", "Maria", "Fernando", "Patricio",
+			"Eduardo", "Alvaro", "Arsenio", "German", "Cecilia", "Silvia", "Angela", "Maria", "Fernando", "Patricio",
 			"David", "Lino", "Rafael" };
 
 	private static final String[] LAST_NAME = new String[] { "Biden", "Castro", "Duque", "Lopez", "Perez", "Parias",

@@ -20,6 +20,8 @@ import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.ClassificationRepository;
 import com.f.thoth.backend.repositories.ExpedienteRepository;
 
+import net.bytebuddy.asm.Advice.Return;
+
 public class ExpedienteGenerator 
 {
     private ClassificationRepository claseRepository;
@@ -28,6 +30,17 @@ public class ExpedienteGenerator
     private User                     user;
     private final Random             random = new Random(1L);
     private int                      nExpedientes = 0;
+    
+
+	private static final String[] FIRST_NAME = new String[] { "Olga", "Amanda", "Octavia", "Cristina", "Marta", "Luis",
+			"Eduardo", "Alvaro", "Arsenio", "German", "Cecilia", "Silvia", "Angela", "Maria", "Fernando", "Patricio",
+			"David", "Lino", "Rafael" };
+
+	private static final String[] LAST_NAME = new String[] { "Biden", "Castro", "Duque", "Lopez", "Perez", "Parias",
+			"Umana", "Rueda", "Vergara", "Gonzalez", "Nunez", "Macias", "Gallegos", "Duarte", "Mejia", "Petro",
+			"Gutierrez", "Vargas", "Puentes", "Holmes", "Macias", "Ospina", "Mutis", "Cortes", "Noble", "Rodriguez", "Arenas",
+			"Trump", "Mogollon", "Samper", "Estrada", "Heredia", "Maldonado", "Reyes" };
+
 
     public ExpedienteGenerator( ClassificationRepository claseRepository, Session jcrSession, ExpedienteRepository expedienteRepository)
     {
@@ -102,33 +115,91 @@ public class ExpedienteGenerator
      }//creeExpediente
     
      private String genereCode(Expediente padre, Classification classificationClass)
-     {
-    	 return ""; //TODO:
+     {   
+    	 return padre == null?   generateExpedienteCode(classificationClass) : generateSubExpedienteCode(padre);
      }//genereCode
+     
+     private synchronized String generateExpedienteCode(Classification classificationClass)
+     {
+         String expedienteCode = classificationClass.nextExpedienteCode();
+         claseRepository.saveAndFlush(classificationClass);
+    	 return expedienteCode;
+     }//generateExpedienteCode
+     
+     private String generateSubExpedienteCode( Expediente padre)
+     {
+    	 String expedienteCode= padre.nextSubCode();
+    	 expedienteRepository.saveAndFlush(padre);
+    	 return expedienteCode;
+     }//generateSubExpedienteCode
      
      private String generateName()
      {
+    	 //  Pregenerar los nombres en otro programa y guardarlos en el disco
+    	 /*
+    	  * Lea lista de palabras válidas.
+    	  * Lea lista de nombres, apellidos
+    	  * N = random(3, 10);
+    	  * name = new StringBuilder();
+    	  * for ( int i = 0; i < N; i++)
+    	  * {
+    	  *     if (i > 0)
+    	  *        name.append(" ");
+    	  *     name.append( randomWord());
+    	  * }
+    	  * if ( N <= 8 && randomBoolean()) 
+    	  *    name.append( randomName().append( randomApellido());
+    	  *    
+    	  * return name.toString();   
+    	  */
     	 return ""; //TODO:
      }//generateName
      
      private Set<String> generateKeywords()
      {
-    	 return new TreeSet<>(); //TODO:
+      	  Set<String> keywords = new TreeSet<>();
+    	 /*
+    	  * Lea keywordList
+    	  * N = random(1,3);
+    	  * for( int i = 0; i < N; i++)
+    	  *     keywords.add( randomKeyword());
+    	  *     
+    	  * return keywords;
+    	  */
+    	 return keywords;
      }//generateKeywords
      
      private String generateMac()
      {
+    	 // Crear un BlockChain
+    	 // Generar el mac del expediente usando el mac de cada documento y el precedente del block
+    	 // 
+    	 
     	 return ""; //TODO:
      }//generateMac
      
      private Long generateVolume( Expediente padre)
      {
+    	 // Verificar que el padre no sea un volumen
+    	 // Verificar que el padre no tenga documentos
+    	 // Decidir si el expediente es un volumen (random boolean)
+    	 // incrementar el volume number
+    	 // cerrar el volumen anterior
+    	 // Crear el columen en el repositorio
     	 return 0L;//TODO:
      }//generateVolume
      
      private Set<DocumentType> generateAdmissibleTypes()
      {
-    	 return new TreeSet<>(); //TODO:
+    	 Set<DocumentType> admissibleTypes = new TreeSet<>(); 
+    	 // Cargar la lista de tipos documentales
+    	 // N = ramdom(1, 10)   
+    	 // for (int i = 0; i < N; i++)
+    	 // { 
+    	 //    admissibleTypes.add(  select a doc type at random);
+    	 // }
+    	 //     
+    	 return admissibleTypes;
      }//generateAdmissibleTypes
      
      private void creeJCRNodo( String path)

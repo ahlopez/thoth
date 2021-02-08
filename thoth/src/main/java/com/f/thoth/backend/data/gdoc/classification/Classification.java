@@ -19,6 +19,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
@@ -35,7 +36,7 @@ import com.f.thoth.backend.data.security.UserGroup;
 
 
 /**
- * Representa una clase del esquema de clasificación documental
+ * Representa una clase del esquema de clasificaciOn documental
  */
 @NamedEntityGraphs({
    @NamedEntityGraph(
@@ -49,6 +50,7 @@ import com.f.thoth.backend.data.security.UserGroup;
             @NamedAttributeNode("dateClosed"),
             @NamedAttributeNode("classCode"),
             @NamedAttributeNode("path"),
+            @NamedAttributeNode("currentExpedienteNumber"),
             @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF)
          },
          subgraphs = @NamedSubgraph(name = ObjectToProtect.BRIEF,
@@ -71,6 +73,7 @@ import com.f.thoth.backend.data.security.UserGroup;
                @NamedAttributeNode("dateClosed"),
                @NamedAttributeNode("classCode"),
                @NamedAttributeNode("path"),
+               @NamedAttributeNode("currentExpedienteNumber"),
                @NamedAttributeNode("metadata"),
                @NamedAttributeNode("retentionSchedule"),
                @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)
@@ -127,7 +130,13 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
    @NotNull(message = "{evidentia.classcode.required}")
    protected String    classCode;                          //  Unique business code of the classification node (includes level codes+ class code)
 
+   @NotNull  (message = "{evidentia.path.required}")
+   @NotBlank (message = "{evidentia.path.required}")
+   @NotEmpty (message = "{evidentia.path.required}")
    protected String    path;                               //  Classification node path in document repository
+
+   @PositiveOrZero
+   protected Integer   currentExpedienteNumber;            //  Number of the last expediente created for this class
 
    // ------------- Constructors ------------------
    public Classification()
@@ -144,13 +153,13 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
          throw new IllegalArgumentException("Nombre["+ name+ "] es invalido");
 
       if ( level == null)
-         throw new IllegalArgumentException("Nivel de la clase del esquema de clasificación no puede ser nulo");
+         throw new IllegalArgumentException("Nivel de la clase del esquema de clasificaciOn no puede ser nulo");
 
       if ( TextUtil.isEmpty(name))
-         throw new IllegalArgumentException("Nombre de la clase del esquema de clasificación no puede ser nulo");
+         throw new IllegalArgumentException("Nombre de la clase del esquema de clasificaciOn no puede ser nulo");
 
       if ( objectToProtect == null)
-         throw new IllegalArgumentException("Objeto de seguridad de la clase del esquema de clasificación no puede ser nulo");
+         throw new IllegalArgumentException("Objeto de seguridad de la clase del esquema de clasificaciOn no puede ser nulo");
 
       init();
       this.level            = level;
@@ -163,14 +172,15 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
 
    private void init()
    {
-      LocalDate now          = LocalDate.now();
-      this.dateOpened        = now;
-      this.dateClosed        = LocalDate.MAX;
-      this.owner             = null;
-      this.retentionSchedule = Retention.DEFAULT;
-      this.metadata          = null;
-      this.classCode         = null;
-      this.path              = "/";
+      LocalDate now                = LocalDate.now();
+      this.dateOpened              = now;
+      this.dateClosed              = LocalDate.MAX;
+      this.owner                   = null;
+      this.retentionSchedule       = Retention.DEFAULT;
+      this.metadata                = null;
+      this.classCode               = null;
+      this.path                    = "/";
+      this.currentExpedienteNumber = 0;
 
    }//init
 
@@ -190,21 +200,21 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
    }//buildCode
 
    // -------------- Getters & Setters ----------------
-   public void       setName(String name)      { this.name  = (name != null ? name.trim() : "Anonima");}
-   public void       setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect; }
-   public void       setOwner(Classification owner){ this.owner = owner; }
+   public void         setName(String name)      { this.name  = (name != null ? name.trim() : "Anonima");}
+   public void         setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect; }
+   public void         setOwner(Classification owner){ this.owner = owner; }
 
-   public Level      getLevel(){ return level;}
-   public void       setLevel(Level level){ this.level = level;}
+   public Level        getLevel(){ return level;}
+   public void         setLevel(Level level){ this.level = level;}
 
-   public LocalDate  getDateOpened() { return dateOpened;}
-   public void       setDateOpened( LocalDate dateOpened) { this.dateOpened = dateOpened;}
+   public LocalDate    getDateOpened() { return dateOpened;}
+   public void         setDateOpened( LocalDate dateOpened) { this.dateOpened = dateOpened;}
 
-   public LocalDate  getDateClosed() { return dateClosed;}
-   public void       setDateClosed( LocalDate dateClosed){ this.dateClosed = dateClosed;}
+   public LocalDate    getDateClosed() { return dateClosed;}
+   public void         setDateClosed( LocalDate dateClosed){ this.dateClosed = dateClosed;}
 
-   public Retention  getRetentionSchedule() { return retentionSchedule;}
-   public void       setRetentionSchedule( Retention retentionSchedule) {this.retentionSchedule = retentionSchedule;}
+   public Retention    getRetentionSchedule() { return retentionSchedule;}
+   public void         setRetentionSchedule( Retention retentionSchedule) {this.retentionSchedule = retentionSchedule;}
 
    public SchemaValues getMetadata() { return metadata;}
    public void         setMetadata ( SchemaValues metadata) { this.metadata = metadata;}
@@ -214,6 +224,9 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
 
    public String       getPath() { return path;}
    public void         setPath ( String path) { this.path = path;}
+
+   public Integer      getCurrentExpedienteNumber() { return currentExpedienteNumber;}
+   public void         setCurrentExpedienteNumber ( Integer currentExpedienteNumber) { this.currentExpedienteNumber = currentExpedienteNumber;}
 
 
    // --------------- Object methods ---------------------
@@ -238,11 +251,12 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
    {
       StringBuilder s = new StringBuilder();
       s.append( "Classification{")
-       .append(  super.toString())
-       .append(  "name["+ name+ "]")
+       .append( super.toString())
+       .append( "name["+ name+ "]")
        .append( " ["+ level.toString()+ "]")
        .append( " classCode["+ classCode+ "]")
        .append( " path["+ path+ "]")
+       .append( " currentExpedienteNumber["+ currentExpedienteNumber+ "]")
        .append( " dateOpened["+ TextUtil.formatDate(dateOpened)+ "]")
        .append( " dateClosed["+ TextUtil.formatDate(dateClosed)+ "]\n")
        .append( " retentionSchedule["+ retentionSchedule == null? "---" :  retentionSchedule.getCode()+ "]\n")
@@ -261,20 +275,6 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
 
    }// compareTo
 
-
-   // --------------- Implements NeedsProtection ------------------------------
-
-   public Integer               getCategory() {return objectToProtect.getCategory();}
-   public void                  setCategory(Integer category) {objectToProtect.setCategory(category);}
-
-   public SingleUser            getUserOwner() {return objectToProtect.getUserOwner();}
-   public void                  setUserOwner(SingleUser userOwner) {objectToProtect.setUserOwner(userOwner);}
-
-   public Role                  getRoleOwner() {return objectToProtect.getRoleOwner();}
-   public void                  setRoleOwner(Role roleOwner) {objectToProtect.setRoleOwner(roleOwner);}
-
-   public UserGroup             getRestrictedTo() {return objectToProtect.getRestrictedTo();}
-   public void                  setRestrictedTo(UserGroup restrictedTo) {objectToProtect.setRestrictedTo(restrictedTo);}
 
    // --------------------------- Implements HierarchicalEntity ---------------------------------------
    @Override public String           getName()   { return name;}
@@ -303,6 +303,18 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
 
    // -----------------  Implements NeedsProtection ----------------
 
+   public Integer                   getCategory() {return objectToProtect.getCategory();}
+   public void                      setCategory(Integer category) {objectToProtect.setCategory(category);}
+
+   public SingleUser                getUserOwner() {return objectToProtect.getUserOwner();}
+   public void                      setUserOwner(SingleUser userOwner) {objectToProtect.setUserOwner(userOwner);}
+
+   public Role                      getRoleOwner() {return objectToProtect.getRoleOwner();}
+   public void                      setRoleOwner(Role roleOwner) {objectToProtect.setRoleOwner(roleOwner);}
+
+   public UserGroup                 getRestrictedTo() {return objectToProtect.getRestrictedTo();}
+   public void                      setRestrictedTo(UserGroup restrictedTo) {objectToProtect.setRestrictedTo(restrictedTo);}
+
    @Override public ObjectToProtect getObjectToProtect()                  { return objectToProtect;}
 
    @Override public boolean         canBeAccessedBy(Integer userCategory) { return objectToProtect.canBeAccessedBy(userCategory);}
@@ -327,5 +339,16 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
       LocalDate now = LocalDate.now();
       return now.compareTo(dateOpened) >= 0 && now.compareTo(dateClosed) <= 0;
    }//isOpen
+
+   protected synchronized Integer nextExpedienteNumber()
+   {
+       currentExpedienteNumber ++;
+       return currentExpedienteNumber;
+   }//nextExpedienteNumber
+
+   public String nextExpedienteCode()
+   {
+       return formatCode()+ "-"+ nextExpedienteNumber();
+   }//nextExpedienteCode
 
 }//Classification
