@@ -6,25 +6,16 @@ import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedAttributeNode;
-import javax.persistence.NamedEntityGraph;
-import javax.persistence.NamedEntityGraphs;
-import javax.persistence.NamedSubgraph;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
-import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.BatchSize;
@@ -46,80 +37,14 @@ import com.f.thoth.backend.data.security.UserGroup;
 /**
  * Representa un nodo de la jerarquia de expedientes (expediente/sub-expediente/volumen
  */
-@NamedEntityGraphs({
-     @NamedEntityGraph(
-         name = Expediente.BRIEF,
-         attributeNodes = {
-            @NamedAttributeNode("tenant"),
-            @NamedAttributeNode("code"),           // DB human id. Includes [tenant, type, path+]
-            @NamedAttributeNode("expedienteCode"), // Business id (vg. dependencia-serie-subserie-secuencial)
-            @NamedAttributeNode("name"),
-            @NamedAttributeNode("path"),
-            @NamedAttributeNode("classificationClass"),
-            @NamedAttributeNode("owner"),
-            @NamedAttributeNode("open"),
-            @NamedAttributeNode("admissibleTypes"),
-            @NamedAttributeNode("currentDocNumber"),
-            @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF)
-         },
-         subgraphs = @NamedSubgraph(name = ObjectToProtect.BRIEF,
-            attributeNodes = {
-               @NamedAttributeNode("category"),
-               @NamedAttributeNode("userOwner"),
-               @NamedAttributeNode("roleOwner"),
-               @NamedAttributeNode("restrictedTo")
-            })
-         ),
-     @NamedEntityGraph(
-         name = Expediente.FULL,
-         attributeNodes = {
-            @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF),
-            @NamedAttributeNode("tenant"),
-            @NamedAttributeNode("code"),
-            @NamedAttributeNode("expedienteCode"),
-            @NamedAttributeNode("name"),
-            @NamedAttributeNode("classificationClass"),
-            @NamedAttributeNode("createdBy"),
-            @NamedAttributeNode("owner"),
-            @NamedAttributeNode("path"),
-            @NamedAttributeNode("dateOpened"),
-            @NamedAttributeNode("dateClosed"),
-            @NamedAttributeNode("classCode"),
-            @NamedAttributeNode("metadata"),
-            @NamedAttributeNode("open"),
-            @NamedAttributeNode("admissibleTypes"),
-            @NamedAttributeNode("currentVolume"),
-            @NamedAttributeNode("currentSubNumber"),
-            @NamedAttributeNode("currentDocNumber"),
-            @NamedAttributeNode("keywords"),
-            @NamedAttributeNode("keywords"),
-            @NamedAttributeNode("entries"),
-            @NamedAttributeNode("mac"),
-            @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)
-         },
-         subgraphs = @NamedSubgraph(name = ObjectToProtect.FULL,
-            attributeNodes = {
-               @NamedAttributeNode("category"),
-               @NamedAttributeNode("userOwner"),
-               @NamedAttributeNode("roleOwner"),
-               @NamedAttributeNode("restrictedTo"),
-               @NamedAttributeNode("acl")
-            })
-         )
-    })
-
-@Entity
-@Table(name = "EXPEDIENTE", indexes = { @Index(columnList = "code"), @Index(columnList = "tenant,expedienteCode"), @Index(columnList= "tenant,keywords")})
-public class Expediente extends BaseEntity implements  NeedsProtection, HierarchicalEntity<Expediente>, Comparable<Expediente>
+@MappedSuperclass
+public class AbstractExpediente extends BaseEntity implements  NeedsProtection, HierarchicalEntity<AbstractExpediente>, Comparable<AbstractExpediente>
 {
-   public static final String BRIEF = "Expediente.brief";
-   public static final String FULL  = "Expediente.full";
-
    @NotNull  (message = "{evidentia.code.required}")
    @NotBlank (message = "{evidentia.code.required}")
    @NotEmpty (message = "{evidentia.code.required}")
    @Size(max = 255)
-   protected String            expedienteCode;             // Expediente code (business id) unique inside the owner (class or expediente)
+   protected String            expedienteCode;             // Business id unique inside the owner (class or expediente), vg 001,002, etc
 
    @NotNull  (message = "{evidentia.repopath.required}")
    @NotBlank (message = "{evidentia.repopath.required}")
@@ -132,7 +57,7 @@ public class Expediente extends BaseEntity implements  NeedsProtection, Hierarch
    @NotEmpty (message = "{evidentia.name.required}")
    @Size(max = 255)
    @Column(unique = true)
-   protected String            name;                       // Expediente name
+   protected String            name;                       // AbstractExpediente name
 
    @NotNull(message = "{evidentia.objectToProtect.required}")
    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
@@ -156,44 +81,24 @@ public class Expediente extends BaseEntity implements  NeedsProtection, Hierarch
    protected LocalDateTime     dateClosed;                 // Date expediente was closed
 
    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-   protected Expediente        owner;                      // Expediente to which this SUBEXPEDIENTE/VOLUMEN belongs
+   protected AbstractExpediente        owner;                      // AbstractExpediente to which this SUBEXPEDIENTE/VOLUMEN belongs
 
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
    @JoinColumn(name="entry_id")
    @BatchSize(size = 50)
-   protected Set<IndexEntry>   entries;                    // Expediente index entries
+   protected Set<IndexEntry>   entries;                    // AbstractExpediente index entries
 
    @NotNull(message = "{evidentia.open.required}")
    protected Boolean           open;                       // Is the expediente currently open?
 
-   @PositiveOrZero
-   @NotNull(message = "{evidentia.volumeNumber.required}")
-   protected Integer           currentVolume;              // Number of the current volume, 0= no volume
-
-   @PositiveOrZero
-   @NotNull(message = "{evidentia.subExpedienteNumber.required}")
-   protected Integer           currentSubNumber;           // Number of current subExpediente created in this expediente
-
-   @PositiveOrZero
-   @NotNull(message = "{evidentia.documentNumber.required}")
-   protected Integer           currentDocNumber;           // Number of current document created in this expediente
-
-   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-   @JoinColumn(name="doctype_id")
-   @BatchSize(size = 20)
-   protected Set<DocumentType> admissibleTypes;            // Admisible document types that can be included in the expediente
-
    @ManyToMany
    protected Set<String>       keywords;                   // Search keywords
-
-   @ManyToOne
-   protected String            location;                   // Signatura topografica
 
    @NotNull(message = "{evidentia.mac.required}")
    protected String            mac;                        // Message authentication code
 
    // ------------- Constructors ------------------
-   public Expediente()
+   public AbstractExpediente()
    {
       super();
       this.expedienteCode       = "";
@@ -208,49 +113,36 @@ public class Expediente extends BaseEntity implements  NeedsProtection, Hierarch
       this.owner                = null;
       this.entries              = new TreeSet<>();
       this.open                 = false;
-      this.currentVolume        = 0;
-      this.currentSubNumber     = 0;
-      this.currentDocNumber     = 0;
-      this.admissibleTypes      = new TreeSet<>();
       this.keywords             = new TreeSet<>();
-      this.location             = "";
       this.mac                  = "";
 
       buildCode();
-   }//Expediente null constructor
+   }//AbstractExpediente null constructor
 
-
-   public Expediente( String expedienteCode, String path, String name, SingleUser createdBy, Classification classificationClass,
-                      SchemaValues metadata, LocalDateTime dateOpened, LocalDateTime dateClosed, Expediente owner,
-                      Set<IndexEntry> entries, Boolean open, Integer currentVolume, Integer currentSubNumber, Integer currentDocNumber,
-                      Set<DocumentType> admissibleTypes, Set<String> keywords, String location, String mac)
+   public AbstractExpediente( String expedienteCode, String path, String name, SingleUser createdBy, Classification classificationClass,
+                     SchemaValues metadata, LocalDateTime dateOpened, LocalDateTime dateClosed, AbstractExpediente owner, Boolean open,
+                     Set<IndexEntry> entries, Set<DocumentType> admissibleTypes, Set<String> keywords, String location, String mac)
    {
       if ( TextUtil.isEmpty(expedienteCode))
-         throw new IllegalArgumentException("Codigo del expediente no puede ser nulo ni vacio");
+         throw new IllegalArgumentException("Codigo del expediente no puede ser nulo ni vac�o");
 
       if ( TextUtil.isEmpty(path))
-         throw new IllegalArgumentException("Path del expediente en el repositorio no puede ser nulo ni vacio");
+         throw new IllegalArgumentException("Path del expediente en el repositorio no puede ser nulo ni vac�o");
 
       if ( TextUtil.isEmpty(name))
-         throw new IllegalArgumentException("Nombre del expediente no puede ser nulo ni vacio");
+         throw new IllegalArgumentException("Nombre del expediente no puede ser nulo ni vac�o");
 
       if ( !TextUtil.isValidName(name))
-         throw new IllegalArgumentException("Nombre["+ name+ "] es invalido");
+         throw new IllegalArgumentException("Nombre["+ name+ "] es inv�lido");
 
       if ( createdBy == null)
          throw new IllegalArgumentException("Creador del expediente no puede ser nulo");
 
       if ( classificationClass == null)
-         throw new IllegalArgumentException("Clase del expediente no puede ser nula ni vacia");
+         throw new IllegalArgumentException("Clase del expediente no puede ser nula ni vac�a");
 
       if ( dateOpened == null)
-         throw new IllegalArgumentException("Fecha de creacion del expediente no puede ser nula");
-
-      if ( currentSubNumber > 0 && currentVolume > 0 )
-         throw new IllegalArgumentException("El expediente no puede tener a la vez sub-expedientes y volumenes");
-
-      if ( (currentSubNumber > 0 || currentVolume > 0) && currentDocNumber > 0 )
-         throw new IllegalArgumentException("El expediente no puede tener a la vez documentos, y sub-expedientes o volumenes");
+         throw new IllegalArgumentException("Fecha de creaci�n del expediente no puede ser nula");
 
       this.objectToProtect     = new ObjectToProtect();
       this.expedienteCode      = expedienteCode;
@@ -264,20 +156,12 @@ public class Expediente extends BaseEntity implements  NeedsProtection, Hierarch
       this.owner               = owner;
       this.entries             = (entries          == null? new TreeSet<>(): entries);
       this.open                = (open             == null? false          : open);
-      this.currentVolume       = (currentVolume    == null? 0              : currentVolume);
-      this.currentSubNumber    = (currentSubNumber == null? 0              : currentSubNumber);
-      this.currentDocNumber    = (currentDocNumber == null? 0              : currentDocNumber);
-      this.admissibleTypes     = (admissibleTypes  == null? new TreeSet<>(): admissibleTypes);
       this.keywords            = (keywords         == null? new TreeSet<>(): keywords);
-      this.location            = (location         == null? ""             : location);
       this.mac                 = mac;
 
       buildCode();
-   }//Expediente constructor
+   }//AbstractExpediente constructor
 
-
-   @PrePersist
-   @PreUpdate
    public void prepareData()
    {
       objectToProtect.prepareData();
@@ -301,7 +185,7 @@ public class Expediente extends BaseEntity implements  NeedsProtection, Hierarch
 
    public void              setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect;}
 
-   public void              setOwner(Expediente owner){ this.owner = owner;}
+   public void              setOwner(AbstractExpediente owner){ this.owner = owner;}
 
    public Classification    getClassificationClass() { return classificationClass;}
    public void              setClassificationClass( Classification classificationClass) { this.classificationClass = classificationClass;}
@@ -324,27 +208,12 @@ public class Expediente extends BaseEntity implements  NeedsProtection, Hierarch
    public String            getPath() { return path;}
    public void              setPath ( String path) { this.path = path;}
 
-   public Set<DocumentType> getAdmissibleTypes() { return admissibleTypes;}
-   public void              setAdmissibleTypes(Set<DocumentType> admissibleTypes) { this.admissibleTypes = admissibleTypes;}
-
    public Set<IndexEntry>   getEntries(){ return entries;}
    public void              setEntries(Set<IndexEntry> entries){ this.entries = entries;}
    public int               size() { return entries.size();}
 
    public Set<String>       getKeywords() { return keywords;}
    public void              setKeywords( Set<String> keywords) { this.keywords = keywords;}
-
-   public Integer           getCurrentVolume()  { return currentVolume;}
-   public void              setCurrentVolume(Integer currentVolume) { this.currentVolume = currentVolume;}
-
-   public Integer           getCurrentSubNumber()  { return currentSubNumber;}
-   public void              setCurrentSubNumber(Integer currentSubNumber) { this.currentSubNumber = currentSubNumber;}
-
-   public Integer           getCurrentDocNumber()  { return currentDocNumber;}
-   public void              setCurrentDocNumber(Integer currentDocNumber) { this.currentDocNumber = currentDocNumber;}
-
-   public String            getLocation() { return location;}
-   public void              setLocation(String location) { this.location = location;}
 
    public String            getMac() { return mac;}
    public void              setMac(String mac) { this.mac = mac;}
@@ -356,10 +225,10 @@ public class Expediente extends BaseEntity implements  NeedsProtection, Hierarch
       if (this == o)
          return true;
 
-      if (!(o instanceof Expediente ))
+      if (!(o instanceof AbstractExpediente ))
          return false;
 
-      Expediente that = (Expediente) o;
+      AbstractExpediente that = (AbstractExpediente) o;
       return this.id != null && this.id.equals(that.id);
 
    }//equals
@@ -369,7 +238,7 @@ public class Expediente extends BaseEntity implements  NeedsProtection, Hierarch
    @Override public String toString()
    {
       StringBuilder s = new StringBuilder();
-      s.append( "Expediente{")
+      s.append( "AbstractExpediente{")
        .append( super.toString())
        .append( " name["+ name+ "]")
        .append( " open["+ open+ "]")
@@ -381,13 +250,9 @@ public class Expediente extends BaseEntity implements  NeedsProtection, Hierarch
        .append( " dateOpened["+ TextUtil.formatDateTime(dateOpened)+ "]")
        .append( " dateClosed["+ TextUtil.formatDateTime(dateClosed)+ "]\n")
        .append( " objectToProtect["+ objectToProtect.toString()+ "]\n")
-       .append( " expediente owner["+ owner.getExpedienteCode()+ "]")
-       .append( " currentVolume["+ currentVolume+ "]")
-       .append( " currentSubNumber["+ currentSubNumber+ "]")
-       .append( " currentDocNumber["+ currentDocNumber+ "]")
+       .append( " expediente owner["+ (owner == null? "---": owner.getExpedienteCode())+ "]")
        .append( " n index-entries["+ entries.size()+ "]")
        .append( " path["+ path+ "]")
-       .append( " location["+ location+ "]")
        .append( " mac=["+ mac+ "]")
        .append( " metadata["+ metadata.toString()+ "]\n keywords[");
 
@@ -400,7 +265,7 @@ public class Expediente extends BaseEntity implements  NeedsProtection, Hierarch
    }//toString
 
 
-   @Override  public int compareTo(Expediente that)
+   @Override  public int compareTo(AbstractExpediente that)
    {
       return this.equals(that)?  0 :
       that == null?       1 :
@@ -412,7 +277,7 @@ public class Expediente extends BaseEntity implements  NeedsProtection, Hierarch
 
    @Override public String      getName()   { return name;}
 
-   @Override public Expediente  getOwner()  { return owner;}
+   @Override public AbstractExpediente  getOwner()  { return owner;}
 
    @Override public String      formatCode()
    {
@@ -423,7 +288,7 @@ public class Expediente extends BaseEntity implements  NeedsProtection, Hierarch
    }//formatCode
 
 
-   private String getOwnerPath(Expediente owner)
+   private String getOwnerPath(AbstractExpediente owner)
    {
       String path = "";
       while (owner != null)
@@ -477,87 +342,26 @@ public class Expediente extends BaseEntity implements  NeedsProtection, Hierarch
 
    public void openExpediente()
    {
-      setOpen(true);
-      setDateOpened(LocalDateTime.now());
+      if ( !isOpen() )
+      {
+         setOpen(true);
+         setDateOpened(LocalDateTime.now());
+      }
    }//openExpediente
 
    public void closeExpediente()
    {
-      setOpen(false);
-      setDateClosed(LocalDateTime.now());
-      closeIndex();
+      if(  isOpen() )
+      {
+         setOpen(false);
+         setDateClosed(LocalDateTime.now());
+         closeIndex();
+      }
    }//closeExpediente
 
-   private void closeIndex()
+   protected void closeIndex()
    {
       //TODO: Cerrar el blockchain del indice
    }//closeIndex
 
-   // ----------------- SubExpedientes ----------------------
-
-   public boolean isSubExpediente()    { return currentSubNumber > 0;}
-
-   public Expediente    createSubExpediente()
-   {
-      currentSubNumber++;
-      return createSubExpediente(this, currentSubNumber, LocalDateTime.now(), LocalDateTime.MAX);
-   }//createSubExpediente
-
-   public Expediente createSubExpediente(Expediente parent, Integer expedienteNumber, LocalDateTime dateOpened, LocalDateTime dateClosed)
-   {
-      Expediente subExpediente = new Expediente();
-      subExpediente.setTenant(parent.getTenant());
-      subExpediente.setExpedienteCode(expedienteNumber.toString());
-      subExpediente.setOwner(parent);
-      subExpediente.setDateOpened(dateOpened);
-      subExpediente.setDateClosed(dateClosed);
-      subExpediente.buildCode();
-      //TODO: Iniciar el blockchain del indice.
-
-      return subExpediente;
-   }//createSubExpediente
-
-   // ----------------- Volumenes --------------------
-
-   public boolean isVolume()    { return currentVolume > 0;}
-
-   public void    nextVolume()
-   {
-      closeVolume( currentVolume, LocalDateTime.now());
-      currentVolume++;
-      createVolume(this, currentVolume, LocalDateTime.now(), LocalDateTime.MAX);
-   }//nextVolume
-
-   public void    setVolume()
-   {
-      if ( !isVolume())
-      {
-         currentVolume = 1;
-         createVolume(this, currentVolume, LocalDateTime.now(), LocalDateTime.MAX);
-      }
-   }//setVolume
-
-
-   private void createVolume( Expediente expediente, Integer currentVolume, LocalDateTime openedDate, LocalDateTime closedDate)
-   {
-      //TODO: Crear el siguiente volumen
-   }//createVolume
-
-   private void closeVolume( Integer currentVolume, LocalDateTime closedDate)
-   {
-      //TODO: Cerrar el volumen y su indice
-   }//closeVolume
-
-   protected synchronized Integer nextSubNumber()
-   {
-      currentSubNumber++;
-      return currentSubNumber;
-   }//nextSubNumber
-
-   public String nextSubCode()
-   {
-      return formatCode()+ "-"+ nextSubNumber();
-   }//nextSubCode
-
-
-}//Expediente
+}//AbstractExpediente

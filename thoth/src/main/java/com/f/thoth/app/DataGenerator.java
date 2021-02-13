@@ -79,7 +79,7 @@ public class DataGenerator implements HasLogger
 			"Umana", "Rueda", "Vergara", "Gonzalez", "Nunez", "Macias", "Gallegos", "Duarte", "Mejia", "Petro",
 			"Gutierrez", "Vargas", "Puentes", "Holmes", "Macias", "Ospina", "Mutis", "Cortes", "Noble", "Rodriguez", "Arenas",
 			"Trump", "Mogollon", "Samper", "Estrada", "Heredia", "Maldonado", "Reyes" };
-
+	
 	private final Random random = new Random(1L);
 
 	@SuppressWarnings("unused")
@@ -451,7 +451,7 @@ public class DataGenerator implements HasLogger
 		if (random.nextInt(10) == 0) {
 			customer.setDetails("Very important customer");
 		}
-	}
+	}//fillCustomer
 
 	private String getRandomPhone() {
 		return "+1-555-" + String.format("%04d", random.nextInt(10000));
