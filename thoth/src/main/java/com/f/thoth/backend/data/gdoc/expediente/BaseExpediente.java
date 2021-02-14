@@ -6,13 +6,19 @@ import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.NamedAttributeNode;
+import javax.persistence.NamedEntityGraph;
+import javax.persistence.NamedEntityGraphs;
+import javax.persistence.NamedSubgraph;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -21,11 +27,9 @@ import javax.validation.constraints.Size;
 import org.hibernate.annotations.BatchSize;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
-import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.document.jackrabbit.NodeType;
-import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
@@ -37,9 +41,67 @@ import com.f.thoth.backend.data.security.UserGroup;
 /**
  * Representa un nodo de la jerarquia de expedientes (expediente/sub-expediente/volumen
  */
-@MappedSuperclass
-public class AbstractExpediente extends BaseEntity implements  NeedsProtection, HierarchicalEntity<AbstractExpediente>, Comparable<AbstractExpediente>
+@NamedEntityGraphs({
+     @NamedEntityGraph(
+         name = BaseExpediente.BRIEF,
+         attributeNodes = {
+            @NamedAttributeNode("tenant"),
+            @NamedAttributeNode("code"),           // DB human id. Includes [tenant, type, path+]
+            @NamedAttributeNode("expedienteCode"), // Business id unique inside the owner (class or expediente), vg 001,002, etc
+            @NamedAttributeNode("name"),
+            @NamedAttributeNode("path"),
+            @NamedAttributeNode("classificationClass"),
+            @NamedAttributeNode("owner"),
+            @NamedAttributeNode("open"),
+            @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF)
+         },
+         subgraphs = @NamedSubgraph(name = ObjectToProtect.BRIEF,
+            attributeNodes = {
+               @NamedAttributeNode("category"),
+               @NamedAttributeNode("userOwner"),
+               @NamedAttributeNode("roleOwner"),
+               @NamedAttributeNode("restrictedTo")
+            })
+         ),
+     @NamedEntityGraph(
+         name = BaseExpediente.FULL,
+         attributeNodes = {
+            @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF),
+            @NamedAttributeNode("tenant"),
+            @NamedAttributeNode("code"),
+            @NamedAttributeNode("expedienteCode"),
+            @NamedAttributeNode("name"),
+            @NamedAttributeNode("classificationClass"),
+            @NamedAttributeNode("createdBy"),
+            @NamedAttributeNode("owner"),
+            @NamedAttributeNode("path"),
+            @NamedAttributeNode("dateOpened"),
+            @NamedAttributeNode("dateClosed"),
+            @NamedAttributeNode("metadata"),
+            @NamedAttributeNode("open"),
+            @NamedAttributeNode("keywords"),
+            @NamedAttributeNode("entries"),
+            @NamedAttributeNode("mac"),
+            @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)
+         },
+         subgraphs = @NamedSubgraph(name = ObjectToProtect.FULL,
+            attributeNodes = {
+               @NamedAttributeNode("category"),
+               @NamedAttributeNode("userOwner"),
+               @NamedAttributeNode("roleOwner"),
+               @NamedAttributeNode("restrictedTo"),
+               @NamedAttributeNode("acl")
+            })
+         )
+    })
+
+@Entity
+@Table(name = "BASE_EXPEDIENTE", indexes = { @Index(columnList = "code"), @Index(columnList = "tenant,expedienteCode"), @Index(columnList= "tenant,keywords")})
+public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comparable<BaseExpediente>
 {
+   public static final String BRIEF = "BaseExpediente.brief";
+   public static final String FULL  = "BaseExpediente.full";
+
    @NotNull  (message = "{evidentia.code.required}")
    @NotBlank (message = "{evidentia.code.required}")
    @NotEmpty (message = "{evidentia.code.required}")
@@ -57,7 +119,7 @@ public class AbstractExpediente extends BaseEntity implements  NeedsProtection, 
    @NotEmpty (message = "{evidentia.name.required}")
    @Size(max = 255)
    @Column(unique = true)
-   protected String            name;                       // AbstractExpediente name
+   protected String            name;                       // Expediente name
 
    @NotNull(message = "{evidentia.objectToProtect.required}")
    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
@@ -81,12 +143,12 @@ public class AbstractExpediente extends BaseEntity implements  NeedsProtection, 
    protected LocalDateTime     dateClosed;                 // Date expediente was closed
 
    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-   protected AbstractExpediente        owner;                      // AbstractExpediente to which this SUBEXPEDIENTE/VOLUMEN belongs
+   protected BranchExpediente  owner;                      // Expediente to which this Branch/Leaf/Volume belongs
 
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
    @JoinColumn(name="entry_id")
    @BatchSize(size = 50)
-   protected Set<IndexEntry>   entries;                    // AbstractExpediente index entries
+   protected Set<IndexEntry>   entries;                    // Expediente index entries
 
    @NotNull(message = "{evidentia.open.required}")
    protected Boolean           open;                       // Is the expediente currently open?
@@ -98,7 +160,7 @@ public class AbstractExpediente extends BaseEntity implements  NeedsProtection, 
    protected String            mac;                        // Message authentication code
 
    // ------------- Constructors ------------------
-   public AbstractExpediente()
+   public BaseExpediente()
    {
       super();
       this.expedienteCode       = "";
@@ -117,32 +179,32 @@ public class AbstractExpediente extends BaseEntity implements  NeedsProtection, 
       this.mac                  = "";
 
       buildCode();
-   }//AbstractExpediente null constructor
+   }//BaseExpediente null constructor
 
-   public AbstractExpediente( String expedienteCode, String path, String name, SingleUser createdBy, Classification classificationClass,
-                     SchemaValues metadata, LocalDateTime dateOpened, LocalDateTime dateClosed, AbstractExpediente owner, Boolean open,
-                     Set<IndexEntry> entries, Set<DocumentType> admissibleTypes, Set<String> keywords, String location, String mac)
+   public BaseExpediente( String expedienteCode, String path, String name, SingleUser createdBy, Classification classificationClass,
+                          SchemaValues metadata, LocalDateTime dateOpened, LocalDateTime dateClosed, BranchExpediente owner,
+                          Boolean open, Set<IndexEntry> entries, Set<String> keywords, String mac)
    {
       if ( TextUtil.isEmpty(expedienteCode))
-         throw new IllegalArgumentException("Codigo del expediente no puede ser nulo ni vac�o");
+         throw new IllegalArgumentException("Código del expediente no puede ser nulo ni vacío");
 
       if ( TextUtil.isEmpty(path))
-         throw new IllegalArgumentException("Path del expediente en el repositorio no puede ser nulo ni vac�o");
+         throw new IllegalArgumentException("Path del expediente en el repositorio no puede ser nulo ni vacío");
 
       if ( TextUtil.isEmpty(name))
-         throw new IllegalArgumentException("Nombre del expediente no puede ser nulo ni vac�o");
+         throw new IllegalArgumentException("Nombre del expediente no puede ser nulo ni vacío");
 
       if ( !TextUtil.isValidName(name))
-         throw new IllegalArgumentException("Nombre["+ name+ "] es inv�lido");
+         throw new IllegalArgumentException("Nombre["+ name+ "] es inválido");
 
       if ( createdBy == null)
          throw new IllegalArgumentException("Creador del expediente no puede ser nulo");
 
       if ( classificationClass == null)
-         throw new IllegalArgumentException("Clase del expediente no puede ser nula ni vac�a");
+         throw new IllegalArgumentException("Clase del expediente no puede ser nula ni vacía");
 
       if ( dateOpened == null)
-         throw new IllegalArgumentException("Fecha de creaci�n del expediente no puede ser nula");
+         throw new IllegalArgumentException("Fecha de creación del expediente no puede ser nula");
 
       this.objectToProtect     = new ObjectToProtect();
       this.expedienteCode      = expedienteCode;
@@ -160,7 +222,7 @@ public class AbstractExpediente extends BaseEntity implements  NeedsProtection, 
       this.mac                 = mac;
 
       buildCode();
-   }//AbstractExpediente constructor
+   }//BaseExpediente constructor
 
    public void prepareData()
    {
@@ -178,6 +240,7 @@ public class AbstractExpediente extends BaseEntity implements  NeedsProtection, 
 
    // -------------- Getters & Setters ----------------
 
+   public String            getName() { return name;}
    public void              setName ( String name) { this.name = name;}
 
    public Boolean           getOpen() { return open;}
@@ -185,7 +248,8 @@ public class AbstractExpediente extends BaseEntity implements  NeedsProtection, 
 
    public void              setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect;}
 
-   public void              setOwner(AbstractExpediente owner){ this.owner = owner;}
+   public BranchExpediente  getOwner() { return owner;}
+   public void              setOwner(BranchExpediente owner){ this.owner = owner;}
 
    public Classification    getClassificationClass() { return classificationClass;}
    public void              setClassificationClass( Classification classificationClass) { this.classificationClass = classificationClass;}
@@ -210,7 +274,7 @@ public class AbstractExpediente extends BaseEntity implements  NeedsProtection, 
 
    public Set<IndexEntry>   getEntries(){ return entries;}
    public void              setEntries(Set<IndexEntry> entries){ this.entries = entries;}
-   public int               size() { return entries.size();}
+   public int               getIndexSize() { return entries.size();}
 
    public Set<String>       getKeywords() { return keywords;}
    public void              setKeywords( Set<String> keywords) { this.keywords = keywords;}
@@ -225,10 +289,10 @@ public class AbstractExpediente extends BaseEntity implements  NeedsProtection, 
       if (this == o)
          return true;
 
-      if (!(o instanceof AbstractExpediente ))
+      if (!(o instanceof BaseExpediente ))
          return false;
 
-      AbstractExpediente that = (AbstractExpediente) o;
+      BaseExpediente that = (BaseExpediente) o;
       return this.id != null && this.id.equals(that.id);
 
    }//equals
@@ -238,7 +302,7 @@ public class AbstractExpediente extends BaseEntity implements  NeedsProtection, 
    @Override public String toString()
    {
       StringBuilder s = new StringBuilder();
-      s.append( "AbstractExpediente{")
+      s.append( "BaseExpediente{")
        .append( super.toString())
        .append( " name["+ name+ "]")
        .append( " open["+ open+ "]")
@@ -250,7 +314,7 @@ public class AbstractExpediente extends BaseEntity implements  NeedsProtection, 
        .append( " dateOpened["+ TextUtil.formatDateTime(dateOpened)+ "]")
        .append( " dateClosed["+ TextUtil.formatDateTime(dateClosed)+ "]\n")
        .append( " objectToProtect["+ objectToProtect.toString()+ "]\n")
-       .append( " expediente owner["+ (owner == null? "---": owner.getExpedienteCode())+ "]")
+       .append( " expediente owner["+ (owner == null? "---": owner.getCode())+ "]")
        .append( " n index-entries["+ entries.size()+ "]")
        .append( " path["+ path+ "]")
        .append( " mac=["+ mac+ "]")
@@ -265,21 +329,16 @@ public class AbstractExpediente extends BaseEntity implements  NeedsProtection, 
    }//toString
 
 
-   @Override  public int compareTo(AbstractExpediente that)
+   @Override  public int compareTo(BaseExpediente that)
    {
       return this.equals(that)?  0 :
-      that == null?       1 :
-      this.code.compareTo(that.code);
+             that == null?       1 :
+             this.code.compareTo(that.code);
    }// compareTo
 
 
-   // --------------------------- Implements HierarchicalEntity ---------------------------------------
-
-   @Override public String      getName()   { return name;}
-
-   @Override public AbstractExpediente  getOwner()  { return owner;}
-
-   @Override public String      formatCode()
+   // ------------------ code & path -------------------------
+   public String            formatCode()
    {
       int i = TextUtil.indexOf(code, "/", 3);
       String formattedCode = code.substring(i);
@@ -288,13 +347,13 @@ public class AbstractExpediente extends BaseEntity implements  NeedsProtection, 
    }//formatCode
 
 
-   private String getOwnerPath(AbstractExpediente owner)
+   private String getOwnerPath(BranchExpediente owner)
    {
       String path = "";
       while (owner != null)
       {
-         path = owner.expedienteCode+ "/"+ path;
-         owner = owner.owner;
+         path = owner.getExpedienteCode()+ "/"+ path;
+         owner = owner.getOwner();
       }
       return  path;
    }//getOwnerPath
@@ -336,8 +395,8 @@ public class AbstractExpediente extends BaseEntity implements  NeedsProtection, 
    {
       LocalDateTime now = LocalDateTime.now();
       return open &&
-      ((now.equals(dateOpened) || now.equals(dateClosed)) ||
-       (now.isAfter(dateOpened) && now.isBefore(dateClosed))) ;
+           ((now.equals(dateOpened) || now.equals(dateClosed)) ||
+            (now.isAfter(dateOpened) && now.isBefore(dateClosed))) ;
    }//isOpen
 
    public void openExpediente()
@@ -364,4 +423,4 @@ public class AbstractExpediente extends BaseEntity implements  NeedsProtection, 
       //TODO: Cerrar el blockchain del indice
    }//closeIndex
 
-}//AbstractExpediente
+}//BaseExpediente

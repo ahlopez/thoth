@@ -1,125 +1,108 @@
 package com.f.thoth.backend.data.gdoc.expediente;
 
-import java.time.LocalDateTime;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
 import javax.persistence.Entity;
 import javax.persistence.Index;
-import javax.persistence.ManyToMany;
-import javax.persistence.NamedAttributeNode;
-import javax.persistence.NamedEntityGraph;
-import javax.persistence.NamedEntityGraphs;
-import javax.persistence.NamedSubgraph;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
-import com.f.thoth.backend.data.gdoc.classification.Classification;
-import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
-import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
+import com.f.thoth.backend.data.entity.AbstractEntity;
+import com.f.thoth.backend.data.entity.HierarchicalEntity;
+import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
+import com.f.thoth.backend.data.security.Permission;
+import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
+import com.f.thoth.backend.data.security.UserGroup;
 
 /**
  * Representa un nodo de la jerarquia de expedientes (expediente/sub-expediente/volumen
  */
-@NamedEntityGraphs({
-     @NamedEntityGraph(
-         name = Expediente.BRIEF,
-         attributeNodes = {
-            @NamedAttributeNode("tenant"),
-            @NamedAttributeNode("code"),           // DB human id. Includes [tenant, type, path+]
-            @NamedAttributeNode("expedienteCode"), // Business id unique inside the owner (class or expediente), vg 001,002, etc
-            @NamedAttributeNode("name"),
-            @NamedAttributeNode("path"),
-            @NamedAttributeNode("classificationClass"),
-            @NamedAttributeNode("owner"),
-            @NamedAttributeNode("open"),
-            @NamedAttributeNode("admissibleTypes"),
-            @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF)
-         },
-         subgraphs = @NamedSubgraph(name = ObjectToProtect.BRIEF,
-            attributeNodes = {
-               @NamedAttributeNode("category"),
-               @NamedAttributeNode("userOwner"),
-               @NamedAttributeNode("roleOwner"),
-               @NamedAttributeNode("restrictedTo")
-            })
-         ),
-     @NamedEntityGraph(
-         name = Expediente.FULL,
-         attributeNodes = {
-            @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF),
-            @NamedAttributeNode("tenant"),
-            @NamedAttributeNode("code"),
-            @NamedAttributeNode("expedienteCode"),
-            @NamedAttributeNode("name"),
-            @NamedAttributeNode("classificationClass"),
-            @NamedAttributeNode("createdBy"),
-            @NamedAttributeNode("owner"),
-            @NamedAttributeNode("path"),
-            @NamedAttributeNode("dateOpened"),
-            @NamedAttributeNode("dateClosed"),
-            @NamedAttributeNode("metadata"),
-            @NamedAttributeNode("open"),
-            @NamedAttributeNode("admissibleTypes"),
-            @NamedAttributeNode("keywords"),
-            @NamedAttributeNode("entries"),
-            @NamedAttributeNode("mac"),
-            @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)
-         },
-         subgraphs = @NamedSubgraph(name = ObjectToProtect.FULL,
-            attributeNodes = {
-               @NamedAttributeNode("category"),
-               @NamedAttributeNode("userOwner"),
-               @NamedAttributeNode("roleOwner"),
-               @NamedAttributeNode("restrictedTo"),
-               @NamedAttributeNode("acl")
-            })
-         )
-    })
-
 @Entity
-@Table(name = "BRANCH_EXPEDIENTE", indexes = { @Index(columnList = "code"), @Index(columnList = "tenant,expedienteCode"), @Index(columnList= "tenant,keywords")})
-public class BranchExpediente extends AbstractExpediente
+@Table(name = "BRANCH_EXPEDIENTE", indexes = {@Index(columnList = "expediente")})
+public class BranchExpediente extends AbstractEntity implements  NeedsProtection, HierarchicalEntity<BranchExpediente>, Comparable<BranchExpediente>
 {
-   public static final String BRIEF = "BranchExpediente.brief";
-   public static final String FULL  = "BranchExpediente.full";
+   @OneToOne
+   @NotNull  (message = "{evidentia.expediente.required}")
+   protected BaseExpediente       expediente;                 // Expediente that describes this branch
 
-   @ManyToMany
-   protected Set<AbstractExpediente>  children;                   // Children of this expediente
+   @OneToMany
+   protected Set<BaseExpediente>  children;                   // Children of this expediente
 
    // ------------- Constructors ------------------
    public BranchExpediente()
    {
       super();
-      this.children = new TreeSet<>();
+      this.expediente = null;
+      this.children   = new TreeSet<>();
    }//BranchExpediente null constructor
 
-   public BranchExpediente( String expedienteCode, String path, String name, SingleUser createdBy, Classification classificationClass,
-                            SchemaValues metadata, LocalDateTime dateOpened, LocalDateTime dateClosed, Expediente owner, Boolean open,
-                            Set<IndexEntry> entries, Set<DocumentType> admissibleTypes, Set<String> keywords, String location,
-                            Set<AbstractExpediente> children, String mac)
+   public BranchExpediente( BaseExpediente expediente, Set<BaseExpediente> children)
    {
-      super( expedienteCode, path, name, createdBy,  classificationClass, metadata, dateOpened, dateClosed,
-             owner, open, entries, admissibleTypes, keywords, location, mac);
+      super();
 
-      this.children = (children == null? new TreeSet<>(): children);
+      if ( expediente == null )
+         throw new IllegalArgumentException("Expediente asociado a la rama no puede ser nulo");
+
+      this.expediente = expediente;
+      this.children   = (children == null? new TreeSet<>(): children);
+
    }//BranchExpediente constructor
 
-   @PrePersist
-   @PreUpdate
-   public void prepareData()
-   {
-      super.prepareData();
-   }//prepareData
-
-
    // -------------- Getters & Setters ----------------
-   public Set<AbstractExpediente>  getChildren() { return children;}
-   public void                     setChildren( Set<AbstractExpediente> children) { this.children = children;}
+
+   public BaseExpediente       getExpediente() { return expediente;}
+   public void             setExpediente(BaseExpediente expediente){ this.expediente = expediente;}
+
+   public Set<BaseExpediente>  getChildren() { return children;}
+   public void             setChildren( Set<BaseExpediente> children) { this.children = children;}
+
+   public           String            getExpedienteCode() { return expediente.getExpedienteCode();}
+
+   // --------------------------- Implements HierarchicalEntity ---------------------------------------
+
+   @Override public String            getName()           { return expediente.getName();}
+
+   @Override public String            getCode()           { return expediente.getCode();}
+
+   @Override public BranchExpediente  getOwner()          { return expediente.getOwner();}
+
+   @Override public String            formatCode()        { return expediente.formatCode();}
+
+   // -----------------  Implements NeedsProtection ----------------
+
+   public Integer                   getCategory()                           {return expediente.getCategory();}
+   public void                      setCategory(Integer category)           {expediente.setCategory(category);}
+
+   public SingleUser                getUserOwner()                          {return expediente.getUserOwner();}
+   public void                      setUserOwner(SingleUser userOwner)      {expediente.setUserOwner(userOwner);}
+
+   public Role                      getRoleOwner()                          {return expediente.getRoleOwner();}
+   public void                      setRoleOwner(Role roleOwner)            {expediente.setRoleOwner(roleOwner);}
+
+   public UserGroup                 getRestrictedTo()                       {return expediente.getRestrictedTo();}
+   public void                      setRestrictedTo(UserGroup restrictedTo) {expediente.setRestrictedTo(restrictedTo);}
+
+   @Override public ObjectToProtect getObjectToProtect()                    { return expediente.getObjectToProtect();}
+
+   @Override public boolean         canBeAccessedBy(Integer userCategory)   { return expediente.canBeAccessedBy(userCategory);}
+
+   @Override public boolean         isOwnedBy( SingleUser user)             { return expediente.isOwnedBy(user);}
+
+   @Override public boolean         isOwnedBy( Role role)                   { return expediente.isOwnedBy(role);}
+
+   @Override public boolean         isRestrictedTo( UserGroup userGroup)    { return expediente.isRestrictedTo(userGroup);}
+
+   @Override public boolean         admits( Role role)                      { return expediente.admits(role);}
+
+   @Override public void            grant( Permission  permission)          { expediente.grant(permission);}
+
+   @Override public void            revoke(Permission permission)           { expediente.revoke(permission);}
 
    // --------------- Object methods ---------------------
 
@@ -136,15 +119,16 @@ public class BranchExpediente extends AbstractExpediente
 
    }//equals
 
-   @Override public int hashCode() { return id == null? 40277: id.hashCode();}
+   @Override public int hashCode() { return id == null? 490277: id.hashCode();}
 
    @Override public String toString()
    {
       StringBuilder s = new StringBuilder();
       s.append( "BranchExpediente{")
-       .append( super.toString()+"]\n children[");
+       .append( super.toString())
+       .append( "expediente["+ expediente.getCode()+ "]\n children[");
 
-      for ( AbstractExpediente child: children )
+      for ( BaseExpediente child: children )
          s.append( child.toString()+ "\n");
 
       s.append("]\n     }\n");
@@ -152,45 +136,38 @@ public class BranchExpediente extends AbstractExpediente
       return s.toString();
    }//toString
 
+   @Override  public int compareTo(BranchExpediente that) { return that == null? 1: expediente.compareTo(that.getExpediente());}
+
    // --------------- Logic ------------------------------
 
-   public boolean isOpen()
+   public void openExpediente()
    {
-      LocalDateTime now = LocalDateTime.now();
-      return open &&
-      ((now.equals(dateOpened) || now.equals(dateClosed)) ||
-       (now.isAfter(dateOpened) && now.isBefore(dateClosed))) ;
-   }//isOpen
-
-
-   @Override public void openExpediente()
-   {
-      if ( !isOpen())
+      if ( !expediente.isOpen())
       {
-         super.openExpediente();
-         for( AbstractExpediente child: children)
+         expediente.openExpediente();
+         for( BaseExpediente child: children)
             child.openExpediente();
       }
    }//openExpediente
 
 
-   @Override public void closeExpediente()
+   public void closeExpediente()
    {
-      if( isOpen())
+      if( expediente.isOpen())
       {
-         super.closeExpediente();
-         for( AbstractExpediente child: children)
+         expediente.closeExpediente();
+         for( BaseExpediente child: children)
             child.closeExpediente();
       }
    }//closeExpediente
 
 
-   public boolean addChild(AbstractExpediente child)
+   public boolean addChild(BaseExpediente child)
    {
       return children.add(child);
    }//addChild
 
-   public Iterator<AbstractExpediente> childIterator()
+   public Iterator<BaseExpediente> childIterator()
    {
       return children.iterator();
    }//childIterator

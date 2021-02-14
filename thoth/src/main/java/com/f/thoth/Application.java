@@ -13,7 +13,7 @@ import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.classification.Level;
 import com.f.thoth.backend.data.gdoc.classification.Retention;
-import com.f.thoth.backend.data.gdoc.expediente.Expediente;
+import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.ExpedienteIndex;
 import com.f.thoth.backend.data.gdoc.expediente.IndexEntry;
 import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
@@ -61,7 +61,7 @@ import com.f.thoth.ui.MainView;
             Role.class,
             Level.class,
             Permission.class,
-            Expediente.class,
+            BaseExpediente.class,
             ExpedienteIndex.class,
             IndexEntry.class,
             Schema.class,
@@ -94,7 +94,7 @@ import com.f.thoth.ui.MainView;
            Classification.class,
            Level.class,
            Permission.class,
-           Expediente.class,
+           BaseExpediente.class,
            ExpedienteIndex.class,
            IndexEntry.class,
            Schema.class,

@@ -12,7 +12,8 @@ import javax.jcr.Session;
 
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
-import com.f.thoth.backend.data.gdoc.expediente.Expediente;
+import com.f.thoth.backend.data.gdoc.expediente.BranchExpediente;
+import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.security.ObjectToProtect;
@@ -75,7 +76,7 @@ public class ExpedienteGenerator
            int numExpedientes =  random.nextInt(10)+ 1;
            for ( int i= 0; i < numExpedientes; i++)
            {
-               Expediente expediente = creeExpediente( user, null, classificationClass);
+               BaseExpediente expediente = creeExpediente( user, null, classificationClass);
                int depthExpedientes = random.nextInt(4)+1;
                genereExpedientesHijos( depthExpedientes, expediente, classificationClass);
            }
@@ -84,12 +85,12 @@ public class ExpedienteGenerator
 
     }//registerExpedientes
 
-    private void genereExpedientesHijos( int depth, Expediente parent, Classification classificationClass)
+    private void genereExpedientesHijos( int depth, BaseExpediente parent, Classification classificationClass)
     {
        if( depth == 0)
            return;
 
-       Expediente currentExpediente = creeExpediente( user, parent, classificationClass);
+       BaseExpediente currentExpediente = creeExpediente( user, parent, classificationClass);
        if (depth == 1)
        {
            currentExpediente.setCurrentVolume( random.nextInt(1));
@@ -101,9 +102,9 @@ public class ExpedienteGenerator
        }
     }//genereExpedientesHijos
 
-    private Expediente creeExpediente( User user,  Expediente padre, Classification classificationClass)
+    private BaseExpediente creeExpediente( User user,  BranchExpediente padre, Classification classificationClass)
     {
-       Expediente  currentExpediente = new Expediente();
+       BaseExpediente  currentExpediente = new BaseExpediente();
 
        currentExpediente.setPath                (genereCode(padre, classificationClass));
        currentExpediente.setCode                (currentExpediente.getPath());
@@ -117,13 +118,12 @@ public class ExpedienteGenerator
        currentExpediente.setEntries             (new TreeSet<>());
        currentExpediente.setOpen                (true);
        currentExpediente.setKeywords            (generateKeywords());
-       currentExpediente.setLocation            ("");
+     //  currentExpediente.setLocation            ("");
        currentExpediente.setMac                 (generateMac());
 
        currentExpediente.setClassificationClass (classificationClass);
        currentExpediente.setOwner               (padre);
-       currentExpediente.setCurrentVolume       (generateVolume( padre));
-       currentExpediente.setAdmissibleTypes     (generateAdmissibleTypes());
+    //   currentExpediente.setAdmissibleTypes     (generateAdmissibleTypes());
 
        creeJCRNodo( currentExpediente.getPath());
        nExpedientes++;
@@ -131,7 +131,7 @@ public class ExpedienteGenerator
 
      }//creeExpediente
 
-     private String genereCode(Expediente padre, Classification classificationClass)
+     private String genereCode(BaseExpediente padre, Classification classificationClass)
      {
          return padre == null?   generateExpedienteCode(classificationClass) : generateSubExpedienteCode(padre);
      }//genereCode
@@ -143,7 +143,7 @@ public class ExpedienteGenerator
          return expedienteCode;
      }//generateExpedienteCode
 
-     private String generateSubExpedienteCode( Expediente padre)
+     private String generateSubExpedienteCode( BaseExpediente padre)
      {
          String expedienteCode= padre.nextSubCode();
          expedienteRepository.saveAndFlush(padre);
@@ -188,7 +188,7 @@ public class ExpedienteGenerator
          return ""; //TODO:
      }//generateMac
 
-     private Integer generateVolume( Expediente padre)
+     private Integer generateVolume( BranchExpediente padre)
      {
         /*  Verificar que el padre no sea un volumen
             Verificar que el padre no tenga documentos
@@ -197,9 +197,6 @@ public class ExpedienteGenerator
             cerrar el volumen anterior
             Crear el volumen en el repositorio
          */
-         if (padre.isVolume())
-             return null;
-
          return 0;//TODO:
      }//generateVolume
 

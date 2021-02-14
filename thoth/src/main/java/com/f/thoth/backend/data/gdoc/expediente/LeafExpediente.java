@@ -1,97 +1,39 @@
 package com.f.thoth.backend.data.gdoc.expediente;
 
-import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.TreeSet;
 
 import javax.persistence.Entity;
 import javax.persistence.Index;
-import javax.persistence.NamedAttributeNode;
-import javax.persistence.NamedEntityGraph;
-import javax.persistence.NamedEntityGraphs;
-import javax.persistence.NamedSubgraph;
 import javax.persistence.OneToMany;
-import javax.persistence.PrePersist;
-import javax.persistence.PreUpdate;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;
 
-import com.f.thoth.backend.data.gdoc.classification.Classification;
+import com.f.thoth.backend.data.entity.AbstractEntity;
 import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
-import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
+import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
+import com.f.thoth.backend.data.security.Permission;
+import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.SingleUser;
+import com.f.thoth.backend.data.security.UserGroup;
 
 /**
  * Representa un nodo de la jerarquia de expedientes (expediente/sub-expediente/volumen
  */
-@NamedEntityGraphs({
-     @NamedEntityGraph(
-         name = Expediente.BRIEF,
-         attributeNodes = {
-            @NamedAttributeNode("tenant"),
-            @NamedAttributeNode("code"),           // DB human id. Includes [tenant, type, path+]
-            @NamedAttributeNode("expedienteCode"), // Business id (vg. dependencia-serie-subserie-secuencial)
-            @NamedAttributeNode("name"),
-            @NamedAttributeNode("path"),
-            @NamedAttributeNode("classificationClass"),
-            @NamedAttributeNode("owner"),
-            @NamedAttributeNode("open"),
-            @NamedAttributeNode("admissibleTypes"),
-            @NamedAttributeNode("currentDocNumber"),
-            @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF)
-         },
-         subgraphs = @NamedSubgraph(name = ObjectToProtect.BRIEF,
-            attributeNodes = {
-               @NamedAttributeNode("category"),
-               @NamedAttributeNode("userOwner"),
-               @NamedAttributeNode("roleOwner"),
-               @NamedAttributeNode("restrictedTo")
-            })
-         ),
-     @NamedEntityGraph(
-         name = Expediente.FULL,
-         attributeNodes = {
-            @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF),
-            @NamedAttributeNode("tenant"),
-            @NamedAttributeNode("code"),
-            @NamedAttributeNode("expedienteCode"),
-            @NamedAttributeNode("name"),
-            @NamedAttributeNode("classificationClass"),
-            @NamedAttributeNode("createdBy"),
-            @NamedAttributeNode("owner"),
-            @NamedAttributeNode("path"),
-            @NamedAttributeNode("dateOpened"),
-            @NamedAttributeNode("dateClosed"),
-            @NamedAttributeNode("metadata"),
-            @NamedAttributeNode("open"),
-            @NamedAttributeNode("admissibleTypes"),
-            @NamedAttributeNode("keywords"),
-            @NamedAttributeNode("entries"),
-            @NamedAttributeNode("mac"),
-            @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)
-         },
-         subgraphs = @NamedSubgraph(name = ObjectToProtect.FULL,
-            attributeNodes = {
-               @NamedAttributeNode("category"),
-               @NamedAttributeNode("userOwner"),
-               @NamedAttributeNode("roleOwner"),
-               @NamedAttributeNode("restrictedTo"),
-               @NamedAttributeNode("acl")
-            })
-         )
-    })
-
 @Entity
 @Table(name = "LEAF_EXPEDIENTE", indexes = { @Index(columnList = "code"), @Index(columnList = "tenant,expedienteCode"), @Index(columnList= "tenant,keywords")})
-public class LeafExpediente extends AbstractExpediente
+public class LeafExpediente extends AbstractEntity implements  NeedsProtection, Comparable<LeafExpediente>
 {
-   public static final String BRIEF = "LeafExpediente.brief";
-   public static final String FULL  = "LeafExpediente.full";
+
+   @OneToOne
+   @NotNull  (message = "{evidentia.expediente.required}")
+   protected BaseExpediente        expediente;                 // Expediente that describes this leaf
 
    @NotNull  (message = "{evidentia.volume.required}")
-   protected Boolean           volume;                     // Is the expediente a volume?
+   protected Boolean           volume;                     // Is the leaf expediente a volume?
 
    @PositiveOrZero
    @NotNull(message = "{evidentia.documentNumber.required}")
@@ -100,7 +42,7 @@ public class LeafExpediente extends AbstractExpediente
    @OneToMany
    @NotNull  (message = "{evidentia.types.required}")
    protected Set<DocumentType> admissibleTypes;            // Admisible document types that can be included in the expediente
-                                                           //
+
    protected String            location;                   // Physical archive location (topographic signature)
 
    // ------------- Constructors ------------------
@@ -116,33 +58,25 @@ public class LeafExpediente extends AbstractExpediente
 
    // ------------- LeafExpediente ------------------
 
-
-
-
-   public LeafExpediente( String expedienteCode, String path, String name, SingleUser createdBy, Classification classificationClass,
-                      SchemaValues metadata, LocalDateTime dateOpened, LocalDateTime dateClosed, Expediente owner,
-                      Set<IndexEntry> entries, Boolean open, Set<String> keywords, String mac,
-                      Boolean volume, Integer currentDocNumber, Set<DocumentType>admissibleTypes, String location)
+   public LeafExpediente( BaseExpediente expediente, Boolean volume, Integer currentDocNumber, Set<DocumentType>admissibleTypes, String location)
    {
-      super( expedienteCode, path, name, createdBy,  classificationClass, metadata, dateOpened, dateClosed,
-             owner, open, entries, admissibleTypes, keywords, location, mac);
+      super();
+
+      if ( expediente == null )
+         throw new IllegalArgumentException("Expediente asociado a la rama no puede ser nulo");
 
       this.volume           = (volume           == null? false: volume);
-      this.currentDocNumber = (currentDocNumber == null? 0  : currentDocNumber);
+      this.currentDocNumber = (currentDocNumber == null? 0    : currentDocNumber);
+      this.location         = (location         == null? ""   : location);
       this.admissibleTypes  = (admissibleTypes  == null? new TreeSet<>(): admissibleTypes);
-      this.location         = (location         == null? "" : location);
+
    }//LeafExpediente constructor
 
 
-   @PrePersist
-   @PreUpdate
-   public void prepareData()
-   {
-      super.prepareData();
-   }//prepareData
-
-
    // -------------- Getters & Setters ----------------
+
+   public BaseExpediente        getExpediente() { return expediente;}
+   public void              setExpediente(BaseExpediente expediente){ this.expediente = expediente;}
 
    public Boolean           isVolume()  { return volume;}
    public Boolean           getVolume() { return volume;}
@@ -172,13 +106,14 @@ public class LeafExpediente extends AbstractExpediente
 
    }//equals
 
-   @Override public int hashCode() { return id == null? 47027: id.hashCode();}
+   @Override public int hashCode() { return id == null? 74027: id.hashCode();}
 
    @Override public String toString()
    {
       StringBuilder s = new StringBuilder();
       s.append( "LeafExpediente{")
        .append( super.toString())
+       .append( " expediente["+ expediente.getCode()+ "]")
        .append( " isVolume["+ volume+ "]")
        .append( " currentDocNumber["+ currentDocNumber+ "]")
        .append( " location["+ location+ "]\nAdmissibleTypes[\n");
@@ -191,19 +126,60 @@ public class LeafExpediente extends AbstractExpediente
       return s.toString();
    }//toString
 
-   // --------------- Logic ------------------------------
-   public boolean isSubExpediente() { return !isVolume();}
 
+   @Override  public int compareTo(LeafExpediente other)
+   {
+     if ( other == null)
+        return 1;
+
+     BaseExpediente that = other.getExpediente();
+      return this.expediente.compareTo(that);
+   }// compareTo
+
+
+   // -----------------  Implements NeedsProtection ----------------
+
+   public Integer                   getCategory()                           {return expediente.getCategory();}
+   public void                      setCategory(Integer category)           {expediente.setCategory(category);}
+
+   public SingleUser                getUserOwner()                          {return expediente.getUserOwner();}
+   public void                      setUserOwner(SingleUser userOwner)      {expediente.setUserOwner(userOwner);}
+
+   public Role                      getRoleOwner()                          {return expediente.getRoleOwner();}
+   public void                      setRoleOwner(Role roleOwner)            {expediente.setRoleOwner(roleOwner);}
+
+   public UserGroup                 getRestrictedTo()                       {return expediente.getRestrictedTo();}
+   public void                      setRestrictedTo(UserGroup restrictedTo) {expediente.setRestrictedTo(restrictedTo);}
+
+   @Override public ObjectToProtect getObjectToProtect()                    { return expediente.getObjectToProtect();}
+
+   @Override public boolean         canBeAccessedBy(Integer userCategory)   { return expediente.canBeAccessedBy(userCategory);}
+
+   @Override public boolean         isOwnedBy( SingleUser user)             { return expediente.isOwnedBy(user);}
+
+   @Override public boolean         isOwnedBy( Role role)                   { return expediente.isOwnedBy(role);}
+
+   @Override public boolean         isRestrictedTo( UserGroup userGroup)    { return expediente.isRestrictedTo(userGroup);}
+
+   @Override public boolean         admits( Role role)                      { return expediente.admits(role);}
+
+   @Override public void            grant( Permission  permission)          { expediente.grant(permission);}
+
+   @Override public void            revoke(Permission permission)           { expediente.revoke(permission);}
+
+   // --------------- Logic ------------------------------
+   public boolean isSubExpediente() { return !volume;}
+
+   /*
    public void    nextVolume()
    {
-      /*
         Verifique isVolume();
         Cree el leafExpediente, con volume=true                      ;
         Cierre este leafExpediente                                   ;
         Adicione al padre el nuevo leafExpediente                                                             ;
         Abra el nuevo leafExpediente                                                                                                  ;
-      */
    }//nextVolume
+   */
 
 
 }//LeafExpediente
