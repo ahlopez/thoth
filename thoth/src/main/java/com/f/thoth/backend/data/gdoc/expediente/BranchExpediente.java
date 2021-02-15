@@ -24,7 +24,7 @@ import com.f.thoth.backend.data.security.UserGroup;
  * Representa un nodo de la jerarquia de expedientes (expediente/sub-expediente/volumen
  */
 @Entity
-@Table(name = "BRANCH_EXPEDIENTE", indexes = {@Index(columnList = "expediente")})
+@Table(name = "BRANCH_EXPEDIENTE")
 public class BranchExpediente extends AbstractEntity implements  NeedsProtection, HierarchicalEntity<BranchExpediente>, Comparable<BranchExpediente>
 {
    @OneToOne

@@ -16,7 +16,7 @@ import com.f.thoth.backend.data.entity.AbstractEntity;
  * Representa un volumen documental (segun Moreq)
  */
 @Entity
-@Table(name = "VOLUME_INSTANCE", indexes = { @Index(columnList = "code")})
+@Table(name = "VOLUME_INSTANCE")
 public class VolumeInstance extends AbstractEntity implements  Comparable<VolumeInstance>
 {
    @NotNull  (message = "{evidentia.volume.required}")
@@ -44,17 +44,17 @@ public class VolumeInstance extends AbstractEntity implements  Comparable<Volume
    public VolumeInstance()
    {
       super();
+      this.volume     = null;
       this.instance   = 0;
-      this.volume     = null;  
-      this.path       = "";              
-      this.dateOpened = LocalDateTime.MAX;           
-      this.dateClosed = LocalDateTime.MAX;           
-      this.open       = false;              
-    
+      this.path       = "";
+      this.dateOpened = LocalDateTime.MAX;
+      this.dateClosed = LocalDateTime.MAX;
+      this.open       = false;
+
    }//Volume
 
 
-   public VolumeInstance(Volume volume, Integer instance, LocalDateTime  dateOpened, LocalDateTime  dateClosed)
+   public VolumeInstance(Volume volume, Integer instance, String path, LocalDateTime  dateOpened, LocalDateTime  dateClosed)
    {
       super();
 
@@ -64,6 +64,9 @@ public class VolumeInstance extends AbstractEntity implements  Comparable<Volume
       if ( instance == null)
          throw new IllegalArgumentException("Indice de instancia del volumen no puede ser nulo");
 
+      if ( path == null)
+         throw new IllegalArgumentException("Path del volumen en el repositorio no puede ser nulo");
+
       if ( dateOpened == null)
          throw new IllegalArgumentException("Fecha de apertura del volumen no puede ser nula");
 
@@ -72,9 +75,11 @@ public class VolumeInstance extends AbstractEntity implements  Comparable<Volume
 
       this.volume        = volume;
       this.instance      = instance;
+      this.path          = path;
       this.dateOpened    = dateOpened;
       this.dateClosed    = dateClosed;
-    
+      this.open          = false;
+
    }//Volume
 
 
@@ -121,10 +126,11 @@ public class VolumeInstance extends AbstractEntity implements  Comparable<Volume
       s.append( "VolumeInstance{")
        .append( super.toString())
        .append( volume.toString())
-       .append( " instance["+ instance+ "]")
+       .append( " instance["   + instance+ "]")
+       .append( " path["       + path+ "]")
        .append( " date opened["+ dateOpened+ "]")
        .append( " date closed["+ dateClosed+ "]")
-       .append( " open["+ open+ "]}\n");
+       .append( " open["       + open+ "]}\n");
 
       return s.toString();
    }//toString

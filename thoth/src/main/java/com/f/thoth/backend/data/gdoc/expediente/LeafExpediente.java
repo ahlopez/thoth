@@ -4,12 +4,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.persistence.Entity;
-import javax.persistence.Index;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PositiveOrZero;
 
 import com.f.thoth.backend.data.entity.AbstractEntity;
 import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
@@ -24,50 +22,36 @@ import com.f.thoth.backend.data.security.UserGroup;
  * Representa un nodo de la jerarquia de expedientes (expediente/sub-expediente/volumen
  */
 @Entity
-@Table(name = "LEAF_EXPEDIENTE", indexes = { @Index(columnList = "code"), @Index(columnList = "tenant,expedienteCode"), @Index(columnList= "tenant,keywords")})
+@Table(name = "LEAF_EXPEDIENTE")
 public class LeafExpediente extends AbstractEntity implements  NeedsProtection, Comparable<LeafExpediente>
 {
 
    @OneToOne
    @NotNull  (message = "{evidentia.expediente.required}")
-   protected BaseExpediente        expediente;                 // Expediente that describes this leaf
-
-   @NotNull  (message = "{evidentia.volume.required}")
-   protected Boolean           volume;                     // Is the leaf expediente a volume?
-
-   @PositiveOrZero
-   @NotNull(message = "{evidentia.documentNumber.required}")
-   protected Integer           currentDocNumber;           // Number of current document created in this expediente
+   protected BaseExpediente    expediente;                 // Expediente that describes this leaf
 
    @OneToMany
    @NotNull  (message = "{evidentia.types.required}")
    protected Set<DocumentType> admissibleTypes;            // Admisible document types that can be included in the expediente
 
-   protected String            location;                   // Physical archive location (topographic signature)
-
    // ------------- Constructors ------------------
    public LeafExpediente()
    {
       super();
-      this.volume               = false;
-      this.currentDocNumber     = 0;
+      this.expediente           = null;
       this.admissibleTypes      = new TreeSet<>();
-      this.location             = "";
    }//LeafExpediente null constructor
 
 
    // ------------- LeafExpediente ------------------
 
-   public LeafExpediente( BaseExpediente expediente, Boolean volume, Integer currentDocNumber, Set<DocumentType>admissibleTypes, String location)
+   public LeafExpediente( BaseExpediente expediente, Set<DocumentType>admissibleTypes)
    {
       super();
 
       if ( expediente == null )
          throw new IllegalArgumentException("Expediente asociado a la rama no puede ser nulo");
 
-      this.volume           = (volume           == null? false: volume);
-      this.currentDocNumber = (currentDocNumber == null? 0    : currentDocNumber);
-      this.location         = (location         == null? ""   : location);
       this.admissibleTypes  = (admissibleTypes  == null? new TreeSet<>(): admissibleTypes);
 
    }//LeafExpediente constructor
@@ -75,21 +59,11 @@ public class LeafExpediente extends AbstractEntity implements  NeedsProtection, 
 
    // -------------- Getters & Setters ----------------
 
-   public BaseExpediente        getExpediente() { return expediente;}
+   public BaseExpediente    getExpediente() { return expediente;}
    public void              setExpediente(BaseExpediente expediente){ this.expediente = expediente;}
-
-   public Boolean           isVolume()  { return volume;}
-   public Boolean           getVolume() { return volume;}
-   public void              setVolume(Boolean volume) { this.volume = volume;}
-
-   public Integer           getCurrentDocNumber() {  return currentDocNumber;}
-   public void              setCurrentDocNumber(Integer currentDocNumber) { this.currentDocNumber = currentDocNumber;}
 
    public Set<DocumentType> getAdmissibleTypes() {  return admissibleTypes;}
    public void              setAdmissibleTypes(Set<DocumentType> admissibleTypes) { this.admissibleTypes = admissibleTypes;}
-
-   public String            getLocation() { return location;}
-   public void              setLocation(String location) { this.location = location;}
 
    // --------------- Object methods ---------------------
 
@@ -113,10 +87,7 @@ public class LeafExpediente extends AbstractEntity implements  NeedsProtection, 
       StringBuilder s = new StringBuilder();
       s.append( "LeafExpediente{")
        .append( super.toString())
-       .append( " expediente["+ expediente.getCode()+ "]")
-       .append( " isVolume["+ volume+ "]")
-       .append( " currentDocNumber["+ currentDocNumber+ "]")
-       .append( " location["+ location+ "]\nAdmissibleTypes[\n");
+       .append( " expediente["+ expediente.getCode()+ "]\nAdmissibleTypes[\n");
 
       for ( DocumentType docType: admissibleTypes )
          s.append( " "+ docType.getName());
@@ -133,7 +104,7 @@ public class LeafExpediente extends AbstractEntity implements  NeedsProtection, 
         return 1;
 
      BaseExpediente that = other.getExpediente();
-      return this.expediente.compareTo(that);
+     return this.expediente.compareTo(that);
    }// compareTo
 
 
@@ -168,18 +139,6 @@ public class LeafExpediente extends AbstractEntity implements  NeedsProtection, 
    @Override public void            revoke(Permission permission)           { expediente.revoke(permission);}
 
    // --------------- Logic ------------------------------
-   public boolean isSubExpediente() { return !volume;}
-
-   /*
-   public void    nextVolume()
-   {
-        Verifique isVolume();
-        Cree el leafExpediente, con volume=true                      ;
-        Cierre este leafExpediente                                   ;
-        Adicione al padre el nuevo leafExpediente                                                             ;
-        Abra el nuevo leafExpediente                                                                                                  ;
-   }//nextVolume
-   */
 
 
 }//LeafExpediente
