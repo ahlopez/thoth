@@ -35,6 +35,6 @@ webpack.generated.js
 
 /package.json
 /package-lock.json
-/.metadata/.mylyn/
-/.metadata/.plugins/
-/.metadata/
+.metadata/.mylyn/
+.metadata/.plugins/
+.metadata/
