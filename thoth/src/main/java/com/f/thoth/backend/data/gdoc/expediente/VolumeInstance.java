@@ -3,7 +3,6 @@ package com.f.thoth.backend.data.gdoc.expediente;
 import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
-import javax.persistence.Index;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;

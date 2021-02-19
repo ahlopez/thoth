@@ -12,8 +12,10 @@ import javax.jcr.Session;
 
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
-import com.f.thoth.backend.data.gdoc.expediente.BranchExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
+import com.f.thoth.backend.data.gdoc.expediente.BranchExpediente;
+import com.f.thoth.backend.data.gdoc.expediente.LeafExpediente;
+import com.f.thoth.backend.data.gdoc.expediente.Volume;
 import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.security.ObjectToProtect;
@@ -59,32 +61,116 @@ public class ExpedienteGenerator
         this.expedienteRepository = expedienteRepository;
         this.jcrSession           = jcrSession;
         this.user                 = ThothSession.getUser();
+        String namesFile          = "data/theNames.txt";
         try
         {
-           this.namesFile            = new BufferedReader(new FileReader("word/CREA_total.TXT"));
+           this.namesFile         = new BufferedReader(new FileReader(namesFile));
         } catch (Exception e)
         {
-           throw new IllegalStateException("No pudo abrir archivo de nombres de expedientes");
+           throw new IllegalStateException("No pudo abrir archivo de nombres de expedientes["+ namesFile+ "]");
         }
     }//ExpedienteGenerator constructor
+    
 
-    public int registerExpedientes( Tenant tenant)
+    public int  registerExpedientes( Tenant tenant)
     {
-        List<Classification> allClasses =  claseRepository.findAll();
-        for (Classification classificationClass: allClasses)
-        {
-           int numExpedientes =  random.nextInt(10)+ 1;
-           for ( int i= 0; i < numExpedientes; i++)
-           {
-               BaseExpediente expediente = creeExpediente( user, null, classificationClass);
-               int depthExpedientes = random.nextInt(4)+1;
-               genereExpedientesHijos( depthExpedientes, expediente, classificationClass);
-           }
-        }
-        return nExpedientes;
-
+    	int nRegistered = registerBaseExpedientes(tenant);    	
+    	registerBranchAndLeafExpedientes(tenant);
+    	return nRegistered;
     }//registerExpedientes
 
+    
+    private int registerBaseExpedientes(Tenant tenant)
+    {
+        List<Classification> leafClasses =  claseRepository.findLeaves(tenant);
+        int nExpedientes = 0;
+        for (Classification classificationClass: leafClasses)
+        {
+           int numBaseExpedientes =  random.nextInt(10)+ 1;
+           nExpedientes+= numBaseExpedientes;
+           for ( int i= 0; i < numBaseExpedientes; i++) {
+               creeBaseExpediente( user, null, classificationClass);
+           }
+         }
+        return nExpedientes;
+    }//registerBaseExpedientes
+
+
+    
+	private void registerBranchAndLeafExpedientes(Tenant tenant)
+	{
+		List<BaseExpediente> baseExpedientes = baseExpedienteRepo.findAll();
+		for ( BaseExpediente base: baseExpedientes )
+		{
+			int b = random.nextInt(100)+1;
+			if (b > 80 )
+				createBranchExpediente(tenant, base);
+			else
+				createLeafExpediente(tenant, base);
+		}
+		
+	}//registerBranchAndLeafExpedientes
+	
+	
+	private void createBranchExpediente(Tenant tenant, BaseExpediente base)
+	{
+		
+	}//createBranchExpediente
+	
+	
+	private void createLeafExpediente(Tenant tenant, BaseExpediente base)
+	{
+		LeafExpediente leaf = createLeaf(tenant, base);
+		int b = random.nextInt(100)+1;
+		if (b > 80 )
+			createExpediente(tenant, leaf);
+		else
+			createVolume(tenant, leaf);
+		
+	}//createLeafExpediente
+	
+	
+	
+	private LeafExpediente createLeaf( Tenant tenant, BaseExpediente base)
+	{
+		return null;
+	}//createLeaf
+	
+	 
+	
+	private void createExpediente( Tenant tenant, LeafExpediente leaf)
+	{
+		
+	}//createExpediente
+	
+	
+	
+	private void createVolume(Tenant tenant, LeafExpediente leaf)
+	{
+		Volume vol = createVol(tenant, leaf);
+		int v = random.nextInt(3)+1;
+		for (int i=0; i < v; i++)
+			createVolumeInstance(tenant, vol, i);
+		
+	}//createVolume
+	
+	
+	
+	private Volume createVol(Tenant tenant, LeafExpediente leaf)
+	{
+		return null;
+	}//createVol
+	
+	
+	
+	private void createVolumeInstance( Tenant tenant, Volume vol, int i)
+	{
+		
+	}//createVolumeInstance
+	
+
+
+	
     private void genereExpedientesHijos( int depth, BaseExpediente parent, Classification classificationClass)
     {
        if( depth == 0)
@@ -101,8 +187,10 @@ public class ExpedienteGenerator
               genereExpedientesHijos( depth-1, currentExpediente, classificationClass);
        }
     }//genereExpedientesHijos
+    
+    
 
-    private BaseExpediente creeExpediente( User user,  BranchExpediente padre, Classification classificationClass)
+    private BaseExpediente creeBaseExpediente( User user,  BranchExpediente padre, Classification classificationClass)
     {
        BaseExpediente  currentExpediente = new BaseExpediente();
 
@@ -130,11 +218,15 @@ public class ExpedienteGenerator
        return currentExpediente;
 
      }//creeExpediente
+    
+    
 
      private String genereCode(BaseExpediente padre, Classification classificationClass)
      {
          return padre == null?   generateExpedienteCode(classificationClass) : generateSubExpedienteCode(padre);
      }//genereCode
+     
+     
 
      private synchronized String generateExpedienteCode(Classification classificationClass)
      {
@@ -142,6 +234,8 @@ public class ExpedienteGenerator
          claseRepository.saveAndFlush(classificationClass);
          return expedienteCode;
      }//generateExpedienteCode
+     
+     
 
      private String generateSubExpedienteCode( BaseExpediente padre)
      {
@@ -149,6 +243,8 @@ public class ExpedienteGenerator
          expedienteRepository.saveAndFlush(padre);
          return expedienteCode;
      }//generateSubExpedienteCode
+     
+     
 
      private String generateName()
      {
@@ -162,6 +258,8 @@ public class ExpedienteGenerator
         }
         return name;
      }//generateName
+     
+     
 
      private Set<String> generateKeywords()
      {
@@ -172,12 +270,16 @@ public class ExpedienteGenerator
 
           return keywords;
      }//generateKeywords
+     
+     
 
      private int getRandom( int low, int high)
      {
          int range = high-low+1;
          return low+ random.nextInt(range);
      }//getRandom
+     
+     
 
      private String generateMac()
      {
@@ -187,6 +289,8 @@ public class ExpedienteGenerator
 
          return ""; //TODO:
      }//generateMac
+     
+     
 
      private Integer generateVolume( BranchExpediente padre)
      {
@@ -199,6 +303,8 @@ public class ExpedienteGenerator
          */
          return 0;//TODO:
      }//generateVolume
+     
+     
 
      private Set<DocumentType> generateAdmissibleTypes()
      {
@@ -212,11 +318,15 @@ public class ExpedienteGenerator
          //
          return admissibleTypes;
      }//generateAdmissibleTypes
+     
+     
 
      private void creeJCRNodo( String path)
      {
 
      }//creeJCRNodo
+     
+     
 
     private <T> T getRandom(T[] array)
     {

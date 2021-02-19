@@ -19,7 +19,7 @@ import com.f.thoth.backend.data.security.SingleUser;
 import com.f.thoth.backend.data.security.UserGroup;
 
 /**
- * Representa un nodo de la jerarquia de expedientes (expediente/sub-expediente/volumen
+ * Representa un nodo terminal de la jerarquia de expedientes (expediente/sub-expediente/volumen)
  */
 @Entity
 @Table(name = "LEAF_EXPEDIENTE")

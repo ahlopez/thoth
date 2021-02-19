@@ -20,7 +20,7 @@ public class Expediente  extends AbstractEntity implements  Comparable<Expedient
       @NotBlank (message = "{evidentia.repopath.required}")
       @NotEmpty (message = "{evidentia.repopath.required}")
       @Size(max = 255)
-      protected String         path;                                          //  Node path in document repository
+      protected String               path;                                    // Node path in document repository
 
       protected String               location;                                // Physical archive location (topographic signature)
 
