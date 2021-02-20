@@ -13,7 +13,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import com.f.thoth.backend.data.entity.User;
-import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
+import com.f.thoth.backend.data.gdoc.expediente.Expediente;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
@@ -24,7 +24,7 @@ import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
 
 @Service
-public class ExpedienteService implements FilterableCrudService<BaseExpediente>, PermissionService<BaseExpediente>
+public class ExpedienteService implements FilterableCrudService<Expediente>, PermissionService<Expediente>
 {
    private final ExpedienteRepository           expedienteRepository;
    private final PermissionRepository           permissionRepository;
@@ -40,7 +40,7 @@ public class ExpedienteService implements FilterableCrudService<BaseExpediente>,
       this.objectToProtectRepository   = objectToProtectRepository;
    }
 
-   @Override public Page<BaseExpediente> findAnyMatching(Optional<String> filter, Pageable pageable)
+   @Override public Page<Expediente> findAnyMatching(Optional<String> filter, Pageable pageable)
    {
       if (filter.isPresent())
       {
@@ -62,24 +62,24 @@ public class ExpedienteService implements FilterableCrudService<BaseExpediente>,
       }
    }//countAnyMatching
 
-   public Page<BaseExpediente> find(Pageable pageable)
+   public Page<Expediente> find(Pageable pageable)
    {
       return expedienteRepository.findBy(ThothSession.getCurrentTenant(), pageable);
    }
 
-   @Override public JpaRepository<BaseExpediente, Long> getRepository()
+   @Override public JpaRepository<Expediente, Long> getRepository()
    {
       return expedienteRepository;
    }
 
-   @Override public BaseExpediente createNew(User currentUser)
+   @Override public Expediente createNew(User currentUser)
    {
-      BaseExpediente Expediente = new BaseExpediente();
+      Expediente Expediente = new Expediente();
       Expediente.setTenant(ThothSession.getCurrentTenant());
       return Expediente;
    }//createNew
 
-   @Override public BaseExpediente save(User currentUser, BaseExpediente Expediente)
+   @Override public Expediente save(User currentUser, Expediente Expediente)
    {
       try {
          ObjectToProtect associatedObject = Expediente.getObjectToProtect();
@@ -95,15 +95,15 @@ public class ExpedienteService implements FilterableCrudService<BaseExpediente>,
 
 
    //  ----- implements HierarchicalService ------
-   @Override public List<BaseExpediente> findAll() { return expedienteRepository.findAll(ThothSession.getCurrentTenant()); }
+   @Override public List<Expediente> findAll() { return expedienteRepository.findAll(ThothSession.getCurrentTenant()); }
 
-   @Override public Optional<BaseExpediente> findById(Long id)  { return expedienteRepository.findById( id);}
+   @Override public Optional<Expediente> findById(Long id)  { return expedienteRepository.findById( id);}
 
-   @Override public List<BaseExpediente>  findByParent ( BaseExpediente owner) { return expedienteRepository.findByParent(owner); }
-   @Override public int         countByParent ( BaseExpediente owner) { return expedienteRepository.countByParent (owner); }
-   @Override public boolean     hasChildren   ( BaseExpediente Expediente){ return expedienteRepository.countByChildren(Expediente) > 0; }
+   @Override public List<Expediente>  findByParent ( Expediente owner) { return expedienteRepository.findByParent(owner); }
+   @Override public int         countByParent ( Expediente owner) { return expedienteRepository.countByParent (owner); }
+   @Override public boolean     hasChildren   ( Expediente Expediente){ return expedienteRepository.countByChildren(Expediente) > 0; }
 
-   @Override public List<BaseExpediente> findByNameLikeIgnoreCase (Tenant tenant, String name)
+   @Override public List<Expediente> findByNameLikeIgnoreCase (Tenant tenant, String name)
                           { return expedienteRepository.findByNameLikeIgnoreCase (tenant, name); }
    @Override public long  countByNameLikeIgnoreCase(Tenant tenant, String name)
                           { return expedienteRepository.countByNameLikeIgnoreCase(tenant, name); }
@@ -112,13 +112,13 @@ public class ExpedienteService implements FilterableCrudService<BaseExpediente>,
 
    @Override public List<Permission> findGrants( Role role)
    {
-      List<BaseExpediente> expedientes = expedienteRepository.findExpedientesGranted(role);
+      List<Expediente> expedientes = expedienteRepository.findExpedientesGranted(role);
       List<ObjectToProtect>     objects = new ArrayList<>();
       expedientes.forEach( expediente-> objects.add(expediente.getObjectToProtect()));
       return  permissionRepository.findByObjects(objects);
    }//findGrants
 
-   @Override public List<BaseExpediente> findObjectsGranted( Role role)
+   @Override public List<Expediente> findObjectsGranted( Role role)
    {
       return expedienteRepository.findExpedientesGranted(role);
    }

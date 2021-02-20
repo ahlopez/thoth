@@ -44,9 +44,12 @@ import com.f.thoth.backend.data.gdoc.metadata.Type;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.UserGroup;
+import com.f.thoth.backend.repositories.BaseExpedienteRepository;
+import com.f.thoth.backend.repositories.BranchExpedienteRepository;
 import com.f.thoth.backend.repositories.ClassificationRepository;
 import com.f.thoth.backend.repositories.ExpedienteRepository;
 import com.f.thoth.backend.repositories.FieldRepository;
+import com.f.thoth.backend.repositories.LeafExpedienteRepository;
 import com.f.thoth.backend.repositories.LevelRepository;
 import com.f.thoth.backend.repositories.MetadataRepository;
 import com.f.thoth.backend.repositories.OperationRepository;
@@ -59,6 +62,8 @@ import com.f.thoth.backend.repositories.SchemaRepository;
 import com.f.thoth.backend.repositories.TenantRepository;
 import com.f.thoth.backend.repositories.UserGroupRepository;
 import com.f.thoth.backend.repositories.UserRepository;
+import com.f.thoth.backend.repositories.VolumeInstanceRepository;
+import com.f.thoth.backend.repositories.VolumeRepository;
 import com.f.thoth.backend.service.TenantService;
 import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.spring.annotation.SpringComponent;
@@ -95,13 +100,18 @@ public class DataGenerator implements HasLogger
 	private PickupLocationRepository      pickupLocationRepository;
 	private PasswordEncoder               passwordEncoder;
 	private ClassificationRepository      claseRepository;
+	private BaseExpedienteRepository      baseExpedienteRepository;
+	private BranchExpedienteRepository    branchExpedienteRepository;
+	private LeafExpedienteRepository      leafExpedienteRepository;
+	private ExpedienteRepository          expedienteRepository;
+	private VolumeRepository              volumeRepository;
+	private VolumeInstanceRepository      volumeInstanceRepository;
 	private LevelRepository               levelRepository;
 	private SchemaRepository              schemaRepository;
 	private MetadataRepository            metadataRepository;
 	private FieldRepository               fieldRepository;
 	private RetentionRepository           retentionRepository;
 	private UserGroupRepository           userGroupRepository;
-	private ExpedienteRepository          expedienteRepository;
 	private Repository                    repo;
 	private Session                       jcrSession;
 	private Level[]                       levels;
@@ -110,9 +120,11 @@ public class DataGenerator implements HasLogger
 	public DataGenerator(TenantService tenantService, OrderRepository orderRepository, UserRepository userRepository,
 			ProductRepository productRepository, PickupLocationRepository pickupLocationRepository,
 			TenantRepository tenantRepository, RoleRepository roleRepository, OperationRepository operationRepository,
-			ClassificationRepository claseRepository, MetadataRepository metadataRepository, FieldRepository fieldRepository,
-			SchemaRepository schemaRepository, LevelRepository levelRepository, ExpedienteRepository expedienteRepository,
-			RetentionRepository retentionRepository, UserGroupRepository userGroupRepository,
+			ClassificationRepository claseRepository, BaseExpedienteRepository baseExpedienteRepository,
+			BranchExpedienteRepository branchExpedienteRepository, LeafExpedienteRepository leafExpedienteRepository,
+			ExpedienteRepository expedienteRepository, VolumeRepository volumeRepository, VolumeInstanceRepository volumeInstanceRepository,
+			MetadataRepository metadataRepository, FieldRepository fieldRepository, SchemaRepository schemaRepository, 
+			LevelRepository levelRepository, RetentionRepository retentionRepository, UserGroupRepository userGroupRepository,
 			PasswordEncoder passwordEncoder)
 	{
 		this.tenantService                 = tenantService;
@@ -124,6 +136,12 @@ public class DataGenerator implements HasLogger
 		this.roleRepository                = roleRepository;
 		this.operationRepository           = operationRepository;
 		this.claseRepository               = claseRepository;
+		this.baseExpedienteRepository      = baseExpedienteRepository;
+		this.branchExpedienteRepository    = branchExpedienteRepository;
+		this.leafExpedienteRepository      = leafExpedienteRepository;
+		this.expedienteRepository          = expedienteRepository;
+		this.volumeRepository              = volumeRepository;
+		this.volumeInstanceRepository      = volumeInstanceRepository;
 		this.levelRepository               = levelRepository;
 		this.schemaRepository              = schemaRepository;
 		this.fieldRepository               = fieldRepository;
@@ -131,7 +149,6 @@ public class DataGenerator implements HasLogger
 		this.passwordEncoder               = passwordEncoder;
 		this.retentionRepository           = retentionRepository;
 		this.userGroupRepository           = userGroupRepository;
-		this.expedienteRepository          = expedienteRepository;
 
 	}//DataGenerator
 
@@ -198,7 +215,12 @@ public class DataGenerator implements HasLogger
 			
 			// -----------------  Generando expedientes y documentos de prueba
 			getLogger().info("... generating expedientes and documents");
-			ExpedienteGenerator  expedienteGenerator = new ExpedienteGenerator(claseRepository, jcrSession, expedienteRepository);
+			ExpedienteGenerator  expedienteGenerator = 
+					new ExpedienteGenerator(
+							claseRepository, jcrSession, baseExpedienteRepository, branchExpedienteRepository, leafExpedienteRepository,
+							expedienteRepository, volumeRepository, volumeInstanceRepository 
+							);
+    		
 			int nExpedientes = expedienteGenerator.registerExpedientes(tenant1);
 			getLogger().info("... "+ nExpedientes+ " expedientes generated");
 
