@@ -33,6 +33,8 @@ node/
 node_modules/
 webpack.generated.js
 
-/package.json
-/package-lock.json
-.metadata/
+#/package.json
+#/package-lock.json
+#/.metadata/.mylyn/
+#/.metadata/.plugins/
+#/.metadata/
