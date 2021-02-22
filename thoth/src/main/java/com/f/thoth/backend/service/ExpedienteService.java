@@ -74,9 +74,9 @@ public class ExpedienteService implements FilterableCrudService<Expediente>, Per
 
    @Override public Expediente createNew(User currentUser)
    {
-      Expediente Expediente = new Expediente();
-      Expediente.setTenant(ThothSession.getCurrentTenant());
-      return Expediente;
+      Expediente expediente = new Expediente();
+      expediente.setTenant(ThothSession.getCurrentTenant());
+      return expediente;
    }//createNew
 
    @Override public Expediente save(User currentUser, Expediente Expediente)

@@ -89,4 +89,10 @@ public class Volume extends AbstractEntity implements  Comparable<Volume>
       return this.expediente.compareTo(that);
    }//compareTo
 
+   // ----------------------- Logic --------------------------
+   public void  addInstance( VolumeInstance instance)
+   {
+      instances.add(instance);
+   }
+
 }//Volume
