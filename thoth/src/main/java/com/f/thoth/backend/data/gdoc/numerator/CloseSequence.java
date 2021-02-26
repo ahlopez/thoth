@@ -1,78 +1,45 @@
 package com.f.thoth.backend.data.gdoc.numerator;
 
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-import javax.persistence.Query;
-
-import db.EmFactory;
+import com.f.thoth.backend.repositories.SequenceRepository;
 
 /**
  * Representa la acción de cerrar una secuencia
  */
 class CloseSequence implements Instruction
 {
-   /**
-    * nombre     - Nombre externo de la secuencia
-    * prefijo    - Prefijo del número
-    * sufijo     - Sufijo del número
-    * emf        - Entity manager factory
-    */
-   private final  String    nombre;
-   private final  String    prefijo;
-   private final  String    sufijo;
-   private static EmFactory emf;
+   private static SequenceRepository sequenceRepository;    // JPA repository
+   private Sequence sequence;                               // Secuencia a cerrar
+
+   @SuppressWarnings("unused")
+   private CloseSequence() {}   // Elimine constructor nulo
 
    /**
-    * Obtiene un comando para cerrar una secuencia
-    * @param nombre Identificador externo de la secuencia
-    * @param prefijo Prefijo del número
-    * @param sufijo  Sufijo del número
+    * Obtiene un comando para cerrar una secuencia de numeracion
+    * @param sequence  La secuencia a cerrar
     */
-   public CloseSequence(  String nombre, String prefijo, String sufijo)
+   public CloseSequence(Sequence sequence)
    {
-      assert nombre  != null && nombre.trim().length() > 0;
-      assert prefijo != null;
-      assert sufijo  != null;
+      if ( sequence == null)
+         throw new IllegalArgumentException("Secuencia a guardar no puede ser nula");
 
-      this.nombre   = nombre;
-      this.prefijo  = prefijo;
-      this.sufijo   = sufijo;
-      emf           = EmFactory.getInstance();
+      this.sequence = sequence;
 
-   }//CreateSequence
+   }//CloseSequence
 
    /**
-    * Aquí cerrar la secuencia en su medio externo
+    * Cierra la secuencia en su medio externo
     */
    public void execute()
    {
-      EntityManager     em = emf.getManager();
-      EntityTransaction tx = null;
       try
       {
-         tx = em.getTransaction();
-         Query query = em.createNamedQuery("selectSequence");
-         query.setParameter("nombre",  nombre);
-         query.setParameter("prefijo", prefijo);
-         query.setParameter("sufijo",  sufijo);
-         DBSequence sequence = (DBSequence) query.getSingleResult();
-
-         tx.begin();
-         em.merge(sequence);
-         sequence.setActive(DBSequence.Status.CERRADA);
-         tx.commit();
-      }catch( Throwable t)
+         sequenceRepository.saveAndFlush(sequence);
+      } catch ( Throwable t)
       {
-         throw new IllegalStateException("No pudo cerrar secuencia["+ nombre+ "] "+
-               "prefijo["+ prefijo+ "] sufijo["+ sufijo+ "].Razón\n"+ t);
-      }finally
-      {
-         if ( tx != null && tx.isActive())
-            tx.rollback();
-
-         em.close();
+         throw new IllegalStateException("No pudo cerrar secuencia["+ sequence.getCode()+ "], status["+ sequence.getStatus()+ "]. Razon\n"+ t);
       }
+
    }//execute
 
 

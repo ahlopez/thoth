@@ -56,7 +56,7 @@ public class SimpleDocument implements Document, SimpleDocumentImporter
          throw new IllegalArgumentException( "Tipo documental no puede ser nulo");
 
       if ( (publicity == Publicity.RESERVED || publicity == Publicity.CLASSIFIED) && endClassification == null )
-         throw new IllegalArgumentException("Documentos reservados o clasificados no pueden tener fecha de fin de clasificaciÃ³n nula");
+         throw new IllegalArgumentException("Documentos reservados o clasificados no pueden tener fecha de fin de clasificacion nula");
 
       this.id                = id;
       this.docType           = docType;

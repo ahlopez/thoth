@@ -32,9 +32,9 @@ public class DocumentTypeService implements FilterableCrudService<DocumentType>,
    private final ObjectToProtectRepository      objectToProtectRepository;
 
    @Autowired
-   public DocumentTypeService(DocumentTypeRepository     documentTypeRepository,
-                                PermissionRepository         permissionRepository,
-                                ObjectToProtectRepository    objectToProtectRepository)
+   public DocumentTypeService(DocumentTypeRepository       documentTypeRepository,
+                              PermissionRepository         permissionRepository,
+                              ObjectToProtectRepository    objectToProtectRepository)
    {
       this.documentTypeRepository        = documentTypeRepository;
       this.permissionRepository          = permissionRepository;

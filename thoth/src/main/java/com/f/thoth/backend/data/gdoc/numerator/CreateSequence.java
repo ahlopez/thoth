@@ -1,71 +1,41 @@
 package com.f.thoth.backend.data.gdoc.numerator;
 
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityTransaction;
-
-import com.f.thoth.backend.data.security.Tenant;
-
-import db.EmFactory;
+import com.f.thoth.backend.repositories.SequenceRepository;
 
 /**
  * Representa la acción de crear una secuencia
  */
-class CreateSequence implements Instruction
+public class CreateSequence implements Instruction, Comparable<CreateSequence>
 {
-   /**
-    * sequence - La secuencia a crear
-    * emf      - Entity manager factory
-    */
-   private DBSequence sequence;
-   private static EmFactory emf;
+   private static SequenceRepository sequenceRepository;
+   private Sequence                  sequence;
+
+   @SuppressWarnings("unused")
+   private CreateSequence() {}   // Elimine constructor nulo
+   
 
    /**
-    * Obtiene un comando para crear una secuencia
-    *
-    * @param nombre Identificador externo de la secuencia
-    * @param prefijo Prefijo del número
-    * @param sufijo  Sufijo del número
-    * @param inicial Valor inicial de la secuencia
-    * @param incremento Delta entre dos números consecutivos de la secuencia
-    * @param longitud Longitud del secuencial
+    * Obtiene un comando para crear una secuencia persistente
+    * @param sequence La secuencia a persistir
     */
-   public CreateSequence(Tenant tenant,  final String nombre, final String prefijo, final String sufijo, final long inicial, final long incremento, final int longitud)
+   public CreateSequence(Sequence sequence)
    {
-      assert nombre != null && nombre.trim().length() > 0;
-      assert prefijo != null;
-      assert sufijo  != null;
-      assert inicial >= 0;
-      assert incremento > 0;
-      assert longitud   > 0;
-
-      emf = EmFactory.getInstance();
-      sequence = new DBSequence(nombre, prefijo, sufijo, inicial, incremento, DBSequence.Status.ACTIVA, longitud);
-
+     this.sequence = sequence;
    }//CreateSequence
+   
 
    /**
-    * Aquí crear o actualizar la secuencia en su medio externo
+    * Crea la secuencia en su medio externo
     */
    public void execute()
    {
-      EntityManager     em = emf.getManager();
-      EntityTransaction tx = null;
       try
       {
-         tx = em.getTransaction();
-         tx.begin();
-         em.persist(sequence);
-         tx.commit();
+        sequenceRepository.saveAndFlush(sequence);
       }catch( Throwable t)
       {
-         throw new IllegalStateException("\nNo pudo crear secuencia "+ sequence+ ".Razón\n"+ t);
-      }finally
-      {
-         if (tx != null && tx.isActive())
-            em.getTransaction().rollback();
-
-         em.close();
+         throw new IllegalStateException("\nNo pudo crear secuencia "+ sequence.getCode()+ ".Razón\n"+ t);
       }
 
    }//execute
@@ -78,18 +48,44 @@ class CreateSequence implements Instruction
     */
    public boolean merge ( Instruction other)
    {
-      boolean merged = false;
-      if ( other instanceof AdvanceSequence )
-      {
-         AdvanceSequence that = (AdvanceSequence) other;
-         merged = this.sequence.esIgual( that.fullName());
-         if ( merged )
-         {
-            this.sequence.advance();
-            System.out.println("Merge create-add"+ sequence.getNombre()+ " valor="+ this.sequence.getValue());
-         }
-      }
-      return merged;
+	  CreateSequence that = (CreateSequence) other;
+      return this.equals(other) && setGreatestValue(that.getValue());
    }// merge
+
+   private String getCode()                     { return sequence.getCode();}
+   private Long   getValue()                    { return sequence.getValue();}
+   private void   setGreatestValue( Long value) { sequence.setGreatestValue(value);}
+
+   // --------------- Object methods --------------------
+
+   @Override public boolean equals( Object other)
+   {
+      if (this == other)
+         return true;
+
+      if (!(other instanceof CreateSequence ))
+         return false;
+
+      CreateSequence that = (CreateSequence) other;
+      return this.sequence.equals(that.sequence);
+
+   }//equals
+
+   @Override public int hashCode() { return sequence == null? 786037: sequence.hashCode();}
+
+   @Override
+   public String toString()
+   {
+       return "CreateSequence{ sequence["+ sequence.getCode()+ "]}\n";
+   }//toString
+
+
+   @Override  public int compareTo(CreateSequence that)
+   {
+      return this.equals(that)?  0 :
+             that == null?       1 :
+             this.getCode().compareTo(that.getCode());
+
+   }// compareTo
 
 }//CreateSequence

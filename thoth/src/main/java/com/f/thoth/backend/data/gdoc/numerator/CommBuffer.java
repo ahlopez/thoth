@@ -2,18 +2,18 @@ package com.f.thoth.backend.data.gdoc.numerator;
 
 
 /**
- * Representa el buffer de comunicación entre dos grupos de hilos
+ * Representa el buffer de comunicacion entre dos grupos de hilos
  * un grupo productor y otro consumidor.
- * El buffer está configurado para almacenar instrucciones
+ * El buffer esta configurado para almacenar instrucciones
  */
 final class CommBuffer<E extends Instruction>
 {
    private E[] B;               // Buffer circular
-   private int P_in;            // Los productores escribirán aquí
-   private int P_out;           // El último consumido por los consumidores
+   private int P_in;            // Los productores escribiran aquí
+   private int P_out;           // El ultimo consumido por los consumidores
    private final int Buff_size; // Tamaño del buffer
-   private boolean stop;        // Si true, pare la comunicación cuando el buffer está vacío
-                                // Tambián para a los productores de incluir elementos en el buffer
+   private boolean stop;        // Si true, pare la comunicacion cuando el buffer está vacio
+                                // Tambien para a los productores de incluir elementos en el buffer
 
 
    // ---------------------------------------------------------------------------
@@ -36,23 +36,22 @@ final class CommBuffer<E extends Instruction>
 
 
    /**
-    * Obtiene el siguiente objeto de comunicación.
-    * La comunicación continúa hasta cuando se ordene
-    * parar la comunicación o el buffer de comunicación está vacío
-    * @param consumer Identificación del consumidor
-    * @return Siguiente objeto de la comunicación.
+    * Obtiene el siguiente objeto de comunicacion.
+    * La comunicacion continúa hasta cuando se ordene
+    * parar la comunicacion o el buffer de comunicacion está vacio
+    * @param consumer Identificacion del consumidor
+    * @return Siguiente objeto de la comunicacion.
     */
    public synchronized E get(final int consumer)
    {
       while ( (P_out+1) % Buff_size == P_in )
       {
-         // Buffer vacío Espere a que se escriba algo
+         // Buffer vacio Espere a que se escriba algo
          try
          {
             wait();
          } catch ( InterruptedException e )
-         {
-         }
+         { }
       }
 
       // Finalmente hay algo que consumir
@@ -70,9 +69,7 @@ final class CommBuffer<E extends Instruction>
    /**
     * Coloca un nuevo elemento en el buffer de comunicaciones
     * @param item Nuevo elemento a ser colocado en el buffer
-    * @param producer Identificador del productor
-    * @return true si aceptó el objeto y lo colocó en el buffer,
-    * false si no aceptó objeto
+    * @return true si acepto el objeto y lo coloco en el buffer;  false si no acepto objeto
     */
    public synchronized boolean put(final E item)
    {
@@ -81,8 +78,10 @@ final class CommBuffer<E extends Instruction>
 
       // Combine las instrucciones compatibles
       for ( int k = (P_in > 0 ? P_in-1 : Buff_size-1); k > P_out; k = (k > 0 ? k-1 :Buff_size-1) )
+      {
          if ( B[k].merge( (Instruction)item) )
             return true;
+      }
 
       while ( P_in == P_out )
       {
@@ -105,8 +104,8 @@ final class CommBuffer<E extends Instruction>
 
 
    /**
-    * Ordena la terminación de la comunicación
-    * una vez que el buffer está vacío
+    * Ordena la terminacion de la comunicacion
+    * una vez que el buffer esta vacio
     */
    public synchronized void stop()
    {
@@ -114,7 +113,7 @@ final class CommBuffer<E extends Instruction>
    }//stop
 
    /**
-    * Evacúa los elementos existentes en el buffer
+    * Evacua los elementos existentes en el buffer
     */
    public synchronized void flush()
    {
@@ -123,7 +122,7 @@ final class CommBuffer<E extends Instruction>
 
       while ( (P_out+1) % Buff_size != P_in )
       {
-         // Bloquee mientras se vacía el buffer
+         // Bloquee mientras se vacia el buffer
          try
          {
             wait();
@@ -132,7 +131,7 @@ final class CommBuffer<E extends Instruction>
          }
       }
 
-      // Finalmente el buffer está vacío Reanude la comunicación
+      // Finalmente el buffer está vacío Reanude la comunicacion
       stop = false;
       notifyAll();
 
