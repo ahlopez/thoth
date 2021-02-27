@@ -277,7 +277,7 @@ public class ExpedienteView extends HorizontalLayout
    }//closeEditor
    
    
-   private void closeAll()
+    private void closeAll()
    {
       closeEditor();
       currentClass = null;
