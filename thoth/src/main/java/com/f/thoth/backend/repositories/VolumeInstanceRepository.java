@@ -7,4 +7,4 @@ import com.f.thoth.backend.data.gdoc.expediente.VolumeInstance;
 public interface VolumeInstanceRepository extends JpaRepository<VolumeInstance, Long> 
 {
 
-}
+}//VolumeInstanceRepository

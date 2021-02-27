@@ -7,4 +7,4 @@ import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 public interface BaseExpedienteRepository extends JpaRepository<BaseExpediente, Long> 
 {
 
-}
+}//BaseExpedienteRepository

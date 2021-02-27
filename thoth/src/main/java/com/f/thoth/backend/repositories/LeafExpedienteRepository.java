@@ -7,4 +7,4 @@ import com.f.thoth.backend.data.gdoc.expediente.LeafExpediente;
 public interface LeafExpedienteRepository extends JpaRepository<LeafExpediente, Long> 
 {
 
-}
+}//LeafExpedienteRepository

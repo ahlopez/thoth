@@ -7,4 +7,4 @@ import com.f.thoth.backend.data.gdoc.expediente.BranchExpediente;
 public interface BranchExpedienteRepository extends JpaRepository<BranchExpediente, Long> 
 {
 
-}
+}//BranchExpedienteRepository

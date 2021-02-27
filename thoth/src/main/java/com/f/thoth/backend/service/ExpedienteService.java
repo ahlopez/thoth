@@ -38,7 +38,7 @@ public class ExpedienteService implements FilterableCrudService<Expediente>, Per
       this.expedienteRepository        = expedienteRepository;
       this.permissionRepository        = permissionRepository;
       this.objectToProtectRepository   = objectToProtectRepository;
-   }
+   }//ExpedienteService constructor
 
    @Override public Page<Expediente> findAnyMatching(Optional<String> filter, Pageable pageable)
    {
@@ -50,6 +50,7 @@ public class ExpedienteService implements FilterableCrudService<Expediente>, Per
          return find(pageable);
       }
    }//findAnyMatching
+   
 
    @Override public long countAnyMatching(Optional<String> filter)
    {
@@ -61,6 +62,7 @@ public class ExpedienteService implements FilterableCrudService<Expediente>, Per
          return n;
       }
    }//countAnyMatching
+   
 
    public Page<Expediente> find(Pageable pageable)
    {
@@ -71,6 +73,7 @@ public class ExpedienteService implements FilterableCrudService<Expediente>, Per
    {
       return expedienteRepository;
    }
+   
 
    @Override public Expediente createNew(User currentUser)
    {

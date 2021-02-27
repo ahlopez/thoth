@@ -8,10 +8,16 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.f.thoth.backend.data.entity.AbstractEntity;
+import com.f.thoth.backend.data.security.NeedsProtection;
+import com.f.thoth.backend.data.security.ObjectToProtect;
+import com.f.thoth.backend.data.security.Permission;
+import com.f.thoth.backend.data.security.Role;
+import com.f.thoth.backend.data.security.SingleUser;
+import com.f.thoth.backend.data.security.UserGroup;
 
 @Entity
 @Table(name = "EXPEDIENTE")
-public class Expediente  extends AbstractEntity implements  Comparable<Expediente>
+public class Expediente  extends AbstractEntity implements  NeedsProtection, Comparable<Expediente>
 {
       @NotNull  (message = "{evidentia.expediente.required}")
       protected LeafExpediente       expediente;                              // Leaf expediente associated to the expediente
@@ -56,6 +62,37 @@ public class Expediente  extends AbstractEntity implements  Comparable<Expedient
 
       public String            getLocation() {  return location;}
       public void              setLocation(String location) { this.location = location;}
+
+
+      // -----------------  Implements NeedsProtection ----------------
+
+      public Integer                   getCategory()                           {return expediente.getCategory();}
+      public void                      setCategory(Integer category)           {expediente.setCategory(category);}
+
+      public SingleUser                getUserOwner()                          {return expediente.getUserOwner();}
+      public void                      setUserOwner(SingleUser userOwner)      {expediente.setUserOwner(userOwner);}
+
+      public Role                      getRoleOwner()                          {return expediente.getRoleOwner();}
+      public void                      setRoleOwner(Role roleOwner)            {expediente.setRoleOwner(roleOwner);}
+
+      public UserGroup                 getRestrictedTo()                       {return expediente.getRestrictedTo();}
+      public void                      setRestrictedTo(UserGroup restrictedTo) {expediente.setRestrictedTo(restrictedTo);}
+
+      @Override public ObjectToProtect getObjectToProtect()                    { return expediente.getObjectToProtect();}
+
+      @Override public boolean         canBeAccessedBy(Integer userCategory)   { return expediente.canBeAccessedBy(userCategory);}
+
+      @Override public boolean         isOwnedBy( SingleUser user)             { return expediente.isOwnedBy(user);}
+
+      @Override public boolean         isOwnedBy( Role role)                   { return expediente.isOwnedBy(role);}
+
+      @Override public boolean         isRestrictedTo( UserGroup userGroup)    { return expediente.isRestrictedTo(userGroup);}
+
+      @Override public boolean         admits( Role role)                      { return expediente.admits(role);}
+
+      @Override public void            grant( Permission  permission)          { expediente.grant(permission);}
+
+      @Override public void            revoke(Permission permission)           { expediente.revoke(permission);}
 
       // --------------- Object methods ---------------------
 
