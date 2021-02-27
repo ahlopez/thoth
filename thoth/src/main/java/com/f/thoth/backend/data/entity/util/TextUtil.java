@@ -233,9 +233,27 @@ public class TextUtil
   {
     String number = String.valueOf(source);
     return "0000000000000000000000000000000000".
-    substring(0, len - number.length())+
-    number;
+           substring(0, len - number.length())+
+           number;
   }// pad
+  
+
+
+  /**
+   * Convierte un entero a una cadena de longitud específica, agregando ceros
+   * por la izquierda
+   *
+   * @source El número que hay que convertir
+   * @len La longitud deseada de la cadena
+   * */
+  public static String pad(long source, int len)
+  {
+     String number = String.valueOf(source);
+     return "0000000000000000000000000000000000".
+             substring(0, len - number.length())+
+             number;
+  }// pad
+
 
   /**
    * Determina si una cadena es un nombre válido para un nodo.

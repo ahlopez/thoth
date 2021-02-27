@@ -44,17 +44,18 @@ public class Numerator
          throw new IllegalArgumentException("El nombre del Numerator no puede ser nulo ni vacio");
 
       if ( inicial < 0 )
-         throw new IllegalArgumentException("Valor inicial de la secuencia["+ name+ "]= " + inicial + ". debe ser cero o positivo.");
+         throw new IllegalArgumentException("Valor inicial de la secuencia["+ nombre+ "]= " + inicial + ". debe ser cero o positivo.");
 
       if ( incremento <= 0 )
-         throw new IllegalArgumentException("Incremento de la secuencia["+ name+ "] = "+ incremento+ ". debe ser mayor que cero");
+         throw new IllegalArgumentException("Incremento de la secuencia["+ nombre+ "] = "+ incremento+ ". debe ser mayor que cero");
 
       String p = ( prefijo == null? "": prefijo);
       String s = ( sufijo  == null? "": sufijo);
       String  name = sequenceName(tenant, nombre, p, s);
+      Sequence seq = null;
       synchronized ( seqs)
       {
-         Sequence seq = seqs.fetch( name);
+         seq = seqs.fetch( name);
          if ( seq == null )
          {
             seq = new Sequence( tenant, nombre, p, s, inicial, incremento, longitud);
@@ -87,37 +88,37 @@ public class Numerator
 
    /**
     * Obtiene una secuencia creada con nombre especifico.
-    * @param nombre Nombre de la secuencia a buscar.
-    *               No es sensitivo a mayusculas/minusculas
+    * @param code Identificador (business key) de la secuencia a buscar.
+    *             No es sensitivo a mayusculas/minusculas
     * @return Sequence La secuencia solicitada, si esta registrada; de otra forma retorna null
-    * @throws IllegalArgumentException cuando el nombre presentado es nulo o vacio
+    * @throws IllegalArgumentException cuando el codigo presentado es nulo o vacio
     */
-   public Sequence obtenga( final String nombre)
+   public Sequence obtenga( final String code)
    {
-      if ( TextUtil.isEmpty(nombre) )
-         throw new IllegalArgumentException("Nombre de la secuencia no puede ser nulo ni vacÃ­o");
+      if ( TextUtil.isEmpty(code) )
+         throw new IllegalArgumentException("Código de la secuencia no puede ser nulo ni vacío");
 
       synchronized(seqs)
       {
-         return seqs.get( nombre.toUpperCase());
+         return seqs.fetch( code);
       }
 
    }//obtenga
 
    /**
     * Cierra la secuencia para numeracion
-    * @param nombre Secuencia a cerrar
+    * @param code  Identificador (business key) de la Secuencia a cerrar
     */
-   public void close( String nombre)
+   public void close( String code)
    {
-      if ( TextUtil.isEmpty( nombre) )
-         throw new IllegalArgumentException("Nombre de la secuencia a cerar no puede ser nulo ni vacÃ­o");
+      if ( TextUtil.isEmpty( code) )
+         throw new IllegalArgumentException("Código (business key) de la secuencia a cerar no puede ser nulo ni vacío");
 
       synchronized( seqs)
       {
-         Sequence seq = seqs.get( nombre.toUpperCase());
+         Sequence seq = seqs.fetch( code);
          if ( seq == null )
-            throw new IllegalArgumentException("Secuencia["+ nombre+ "]  no existe");
+            throw new IllegalArgumentException("Secuencia["+ code+ "]  no existe");
 
          seq.close();
       }
@@ -126,23 +127,23 @@ public class Numerator
    /**
     * Retorna el siguiente valor de la secuencia.
     * En la primera llamada retorna el valor inicial de la secuencia
-    * @param nombre Secuencia a incrementar
+    * @param code identificador (business key) de la Secuencia a incrementar
     * @return long Siguiente valor de la secuencia
     * @throws IllegalArgumentException si el nombre de secuencia es nulo o vacio, o
     * si la secuencia no existe
     */
-   public String next(String nombre)
+   public String next(String code)
    {
-      if ( TextUtil.isEmpty(nombre) )
-         throw new IllegalArgumentException("Nombre de secuencia no puede ser nulo ni vacio");
+      if ( TextUtil.isEmpty(code) )
+          throw new IllegalArgumentException("Código (business key) de la secuencia a cerar no puede ser nulo ni vacío");
 
       Sequence s = null;
       synchronized( seqs)
       {
-         s = seqs.get( nombre.toUpperCase());
+         s = seqs.fetch( code);
 
          if ( s == null )
-            throw new IllegalArgumentException("Secuencia["+ nombre+ "] no existe");
+            throw new IllegalArgumentException("Secuencia["+ code+ "] no existe");
 
          return s.next();
       }
@@ -151,21 +152,20 @@ public class Numerator
 
    /**
     *  Obtiene el valor actual de la secuencia
-    * @param nombre  Nombre de la secuencia requerida
-    * @throws IllegalArgumentException si el nombre de secuencia es nulo o vacio, o
-    * si la secuencia no existe
+    * @param code Identificador (business key) de la secuencia requerida
+    * @throws IllegalArgumentException si el nombre de secuencia es nulo o vacio, o si la secuencia no existe
     *  @return Valor actual de la secuencia
     */
-   public String get( String nombre)
+   public String get( String code)
    {
-      if ( TextUtil.isEmpty(nombre) )
+      if ( TextUtil.isEmpty(code) )
          throw new IllegalArgumentException("Nombre de secuencia a consultar no puede ser nulo ni vacÃ­o");
 
       synchronized( seqs)
       {
-         Sequence s = seqs.get( nombre.toUpperCase());
+         Sequence s = seqs.fetch( code);
          if ( s == null )
-            throw new IllegalArgumentException("Secuencia["+ nombre+ "] no existe");
+            throw new IllegalArgumentException("Secuencia["+ code+ "] no existe");
 
          return s.get();
       }

@@ -14,5 +14,7 @@ public interface SequenceRepository extends JpaRepository<Sequence, Long>
 	   
 	   @Query("SELECT s FROM Sequence s where s.code=?1")
 	   Optional<Sequence> findByCode(String sequenceCode);
+	   
+	   
 
 }//SequenceRepository

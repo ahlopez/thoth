@@ -56,9 +56,9 @@ public class SaveSequence implements Instruction, Comparable<SaveSequence>
 		return this.equals(other) && setGreatestValue(that.getValue());
 	}// merge
 
-	private String getCode()                     { return sequence.getCode();}
-	private Long   getValue()                    { return sequence.getValue();}
-	private void   setGreatestValue( Long value) { sequence.setGreatestValue(value);}
+	private String   getCode()                     { return sequence.getCode();}
+	private Long     getValue()                    { return sequence.getValue();}
+	private boolean  setGreatestValue( Long value) { return sequence.setGreatestValue(value);}
 
 	// --------------- Object methods --------------------
 

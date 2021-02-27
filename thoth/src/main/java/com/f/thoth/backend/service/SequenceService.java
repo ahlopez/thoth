@@ -13,69 +13,106 @@ import com.f.thoth.backend.repositories.SequenceRepository;
 public class SequenceService implements Cache.Fetcher<String, Sequence>
 {
 	private SequenceRepository sequenceRepository;
-	
+
 	@Autowired
 	public SequenceService( SequenceRepository sequenceRepository)
 	{
 		this.sequenceRepository = sequenceRepository;
 	}//SequenceService constructor
-	
-    /**
-     * Obtiene un objeto con base en su identificador
-     * @param key Identificador del objeto
-     * @return Keyable El objeto solicitado, si se encuentra;
-     * null cuando no se encuentra
-     */
-    public Sequence fetch( Long key)
-    {
-    	Optional<Sequence> sequence =  sequenceRepository.findById(key);
-    	return sequence.isPresent()? sequence.get(): null;
-    }//fetch
-	
-    /**
-     * Obtiene un objeto con base en su identificador
-     * @param key Identificador del objeto
-     * @return Keyable El objeto solicitado, si se encuentra;
-     * null cuando no se encuentra
-     */
-    public Sequence fetch( String key)
-    {
-    	Optional<Sequence> sequence =  sequenceRepository.findById(key);
-    	return sequence.isPresent()? sequence.get(): null;
-    }//fetch
 
-    /**
-     * Adiciona un nuevo objeto al sistema
-     * @param key Identificador del objeto
-     * @param object El objeto a adicionar
-     */
-    public void add(Long key, Sequence object) 
-    {
-    	sequenceRepository.saveAndFlush(object);
-    }//add
+	/**
+	 * Obtiene una secuencia con base en su identificador 
+	 * @param key Identificador (primary key) de la secuencia
+	 * @return secuencia solicitada, si se encuentra; null cuando no se encuentra
+	 */
+	public Sequence fetch( Long key)
+	{
+		Optional<Sequence> sequence =  sequenceRepository.findById(key);
+		return sequence.isPresent()? sequence.get(): null;
+	}//fetch
 
-    /**
-     * Actualiza la información de un objeto en el sistema
-     * @param key Identificador del objeto
-     * @param object El objeto a actualizar
-     * @return el objeto anterior, si existe; null si no existe
-     */
-    public Sequence update(Long key, Sequence object)
-    {
-    	sequenceRepository.saveAndFlush(object);
-    	return object;
-    }//update
+	/**
+	 * Obtiene una secuencia con base en su identificador
+	 * @param key Codigo (business key)  de la secuencia
+	 * @return  Secuencia solicitada, si se encuentra; null cuando no se encuentra
+	 */
+	public Sequence fetch( String key)
+	{
+		Optional<Sequence> sequence =  sequenceRepository.findByCode(key);
+		return sequence.isPresent()? sequence.get(): null;
+	}//fetch
 
-    /**
-     * Remueve el objeto del proveedor
-     * @param key Identificador del objeto
-     * @return el objeto removido, si existe; null si no existe
-     */
-    public Sequence remove( Long key)
-    {
-    	Optional<Sequence> old = sequenceRepository.findById(key);
-    	sequenceRepository.deleteById(key);
-    	return old.isPresent()? old.get(): null;
-    }//remove
+	/**
+	 * Adiciona una nueva secuencia al sistema
+	 * @param key Identificador (primary key) de la secuencia
+	 * @param sequence La secuencia a adicionar
+	 */
+	public void add(Long key, Sequence sequence) 
+	{
+		sequenceRepository.saveAndFlush(sequence);
+	}//add
+
+	/**
+	 * Adiciona una nueva secuencia al sistema
+	 * @param key Identificador (business key) de la secuencia
+	 * @param sequence La secuencia a adicionar
+	 */
+	public void add(String key, Sequence sequence) 
+	{
+		sequenceRepository.saveAndFlush(sequence);
+	}//add
+
+	/**
+	 * Actualiza la información de una secuencia en el sistema
+	 * @param key Identificador (db primary key) de la secuencia
+	 * @param sequence La secuencia a actualizar
+	 * @return Estado anterior de la secuencia, si existe; null si no existe
+	 */
+	public Sequence update(Long key, Sequence sequence)
+	{
+		sequenceRepository.saveAndFlush(sequence);
+		return sequence;
+	}//update
+
+	/**
+	 * Actualiza la información de una secuencia en el sistema
+	 * @param key Identificador (business key) de la secuencia
+	 * @param sequence La secuencia a actualizar
+	 * @return Estado anterior de la secuencia, si existe; null si no existe
+	 */
+	public Sequence update(String key, Sequence sequence)
+	{
+		sequenceRepository.saveAndFlush(sequence);
+		return sequence;
+	}//update
+
+	/**
+	 * Remueve la secuencia del proveedor
+	 * @param key Identificador (primary key) de la secuencia a remover
+	 * @return Secuencia removida, si existe; null si no existe
+	 */
+	public Sequence remove( Long key)
+	{
+		Optional<Sequence> old = sequenceRepository.findById(key);
+		sequenceRepository.deleteById(key);
+		return old.isPresent()? old.get(): null;
+	}//remove
+
+	/**
+	 * Remueve la secuencia del proveedor
+	 * @param key Identificador (business key) de la secuencia a remover
+	 * @return Secuencia removida, si existe; null si no existe
+	 */
+	public Sequence remove( String key)
+	{
+		Optional<Sequence> old = sequenceRepository.findByCode(key);
+		if ( old.isPresent())
+		{
+			Sequence sequence =old.get();	
+			sequenceRepository.deleteById(sequence.getId());
+			return sequence;
+		}
+		return null;
+	}//remove
 
 }//SequenceService

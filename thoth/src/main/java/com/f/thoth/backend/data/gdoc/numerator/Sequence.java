@@ -105,6 +105,7 @@ public class Sequence extends Observable implements Comparable<Sequence>
       this.nombre     = nombre;
       this.prefijo    = prefijo;
       this.sufijo     = sufijo;
+      this.code       = buildCode();
       this.value      = new AtomicLong( initialValue);
       this.increment  = increment;
       this.status     = Status.OPEN;
@@ -120,7 +121,7 @@ public class Sequence extends Observable implements Comparable<Sequence>
    @PreUpdate
    public void prepareData()
    {
-      this.code = getCode();
+      this.code = buildCode();
    }//prepareData
 
    // ---------------------- Getters & Setters -----------------
@@ -184,6 +185,7 @@ public class Sequence extends Observable implements Comparable<Sequence>
        .append(" n observers["+ countObservers()+ "]")
        .append(" id["+ id+ ")")
        .append(" version["+ version+ "]")
+       .append("  code["+ code+ "]")
        .append(" tenant["+ tenant.getCode()+ "]")
        .append(" nombre["+ nombre+ "]\n")
        .append(" prefijo["+ prefijo+ "]")
@@ -200,13 +202,13 @@ public class Sequence extends Observable implements Comparable<Sequence>
    {
       return this.equals(that)?  0 :
              that == null?       1 :
-             this.getCode().compareTo(that.getCode());
+             this.code.compareTo(that.code);
 
    }// compareTo
 
    public String buildCode()
    {
-      return("["+ tenant.getId()+ "]"+ nombre+ "_"+ prefijo+ "_"+ sufijo).toUpperCase();
+      return ("["+ tenant.getId()+ "]"+ nombre+ "_"+ prefijo+ "_"+ sufijo).toUpperCase();
    }//buildCode
 
    // ----------------------- Logica ---------------------------
@@ -221,7 +223,7 @@ public class Sequence extends Observable implements Comparable<Sequence>
    public  String next()
    {
       if ( status != Status.OPEN )
-         throw new IllegalStateException("Secuencia ["+ tenant.getId()+ "]"+ nombre+ ","+ prefijo+ ","+ sufijo+ " está cerrada. No puede avanzar");
+         throw new IllegalStateException("Secuencia ["+ code+ "] está cerrada. No puede avanzar");
 
       long n =  value.addAndGet(increment);
       setChanged( );
@@ -259,16 +261,14 @@ public class Sequence extends Observable implements Comparable<Sequence>
     */
    public boolean  setGreatestValue( Long otherValue)
    {
-      boolean updated = false;
       synchronized(this)
       {
-         if ( this.value.get() < otherValue )
-         {
+         boolean updated = (this.value.get() < otherValue);
+         if (updated  )
             this.value.set( otherValue);
-            updated = true;
-         }
-      }
-      return updated;
+         
+         return updated;
+     }
    }//setGreatestValue
 
 }//Sequence
