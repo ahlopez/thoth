@@ -13,7 +13,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import com.f.thoth.backend.data.entity.User;
+import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.Expediente;
+import com.f.thoth.backend.data.gdoc.expediente.LeafExpediente;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
@@ -50,7 +52,7 @@ public class ExpedienteService implements FilterableCrudService<Expediente>, Per
          return find(pageable);
       }
    }//findAnyMatching
-   
+
 
    @Override public long countAnyMatching(Optional<String> filter)
    {
@@ -62,7 +64,7 @@ public class ExpedienteService implements FilterableCrudService<Expediente>, Per
          return n;
       }
    }//countAnyMatching
-   
+
 
    public Page<Expediente> find(Pageable pageable)
    {
@@ -73,12 +75,19 @@ public class ExpedienteService implements FilterableCrudService<Expediente>, Per
    {
       return expedienteRepository;
    }
-   
+
 
    @Override public Expediente createNew(User currentUser)
    {
+     BaseExpediente baseExpediente = new BaseExpediente();
+     baseExpediente.setTenant(ThothSession.getCurrentTenant());
+     baseExpediente.setCreatedBy(null/*TODO: currentUser*/);
+
+     LeafExpediente leafExpediente = new LeafExpediente();
+     leafExpediente.setExpediente(baseExpediente);
+
       Expediente expediente = new Expediente();
-      expediente.setTenant(ThothSession.getCurrentTenant());
+      expediente.setExpediente(leafExpediente);
       return expediente;
    }//createNew
 
@@ -91,7 +100,7 @@ public class ExpedienteService implements FilterableCrudService<Expediente>, Per
 
          return FilterableCrudService.super.save(currentUser, Expediente);
       } catch (DataIntegrityViolationException e) {
-         throw new UserFriendlyDataException("Ya hay un expediente con esa identificación. Por favor escoja un identificador único para el expediente");
+         throw new UserFriendlyDataException("Ya hay un expediente con esa identificaciÃ³n. Por favor escoja un identificador Ãºnico para el expediente");
       }
 
    }//save
@@ -99,12 +108,10 @@ public class ExpedienteService implements FilterableCrudService<Expediente>, Per
 
    //  ----- implements HierarchicalService ------
    @Override public List<Expediente> findAll() { return expedienteRepository.findAll(ThothSession.getCurrentTenant()); }
-
-   @Override public Optional<Expediente> findById(Long id)  { return expedienteRepository.findById( id);}
-
-   @Override public List<Expediente>  findByParent ( Expediente owner) { return expedienteRepository.findByParent(owner); }
-   @Override public int         countByParent ( Expediente owner) { return expedienteRepository.countByParent (owner); }
-   @Override public boolean     hasChildren   ( Expediente Expediente){ return expedienteRepository.countByChildren(Expediente) > 0; }
+   @Override public Optional<Expediente> findById(Long id)                  { return expedienteRepository.findById( id);}
+   @Override public List<Expediente>  findByParent ( Expediente owner)      { return expedienteRepository.findByParent(owner); }
+   @Override public int               countByParent ( Expediente owner)     { return expedienteRepository.countByParent (owner); }
+   @Override public boolean           hasChildren   ( Expediente Expediente){ return expedienteRepository.countByChildren(Expediente) > 0; }
 
    @Override public List<Expediente> findByNameLikeIgnoreCase (Tenant tenant, String name)
                           { return expedienteRepository.findByNameLikeIgnoreCase (tenant, name); }
@@ -122,15 +129,12 @@ public class ExpedienteService implements FilterableCrudService<Expediente>, Per
    }//findGrants
 
    @Override public List<Expediente> findObjectsGranted( Role role)
-   {
-      return expedienteRepository.findExpedientesGranted(role);
-   }
+           { return expedienteRepository.findExpedientesGranted(role); }
 
    public void grantRevoke( User currentUser, Role role, Set<Permission> newGrants, Set<Permission> newRevokes)
    {
       grant ( currentUser, role, newGrants);
       revoke( currentUser, role, newRevokes);
-
    }//grantRevoke
 
    public void grant( User currentUser, Role role, Set<Permission> newGrants)

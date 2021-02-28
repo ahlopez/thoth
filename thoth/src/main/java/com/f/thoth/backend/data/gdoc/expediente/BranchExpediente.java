@@ -26,150 +26,150 @@ import com.f.thoth.backend.data.security.UserGroup;
 @Table(name = "BRANCH_EXPEDIENTE")
 public class BranchExpediente extends AbstractEntity implements  NeedsProtection, HierarchicalEntity<BranchExpediente>, Comparable<BranchExpediente>
 {
-   @OneToOne
-   @NotNull  (message = "{evidentia.expediente.required}")
-   protected BaseExpediente       expediente;                 // Expediente that describes this branch
+	@OneToOne
+	@NotNull  (message = "{evidentia.expediente.required}")
+	protected BaseExpediente       expediente;                 // Expediente that describes this branch
 
-   @OneToMany
-   protected Set<BaseExpediente>  children;                   // Children of this expediente
+	@OneToMany
+	protected Set<BaseExpediente>  children;                   // Children of this expediente
 
-   // ------------- Constructors ------------------
-   public BranchExpediente()
-   {
-      super();
-      this.expediente = null;
-      this.children   = new TreeSet<>();
-   }//BranchExpediente null constructor
+	// ------------- Constructors ------------------
+	public BranchExpediente()
+	{
+		super();
+		this.expediente = null;
+		this.children   = new TreeSet<>();
+	}//BranchExpediente null constructor
 
-   public BranchExpediente( BaseExpediente expediente, Set<BaseExpediente> children)
-   {
-      super();
+	public BranchExpediente( BaseExpediente expediente, Set<BaseExpediente> children)
+	{
+		super();
 
-      if ( expediente == null )
-         throw new IllegalArgumentException("Expediente asociado a la rama no puede ser nulo");
+		if ( expediente == null )
+			throw new IllegalArgumentException("Expediente asociado a la rama no puede ser nulo");
 
-      this.expediente = expediente;
-      this.children   = (children == null? new TreeSet<>(): children);
+		this.expediente = expediente;
+		this.children   = (children == null? new TreeSet<>(): children);
 
-   }//BranchExpediente constructor
+	}//BranchExpediente constructor
 
-   // -------------- Getters & Setters ----------------
+	// -------------- Getters & Setters ----------------
 
-   public BaseExpediente       getExpediente() { return expediente;}
-   public void             setExpediente(BaseExpediente expediente){ this.expediente = expediente;}
+	public BaseExpediente       getExpediente() { return expediente;}
+	public void                 setExpediente(BaseExpediente expediente){ this.expediente = expediente;}
 
-   public Set<BaseExpediente>  getChildren() { return children;}
-   public void             setChildren( Set<BaseExpediente> children) { this.children = children;}
+	public Set<BaseExpediente>  getChildren() { return children;}
+	public void                 setChildren( Set<BaseExpediente> children) { this.children = children;}
 
-   public           String            getExpedienteCode() { return expediente.getExpedienteCode();}
+	public  String              getExpedienteCode() { return expediente.getExpedienteCode();}
 
-   // --------------------------- Implements HierarchicalEntity ---------------------------------------
+	// --------------------------- Implements HierarchicalEntity ---------------------------------------
 
-   @Override public String            getName()           { return expediente.getName();}
+	@Override public String            getName()           { return expediente.getName();}
 
-   @Override public String            getCode()           { return expediente.getCode();}
+	@Override public String            getCode()           { return expediente.getCode();}
 
-   @Override public BranchExpediente  getOwner()          { return expediente.getOwner();}
+	@Override public BranchExpediente  getOwner()          { return expediente.getOwner();}
 
-   @Override public String            formatCode()        { return expediente.formatCode();}
+	@Override public String            formatCode()        { return expediente.formatCode();}
 
-   // -----------------  Implements NeedsProtection ----------------
+	// -----------------  Implements NeedsProtection ----------------
 
-   public Integer                   getCategory()                           {return expediente.getCategory();}
-   public void                      setCategory(Integer category)           {expediente.setCategory(category);}
+	public Integer                   getCategory()                           {return expediente.getCategory();}
+	public void                      setCategory(Integer category)           {expediente.setCategory(category);}
 
-   public SingleUser                getUserOwner()                          {return expediente.getUserOwner();}
-   public void                      setUserOwner(SingleUser userOwner)      {expediente.setUserOwner(userOwner);}
+	public SingleUser                getUserOwner()                          {return expediente.getUserOwner();}
+	public void                      setUserOwner(SingleUser userOwner)      {expediente.setUserOwner(userOwner);}
 
-   public Role                      getRoleOwner()                          {return expediente.getRoleOwner();}
-   public void                      setRoleOwner(Role roleOwner)            {expediente.setRoleOwner(roleOwner);}
+	public Role                      getRoleOwner()                          {return expediente.getRoleOwner();}
+	public void                      setRoleOwner(Role roleOwner)            {expediente.setRoleOwner(roleOwner);}
 
-   public UserGroup                 getRestrictedTo()                       {return expediente.getRestrictedTo();}
-   public void                      setRestrictedTo(UserGroup restrictedTo) {expediente.setRestrictedTo(restrictedTo);}
+	public UserGroup                 getRestrictedTo()                       {return expediente.getRestrictedTo();}
+	public void                      setRestrictedTo(UserGroup restrictedTo) {expediente.setRestrictedTo(restrictedTo);}
 
-   @Override public ObjectToProtect getObjectToProtect()                    { return expediente.getObjectToProtect();}
+	@Override public ObjectToProtect getObjectToProtect()                    { return expediente.getObjectToProtect();}
 
-   @Override public boolean         canBeAccessedBy(Integer userCategory)   { return expediente.canBeAccessedBy(userCategory);}
+	@Override public boolean         canBeAccessedBy(Integer userCategory)   { return expediente.canBeAccessedBy(userCategory);}
 
-   @Override public boolean         isOwnedBy( SingleUser user)             { return expediente.isOwnedBy(user);}
+	@Override public boolean         isOwnedBy( SingleUser user)             { return expediente.isOwnedBy(user);}
 
-   @Override public boolean         isOwnedBy( Role role)                   { return expediente.isOwnedBy(role);}
+	@Override public boolean         isOwnedBy( Role role)                   { return expediente.isOwnedBy(role);}
 
-   @Override public boolean         isRestrictedTo( UserGroup userGroup)    { return expediente.isRestrictedTo(userGroup);}
+	@Override public boolean         isRestrictedTo( UserGroup userGroup)    { return expediente.isRestrictedTo(userGroup);}
 
-   @Override public boolean         admits( Role role)                      { return expediente.admits(role);}
+	@Override public boolean         admits( Role role)                      { return expediente.admits(role);}
 
-   @Override public void            grant( Permission  permission)          { expediente.grant(permission);}
+	@Override public void            grant( Permission  permission)          { expediente.grant(permission);}
 
-   @Override public void            revoke(Permission permission)           { expediente.revoke(permission);}
+	@Override public void            revoke(Permission permission)           { expediente.revoke(permission);}
 
-   // --------------- Object methods ---------------------
+	// --------------- Object methods ---------------------
 
-   @Override public boolean equals( Object o)
-   {
-      if (this == o)
-         return true;
+	@Override public boolean equals( Object o)
+	{
+		if (this == o)
+			return true;
 
-      if (!(o instanceof BranchExpediente ))
-         return false;
+		if (!(o instanceof BranchExpediente ))
+			return false;
 
-      BranchExpediente that = (BranchExpediente) o;
-      return this.id != null && this.id.equals(that.id);
+		BranchExpediente that = (BranchExpediente) o;
+		return this.id != null && this.id.equals(that.id);
 
-   }//equals
+	}//equals
 
-   @Override public int hashCode() { return id == null? 490277: id.hashCode();}
+	@Override public int hashCode() { return id == null? 490277: id.hashCode();}
 
-   @Override public String toString()
-   {
-      StringBuilder s = new StringBuilder();
-      s.append( "BranchExpediente{")
-       .append( super.toString())
-       .append( "expediente["+ expediente.getCode()+ "]\n children[");
+	@Override public String toString()
+	{
+		StringBuilder s = new StringBuilder();
+		s.append( "BranchExpediente{")
+		 .append( super.toString())
+		 .append( "expediente["+ expediente.getCode()+ "]\n children[");
 
-      for ( BaseExpediente child: children )
-         s.append( child.toString()+ "\n");
+		for ( BaseExpediente child: children )
+			s.append( child.toString()+ "\n");
 
-      s.append("]\n     }\n");
+		s.append("]\n     }\n");
 
-      return s.toString();
-   }//toString
+		return s.toString();
+	}//toString
 
-   @Override  public int compareTo(BranchExpediente that) { return that == null? 1: expediente.compareTo(that.getExpediente());}
+	@Override  public int compareTo(BranchExpediente that) { return that == null? 1: expediente.compareTo(that.getExpediente());}
 
-   // --------------- Logic ------------------------------
+	// --------------- Logic ------------------------------
 
-   public void openExpediente()
-   {
-      if ( !expediente.isOpen())
-      {
-         expediente.openExpediente();
-         for( BaseExpediente child: children)
-            child.openExpediente();
-      }
-   }//openExpediente
-
-
-   public void closeExpediente()
-   {
-      if( expediente.isOpen())
-      {
-         expediente.closeExpediente();
-         for( BaseExpediente child: children)
-            child.closeExpediente();
-      }
-   }//closeExpediente
+	public void openExpediente()
+	{
+		if ( !expediente.isOpen())
+		{
+			expediente.openExpediente();
+			for( BaseExpediente child: children)
+				child.openExpediente();
+		}
+	}//openExpediente
 
 
-   public boolean addChild(BaseExpediente child)
-   {
-      return children.add(child);
-   }//addChild
+	public void closeExpediente()
+	{
+		if( expediente.isOpen())
+		{
+			expediente.closeExpediente();
+			for( BaseExpediente child: children)
+				child.closeExpediente();
+		}
+	}//closeExpediente
 
-   public Iterator<BaseExpediente> childIterator()
-   {
-      return children.iterator();
-   }//childIterator
+
+	public boolean addChild(BaseExpediente child)
+	{
+		return children.add(child);
+	}//addChild
+
+	public Iterator<BaseExpediente> childIterator()
+	{
+		return children.iterator();
+	}//childIterator
 
 
 }//BranchExpediente

@@ -36,63 +36,63 @@ import com.vaadin.flow.router.Route;
 @Secured(Role.ADMIN)
 public class ExpedienteView extends HorizontalLayout
 {
-   private ClassificationForm    expedienteForm;
-   private ClassificationService classificationService;
-   private ExpedienteService     expedienteService;
-   private User                  currentUser;
+	private ClassificationForm    expedienteForm;
+	private ClassificationService classificationService;
+	private ExpedienteService     expedienteService;
+	private User                  currentUser;
 
-   private VerticalLayout        leftSection;
-   private VerticalLayout        content;
-   private VerticalLayout        rightSection;
-   
-   private HierarchicalSelector<Classification, HasValue.ValueChangeEvent<Classification>> ownerClass;
-   private Classification        currentClass= null;
-   
-   private Button add      = new Button("+ Nuevo Expediente");
-   private Button save     = new Button("Guardar expediente");
-   private Button delete   = new Button("Eliminar expediente");
-   private Button close    = new Button("Cancelar");
+	private VerticalLayout        leftSection;
+	private VerticalLayout        content;
+	private VerticalLayout        rightSection;
 
-   
-   /**********
-    *  1. Considerar utilizar solo dos páneles fijos y uno flotante Left-> Class selector right-> expediente selector  float-> edit expediente
-    *  2. >>>DONE-> Adicionar la columna de id al hierarchicalSelector
-    *  3. Ir por pasos. a) >>>DONE-> construir y probar el Class selector, b) construir el expediente selector c) Construir el expediente editor
-    *  4. Crear la configuración de debug del proyecto ver https://www.baeldung.com/spring-debugging
-    *  
-    */
+	private HierarchicalSelector<Classification, HasValue.ValueChangeEvent<Classification>> ownerClass;
+	private Classification        currentClass= null;
 
-   @Autowired
-   public ExpedienteView(ClassificationService classificationService, ExpedienteService expedienteService)
-   {
-	  this.classificationService = classificationService;
-      this.expedienteService     = expedienteService;
-      this.currentUser           = ThothSession.getCurrentUser();
-      
-      addClassName("main-view");
-      setSizeFull();
+	private Button add      = new Button("+ Nuevo Expediente");
+	private Button save     = new Button("Guardar expediente");
+	private Button delete   = new Button("Eliminar expediente");
+	private Button close    = new Button("Cancelar");
 
-      leftSection  = new VerticalLayout();
-      leftSection.addClassName  ("left-section");
-      leftSection.add(new H3 ("Gestión de Expedientes"));
 
-      content      = new VerticalLayout();
-      content.addClassName ("selector");
-      content.add( configureClassSelector());
-      content.setSizeFull();
-      
-      rightSection = new VerticalLayout();
-      rightSection.addClassName ("right-section");
-      rightSection.add(new Label("  "));
+	/**********
+	 *  1. Considerar utilizar solo dos páneles fijos y uno flotante Left-> Class selector right-> expediente selector  float-> edit expediente
+	 *  2. >>>DONE-> Adicionar la columna de id al hierarchicalSelector
+	 *  3. Ir por pasos. a) >>>DONE-> construir y probar el Class selector, b) construir el expediente selector c) Construir el expediente editor
+	 *  4. Crear la configuración de debug del proyecto ver https://www.baeldung.com/spring-debugging
+	 *  
+	 */
 
-      add(leftSection, content, rightSection);
-      
-      updateSelector();
-      closeEditor();
+	@Autowired
+	public ExpedienteView(ClassificationService classificationService, ExpedienteService expedienteService)
+	{
+		this.classificationService = classificationService;
+		this.expedienteService     = expedienteService;
+		this.currentUser           = ThothSession.getCurrentUser();
 
-    
-        
-/*
+		addClassName("main-view");
+		setSizeFull();
+
+		leftSection  = new VerticalLayout();
+		leftSection.addClassName  ("left-section");
+		leftSection.add(new H3 ("Gestión de Expedientes"));
+
+		content      = new VerticalLayout();
+		content.addClassName ("selector");
+		content.add( configureClassSelector());
+		content.setSizeFull();
+
+		rightSection = new VerticalLayout();
+		rightSection.addClassName ("right-section");
+		rightSection.add(new Label("  "));
+
+		add(leftSection, content, rightSection);
+
+		updateSelector();
+		closeEditor();
+
+
+
+		/*
       leftSection  = new VerticalLayout();
       leftSection.addClassName  ("left-section");
       leftSection.add(new H3 ("Clasificación del expediente"));
@@ -114,55 +114,55 @@ public class ExpedienteView extends HorizontalLayout
       HorizontalLayout panel=  new HorizontalLayout( content, rightSection);
       panel.setSizeFull();
       add( panel);
-*/
-   }//ExpedienteView
+		 */
+	}//ExpedienteView
 
-   protected String getBasePage() { return PAGE_EXPEDIENTES; }
+	protected String getBasePage() { return PAGE_EXPEDIENTES; }
 
 
-   private Component configureClassSelector()
-   {
-      ownerClass = new HierarchicalSelector<>(
-                           classificationService, 
-                           Grid.SelectionMode.SINGLE, 
-                           "Seleccione la clase a la que pertenece", 
-                           true,
-                           true,
-                           this::selectedOwnerClass
-                           );     
-      ownerClass.getElement().setAttribute("colspan", "3");
+	private Component configureClassSelector()
+	{
+		ownerClass = new HierarchicalSelector<>(
+				classificationService, 
+				Grid.SelectionMode.SINGLE, 
+				"Seleccione la clase a la que pertenece", 
+				true,
+				true,
+				this::selectedOwnerClass
+				);     
+		ownerClass.getElement().setAttribute("colspan", "3");
 
-      FormLayout form = new FormLayout(ownerClass);
-      form.setResponsiveSteps(
-            new ResponsiveStep("30em", 1),
-            new ResponsiveStep("30em", 2),
-            new ResponsiveStep("30em", 3),
-            new ResponsiveStep("30em", 4));
+		FormLayout form = new FormLayout(ownerClass);
+		form.setResponsiveSteps(
+				new ResponsiveStep("30em", 1),
+				new ResponsiveStep("30em", 2),
+				new ResponsiveStep("30em", 3),
+				new ResponsiveStep("30em", 4));
 
-      BeanValidationBinder<Classification> binder = new BeanValidationBinder<>(Classification.class);
-      binder.forField(ownerClass)
-            .bind("owner");
-      
-      return ownerClass;
+		BeanValidationBinder<Classification> binder = new BeanValidationBinder<>(Classification.class);
+		binder.forField(ownerClass)
+		.bind("owner");
 
-   }//configureClassSelector
-     
-   /*
+		return ownerClass;
+
+	}//configureClassSelector
+
+	/*
    private Component configureButtons()
    {      
       add.     addThemeVariants(ButtonVariant.LUMO_PRIMARY);
       save.    addThemeVariants(ButtonVariant.LUMO_PRIMARY);
       delete.  addThemeVariants(ButtonVariant.LUMO_ERROR);
       close.   addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-      
+
       save.addClickShortcut (Key.ENTER);
       close.addClickShortcut(Key.ESCAPE);
-      
+
       add .addClickListener  (click -> addClass());
       save.addClickListener  (click -> saveClass(currentClass));
       delete.addClickListener(click -> deleteClass(currentClass));
       close.addClickListener (click -> closeAll());
-      
+
       save.getElement().getStyle().set("margin-left", "auto");
       add .getElement().getStyle().set("margin-left", "auto");
 
@@ -172,7 +172,7 @@ public class ExpedienteView extends HorizontalLayout
       buttons.add( delete, save, close, add);
       return buttons;
    }//configureButtons
-    
+
 
    private ClassificationForm configureForm(List<Retention >retentionSchedules)
    {
@@ -182,22 +182,22 @@ public class ExpedienteView extends HorizontalLayout
       return expedienteForm;
 
    }//configureForm
-   */
-   
-   private void selectedOwnerClass(Classification owner)
-   {
-	  /*
-	   * 1. Guarde la clase en el estado de la sesión
-	   * 2. Ejecute el routing interno
-	   * 
-	   * (Las clases intermedias no pueden contener expedientes)
-	   */
-      this.currentClass = owner;
-      if (currentClass != null)
-         editClass(currentClass);
-   }//selectedOwnerClass
-   
-    /*
+	 */
+
+	private void selectedOwnerClass(Classification owner)
+	{
+		/*
+		 * 1. Guarde la clase en el estado de la sesión
+		 * 2. Ejecute el routing interno
+		 * 
+		 * (Las clases intermedias no pueden contener expedientes)
+		 */
+		this.currentClass = owner;
+		if (currentClass != null)
+			editClass(currentClass);
+	}//selectedOwnerClass
+
+	/*
    private void addClass()
    {
       currentClass = new Classification();
@@ -207,15 +207,15 @@ public class ExpedienteView extends HorizontalLayout
       currentClass.setLevel(level);
       editClass(currentClass);
    }//addClass
-   
-   
-   
+
+
+
    private void saveClass( Classification expediente)
    {
       expedienteService.save(currentUser, expediente);
       closeEditor();
       currentClass = null;
-     
+
    }//saveClass
 
 
@@ -232,27 +232,27 @@ public class ExpedienteView extends HorizontalLayout
       updateSelector();
       closeEditor();
    }//deleteClass
-    */
-   
-    
-   private void editClass(Classification ownerClass)
-   {
-	  
-      if (ownerClass == null)
-      {
-    	 System.out.println("Owner class = null");
-    	 Notification.show("Owner class = null");
-         closeEditor();
-      } else
-      {
-    	  System.out.println("Selected class["+ownerClass.getClassCode()+ "-> "+ ownerClass.formatCode()+ "->"+  ownerClass.getPath()+ "]");
-    	  Notification.show("Selected class["+ownerClass.getClassCode()+ "-> "+ ownerClass.formatCode()+ "->"+  ownerClass.getPath()+ "]");
-    	  
-    	  
-    	  getUI().ifPresent(ui -> ui.navigate(ExpedienteHierarchyView.class, ownerClass.formatCode()));
-         //content.removeClassName("selector");
+	 */
 
-    	  /*
+
+	private void editClass(Classification ownerClass)
+	{
+
+		if (ownerClass == null)
+		{
+			System.out.println("Owner class = null");
+			Notification.show("Owner class = null");
+			closeEditor();
+		} else
+		{
+			System.out.println("Selected class["+ownerClass.getClassCode()+ "-> "+ ownerClass.formatCode()+ "->"+  ownerClass.getPath()+ "]");
+			Notification.show("Selected class["+ownerClass.getClassCode()+ "-> "+ ownerClass.formatCode()+ "->"+  ownerClass.getPath()+ "]");
+
+
+			getUI().ifPresent(ui -> ui.navigate(ExpedienteHierarchyView.class, ownerClass.formatCode()));
+			//content.removeClassName("selector");
+
+			/*
          if( expediente.isPersisted())
             expediente = expedienteService.load(expediente.getId());
 
@@ -260,37 +260,37 @@ public class ExpedienteView extends HorizontalLayout
          expedienteForm.setClassification(expediente);
          rightSection.setVisible(true);
          expedienteForm.addClassName("selected-item-form");
-         */
-      }
-   }//editClass
-   
-  
+			 */
+		}
+	}//editClass
 
-   private void closeEditor()
-   {
-	   /*
+
+
+	private void closeEditor()
+	{
+		/*
       expedienteForm.setClassification(null);
       expedienteForm.setVisible(false);
       expedienteForm.removeClassName("selected-item-form");
-      */
+		 */
 
-   }//closeEditor
-   
-   
-    private void closeAll()
-   {
-      closeEditor();
-      currentClass = null;
-      ownerClass.resetSelector();      
-   }//closeAll
-   
+	}//closeEditor
 
-   private void updateSelector()
-   {
-     ownerClass.refresh();
-   }//updateSelector
 
-   /*
+	private void closeAll()
+	{
+		closeEditor();
+		currentClass = null;
+		ownerClass.resetSelector();      
+	}//closeAll
+
+
+	private void updateSelector()
+	{
+		ownerClass.refresh();
+	}//updateSelector
+
+	/*
    private void saveClassification(ClassificationForm.SaveEvent event)
    {
       Classification expediente = event.getClassification();
@@ -298,6 +298,6 @@ public class ExpedienteView extends HorizontalLayout
       updateSelector();
       closeEditor();
    }//saveClassification
-   */
+	 */
 
 }//ExpedienteView
