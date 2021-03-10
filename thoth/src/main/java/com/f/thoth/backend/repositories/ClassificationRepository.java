@@ -45,7 +45,7 @@ public interface ClassificationRepository extends JpaRepository<Classification, 
    List<Classification> findRoots( Tenant tenant);
    
    @EntityGraph(value= Classification.BRIEF, type = EntityGraphType.FETCH)
-   @Query("SELECT c FROM Classification c WHERE (c.tenant=?1 AND (SELECT count(l) FROM Classification WHERE l.owner = c) = 0)")
+   @Query("SELECT c FROM Classification c WHERE (c.tenant=?1 AND (SELECT count(leaf) FROM Classification WHERE leaf.owner = c) = 0)")
    List<Classification> findLeaves( Tenant tenant);
 
    @Query("SELECT count(c) FROM Classification c WHERE (c.owner is null and ?1 is null) or (c.owner=?1)")

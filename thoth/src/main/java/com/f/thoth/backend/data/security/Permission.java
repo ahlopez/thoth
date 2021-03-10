@@ -11,7 +11,6 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
-import com.f.thoth.backend.data.entity.User;
 
 /**
  * Representa un permiso de acceso a un objeto que requiere protección

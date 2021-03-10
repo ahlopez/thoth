@@ -12,7 +12,7 @@ import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.security.Operation;
 import com.f.thoth.backend.data.security.Role;
-import com.f.thoth.backend.data.security.SingleUser;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.service.OperationService;
 import com.f.thoth.ui.MainView;
@@ -89,7 +89,7 @@ public class OperationView extends AbstractEvidentiaCrudView<Operation>
       roleOwner.setAllowCustomValue(true);
       roleOwner.setPageSize(20);
 
-      ComboBox<SingleUser> userOwner = new ComboBox<>();  // TODO: Considerar el uso del HierarchicalSelector
+      ComboBox<User> userOwner = new ComboBox<>();  // TODO: Considerar el uso del HierarchicalSelector
       userOwner.setLabel("Usuario dueño");
       userOwner.getElement().setAttribute("colspan", "2");
       userOwner.setRequired(false);

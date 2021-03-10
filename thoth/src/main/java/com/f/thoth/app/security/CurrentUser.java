@@ -1,9 +1,9 @@
 package com.f.thoth.app.security;
 
-import com.f.thoth.backend.data.entity.User;
+import com.f.thoth.backend.data.security.User;
 
 @FunctionalInterface
-public interface CurrentUser {
-
+public interface CurrentUser 
+{
    User getUser();
 }

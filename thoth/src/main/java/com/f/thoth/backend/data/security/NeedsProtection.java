@@ -10,7 +10,7 @@ public interface NeedsProtection
 
    public boolean canBeAccessedBy(Integer userCategory);
 
-   public boolean isOwnedBy( SingleUser user);
+   public boolean isOwnedBy( User user);
 
    public boolean isOwnedBy( Role role);
 

@@ -10,30 +10,30 @@ import org.springframework.data.jpa.repository.EntityGraph.EntityGraphType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
-import com.f.thoth.backend.data.security.SingleUser;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.Tenant;
 
-public interface SingleUserRepository extends JpaRepository<SingleUser, Long>
+public interface SingleUserRepository extends JpaRepository<User, Long>
 {
-   @EntityGraph(value = SingleUser.BRIEF, type = EntityGraphType.LOAD)
-   @Query("SELECT g FROM SingleUser g where g.tenant=?1")
-   Page<SingleUser> findBy(Tenant tenant, Pageable page);
+   @EntityGraph(value = User.BRIEF, type = EntityGraphType.LOAD)
+   @Query("SELECT u FROM User u where u.tenant=?1")
+   Page<User> findBy(Tenant tenant, Pageable page);
 
-   @EntityGraph(value = SingleUser.FULL, type = EntityGraphType.LOAD)
-   Optional<SingleUser> findById(Long id);
+   @EntityGraph(value = User.FULL, type = EntityGraphType.LOAD)
+   Optional<User> findById(Long id);
 
-   @EntityGraph(value = SingleUser.BRIEF, type = EntityGraphType.LOAD)
-   @Query("SELECT u FROM SingleUser u where u.tenant=?1")
-   List<SingleUser> findAll(Tenant tenant);
+   @EntityGraph(value = User.BRIEF, type = EntityGraphType.LOAD)
+   @Query("SELECT u FROM User u where u.tenant=?1")
+   List<User> findAll(Tenant tenant);
 
-   @Query("SELECT count(u) FROM SingleUser u where u.tenant=?1")
+   @Query("SELECT count(u) FROM User u where u.tenant=?1")
    long countAll(Tenant tenant);
 
-   @EntityGraph(value = SingleUser.BRIEF, type = EntityGraphType.LOAD)
-   @Query("SELECT u FROM SingleUser u where u.tenant=?1 and u.name like ?2")
-   Page<SingleUser> findByNameLikeIgnoreCase(Tenant tenant, String name, Pageable page);
+   @EntityGraph(value = User.BRIEF, type = EntityGraphType.LOAD)
+   @Query("SELECT u FROM User u where u.tenant=?1 and u.name like ?2")
+   Page<User> findByNameLikeIgnoreCase(Tenant tenant, String name, Pageable page);
 
-   @Query("SELECT count(u) FROM SingleUser u where u.tenant=?1 and u.name like ?2")
+   @Query("SELECT count(u) FROM User u where u.tenant=?1 and u.name like ?2")
    long countByNameLikeIgnoreCase(Tenant tenant, String name);
 
 }//SingleUserRepository

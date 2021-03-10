@@ -8,7 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.Role;
-import com.f.thoth.backend.data.entity.User;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.service.UserService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.crud.AbstractEvidentiaCrudView;
@@ -29,26 +29,31 @@ import com.vaadin.flow.router.Route;
 @Route(value = PAGE_USERS, layout = MainView.class)
 @PageTitle(Constant.TITLE_USERS)
 @Secured(Role.ADMIN)
-public class UsersView extends AbstractEvidentiaCrudView<User> {
+public class UsersView extends AbstractEvidentiaCrudView<User> 
+{
 
    @Autowired
-   public UsersView(UserService service, CurrentUser currentUser, PasswordEncoder passwordEncoder) {
+   public UsersView(UserService service, CurrentUser currentUser, PasswordEncoder passwordEncoder) 
+   {
       super(User.class, service, new Grid<>(), createForm(passwordEncoder), currentUser);
    }
 
    @Override
-   public void setupGrid(Grid<User> grid) {
+   public void setupGrid(Grid<User> grid) 
+   {
       grid.addColumn(User::getEmail).setWidth("270px").setHeader("Email").setFlexGrow(5);
-      grid.addColumn(u -> u.getFirstName() + " " + u.getLastName()).setHeader("Name").setWidth("200px").setFlexGrow(5);
-      grid.addColumn(User::getRole).setHeader("Role").setWidth("150px");
+      grid.addColumn(u -> u.getName() + " " + u.getLastName()).setHeader("Name").setWidth("200px").setFlexGrow(5);
+    //  grid.addColumn(User::getRole).setHeader("Role").setWidth("150px");
    }
 
    @Override
-   protected String getBasePage() {
+   protected String getBasePage() 
+   {
       return PAGE_USERS;
    }
 
-   private static BinderCrudEditor<User> createForm(PasswordEncoder passwordEncoder) {
+   private static BinderCrudEditor<User> createForm(PasswordEncoder passwordEncoder) 
+   {
       EmailField email = new EmailField("Email (login)");
       email.getElement().setAttribute("colspan", "2");
       TextField first = new TextField("First name");
@@ -67,10 +72,10 @@ public class UsersView extends AbstractEvidentiaCrudView<User> {
       role.setItemLabelGenerator(s -> s != null ? s : "");
       role.setDataProvider(roleProvider);
 
-      binder.bind(first, "firstName");
-      binder.bind(last, "lastName");
+      binder.bind(first, "name");
+      binder.bind(last,  "lastName");
       binder.bind(email, "email");
-      binder.bind(role, "role");
+      binder.bind(role,  "role");
 
       binder.forField(password)
             .withValidator(pass -> pass.matches("^(|(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{6,})$"),

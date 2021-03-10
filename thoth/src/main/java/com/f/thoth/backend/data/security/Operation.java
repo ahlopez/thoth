@@ -150,8 +150,8 @@ public class Operation extends BaseEntity implements NeedsProtection, Hierarchic
    public Integer               getCategory() {return objectToProtect.getCategory();}
    public void                  setCategory(Integer category) {objectToProtect.setCategory(category);}
 
-   public SingleUser            getUserOwner() {return objectToProtect.getUserOwner();}
-   public void                  setUserOwner(SingleUser userOwner) {objectToProtect.setUserOwner(userOwner);}
+   public User            getUserOwner() {return objectToProtect.getUserOwner();}
+   public void                  setUserOwner(User userOwner) {objectToProtect.setUserOwner(userOwner);}
 
    public Role                  getRoleOwner() {return objectToProtect.getRoleOwner();}
    public void                  setRoleOwner(Role roleOwner) {objectToProtect.setRoleOwner(roleOwner);}
@@ -174,7 +174,7 @@ public class Operation extends BaseEntity implements NeedsProtection, Hierarchic
 
    @Override public boolean         canBeAccessedBy(Integer userCategory) { return objectToProtect.canBeAccessedBy(userCategory);}
 
-   @Override public boolean         isOwnedBy( SingleUser user)           { return objectToProtect.isOwnedBy(user);}
+   @Override public boolean         isOwnedBy( User user)           { return objectToProtect.isOwnedBy(user);}
 
    @Override public boolean         isOwnedBy( Role role)                 { return objectToProtect.isOwnedBy(role);}
 

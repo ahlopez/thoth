@@ -10,7 +10,6 @@ import java.util.TreeSet;
 
 import javax.jcr.Session;
 
-import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.BranchExpediente;
@@ -21,7 +20,7 @@ import com.f.thoth.backend.data.gdoc.expediente.VolumeInstance;
 import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.security.ObjectToProtect;
-import com.f.thoth.backend.data.security.SingleUser;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.BaseExpedienteRepository;
@@ -110,7 +109,7 @@ public class ExpedienteGenerator
 	}//registerExpedientes
 
 
-	private BaseExpediente creeExpediente( Tenant tenant, SingleUser user, Classification classificationClass, BranchExpediente owner)
+	private BaseExpediente creeExpediente( Tenant tenant, User user, Classification classificationClass, BranchExpediente owner)
 	{
 		int branchProbability =  random.nextInt(100);
 		if ( branchProbability < 20)
@@ -124,7 +123,7 @@ public class ExpedienteGenerator
 	}//creeRootExpediente
 
 
-	private BranchExpediente creeBranchExpediente(Tenant tenant, SingleUser user, Classification classificationClass, BranchExpediente owner)
+	private BranchExpediente creeBranchExpediente(Tenant tenant, User user, Classification classificationClass, BranchExpediente owner)
 	{
 		BaseExpediente   base   = createBase( classificationClass,  owner);
 		BranchExpediente branch = new BranchExpediente();
@@ -143,7 +142,7 @@ public class ExpedienteGenerator
 	
 	
 	
-	private LeafExpediente	creeLeafExpediente(Tenant tenant, SingleUser user, Classification classificationClass, BranchExpediente owner)
+	private LeafExpediente	creeLeafExpediente(Tenant tenant, User user, Classification classificationClass, BranchExpediente owner)
 	{
 		BaseExpediente   base   = createBase( classificationClass,  owner);
 		LeafExpediente   leaf   = new LeafExpediente();

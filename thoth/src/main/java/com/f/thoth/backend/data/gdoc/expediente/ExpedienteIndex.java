@@ -39,7 +39,7 @@ import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
-import com.f.thoth.backend.data.security.SingleUser;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.UserGroup;
 
 /**
@@ -115,7 +115,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
         protected NodeType  type;                               // Node type: {EXPEDIENTE}
 
         @ManyToOne
-        protected SingleUser        createdBy;                  // User that created this expediente
+        protected User        createdBy;                  // User that created this expediente
 
         @NotNull(message = "{evidentia.class.required}")
         @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
@@ -221,8 +221,8 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
         public Classification   getClassificationClass() { return classificationClass;}
         public void             setClassificationClass( Classification classificationClass) { this.classificationClass = classificationClass;}
 
-        public SingleUser       getCreatedBy() { return createdBy;}
-        public void             setCreatedBy( SingleUser createdBy){ this.createdBy = createdBy;}
+        public User       getCreatedBy() { return createdBy;}
+        public void             setCreatedBy( User createdBy){ this.createdBy = createdBy;}
 
         public LocalDateTime    getDateOpened() { return dateOpened;}
         public void             setDateOpened( LocalDateTime dateOpened) { this.dateOpened = dateOpened;}
@@ -307,8 +307,8 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
         public Integer               getCategory() {return objectToProtect.getCategory();}
         public void                  setCategory(Integer category) {objectToProtect.setCategory(category);}
 
-        public SingleUser            getUserOwner() {return objectToProtect.getUserOwner();}
-        public void                  setUserOwner(SingleUser userOwner) {objectToProtect.setUserOwner(userOwner);}
+        public User            getUserOwner() {return objectToProtect.getUserOwner();}
+        public void                  setUserOwner(User userOwner) {objectToProtect.setUserOwner(userOwner);}
 
         public Role                  getRoleOwner() {return objectToProtect.getRoleOwner();}
         public void                  setRoleOwner(Role roleOwner) {objectToProtect.setRoleOwner(roleOwner);}
@@ -347,7 +347,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
 
         @Override public boolean         canBeAccessedBy(Integer userCategory) { return objectToProtect.canBeAccessedBy(userCategory);}
 
-        @Override public boolean         isOwnedBy( SingleUser user)           { return objectToProtect.isOwnedBy(user);}
+        @Override public boolean         isOwnedBy( User user)           { return objectToProtect.isOwnedBy(user);}
 
         @Override public boolean         isOwnedBy( Role role)                 { return objectToProtect.isOwnedBy(role);}
 

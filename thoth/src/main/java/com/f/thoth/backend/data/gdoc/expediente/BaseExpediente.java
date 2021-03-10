@@ -35,7 +35,7 @@ import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
-import com.f.thoth.backend.data.security.SingleUser;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.UserGroup;
 
 /**
@@ -127,7 +127,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
    @NotNull  (message = "{evidentia.creator.required}")
    @ManyToOne
-   protected SingleUser        createdBy;                  // User that created this expediente
+   protected User        createdBy;                  // User that created this expediente
 
    @NotNull(message = "{evidentia.class.required}")
    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -181,7 +181,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
       buildCode();
    }//BaseExpediente null constructor
 
-   public BaseExpediente( String expedienteCode, String path, String name, SingleUser createdBy, Classification classificationClass,
+   public BaseExpediente( String expedienteCode, String path, String name, User createdBy, Classification classificationClass,
                           SchemaValues metadata, LocalDateTime dateOpened, LocalDateTime dateClosed, BranchExpediente owner,
                           Boolean open, Set<IndexEntry> entries, Set<String> keywords, String mac)
    {
@@ -254,8 +254,8 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
    public Classification    getClassificationClass() { return classificationClass;}
    public void              setClassificationClass( Classification classificationClass) { this.classificationClass = classificationClass;}
 
-   public SingleUser        getCreatedBy() { return createdBy;}
-   public void              setCreatedBy( SingleUser createdBy){ this.createdBy = createdBy;}
+   public User        getCreatedBy() { return createdBy;}
+   public void              setCreatedBy( User createdBy){ this.createdBy = createdBy;}
 
    public LocalDateTime     getDateOpened() { return dateOpened;}
    public void              setDateOpened( LocalDateTime dateOpened) { this.dateOpened = dateOpened;}
@@ -364,8 +364,8 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
    public Integer                   getCategory()                           {return objectToProtect.getCategory();}
    public void                      setCategory(Integer category)           {objectToProtect.setCategory(category);}
 
-   public SingleUser                getUserOwner()                          {return objectToProtect.getUserOwner();}
-   public void                      setUserOwner(SingleUser userOwner)      {objectToProtect.setUserOwner(userOwner);}
+   public User                getUserOwner()                          {return objectToProtect.getUserOwner();}
+   public void                      setUserOwner(User userOwner)      {objectToProtect.setUserOwner(userOwner);}
 
    public Role                      getRoleOwner()                          {return objectToProtect.getRoleOwner();}
    public void                      setRoleOwner(Role roleOwner)            {objectToProtect.setRoleOwner(roleOwner);}
@@ -377,7 +377,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
    @Override public boolean         canBeAccessedBy(Integer userCategory)   { return objectToProtect.canBeAccessedBy(userCategory);}
 
-   @Override public boolean         isOwnedBy( SingleUser user)             { return objectToProtect.isOwnedBy(user);}
+   @Override public boolean         isOwnedBy( User user)             { return objectToProtect.isOwnedBy(user);}
 
    @Override public boolean         isOwnedBy( Role role)                   { return objectToProtect.isOwnedBy(role);}
 

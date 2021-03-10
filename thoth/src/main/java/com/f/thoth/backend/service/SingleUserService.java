@@ -10,13 +10,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import com.f.thoth.backend.data.entity.User;
-import com.f.thoth.backend.data.security.SingleUser;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.SingleUserRepository;
 
 @Service
-public class SingleUserService implements FilterableCrudService<SingleUser>
+public class SingleUserService implements FilterableCrudService<User>
 {
    private final SingleUserRepository SingleUserRepository;
 
@@ -26,13 +25,13 @@ public class SingleUserService implements FilterableCrudService<SingleUser>
       this.SingleUserRepository = SingleUserRepository;
    }
 
-   public List<SingleUser> findAll()
+   public List<User> findAll()
    {
       return SingleUserRepository.findAll(ThothSession.getCurrentTenant());
    }//findAll
 
    @Override
-   public Page<SingleUser> findAnyMatching(Optional<String> filter, Pageable pageable)
+   public Page<User> findAnyMatching(Optional<String> filter, Pageable pageable)
    {
       if (filter.isPresent())
       {
@@ -55,31 +54,31 @@ public class SingleUserService implements FilterableCrudService<SingleUser>
       }
    }//countAnyMatching
 
-   public Page<SingleUser> find(Pageable pageable)
+   public Page<User> find(Pageable pageable)
    {
       return SingleUserRepository.findBy(ThothSession.getCurrentTenant(), pageable);
    }
 
    @Override
-   public JpaRepository<SingleUser, Long> getRepository()
+   public JpaRepository<User, Long> getRepository()
    {
       return SingleUserRepository;
    }
 
    @Override
-   public SingleUser createNew(User currentUser)
+   public User createNew(User currentUser)
    {
-      SingleUser SingleUser = new SingleUser();
-      SingleUser.setTenant(ThothSession.getCurrentTenant());
-      return SingleUser;
+      User singleUser = new User();
+      singleUser.setTenant(ThothSession.getCurrentTenant());
+      return singleUser;
    }//createNew
 
    @Override
-   public SingleUser save(User currentUser, SingleUser entity)
+   public User save(User currentUser, User entity)
    {
       try
       {
-         SingleUser newSingleUser =  FilterableCrudService.super.save(currentUser, entity);
+         User newSingleUser =  FilterableCrudService.super.save(currentUser, entity);
          return newSingleUser;
       } catch (DataIntegrityViolationException e)
       {

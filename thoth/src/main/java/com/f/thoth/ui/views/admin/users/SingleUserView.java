@@ -14,7 +14,7 @@ import org.springframework.security.access.annotation.Secured;
 import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.security.Role;
-import com.f.thoth.backend.data.security.SingleUser;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.UserGroup;
 import com.f.thoth.backend.service.RoleService;
 import com.f.thoth.backend.service.SingleUserService;
@@ -52,14 +52,14 @@ import com.vaadin.flow.router.Route;
 @Route(value = PAGE_SINGLE_USERS, layout = MainView.class)
 @PageTitle(TITLE_SINGLE_USERS)
 @Secured(com.f.thoth.backend.data.Role.ADMIN)
-public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
+public class SingleUserView extends AbstractEvidentiaCrudView<User>
 {
    private static final Converter<LocalDate, LocalDate> DATE_CONVERTER   = new LocalDateToLocalDate();
    private static final Converter<String, String>       STRING_CONVERTER = new StringToString("");
    private static final Converter<String, Integer>    CATEGORY_CONVERTER =
                     new StringToIntegerConverter( Constant.DEFAULT_CATEGORY, "Categoría inválida");
 
-   private static SingleUser        singleUser = null;
+   private static User        singleUser = null;
    private static Set<UserGroup>    userGroups = new TreeSet<>();
    private static Set<Role>         userRoles  = new TreeSet<>();
 
@@ -78,19 +78,19 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
    @Autowired
    public SingleUserView(SingleUserService singleUserService, UserGroupService userGroupService, RoleService roleService, CurrentUser currentUser)
    {
-      super(SingleUser.class, singleUserService, new Grid<>(), createForm( userGroupService, roleService), currentUser);
+      super(User.class, singleUserService, new Grid<>(), createForm( userGroupService, roleService), currentUser);
    }
 
    @Override
-   protected void setupGrid(Grid<SingleUser> grid)
+   protected void setupGrid(Grid<User> grid)
    {
       grid.addColumn(user -> user.getName()    .toLowerCase()).setHeader("Nombre").setFlexGrow(13);
       grid.addColumn(user -> user.getLastName().toLowerCase()).setHeader("Apellido").setFlexGrow(13);
       grid.addColumn(user -> user.getEmail()   .toLowerCase()).setHeader("Correo").setFlexGrow(15);
       grid.addColumn(user -> user.isLocked() ? "SI" : "--").setHeader("Bloqueado?").setFlexGrow(3);
       grid.addColumn(user -> user.getCategory() == null? "0" : user.getCategory().toString()).setHeader("Categoría").setFlexGrow(6);
-      grid.addColumn(SingleUser::getFromDate).setHeader("Desde").setFlexGrow(10);
-      grid.addColumn(SingleUser::getToDate)  .setHeader("Hasta").setFlexGrow(10);
+      grid.addColumn(User::getFromDate).setHeader("Desde").setFlexGrow(10);
+      grid.addColumn(User::getToDate)  .setHeader("Hasta").setFlexGrow(10);
       grid.addColumn(user -> ""+ user.getGroups().size()).setHeader("Grupos").setFlexGrow(5);
       grid.addColumn(user -> ""+ user.getRoles() .size()).setHeader("Roles") .setFlexGrow(5);
 
@@ -100,7 +100,7 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
    @Override
    protected String getBasePage() { return PAGE_SINGLE_USERS;}
 
-   private static BinderCrudEditor<SingleUser> createForm( UserGroupService userGroupService, RoleService roleService)
+   private static BinderCrudEditor<User> createForm( UserGroupService userGroupService, RoleService roleService)
    {
       userGService   = userGroupService;
       roleSvice      = roleService;
@@ -160,7 +160,7 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
 
       FormLayout form = new FormLayout(name, lastName, password, email,  blocked, category, fromDate, toDate, buttonsComponent);
 
-      BeanValidationBinder<SingleUser> binder = new BeanValidationBinder<>(SingleUser.class);
+      BeanValidationBinder<User> binder = new BeanValidationBinder<>(User.class);
 
       binder.forField(name)
             .withConverter(STRING_CONVERTER)
@@ -202,14 +202,14 @@ public class SingleUserView extends AbstractEvidentiaCrudView<SingleUser>
       groupsDialog = createGroupsSelector(userGService);
       rolesDialog  = createRolesSelector(roleSvice);
 
-      return new BinderCrudEditor<SingleUser>(binder, form);
+      return new BinderCrudEditor<User>(binder, form);
    }//BinderCrudEditor
 
 
-   @Override protected void setupCrudEventListeners(CrudEntityPresenter<SingleUser> entityPresenter)
+   @Override protected void setupCrudEventListeners(CrudEntityPresenter<User> entityPresenter)
    {
-      Consumer<SingleUser> onSuccess = entity -> navigateToEntity(null);
-      Consumer<SingleUser> onFail    = entity -> {  throw new RuntimeException("La operación no pudo ser ejecutada."); };
+      Consumer<User> onSuccess = entity -> navigateToEntity(null);
+      Consumer<User> onFail    = entity -> {  throw new RuntimeException("La operación no pudo ser ejecutada."); };
 
       addEditListener(e ->
       {

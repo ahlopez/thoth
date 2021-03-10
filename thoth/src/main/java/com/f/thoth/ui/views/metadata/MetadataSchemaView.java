@@ -7,9 +7,9 @@ import java.util.TreeSet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
-import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.service.MetadataService;
 import com.f.thoth.backend.service.SchemaService;
 import com.f.thoth.ui.MainView;

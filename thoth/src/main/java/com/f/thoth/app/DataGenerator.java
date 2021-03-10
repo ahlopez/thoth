@@ -34,7 +34,6 @@ import com.f.thoth.backend.data.entity.Order;
 import com.f.thoth.backend.data.entity.OrderItem;
 import com.f.thoth.backend.data.entity.PickupLocation;
 import com.f.thoth.backend.data.entity.Product;
-import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.gdoc.classification.Level;
 import com.f.thoth.backend.data.gdoc.classification.Retention;
 import com.f.thoth.backend.data.gdoc.metadata.Field;
@@ -43,6 +42,7 @@ import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.gdoc.metadata.Type;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.UserGroup;
 import com.f.thoth.backend.repositories.BaseExpedienteRepository;
 import com.f.thoth.backend.repositories.BranchExpedienteRepository;
@@ -737,12 +737,12 @@ public class DataGenerator implements HasLogger
    private User createUser(String email, String firstName, String lastName, String passwordHash, String role, boolean locked)
    {
       User user = new User();
-      user.setEmail(email);
-      user.setFirstName(firstName);
-      user.setLastName(lastName);
+      user.setEmail       (email);
+      user.setName        (firstName);
+      user.setLastName    (lastName);
       user.setPasswordHash(passwordHash);
-      user.setRole(role);
-      user.setLocked(locked);
+      user.setRole        (role);
+      user.setLocked      (locked);
       return user;
    }//createUser
 

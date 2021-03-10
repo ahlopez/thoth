@@ -87,11 +87,11 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 
    @NotNull(message = "{evidentia.date.required}")
    protected LocalDate  toDate;                      // Fecha hasta la cual puede usar el sistema (inclusive)
-   
+
    protected String  workspace;                      // Raíz del workspace del repositorio asignado al Tenant
 
    protected boolean locked = false;                 // Está el Tenant bloqueado? (No puede usar el sistema)
-      
+
 
    /*
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
@@ -107,7 +107,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
    @JoinColumn(name="user_id")
    @BatchSize(size = 100)
    @Valid
-   private Set<SingleUser>  singleUsers;
+   private Set<User>  singleUsers;
 
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
    @OrderColumn
@@ -126,13 +126,13 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 
    @Transient
    private Set<Role>             roles;
-   
+
    @Transient
-   private Set<SingleUser>       singleUsers;
-   
+   private Set<User>             singleUsers;
+
    @Transient
    private Set<UserGroup>        userGroups;
-   
+
    @Transient
    private Set<DocumentType>     docTypes;
 
@@ -169,9 +169,9 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 
 
    protected void buildCode()
-   { 
-	   this.code = this.code == null? (name == null? "/COD" : "/"+ name): this.code;
-	   this.workspace = code;
+   {
+      this.code = this.code == null? (name == null? "/COD" : "/"+ name): this.code;
+      this.workspace = code;
    }//buildCode
 
    private void init()
@@ -234,8 +234,8 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
    public Set<Role>          getRoles() { return roles;}
    public void               setRoles( Set<Role> roles) { this.roles = roles;}
 
-   public Set<SingleUser>    getSingleUsers() { return singleUsers;}
-   public void               setUsers( Set<SingleUser> singleUsers){ this.singleUsers = singleUsers;}
+   public Set<User>    getSingleUsers() { return singleUsers;}
+   public void               setUsers( Set<User> singleUsers){ this.singleUsers = singleUsers;}
 
    public Set<UserGroup>     getUserGroups() { return userGroups;}
    public void               setUserGroups( Set<UserGroup> userGroups){ this.userGroups = userGroups;}
@@ -265,8 +265,8 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
    @Override
    public String toString()
    {
-      return "Tenant{ id["+ id+ "] version["+ version+ "] name["+ name+ "] "+ 
-             "code["+  code+ "] workspace["+ workspace+ "] "+ 
+      return "Tenant{ id["+ id+ "] version["+ version+ "] name["+ name+ "] "+
+             "code["+  code+ "] workspace["+ workspace+ "] "+
              "roles["+  roles.size()+ "] singleUsers["+ singleUsers.size()+ "] "+
              "userGroups["+ userGroups.size()+ "] docTypes["+ docTypes.size()+ "]}";
    }//toString
@@ -294,9 +294,9 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 
    public void addUserGroup( UserGroup group) { userGroups.add(group); }
 
-   public SingleUser getSingleUserById( String userCode)
+   public User getSingleUserById( String userCode)
    {
-      for ( SingleUser s: singleUsers )
+      for ( User s: singleUsers )
       {
          if ( s.getCode().equals(userCode))
             return s;

@@ -100,7 +100,7 @@ public class OrderDetails extends PolymerTemplate<OrderDetails.Model> {
    {
       @Include({ "id", "dueDate.day", "dueDate.weekday", "dueDate.date", "dueTime", "state", "pickupLocation.name",
          "customer.fullName", "customer.phoneNumber", "customer.details", "items.product.name", "items.comment",
-         "items.quantity", "items.product.price", "history.message", "history.createdBy.firstName",
+         "items.quantity", "items.product.price", "history.message", "history.createdBy.name",
          "history.timestamp", "history.newState", "totalPrice" })
       @Encode(value = LongToStringConverter.class, path = "id")
       @Encode(value = StorefrontLocalDateConverter.class, path = "dueDate")

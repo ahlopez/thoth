@@ -36,31 +36,31 @@ public abstract class Usuario extends BaseEntity implements NeedsProtection, Com
    @NotEmpty(message = "{evidentia.name.required}")
    @NotBlank(message = "{evidentia.name.required}")
    @Size(min = 1, max = 255, message="{evidentia.name.min.max.length}")
-   protected String        name;                 // user first name
+   protected String            name;                 // user first name
 
    @NotNull     (message= "{evidentia.category.required}")
    @Min(value=0, message= "{evidentia.category.minvalue}")
    @Max(value=5, message= "{evidentia.category.maxvalue}")
-   protected Integer         userCategory;   // Security category
+   protected Integer           userCategory;         // Security category
 
    @NotNull(message = "{evidentia.objectToProtect.required}")
    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-   protected ObjectToProtect  objectToProtect;   // Associated security object
+   protected ObjectToProtect   objectToProtect;      // Associated security object
 
    @NotNull(message = "{evidentia.date.required}")
    @PastOrPresent(message="{evidentia.date.pastorpresent}")
-   protected LocalDate      fromDate;            // initial date it can be used. default = now
+   protected LocalDate         fromDate;             // Initial date it can be used. default = now
 
    @NotNull(message = "{evidentia.date.required}")
-   protected LocalDate      toDate;              // final date it can be used. default end of year
+   protected LocalDate         toDate;               // Final date it can be used. default end of year
 
    @OneToMany( fetch = FetchType.EAGER)
    @JoinColumn(name="role_id")
    @BatchSize(size = 20)
    @Valid
-   protected Set<Role>       roles;               // roles assigned to it
+   protected Set<Role>         roles;                // Roles assigned to it
 
-   protected boolean         locked;              // is the user locked?
+   protected boolean           locked;               // Is the user locked?
 
    // ----------------- Constructor -----------------
    public Usuario()
@@ -130,7 +130,7 @@ public abstract class Usuario extends BaseEntity implements NeedsProtection, Com
 
    @Override public boolean         canBeAccessedBy(Integer userCategory) { return objectToProtect.canBeAccessedBy(userCategory);}
 
-   @Override public boolean         isOwnedBy( SingleUser user)           { return objectToProtect.isOwnedBy(user);}
+   @Override public boolean         isOwnedBy( User user)           { return objectToProtect.isOwnedBy(user);}
 
    @Override public boolean         isOwnedBy( Role role)                 { return objectToProtect.isOwnedBy(role);}
 

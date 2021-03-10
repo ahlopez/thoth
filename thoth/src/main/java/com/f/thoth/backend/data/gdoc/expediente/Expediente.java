@@ -12,7 +12,7 @@ import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
-import com.f.thoth.backend.data.security.SingleUser;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.UserGroup;
 
 @Entity
@@ -69,8 +69,8 @@ public class Expediente  extends AbstractEntity implements  NeedsProtection, Com
       public Integer                   getCategory()                           {return expediente.getCategory();}
       public void                      setCategory(Integer category)           {expediente.setCategory(category);}
 
-      public SingleUser                getUserOwner()                          {return expediente.getUserOwner();}
-      public void                      setUserOwner(SingleUser userOwner)      {expediente.setUserOwner(userOwner);}
+      public User                getUserOwner()                          {return expediente.getUserOwner();}
+      public void                      setUserOwner(User userOwner)      {expediente.setUserOwner(userOwner);}
 
       public Role                      getRoleOwner()                          {return expediente.getRoleOwner();}
       public void                      setRoleOwner(Role roleOwner)            {expediente.setRoleOwner(roleOwner);}
@@ -82,7 +82,7 @@ public class Expediente  extends AbstractEntity implements  NeedsProtection, Com
 
       @Override public boolean         canBeAccessedBy(Integer userCategory)   { return expediente.canBeAccessedBy(userCategory);}
 
-      @Override public boolean         isOwnedBy( SingleUser user)             { return expediente.isOwnedBy(user);}
+      @Override public boolean         isOwnedBy( User user)             { return expediente.isOwnedBy(user);}
 
       @Override public boolean         isOwnedBy( Role role)                   { return expediente.isOwnedBy(role);}
 

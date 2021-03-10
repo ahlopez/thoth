@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
-import com.f.thoth.backend.data.security.SingleUser;
+import com.f.thoth.backend.data.security.User;
 
 /**
  * Representa una entrada de un indice de expedientes
@@ -38,7 +38,7 @@ public class IndexEntry extends BaseEntity implements Comparable<IndexEntry>
    private ExpedienteIndex     expediente;
    
    @ManyToOne
-   private SingleUser    user;
+   private User    user;
    
    private LocalDate     date;
    
@@ -52,7 +52,7 @@ public class IndexEntry extends BaseEntity implements Comparable<IndexEntry>
       buildCode();
    }
 
-   public IndexEntry(Action entryType, ExpedienteIndex expediente, SingleUser user, LocalDate date, String reference)
+   public IndexEntry(Action entryType, ExpedienteIndex expediente, User user, LocalDate date, String reference)
    {
       if( entryType == null)
          throw new IllegalArgumentException("Tipo de entrada del índice no puede ser nula");
@@ -83,8 +83,8 @@ public class IndexEntry extends BaseEntity implements Comparable<IndexEntry>
    public ExpedienteIndex        getExpediente() {  return expediente;}
    public void             setExpediente(ExpedienteIndex expediente) {this.expediente = expediente;}
 
-   public SingleUser       getUser() {return user;}
-   public void             setUser(SingleUser user) {this.user = user;}
+   public User       getUser() {return user;}
+   public void             setUser(User user) {this.user = user;}
 
    public LocalDate        getDate() {return date;}
    public void             setDate(LocalDate date) {this.date = date;}

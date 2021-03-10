@@ -15,7 +15,7 @@ public final class EntityUtil
       className.put( "Operation",           "Operación");
       className.put( "Permission",          "Permiso");
       className.put( "Role",                "Rol");
-      className.put( "SingleUser",          "Usuario");
+      className.put( "User",                "Usuario");
       className.put( "UserGroup",           "Grupo de Usuarios");
       className.put( "Metadata",            "Metadato");
       className.put( "Field",               "Campo");

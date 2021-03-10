@@ -22,7 +22,7 @@ import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
-import com.f.thoth.backend.data.security.SingleUser;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.UserGroup;
 import com.f.thoth.ui.utils.FormattingUtils;
 
@@ -222,7 +222,7 @@ public class Clazz extends BaseEntity implements NeedsProtection, HierarchicalEn
 
    @Override public boolean canBeAccessedBy (Integer userCategory) { return this.category != null && userCategory != null && this.category.compareTo( userCategory) <= 0; }
 
-   @Override public boolean isOwnedBy( SingleUser user)            { return false;}
+   @Override public boolean isOwnedBy( User user)            { return false;}
 
    @Override public boolean isOwnedBy( Role role)                  { return roleOwner != null && roleOwner.equals(role); }
 
