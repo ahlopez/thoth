@@ -12,7 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import com.f.thoth.backend.data.entity.User;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.BranchExpediente;
 import com.f.thoth.backend.data.security.ObjectToProtect;
@@ -74,14 +74,14 @@ public class BranchExpedienteService implements FilterableCrudService<BranchExpe
 
    @Override public BranchExpediente createNew(User currentUser)
    {
-	  BaseExpediente   baseExpediente   = new BaseExpediente();
+     BaseExpediente   baseExpediente   = new BaseExpediente();
       baseExpediente.setTenant(ThothSession.getCurrentTenant());
       baseExpediente.setCreatedBy(null /*TODO: currentUser*/);
-      
+
       BranchExpediente branchExpediente = new BranchExpediente();
-      branchExpediente.setExpediente(baseExpediente);      
+      branchExpediente.setExpediente(baseExpediente);
       return branchExpediente;
-      
+
    }//createNew
 
    @Override public BranchExpediente save(User currentUser, BranchExpediente expediente)

@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import com.f.thoth.backend.data.entity.PickupLocation;
-import com.f.thoth.backend.data.entity.User;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.repositories.PickupLocationRepository;
 
 @Service

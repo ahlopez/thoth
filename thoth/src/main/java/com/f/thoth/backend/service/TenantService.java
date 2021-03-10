@@ -9,24 +9,24 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import com.f.thoth.backend.data.entity.User;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.repositories.TenantRepository;
 
 @Service
-public class TenantService implements FilterableCrudService<Tenant> 
+public class TenantService implements FilterableCrudService<Tenant>
 {
 
    private final TenantRepository tenantRepository;
 
    @Autowired
-   public TenantService(TenantRepository tenantRepository) 
+   public TenantService(TenantRepository tenantRepository)
    {
       this.tenantRepository = tenantRepository;
    }
 
    @Override
-   public Page<Tenant> findAnyMatching(Optional<String> filter, Pageable pageable) 
+   public Page<Tenant> findAnyMatching(Optional<String> filter, Pageable pageable)
    {
       if (filter.isPresent()) {
          String repositoryFilter = "%" + filter.get() + "%";
@@ -35,14 +35,14 @@ public class TenantService implements FilterableCrudService<Tenant>
          return find(pageable);
       }
    }//findAnyMatching
-   
+
    public Optional<Tenant> findById( Long id)
    {
-	   return tenantRepository.findById(id);
+      return tenantRepository.findById(id);
    }
 
    @Override
-   public long countAnyMatching(Optional<String> filter) 
+   public long countAnyMatching(Optional<String> filter)
    {
       if (filter.isPresent()) {
          String repositoryFilter = "%" + filter.get() + "%";
@@ -52,25 +52,25 @@ public class TenantService implements FilterableCrudService<Tenant>
       }
    }//countAnyMatching
 
-   public Page<Tenant> find(Pageable pageable) 
+   public Page<Tenant> find(Pageable pageable)
    {
       return tenantRepository.findBy(pageable);
    }
 
    @Override
-   public JpaRepository<Tenant, Long> getRepository() 
+   public JpaRepository<Tenant, Long> getRepository()
    {
       return tenantRepository;
    }
 
    @Override
-   public Tenant createNew(User currentUser) 
+   public Tenant createNew(User currentUser)
    {
       return new Tenant();
    }
 
    @Override
-   public Tenant save(User currentUser, Tenant entity) 
+   public Tenant save(User currentUser, Tenant entity)
    {
       try {
          return FilterableCrudService.super.save(currentUser, entity);

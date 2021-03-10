@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.f.thoth.backend.data.entity.User;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.repositories.UserRepository;
 
 /**
@@ -43,7 +43,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
       User user = userRepository.findByEmailIgnoreCase(username);
       if (null == user) {
-         throw new UsernameNotFoundException("No user present with username: " + username);
+         throw new UsernameNotFoundException("No hay un usuario con nombre[" + username+ "]");
       } else {
          return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPasswordHash(),
                Collections.singletonList(new SimpleGrantedAuthority(user.getRole())));

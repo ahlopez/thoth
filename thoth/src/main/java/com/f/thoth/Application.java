@@ -9,7 +9,7 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import com.f.thoth.app.security.SecurityConfiguration;
-import com.f.thoth.backend.data.entity.User;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.classification.Level;
 import com.f.thoth.backend.data.gdoc.classification.Retention;

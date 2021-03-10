@@ -9,6 +9,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.f.thoth.backend.data.OrderState;
+import com.f.thoth.backend.data.security.User;
 
 @Entity
 public class HistoryItem extends AbstractEntity {

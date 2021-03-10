@@ -17,7 +17,7 @@ import com.f.thoth.backend.data.OrderState;
 import com.f.thoth.backend.data.entity.Order;
 import com.f.thoth.backend.data.entity.PickupLocation;
 import com.f.thoth.backend.data.entity.Product;
-import com.f.thoth.backend.data.entity.User;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.service.PickupLocationService;
 import com.f.thoth.backend.service.ProductService;
 import com.f.thoth.ui.crud.CrudEntityDataProvider;

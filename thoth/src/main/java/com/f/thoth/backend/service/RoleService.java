@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import com.f.thoth.backend.data.entity.User;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.RoleRepository;
@@ -28,7 +28,7 @@ public class RoleService implements FilterableCrudService<Role>
 
    public List<Role> findAll()
    {
-      return roleRepository.findAll(ThothSession.getCurrentTenant());  
+      return roleRepository.findAll(ThothSession.getCurrentTenant());
    }//findAll
 
    @Override

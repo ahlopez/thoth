@@ -26,6 +26,7 @@ import javax.validation.constraints.NotNull;
 import org.hibernate.annotations.BatchSize;
 
 import com.f.thoth.backend.data.OrderState;
+import com.f.thoth.backend.data.security.User;
 
 @Entity(name = "OrderInfo") // "Order" is a reserved word
 @NamedEntityGraphs({@NamedEntityGraph(name = Order.ENTITY_GRAPTH_BRIEF, attributeNodes = {

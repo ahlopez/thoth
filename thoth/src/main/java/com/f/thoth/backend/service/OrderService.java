@@ -26,11 +26,12 @@ import com.f.thoth.backend.data.OrderState;
 import com.f.thoth.backend.data.entity.Order;
 import com.f.thoth.backend.data.entity.OrderSummary;
 import com.f.thoth.backend.data.entity.Product;
-import com.f.thoth.backend.data.entity.User;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.repositories.OrderRepository;
 
 @Service
-public class OrderService implements CrudService<Order> {
+public class OrderService implements CrudService<Order> 
+{
 
    private final OrderRepository orderRepository;
 

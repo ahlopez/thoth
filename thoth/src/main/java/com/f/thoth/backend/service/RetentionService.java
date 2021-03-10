@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import com.f.thoth.backend.data.entity.User;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.gdoc.classification.Retention;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.RetentionRepository;
@@ -28,7 +28,7 @@ public class RetentionService implements FilterableCrudService<Retention>
 
    public List<Retention> findAll()
    {
-      return retentionRepository.findAll(ThothSession.getCurrentTenant());  
+      return retentionRepository.findAll(ThothSession.getCurrentTenant());
    }//findAll
 
    @Override
@@ -43,7 +43,7 @@ public class RetentionService implements FilterableCrudService<Retention>
       }
    }//findAnyMatching
 
-   
+
    public List<Retention> findAnyMatching(Optional<String> filter)
    {
       if (filter.isPresent())

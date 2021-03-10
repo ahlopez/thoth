@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import com.f.thoth.backend.data.entity.User;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.SchemaRepository;
@@ -29,7 +29,7 @@ public class SchemaService implements FilterableCrudService<Schema>
 
    public List<Schema> findAll()
    {
-      return schemaRepository.findAll(ThothSession.getCurrentTenant());  
+      return schemaRepository.findAll(ThothSession.getCurrentTenant());
    }//findAll
 
    public List<Schema> findAnyMatching(Optional<String> filter)
@@ -42,13 +42,13 @@ public class SchemaService implements FilterableCrudService<Schema>
          return findAll();
       }
    }//findAnyMatching
-   
+
    public Schema findById( Long id)
    {
       Optional<Schema> schema = schemaRepository.findById(id);
       return  schema.isPresent()? schema.get(): null;
    }//findById
-   
+
    @Override
    public Page<Schema> findAnyMatching(Optional<String> filter, Pageable pageable)
    {
@@ -111,7 +111,7 @@ public class SchemaService implements FilterableCrudService<Schema>
    {
       schemaRepository.delete(entity);
    }
-   
-   
+
+
 
 }//SchemaService

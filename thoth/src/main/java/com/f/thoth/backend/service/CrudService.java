@@ -5,7 +5,7 @@ import javax.persistence.EntityNotFoundException;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.f.thoth.backend.data.entity.AbstractEntity;
-import com.f.thoth.backend.data.entity.User;
+import com.f.thoth.backend.data.security.User;
 
 public interface CrudService<T extends AbstractEntity> 
 {

@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import com.f.thoth.backend.data.entity.User;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.gdoc.metadata.Metadata;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.MetadataRepository;
@@ -28,7 +28,7 @@ public class MetadataService implements FilterableCrudService<Metadata>
 
    public List<Metadata> findAll()
    {
-      return metadataRepository.findAll(ThothSession.getCurrentTenant());  
+      return metadataRepository.findAll(ThothSession.getCurrentTenant());
    }//findAll
 
    @Override

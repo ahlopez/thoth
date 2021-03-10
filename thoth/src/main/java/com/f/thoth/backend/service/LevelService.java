@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import com.f.thoth.backend.data.entity.User;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.gdoc.classification.Level;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.LevelRepository;
@@ -29,7 +29,7 @@ public class LevelService implements FilterableCrudService<Level>
 
    public List<Level> findAll()
    {
-      return levelRepository.findAll(ThothSession.getCurrentTenant());  
+      return levelRepository.findAll(ThothSession.getCurrentTenant());
    }//findAll
 
    @Override
@@ -44,7 +44,7 @@ public class LevelService implements FilterableCrudService<Level>
       }
    }//findAnyMatching
 
-   
+
    public List<Level> findAnyMatching(Optional<String> filter)
    {
       if (filter.isPresent())

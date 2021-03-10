@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import com.f.thoth.app.HasLogger;
 import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.entity.HierarchicalEntity;
-import com.f.thoth.backend.data.entity.User;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.service.PermissionService;
@@ -29,14 +29,14 @@ public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements Ha
       this.currentUser = currentUser.getUser();
 
    }//PermissionPresenter
-   
+
 
    public List<E> loadGrants( Role role )
-   {  
+   {
       return service.findObjectsGranted(role);
    }//loadGrants
-   
-   
+
+
    public void grantRevoke( Collection<E> objectsGranted, Role role, Period period )
    {
       List<Permission> oldGrants  = service.findGrants(role);
@@ -47,12 +47,12 @@ public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements Ha
 
    }//grantRevoke
 
-   
+
    private Set<Permission> getNewGrants( Collection<E> objectsGranted, List<Permission> oldGrants, Role role, Period period)
    {
       Set<Permission> newGrants  = new TreeSet<>();
-      objectsGranted.forEach (obj -> 
-      {  
+      objectsGranted.forEach (obj ->
+      {
          boolean nuevo= true;
          for (Permission oGrant: oldGrants)
          {
@@ -63,19 +63,19 @@ public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements Ha
             }
          }
          if (nuevo)
-            newGrants.add(  new Permission(role, obj.getObjectToProtect(), period.getFromDate(), period.getToDate()));        
+            newGrants.add(  new Permission(role, obj.getObjectToProtect(), period.getFromDate(), period.getToDate()));
       });
-      
+
       return newGrants;
-      
+
    }//getNewGrants
-   
+
 
    private Set<Permission> getNewRevokes( Collection<E> objectsGranted, List<Permission> oldGrants, Role role, Period period)
    {
       Set<Permission> newRevokes = new TreeSet<>();
-      oldGrants.forEach (oldPermit -> 
-      {  
+      oldGrants.forEach (oldPermit ->
+      {
          boolean still= false;
          for (E  obj: objectsGranted)
          {
@@ -86,11 +86,11 @@ public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements Ha
             }
          }
          if (!still)
-            newRevokes.add(  new Permission(role, oldPermit.getObjectToProtect(), period.getFromDate(), period.getToDate()));        
+            newRevokes.add(  new Permission(role, oldPermit.getObjectToProtect(), period.getFromDate(), period.getToDate()));
       });
-      
+
       return newRevokes;
-      
+
    }//getNewRevokes
 
 
