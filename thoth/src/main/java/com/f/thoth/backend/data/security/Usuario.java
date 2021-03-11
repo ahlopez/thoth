@@ -190,5 +190,21 @@ public abstract class Usuario extends BaseEntity implements NeedsProtection, Com
    }
 
    public abstract boolean canAccess( NeedsProtection object);
+   
+   public String getRole() 
+   { 
+	   StringBuilder s = new StringBuilder();
+	   for ( Role r: roles)
+	   {   s.append(s.length() > 0? ",": "")
+			.append(r.getName());
+	   }
+	   return s.toString();
+   }//getRole
+   
+   public void setRole(String roleName)
+   {
+	   roles.add(new Role(roleName));
+   }//setRole
+
 
 }//grantRole
