@@ -9,13 +9,18 @@ import org.springframework.boot.web.servlet.support.SpringBootServletInitializer
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import com.f.thoth.app.security.SecurityConfiguration;
-import com.f.thoth.backend.data.security.User;
+import com.f.thoth.backend.data.entity.Order;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.classification.Level;
 import com.f.thoth.backend.data.gdoc.classification.Retention;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
+import com.f.thoth.backend.data.gdoc.expediente.BranchExpediente;
+import com.f.thoth.backend.data.gdoc.expediente.Expediente;
 import com.f.thoth.backend.data.gdoc.expediente.ExpedienteIndex;
 import com.f.thoth.backend.data.gdoc.expediente.IndexEntry;
+import com.f.thoth.backend.data.gdoc.expediente.LeafExpediente;
+import com.f.thoth.backend.data.gdoc.expediente.Volume;
+import com.f.thoth.backend.data.gdoc.expediente.VolumeInstance;
 import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.gdoc.metadata.Metadata;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
@@ -24,6 +29,7 @@ import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.repositories.ClassificationRepository;
 import com.f.thoth.backend.repositories.LevelRepository;
 import com.f.thoth.backend.repositories.OperationRepository;
@@ -62,13 +68,19 @@ import com.f.thoth.ui.MainView;
             Level.class,
             Permission.class,
             BaseExpediente.class,
+            LeafExpediente.class,
+            BranchExpediente.class,
+            Expediente.class,
+            Volume.class,
+            VolumeInstance.class,
             ExpedienteIndex.class,
             IndexEntry.class,
             Schema.class,
             SchemaValues.class,
             Metadata.class,
             DocumentType.class,
-            Retention.class
+            Retention.class,
+            Order.class
          },
            exclude = ErrorMvcAutoConfiguration.class
       )
@@ -95,6 +107,11 @@ import com.f.thoth.ui.MainView;
            Level.class,
            Permission.class,
            BaseExpediente.class,
+           BranchExpediente.class,
+           LeafExpediente.class,
+           Expediente.class,
+           Volume.class,
+           VolumeInstance.class,
            ExpedienteIndex.class,
            IndexEntry.class,
            Schema.class,
@@ -102,6 +119,7 @@ import com.f.thoth.ui.MainView;
            SchemaValues.class,
            DocumentType.class,
            Retention.class,
+           Order.class
          }
       )
 public class Application extends SpringBootServletInitializer

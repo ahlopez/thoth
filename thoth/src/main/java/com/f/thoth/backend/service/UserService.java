@@ -30,8 +30,8 @@ public class UserService implements FilterableCrudService<User>
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return getRepository().findByEmailLikeIgnoreCaseOrFirstNameLikeIgnoreCaseOrLastNameLikeIgnoreCaseOrRoleLikeIgnoreCase(
-                                repositoryFilter, repositoryFilter, repositoryFilter, repositoryFilter, pageable);
+         return getRepository().findByEmailLikeIgnoreCaseOrNameLikeIgnoreCaseOrLastNameLikeIgnoreCase(
+                                repositoryFilter, repositoryFilter, repositoryFilter, pageable);
       } else
       {
          return find(pageable);
@@ -44,8 +44,8 @@ public class UserService implements FilterableCrudService<User>
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return userRepository.countByEmailLikeIgnoreCaseOrFirstNameLikeIgnoreCaseOrLastNameLikeIgnoreCaseOrRoleLikeIgnoreCase(
-         repositoryFilter, repositoryFilter, repositoryFilter, repositoryFilter);
+         return userRepository.countByEmailLikeIgnoreCaseOrNameLikeIgnoreCaseOrLastNameLikeIgnoreCase(
+         repositoryFilter, repositoryFilter, repositoryFilter);
       } else
       {
          return count();

@@ -20,9 +20,9 @@ import com.f.thoth.backend.data.gdoc.expediente.VolumeInstance;
 import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.security.ObjectToProtect;
-import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.repositories.BaseExpedienteRepository;
 import com.f.thoth.backend.repositories.BranchExpedienteRepository;
 import com.f.thoth.backend.repositories.ClassificationRepository;
@@ -268,14 +268,19 @@ public class ExpedienteGenerator
 
 
 
-	private Set<String> generateKeywords()
+	private String generateKeywords()
 	{
-		Set<String> keywords = new TreeSet<>();
+		StringBuilder keywords = new StringBuilder();
 		int nKeywords = getRandom(1,3);
 		for( int i = 0; i < nKeywords; i++)
-			keywords.add( getRandom(KEYWORD_NAMES));
+		{
+			if (i > 0)
+				keywords.append(",");
+			
+			keywords.append( getRandom(KEYWORD_NAMES));
+		}
 
-		return keywords;
+		return keywords.toString();
 	}//generateKeywords
 
 

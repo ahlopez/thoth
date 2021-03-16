@@ -4,6 +4,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -19,12 +21,14 @@ import com.f.thoth.backend.data.security.UserGroup;
 @Table(name = "VOLUME")
 public class Volume extends AbstractEntity implements  NeedsProtection, Comparable<Volume>
 {
+   @ManyToOne
    @NotNull  (message = "{evidentia.expediente.required}")
    protected LeafExpediente       expediente;                              // Leaf expediente associated to the volume
 
    @NotNull  (message = "{evidentia.expediente.required}")
    protected Integer              currentInstance;                         // Current instace of this volume
 
+   @OneToMany
    @NotNull  (message = "{evidentia.volume_instances.required}")
    protected Set<VolumeInstance>  instances;                               // Set of volume instances
 

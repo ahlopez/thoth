@@ -11,7 +11,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
@@ -52,10 +51,13 @@ import com.f.thoth.backend.data.security.UserGroup;
                                         @NamedAttributeNode("tenant"),
                                         @NamedAttributeNode("code"),
                                         @NamedAttributeNode("name"),
+                                        @NamedAttributeNode("type"),
                                         @NamedAttributeNode("owner"),
                                         @NamedAttributeNode("dateOpened"),
                                         @NamedAttributeNode("dateClosed"),
-                                        @NamedAttributeNode("classCode"),
+                                        @NamedAttributeNode("classificationClass"),
+                                        @NamedAttributeNode("path"),
+                                        @NamedAttributeNode("open"),
                                         @NamedAttributeNode("path"),
                                         @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF)
                         },
@@ -73,12 +75,16 @@ import com.f.thoth.backend.data.security.UserGroup;
                                         @NamedAttributeNode("tenant"),
                                         @NamedAttributeNode("code"),
                                         @NamedAttributeNode("name"),
+                                        @NamedAttributeNode("type"),
                                         @NamedAttributeNode("owner"),
+                                        @NamedAttributeNode("createdBy"),
                                         @NamedAttributeNode("dateOpened"),
                                         @NamedAttributeNode("dateClosed"),
-                                        @NamedAttributeNode("classCode"),
+                                        @NamedAttributeNode("classificationClass"),
                                         @NamedAttributeNode("path"),
                                         @NamedAttributeNode("metadata"),
+                                        @NamedAttributeNode("location"),
+                                        @NamedAttributeNode("mac"),
                                         @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)
                         },
                         subgraphs = @NamedSubgraph(name = ObjectToProtect.FULL,
@@ -89,6 +95,8 @@ import com.f.thoth.backend.data.security.UserGroup;
                                         @NamedAttributeNode("restrictedTo"),
                                         @NamedAttributeNode("acl")
                         })
+                        // TODO:  Ojo, cargar el subgraph del Set<IndexEntry> entries
+                        // TODO:  Ojo, cargar el subraph del Set<String> keywords
                         )
 })
 
@@ -104,7 +112,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
         @NotEmpty (message = "{evidentia.name.required}")
         @Size(max = 255)
         @Column(unique = true)
-        protected String          name;                         // Expediente name
+        protected String            name;                       // Expediente name
 
         @NotNull(message = "{evidentia.objectToProtect.required}")
         @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
@@ -112,10 +120,10 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
 
         @NotNull(message = "{evidentia.level.required}")
         @Enumerated(EnumType.STRING)
-        protected NodeType  type;                               // Node type: {EXPEDIENTE}
+        protected NodeType         type;                        // Node type: {EXPEDIENTE}
 
         @ManyToOne
-        protected User        createdBy;                  // User that created this expediente
+        protected User             createdBy;                   // User that created this expediente
 
         @NotNull(message = "{evidentia.class.required}")
         @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
@@ -123,38 +131,36 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
 
         @NotNull(message = "evidentia.metadata.required")
         @OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-        protected SchemaValues metadata;                        // Metadata values of the associated expediente
+        protected SchemaValues      metadata;                   // Metadata values of the associated expediente
 
         @NotNull(message = "{evidentia.dateopened.required}")
-        protected LocalDateTime  dateOpened;                    // Date expediente was opened
+        protected LocalDateTime     dateOpened;                 // Date expediente was opened
 
         @NotNull(message = "{evidentia.dateclosed.required}")
-        protected LocalDateTime  dateClosed;                    // Date expediente was closed
+        protected LocalDateTime     dateClosed;                 // Date expediente was closed
 
         @ManyToOne
-        protected ExpedienteIndex owner;                        //  Expediente to which this SUBEXPEDIENTE/VOLUMEN belongs
+        protected ExpedienteIndex    owner;                     // Expediente to which this SUBEXPEDIENTE/VOLUMEN belongs
 
         @NotNull(message = "{evidentia.expedientecode.required}")
-        protected String    expedienteCode;                     //  expediente code
+        protected String             expedienteCode;            // Expediente code
 
-        protected String    path;                               //  Node path in document repository
+        protected String             path;                      // Node path in document repository
 
         @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
         @JoinColumn(name="entry_id")
         @BatchSize(size = 50)
-        public Set<IndexEntry> entries;
+        public Set<IndexEntry>       entries;                   // Entries in the index
 
         @NotNull(message = "{evidentia.open.required}")
-        protected boolean           open;                 // Is the expediente currently open?
+        protected boolean            open;                      // Is the expediente currently open?
 
-        @ManyToMany
-        protected Set<String>       keywords;             // Search keywords
+        protected String             keywords;                  // Search keywords
 
-        @ManyToOne
-        protected String            location;             // Signatura topogr�fica
+        protected String             location;                  // Signatura topográfica
 
         @NotNull(message = "{evidentia.mac.required}")
-        public String               mac;                  // Message authentication code
+        public String                mac;                       // Message authentication code
 
         // ------------- Constructors ------------------
         public ExpedienteIndex()
@@ -246,8 +252,8 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
         public void             setEntries(Set<IndexEntry> entries){ this.entries = entries;}
         public int              size() { return entries.size();}
 
-        public Set<String>      getKeywords() { return keywords;}
-        public void             setKeywords( Set<String> keywords) { this.keywords = keywords;}
+        public String           getKeywords() { return keywords;}
+        public void             setKeywords( String keywords) { this.keywords = keywords;}
 
         public String           getLocation() { return location;}
         public void             setLocation(String location) { this.location = location;}
@@ -288,6 +294,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
                 .append( " path="+ path)
                 .append( " mac=["+ mac+ "]")
                 .append("\n     }\n");
+                //TODO:  Revisar que estén todos los campos
 
                 return s.toString();
         }//toString

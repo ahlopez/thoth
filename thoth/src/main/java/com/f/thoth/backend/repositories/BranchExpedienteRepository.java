@@ -32,7 +32,7 @@ public interface BranchExpedienteRepository extends JpaRepository<BranchExpedien
    Page<BranchExpediente> findByNameLikeIgnoreCase(Tenant tenant, String name, Pageable page);
 
    @Query("SELECT count(branch) FROM BranchExpediente branch, BaseExpediente base WHERE "+
-          "base.tenant=?1 AND base.name like ?2 AND base.id = branch.expediente.id")
+          "base.tenant=?1 AND base.name LIKE ?2 AND base.id = branch.expediente.id")
    Page<BranchExpediente> countByNameLikeIgnoreCase(Tenant tenant, String name, Pageable page);
 
 
@@ -44,11 +44,11 @@ public interface BranchExpedienteRepository extends JpaRepository<BranchExpedien
    List<BranchExpediente> findByParent( BranchExpediente parent);
 
    @Query("SELECT count(branch) FROM BranchExpediente branch, BaseExpediente base WHERE "+
-          "((e.owner IS null AND ?1 is null) OR (base.owner=?1.expediente) AND base.id = branch.expediente.id")
+          "((branch.owner IS null AND ?1 is null) OR (base.owner=?1.expediente) AND base.id = branch.expediente.id")
    int countByParent( BranchExpediente parent);
 
    @Query("SELECT count(branch) FROM BranchExpediente branch BaseExpediente base WHERE "+
-          "((e.owner IS null AND ?1 is null) OR (base.owner=?1.expediente) AND base.id = branch.expediente.id")
+          "((branch.owner IS null AND ?1 is null) OR (base.owner=?1.expediente AND base.id = branch.expediente.id)")
    int countByChildren(BranchExpediente group);
 
    @Query("SELECT branch FROM BranchExpediente branch, BaseExpediente base WHERE "+

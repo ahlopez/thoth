@@ -10,7 +10,6 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
@@ -96,7 +95,7 @@ import com.f.thoth.backend.data.security.UserGroup;
     })
 
 @Entity
-@Table(name = "BASE_EXPEDIENTE", indexes = { @Index(columnList = "code"), @Index(columnList = "tenant,expedienteCode"), @Index(columnList= "tenant,keywords")})
+@Table(name = "BASE_EXPEDIENTE", indexes = { @Index(columnList = "code"), @Index(columnList ="expedienteCode")}) //TODO: debe ser "tenant, expedienteCode"
 public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comparable<BaseExpediente>
 {
    public static final String BRIEF = "BaseExpediente.brief";
@@ -106,28 +105,28 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
    @NotBlank (message = "{evidentia.code.required}")
    @NotEmpty (message = "{evidentia.code.required}")
    @Size(max = 255)
-   protected String            expedienteCode;             // Business id unique inside the owner (class or expediente), vg 001,002, etc
+   protected String            expedienteCode;              // Business id unique inside the owner (class or expediente), vg 001,002, etc
 
    @NotNull  (message = "{evidentia.repopath.required}")
    @NotBlank (message = "{evidentia.repopath.required}")
    @NotEmpty (message = "{evidentia.repopath.required}")
    @Size(max = 255)
-   protected String            path;                       // Node path in document repository
+   protected String            path;                        // Node path in document repository
 
    @NotNull  (message = "{evidentia.name.required}")
    @NotBlank (message = "{evidentia.name.required}")
    @NotEmpty (message = "{evidentia.name.required}")
    @Size(max = 255)
    @Column(unique = true)
-   protected String            name;                       // Expediente name
+   protected String            name;                        // Expediente name
 
    @NotNull(message = "{evidentia.objectToProtect.required}")
    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-   protected ObjectToProtect   objectToProtect;            // Associated security object
+   protected ObjectToProtect   objectToProtect;             // Associated security object
 
    @NotNull  (message = "{evidentia.creator.required}")
    @ManyToOne
-   protected User        createdBy;                  // User that created this expediente
+   protected User        createdBy;                         // User that created this expediente
 
    @NotNull(message = "{evidentia.class.required}")
    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -153,8 +152,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
    @NotNull(message = "{evidentia.open.required}")
    protected Boolean           open;                       // Is the expediente currently open?
 
-   @ManyToMany
-   protected Set<String>       keywords;                   // Search keywords
+   protected String            keywords;                   // Search keywords
 
    @NotNull(message = "{evidentia.mac.required}")
    protected String            mac;                        // Message authentication code
@@ -175,7 +173,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
       this.owner                = null;
       this.entries              = new TreeSet<>();
       this.open                 = false;
-      this.keywords             = new TreeSet<>();
+      this.keywords             = null;
       this.mac                  = "";
 
       buildCode();
@@ -183,7 +181,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
    public BaseExpediente( String expedienteCode, String path, String name, User createdBy, Classification classificationClass,
                           SchemaValues metadata, LocalDateTime dateOpened, LocalDateTime dateClosed, BranchExpediente owner,
-                          Boolean open, Set<IndexEntry> entries, Set<String> keywords, String mac)
+                          Boolean open, Set<IndexEntry> entries, String keywords, String mac)
    {
       if ( TextUtil.isEmpty(expedienteCode))
          throw new IllegalArgumentException("Código del expediente no puede ser nulo ni vacío");
@@ -218,7 +216,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
       this.owner               = owner;
       this.entries             = (entries          == null? new TreeSet<>(): entries);
       this.open                = (open             == null? false          : open);
-      this.keywords            = (keywords         == null? new TreeSet<>(): keywords);
+      this.keywords            = keywords;
       this.mac                 = mac;
 
       buildCode();
@@ -276,8 +274,8 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
    public void              setEntries(Set<IndexEntry> entries){ this.entries = entries;}
    public int               getIndexSize() { return entries.size();}
 
-   public Set<String>       getKeywords() { return keywords;}
-   public void              setKeywords( Set<String> keywords) { this.keywords = keywords;}
+   public String            getKeywords() { return keywords;}
+   public void              setKeywords( String keywords) { this.keywords = keywords;}
 
    public String            getMac() { return mac;}
    public void              setMac(String mac) { this.mac = mac;}
@@ -318,12 +316,9 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
        .append( " n index-entries["+ entries.size()+ "]")
        .append( " path["+ path+ "]")
        .append( " mac=["+ mac+ "]")
-       .append( " metadata["+ metadata.toString()+ "]\n keywords[");
-
-      for ( String keyword: keywords )
-         s.append( " "+ keyword);
-
-      s.append("]\n     }\n");
+       .append( " metadata["+ metadata.toString()+ "]")
+       .append( " keywords["+ keywords+ "]")
+       .append("     }\n");
 
       return s.toString();
    }//toString

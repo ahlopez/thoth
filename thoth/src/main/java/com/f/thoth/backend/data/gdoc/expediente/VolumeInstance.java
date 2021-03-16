@@ -3,6 +3,7 @@ package com.f.thoth.backend.data.gdoc.expediente;
 import java.time.LocalDateTime;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -21,6 +22,7 @@ public class VolumeInstance extends AbstractEntity implements  Comparable<Volume
    @NotNull  (message = "{evidentia.volume.required}")
    protected Integer       instance;                                     // Index of the current volume
 
+   @ManyToOne
    @NotNull  (message = "{evidentia.volume.required}")
    protected Volume        volume;                                       // Volume to which this instance belongs
 
