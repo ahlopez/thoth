@@ -69,7 +69,7 @@ public class VolumeService implements FilterableCrudService<Volume>, PermissionS
    }//countAnyMatching
 
 
-   public Page<Volume> find(Pageable pageable) { return volumeRepository.findBy(ThothSession.getCurrentTenant(), pageable); }
+   public Page<Volume> find(Pageable pageable) { return volumeRepository.findAll(ThothSession.getCurrentTenant(), pageable); }
 
    @Override public JpaRepository<Volume, Long> getRepository() { return volumeRepository; }
 

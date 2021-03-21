@@ -68,7 +68,7 @@ public class ExpedienteService implements FilterableCrudService<Expediente>, Per
 
    public Page<Expediente> find(Pageable pageable)
    {
-      return expedienteRepository.findBy(ThothSession.getCurrentTenant(), pageable);
+      return expedienteRepository.findAll(ThothSession.getCurrentTenant(), pageable);
    }
 
    @Override public JpaRepository<Expediente, Long> getRepository()

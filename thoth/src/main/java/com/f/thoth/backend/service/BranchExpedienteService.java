@@ -102,9 +102,9 @@ public class BranchExpedienteService implements FilterableCrudService<BranchExpe
    //  ----- implements HierarchicalService ------
    @Override public List<BranchExpediente>     findAll()                            {return branchExpedienteRepository.findAll(ThothSession.getCurrentTenant()); }
    @Override public Optional<BranchExpediente> findById(Long id)                    {return branchExpedienteRepository.findById( id);}
-   @Override public List<BranchExpediente>     findByParent( BranchExpediente owner){return branchExpedienteRepository.findByParent(owner); }
-   @Override public int        countByParent ( BranchExpediente owner)              {return branchExpedienteRepository.countByParent (owner); }
-   @Override public boolean    hasChildren   ( BranchExpediente expediente)         {return branchExpedienteRepository.countByChildren(expediente)> 0;}
+   @Override public List<BranchExpediente>     findByParent( BranchExpediente owner){return branchExpedienteRepository.findByParent(owner.getExpediente()); }
+   @Override public int        countByParent ( BranchExpediente owner)              {return branchExpedienteRepository.countByParent (owner.getExpediente()); }
+   @Override public boolean    hasChildren   ( BranchExpediente expediente)         {return branchExpedienteRepository.countByChildren(expediente.getExpediente())> 0;}
 
    @Override public List<BranchExpediente> findByNameLikeIgnoreCase (Tenant tenant, String name)
                           { return branchExpedienteRepository.findByNameLikeIgnoreCase (tenant, name); }
