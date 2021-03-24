@@ -53,12 +53,12 @@ public interface LeafExpedienteRepository extends JpaRepository<LeafExpediente, 
 
    @Query("SELECT count(leaf) FROM LeafExpediente leaf "+
           "JOIN BaseExpediente base "+
-          "WHERE ((e.owner IS null AND :owner is null) OR (base.owner= :owner) AND base.id = leaf.expediente.id")
+          "WHERE ((base.owner IS null AND :owner is null) OR base.owner= :owner) AND base.id = leaf.expediente.id")
    int countByParent( @Param("owner") BaseExpediente owner);
 
    @Query("SELECT count(leaf) FROM LeafExpediente leaf "+
           "JOIN BaseExpediente base "+
-          "WHERE ((e.owner IS null AND :group is null) OR base.owner= :group) AND base.id = leaf.expediente.id")
+          "WHERE ((base.owner IS null AND :group is null) OR base.owner= :group) AND base.id = leaf.expediente.id")
    int countByChildren( @Param("group") BaseExpediente group);
  
    @Query("SELECT leaf FROM LeafExpediente leaf "+

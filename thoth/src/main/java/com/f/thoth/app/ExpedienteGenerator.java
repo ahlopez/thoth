@@ -1,7 +1,9 @@
 package com.f.thoth.app;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
@@ -9,6 +11,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.jcr.Session;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
@@ -31,7 +37,7 @@ import com.f.thoth.backend.repositories.LeafExpedienteRepository;
 import com.f.thoth.backend.repositories.VolumeInstanceRepository;
 import com.f.thoth.backend.repositories.VolumeRepository;
 
-public class ExpedienteGenerator
+public class ExpedienteGenerator implements HasLogger
 {
 	private ClassificationRepository   claseRepository;
 	private BaseExpedienteRepository   baseExpedienteRepository;
@@ -44,8 +50,8 @@ public class ExpedienteGenerator
 	private User                       user;
 	private final Random               random = new Random(1L);
 	private int                        nExpedientes = 0;
-	private BufferedReader             namesFile;
-
+	private BufferedReader             expedienteNamesReader;     
+    @Autowired private ClassPathResource  resourceLoader;
 
 	private static String KEYWORD_NAMES[] = {
 			"belleza",      "escepticismo", "nostalgia",    "justicia",     "esperanza",    "tentación",   "nación",       "espiritualidad",
@@ -82,15 +88,28 @@ public class ExpedienteGenerator
 		this.volumeInstanceRepository   = volumeInstanceRepository;
 		this.jcrSession                 = jcrSession;
 		this.user                       = ThothSession.getUser();
-		String namesFile                = "data/theNames.txt";
+		
+		expedienteNamesReader           = openNamesFile("data/theNames.txt");
+		
+	}//ExpedienteGenerator constructor
+ 
+	
+	private BufferedReader  openNamesFile(String names)
+	{
+		BufferedReader namesReader = null;
 		try
 		{
-			this.namesFile         = new BufferedReader(new FileReader(namesFile));
-		} catch (Exception e)
+			Resource resource = new ClassPathResource(names);
+			File namesFile = resource.getFile();
+			namesReader = new BufferedReader( new FileReader(namesFile));
+		    String firstLine = namesReader.readLine();
+		    getLogger().info("    Opended ["+ names+ "]. First line["+ firstLine+ "]");
+		}catch( Exception e)
 		{
-			throw new IllegalStateException("No pudo abrir archivo de nombres de expedientes["+ namesFile+ "]");
+			throw new IllegalStateException("No pudo abrir archivo de nombres de expediente["+ names+ "]. Causa\n"+ e.getMessage());
 		}
-	}//ExpedienteGenerator constructor
+		return namesReader;
+	}//openNamesFile
 
 
 	public int  registerExpedientes( Tenant tenant)
@@ -258,10 +277,10 @@ public class ExpedienteGenerator
 		String name = "";
 		try
 		{  // Los nombres han sido pre-generados
-			name = namesFile.readLine();
+			name = expedienteNamesReader.readLine();
 		} catch (Exception e)
 		{
-			throw new IllegalStateException("No pudo abrir archivo de nombres de expediente");
+			throw new IllegalStateException("No pudo leer archivo de nombres de expediente");
 		}
 		return name;
 	}//generateName

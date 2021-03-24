@@ -8,9 +8,8 @@ import org.slf4j.LoggerFactory;
  * implementing it where logger needs to operate in serializable environment
  * without being static.
  */
-public interface HasLogger {
-
-   default Logger getLogger() {
-      return LoggerFactory.getLogger(getClass());
-   }
-}
+public interface HasLogger 
+{
+   default Logger getLogger() { return LoggerFactory.getLogger(getClass()); }
+   
+}//HasLogger

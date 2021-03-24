@@ -58,8 +58,8 @@ public interface BranchExpedienteRepository extends JpaRepository<BranchExpedien
 
    @Query("SELECT count(branch) FROM BranchExpediente branch "+
           "JOIN BaseExpediente base "+
-          "WHERE (branch.owner IS null AND :group IS null) OR (base.owner = :group AND base.id = branch.expediente.id)")
-   int countByChildren(@Param("owner") BaseExpediente group);
+          "WHERE (base.owner IS null AND :group IS null) OR (base.owner = :group AND base.id = branch.expediente.id)")
+   int countByChildren(@Param("group") BaseExpediente group);
 
    @Query("SELECT branch FROM BranchExpediente branch "+
           "JOIN BaseExpediente base "+
