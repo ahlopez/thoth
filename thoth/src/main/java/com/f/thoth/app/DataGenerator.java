@@ -40,6 +40,7 @@ import com.f.thoth.backend.data.gdoc.metadata.Field;
 import com.f.thoth.backend.data.gdoc.metadata.Metadata;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.gdoc.metadata.Type;
+import com.f.thoth.backend.data.gdoc.numerator.Numerator;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
@@ -112,6 +113,7 @@ public class DataGenerator implements HasLogger
    private FieldRepository               fieldRepository;
    private RetentionRepository           retentionRepository;
    private UserGroupRepository           userGroupRepository;
+   private Numerator                     numerator;
    private Repository                    repo;
    private Session                       jcrSession;
    private Level[]                       levels;
@@ -125,7 +127,7 @@ public class DataGenerator implements HasLogger
          ExpedienteRepository expedienteRepository, VolumeRepository volumeRepository, VolumeInstanceRepository volumeInstanceRepository,
          MetadataRepository metadataRepository, FieldRepository fieldRepository, SchemaRepository schemaRepository,
          LevelRepository levelRepository, RetentionRepository retentionRepository, UserGroupRepository userGroupRepository,
-         PasswordEncoder passwordEncoder)
+         Numerator numerator, PasswordEncoder passwordEncoder)
    {
       this.tenantService                 = tenantService;
       this.orderRepository               = orderRepository;
@@ -146,6 +148,7 @@ public class DataGenerator implements HasLogger
       this.schemaRepository              = schemaRepository;
       this.fieldRepository               = fieldRepository;
       this.metadataRepository            = metadataRepository;
+      this.numerator                     = numerator;
       this.passwordEncoder               = passwordEncoder;
       this.retentionRepository           = retentionRepository;
       this.userGroupRepository           = userGroupRepository;
@@ -210,7 +213,8 @@ public class DataGenerator implements HasLogger
 
          // -----------------  Inicialice el árbol de clasificacion documental -----------------------------
          getLogger().info("... generating classification classes" );
-         ClassificationGenerator classificationGenerator = new ClassificationGenerator(claseRepository, levelRepository, schemaRepository, levels, jcrSession);
+         ClassificationGenerator classificationGenerator = 
+        		 new ClassificationGenerator(claseRepository, levelRepository, schemaRepository, numerator, levels, jcrSession);
          classificationGenerator.registerClasses(tenant1);
 
          // -----------------  Generando expedientes y documentos de prueba

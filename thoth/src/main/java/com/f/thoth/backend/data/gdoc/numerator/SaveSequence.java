@@ -1,16 +1,16 @@
 package com.f.thoth.backend.data.gdoc.numerator;
 
 
-import com.f.thoth.backend.repositories.SequenceRepository;
+import com.f.thoth.backend.service.SequenceService;
 
 
 /**
- * Representa la acción de guardaar una secuencia
+ * Representa la acción de guardar una secuencia
  */
 public class SaveSequence implements Instruction, Comparable<SaveSequence>
 {
-	private static SequenceRepository sequenceRepository;    // JPA repository
-	private Sequence sequence;                               // Secuencia a persistir
+	private static SequenceService sequenceService;    // Persistence service
+	private Sequence sequence;                         // Sequence to save
 
 	@SuppressWarnings("unused")
 	private SaveSequence() {}   // Elimine constructor nulo
@@ -28,14 +28,24 @@ public class SaveSequence implements Instruction, Comparable<SaveSequence>
 
 	}//SaveSequence
 
+
+	public static void setService( SequenceService service)
+	{
+		sequenceService = service;
+	}//setService
+
+
 	/**
 	 * Actualiza la secuencia con su nuevo valor
 	 */
-	public void execute()
+	public void  execute()
 	{
 		try
 		{
-			sequenceRepository.saveAndFlush(sequence);
+			synchronized(sequenceService)
+			{
+				sequenceService.update(sequence);
+			}
 		} catch ( Throwable t)
 		{
 			throw new IllegalStateException("No pudo guardar secuencia["+ sequence.getCode()+ "], valor["+ sequence.getValue()+ "]. Razon\n"+ t);

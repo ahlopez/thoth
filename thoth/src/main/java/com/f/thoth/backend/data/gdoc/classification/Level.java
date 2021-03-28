@@ -126,5 +126,6 @@ public class Level extends BaseEntity implements Comparable<Level>
    }// compareTo
 
    // --------------- Logic ---------------------
+   public boolean isRoot() { return orden == 0;}
 
 }//Level

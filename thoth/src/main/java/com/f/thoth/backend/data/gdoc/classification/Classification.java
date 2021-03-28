@@ -339,6 +339,22 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
       LocalDate now = LocalDate.now();
       return now.compareTo(dateOpened) >= 0 && now.compareTo(dateClosed) <= 0;
    }//isOpen
+   
+   public boolean isRoot()
+   {
+	   return level.isRoot();
+   }//isRoot
+
+   
+   public String getSequenceName()
+   {
+       Classification parent  = owner;	   
+	   while (!parent.isRoot())
+	   {   parent  = parent.owner;		   
+	   }
+	   return parent.code;
+   }//getSequenceName
+   
 
    protected synchronized Integer nextExpedienteNumber()
    {

@@ -240,18 +240,30 @@ public class TextUtil
 
 
   /**
-   * Convierte un entero a una cadena de longitud específica, agregando ceros
-   * por la izquierda
+   * Convierte un entero a una cadena de longitud específica, agregando ceros por la izquierda
    *
    * @source El número que hay que convertir
    * @len La longitud deseada de la cadena
-   * */
+   */
   public static String pad(long source, int len)
   {
      String number = String.valueOf(source);
      return "0000000000000000000000000000000000".
              substring(0, len - number.length())+
              number;
+  }// pad
+  
+  /**
+   * Asegura que una cadena tiene una longitud específica, agregando ceros por la izquierda
+   * 
+   * @source La cadena a asegurar
+   * @len La longitud deseada de la cadena
+   */
+  public static String pad(String source, int len)
+  {
+     return "0000000000000000000000000000000000".
+             substring(0, len - source.length())+
+             source;
   }// pad
 
 

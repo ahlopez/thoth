@@ -25,6 +25,8 @@ import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.gdoc.metadata.Metadata;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
+import com.f.thoth.backend.data.gdoc.numerator.Numerator;
+import com.f.thoth.backend.data.gdoc.numerator.Sequence;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
@@ -36,12 +38,14 @@ import com.f.thoth.backend.repositories.OperationRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
 import com.f.thoth.backend.repositories.RetentionRepository;
 import com.f.thoth.backend.repositories.RoleRepository;
+import com.f.thoth.backend.repositories.SequenceRepository;
 import com.f.thoth.backend.repositories.TenantRepository;
 import com.f.thoth.backend.repositories.UserRepository;
 import com.f.thoth.backend.service.ClassificationService;
 import com.f.thoth.backend.service.LevelService;
 import com.f.thoth.backend.service.OperationService;
 import com.f.thoth.backend.service.RetentionService;
+import com.f.thoth.backend.service.SequenceService;
 import com.f.thoth.backend.service.TenantService;
 import com.f.thoth.backend.service.UserService;
 import com.f.thoth.ui.MainView;
@@ -64,9 +68,11 @@ import com.f.thoth.ui.MainView;
             TenantService.class,
             RetentionService.class,
             ObjectToProtect.class,
+            SequenceService.class,
             Role.class,
             Level.class,
             Permission.class,
+            Sequence.class,
             BaseExpediente.class,
             LeafExpediente.class,
             BranchExpediente.class,
@@ -93,6 +99,7 @@ import com.f.thoth.ui.MainView;
             RoleRepository.class,
             PermissionRepository.class,
             ClassificationRepository.class,
+            SequenceRepository.class,
             RetentionRepository.class,
             LevelRepository.class
          }
@@ -104,6 +111,8 @@ import com.f.thoth.ui.MainView;
            Role.class,
            ObjectToProtect.class,
            Classification.class,
+           Numerator.class,
+           Sequence.class,
            Level.class,
            Permission.class,
            BaseExpediente.class,

@@ -1,6 +1,7 @@
 package com.f.thoth.backend.data.gdoc.numerator;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.f.thoth.backend.data.cache.CacheManager;
 import com.f.thoth.backend.data.entity.util.TextUtil;
@@ -10,6 +11,7 @@ import com.f.thoth.backend.service.SequenceService;
 /**
  * Un Numerator administra un conjunto de secuencias de numeracion
  */
+@Component
 public class Numerator
 {
    private CacheManager<String,Sequence>  seqs;
@@ -19,6 +21,9 @@ public class Numerator
    public Numerator(SequenceService sequenceService)
    {
       this.seqs = new CacheManager<>( sequenceService, CACHE_SIZE);
+      CreateSequence.setService(sequenceService);
+      SaveSequence.setService(sequenceService);
+      CloseSequence.setService(sequenceService);
    }//Numerator
 
    /**
@@ -35,7 +40,7 @@ public class Numerator
     * @param incremento Delta entre numeros consecutivos de la secuencia
     * @return Sequence  La secuencia solicitada
     */
-   public Sequence getSequence(final Tenant tenant, final String nombre, final String prefijo, final String sufijo, final long inicial, final int incremento,final int longitud )
+   public Sequence getSequence(final Tenant tenant, final String nombre, final String prefijo, final String sufijo, final long inicial, final int incremento, final int longitud )
    {
       if ( tenant == null )
          throw new IllegalArgumentException("Tenant al que pertenece la secuencia no puede ser nulo");
@@ -49,8 +54,8 @@ public class Numerator
       if ( incremento <= 0 )
          throw new IllegalArgumentException("Incremento de la secuencia["+ nombre+ "] = "+ incremento+ ". debe ser mayor que cero");
 
-      String p = ( prefijo == null? "": prefijo);
-      String s = ( sufijo  == null? "": sufijo);
+      String     p = ( prefijo == null? "": prefijo);
+      String     s = ( sufijo  == null? "": sufijo);
       String  name = sequenceName(tenant, nombre, p, s);
       Sequence seq = null;
       synchronized ( seqs)
@@ -78,7 +83,7 @@ public class Numerator
     */
    private static String sequenceName( Tenant tenant, String nombre, String prefijo, String sufijo)
    {
-      return("["+ tenant.getId()+ "]"+ nombre+ "_"+ prefijo+ "_"+ sufijo).toUpperCase();
+      return("["+ tenant.getId()+ "]"+ nombre).toUpperCase();
    }//sequenceName
 
 

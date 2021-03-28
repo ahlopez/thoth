@@ -3,7 +3,6 @@ package com.f.thoth.app;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
@@ -12,7 +11,6 @@ import java.util.TreeSet;
 
 import javax.jcr.Session;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -49,9 +47,8 @@ public class ExpedienteGenerator implements HasLogger
 	private Session                    jcrSession;
 	private User                       user;
 	private final Random               random = new Random(1L);
-	private int                        nExpedientes = 0;
-	private BufferedReader             expedienteNamesReader;     
-    @Autowired private ClassPathResource  resourceLoader;
+	private BufferedReader             expedienteNamesReader;  
+	private int                        nExpedientes;
 
 	private static String KEYWORD_NAMES[] = {
 			"belleza",      "escepticismo", "nostalgia",    "justicia",     "esperanza",    "tentación",   "nación",       "espiritualidad",
@@ -114,7 +111,6 @@ public class ExpedienteGenerator implements HasLogger
 
 	public int  registerExpedientes( Tenant tenant)
 	{
-		int nExpedientes = 0;
 		List<Classification> leafClasses =  claseRepository.findLeaves(tenant);
 		for (Classification classificationClass: leafClasses)
 		{
@@ -183,7 +179,7 @@ public class ExpedienteGenerator implements HasLogger
 	private BaseExpediente createBase(Classification classificationClass, BranchExpediente parent)
 	{
 		BaseExpediente base     =   new BaseExpediente();
-		base.setPath                (genereCode(base, classificationClass));
+		base.setPath                (assignExpedienteCode(base, classificationClass));
 		base.setCode                (base.getPath());
 		base.setExpedienteCode      (base.formatCode());
 		base.setName                (generateName());
@@ -265,10 +261,10 @@ public class ExpedienteGenerator implements HasLogger
 
 
 
-	private String genereCode(BaseExpediente padre, Classification classificationClass)
+	private String assignExpedienteCode(BaseExpediente padre, Classification classificationClass)
 	{
 		return null; //TODO:
-	}//genereCode
+	}//assignExpedienteCode
 
 
 

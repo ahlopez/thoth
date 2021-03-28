@@ -44,6 +44,17 @@ public class SequenceService implements Cache.Fetcher<String, Sequence>
 
 	/**
 	 * Adiciona una nueva secuencia al sistema
+	 * @param sequence La secuencia a adicionar
+	 */
+	public void add(Sequence sequence) 
+	{
+		System.out.println("seqService.add("+ sequence.toString()); System.out.flush();
+		sequenceRepository.saveAndFlush(sequence);
+		System.out.println("seqService.added("+ sequence.getCode()+ "]"); System.out.flush();		
+	}//add
+
+	/**
+	 * Adiciona una nueva secuencia al sistema
 	 * @param key Identificador (primary key) de la secuencia
 	 * @param sequence La secuencia a adicionar
 	 */
@@ -64,11 +75,10 @@ public class SequenceService implements Cache.Fetcher<String, Sequence>
 
 	/**
 	 * Actualiza la información de una secuencia en el sistema
-	 * @param key Identificador (db primary key) de la secuencia
 	 * @param sequence La secuencia a actualizar
 	 * @return Estado anterior de la secuencia, si existe; null si no existe
 	 */
-	public Sequence update(Long key, Sequence sequence)
+	public Sequence update(Sequence sequence)
 	{
 		sequenceRepository.saveAndFlush(sequence);
 		return sequence;

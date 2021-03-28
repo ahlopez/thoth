@@ -9,12 +9,10 @@ import com.f.thoth.backend.data.gdoc.numerator.Sequence;
 
 public interface SequenceRepository extends JpaRepository<Sequence, Long> 
 {
-	   @Query("SELECT s FROM Sequence s where s.name=?1")
+	   @Query("SELECT s FROM Sequence s where s.nombre=?1")
 	   Optional<Sequence> findByName(String sequenceName);
 	   
 	   @Query("SELECT s FROM Sequence s where s.code=?1")
 	   Optional<Sequence> findByCode(String sequenceCode);
-	   
-	   
 
 }//SequenceRepository

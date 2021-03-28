@@ -12,6 +12,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Index;
+import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -25,11 +26,11 @@ import com.f.thoth.backend.data.security.Tenant;
 
 /** Representa una secuencia de numeracion */
 @Entity
-@Table(name = "SEQUENCE", indexes = { @Index(columnList = "nombre")})
+@Table(name = "SEQUENCE", indexes = { @Index(columnList = "code")})
 public class Sequence extends Observable implements Comparable<Sequence>
 {
    public enum Status { OPEN, CLOSED};
-
+   
    /** persistor - Observador de persistencia de la secuencia */
    private static final Observer persistor   =  PersistProducer.getInstance();
 
@@ -41,15 +42,16 @@ public class Sequence extends Observable implements Comparable<Sequence>
    protected int         version;                                // Record version
       
    @NotNull (message = "{evidentia.code.required}")
+   @Column(unique = true)
    protected String      code;                                   // Business id
 
    @NotNull (message = "{evidentia.tenant.required}")
+   @ManyToOne
    protected Tenant      tenant;                                 // Tenant duenno de la secuencia
 
    @NotNull (message = "{evidentia.name.required}")
    @NotEmpty(message = "{evidentia.name.required}")
    @Size(max = 255, message="{evidentia.code.maxlength}")
-   @Column(unique = true)
    protected String      nombre;                                 // Nombre de la secuencia
 
    @NotNull (message = "{evidentia.prefix.required}")
@@ -62,7 +64,7 @@ public class Sequence extends Observable implements Comparable<Sequence>
    protected AtomicLong  value;                                  // Valor actual de la secuencia
 
    @NotNull (message = "{evidentia.increment.required}")
-   protected Integer        increment;                           // Delta entre dos numeros consecutivos de la secuencia
+   protected Integer     increment;                              // Delta entre dos numeros consecutivos de la secuencia
 
    @NotNull (message = "{evidentia.length.required}")
    protected Integer     longitud;                               // Longitud obligatoria del secuencial. Asegurarla con padding de ceros por la izquierda
@@ -158,6 +160,7 @@ public class Sequence extends Observable implements Comparable<Sequence>
 
    public  Status      getStatus()                     { return status;}
    public  void        setStatus(Status status)        { this.status = status;}
+   
 
    // --------------- Object methods ---------------------
 
@@ -208,7 +211,7 @@ public class Sequence extends Observable implements Comparable<Sequence>
 
    public String buildCode()
    {
-      return ("["+ tenant.getId()+ "]"+ nombre+ "_"+ prefijo+ "_"+ sufijo).toUpperCase();
+      return ("["+ tenant.getId()+ "]"+ nombre).toUpperCase();
    }//buildCode
 
    // ----------------------- Logica ---------------------------
@@ -253,6 +256,7 @@ public class Sequence extends Observable implements Comparable<Sequence>
       }
 
    }//close
+     
 
    /**
     * Actualiza el valor de una secuencia para que tenga el mayor valor entre el actual y el presentado
