@@ -26,52 +26,51 @@ import com.f.thoth.backend.data.security.Tenant;
 
 /** Representa una secuencia de numeracion */
 @Entity
-@Table(name = "SEQUENCE", indexes = { @Index(columnList = "code")})
+@Table(name = "SEQUENCE", indexes = { @Index(columnList= "code", unique= true)})
 public class Sequence extends Observable implements Comparable<Sequence>
 {
    public enum Status { OPEN, CLOSED};
    
-   /** persistor - Observador de persistencia de la secuencia */
-   private static final Observer persistor   =  PersistProducer.getInstance();
+   private static final Observer persistor   =  PersistProducer.getInstance();  // Persistence Observer of the sequence
 
    @Id
-   @GeneratedValue(strategy = GenerationType.IDENTITY)
+   @GeneratedValue(strategy = GenerationType.SEQUENCE)
    protected Long        id;                                     // Primary key
 
    @Version
    protected int         version;                                // Record version
       
    @NotNull (message = "{evidentia.code.required}")
-   @Column(unique = true)
+   @Column(name = "code", nullable = false, unique = true)
    protected String      code;                                   // Business id
 
    @NotNull (message = "{evidentia.tenant.required}")
    @ManyToOne
-   protected Tenant      tenant;                                 // Tenant duenno de la secuencia
+   protected Tenant      tenant;                                 // Tenant owner of the sequence
 
    @NotNull (message = "{evidentia.name.required}")
    @NotEmpty(message = "{evidentia.name.required}")
    @Size(max = 255, message="{evidentia.code.maxlength}")
-   protected String      nombre;                                 // Nombre de la secuencia
+   protected String      nombre;                                 // Sequence name
 
    @NotNull (message = "{evidentia.prefix.required}")
-   protected String      prefijo;                                // Prefijo del numero
+   protected String      prefijo;                                // Sequence prefix
 
    @NotNull (message = "{evidentia.suffix.required}")
-   protected String      sufijo;                                 // Sufijo  del numero
+   protected String      sufijo;                                 // Sequence suffix
 
    @NotNull (message = "{evidentia.value.required}")
-   protected AtomicLong  value;                                  // Valor actual de la secuencia
+   protected AtomicLong  value;                                  // Current value of the sequence
 
    @NotNull (message = "{evidentia.increment.required}")
-   protected Integer     increment;                              // Delta entre dos numeros consecutivos de la secuencia
+   protected Integer     increment;                              // Delta between two consecutive numbers of the sequence
 
    @NotNull (message = "{evidentia.length.required}")
-   protected Integer     longitud;                               // Longitud obligatoria del secuencial. Asegurarla con padding de ceros por la izquierda
+   protected Integer     longitud;                               // Length of the string number of the sequence. Padding with zeros on the left
 
    @NotNull     (message= "{evidentia.status.required}")
    @Enumerated(EnumType.STRING)
-   protected Status      status;                                 // Estado de la secuencia OPEN/CLOSED
+   protected Status      status;                                 // Sequence status OPEN/CLOSED
 
 
    // ================================================================================
@@ -173,7 +172,7 @@ public class Sequence extends Observable implements Comparable<Sequence>
          return false;
 
       Sequence that = (Sequence) o;
-      return this.id != null && this.id.equals(that.id);
+      return this.code != null && this.code.equals(that.code);
 
    }//equals
 

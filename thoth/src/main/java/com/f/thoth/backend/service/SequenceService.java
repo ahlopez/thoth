@@ -2,7 +2,6 @@ package com.f.thoth.backend.service;
 
 import java.util.Optional;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.f.thoth.backend.data.cache.Cache;
@@ -12,13 +11,35 @@ import com.f.thoth.backend.repositories.SequenceRepository;
 @Service
 public class SequenceService implements Cache.Fetcher<String, Sequence>
 {
-	private SequenceRepository sequenceRepository;
-
-	@Autowired
-	public SequenceService( SequenceRepository sequenceRepository)
+	private SequenceRepository      sequenceRepository;
+	private static SequenceService  INSTANCE = null;
+	
+	/** Obtiene una instancia del encargado de persistir las secuencias */
+	private SequenceService( )
 	{
-		this.sequenceRepository = sequenceRepository;
+		INSTANCE   = this;
 	}//SequenceService constructor
+
+
+	/**
+	 * Obtiene una instancia del productor
+	 * @return PersistProducer La instancia solicitada del productor
+	 */
+	public static SequenceService   getInstance()
+	{
+		if( INSTANCE == null )
+			INSTANCE = new SequenceService();
+
+		return INSTANCE;
+	}//getInstance
+
+	
+	public static void setRepository( SequenceRepository repository)
+	{
+		getInstance().sequenceRepository = repository;
+	}
+	
+	
 
 	/**
 	 * Obtiene una secuencia con base en su identificador 
@@ -48,9 +69,9 @@ public class SequenceService implements Cache.Fetcher<String, Sequence>
 	 */
 	public void add(Sequence sequence) 
 	{
-		System.out.println("seqService.add("+ sequence.toString()); System.out.flush();
+		System.out.println("A crear["+ sequence.getCode()+ " id["+ sequence.getId()+ "]"); System.out.flush();
 		sequenceRepository.saveAndFlush(sequence);
-		System.out.println("seqService.added("+ sequence.getCode()+ "]"); System.out.flush();		
+		System.out.println("Creó["+ sequence.getCode()+ " id["+ sequence.getId()+ "]"); System.out.flush();
 	}//add
 
 	/**

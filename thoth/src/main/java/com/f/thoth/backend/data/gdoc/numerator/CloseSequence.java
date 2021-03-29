@@ -8,7 +8,6 @@ import com.f.thoth.backend.service.SequenceService;
  */
 class CloseSequence implements Instruction
 {
-	private static SequenceService    sequenceService;    // Persistence service
 	private        Sequence           sequence;           // Sequence to close
 
 	@SuppressWarnings("unused")
@@ -28,12 +27,6 @@ class CloseSequence implements Instruction
 	}//CloseSequence
 
 
-	public static void setService( SequenceService service)
-	{
-		sequenceService = service;
-	}//setService   
-
-
 	/**
 	 * Cierra la secuencia en su medio externo
 	 */
@@ -41,9 +34,8 @@ class CloseSequence implements Instruction
 	{
 		try
 		{
-			synchronized(sequenceService)
-			{
-				sequenceService.update(sequence);
+			synchronized(sequence)
+			{   SequenceService.getInstance().update(sequence);				
 			}
 		} catch ( Throwable t)
 		{

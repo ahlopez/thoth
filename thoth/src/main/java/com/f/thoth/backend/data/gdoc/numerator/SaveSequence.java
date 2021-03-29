@@ -9,7 +9,6 @@ import com.f.thoth.backend.service.SequenceService;
  */
 public class SaveSequence implements Instruction, Comparable<SaveSequence>
 {
-	private static SequenceService sequenceService;    // Persistence service
 	private Sequence sequence;                         // Sequence to save
 
 	@SuppressWarnings("unused")
@@ -29,12 +28,6 @@ public class SaveSequence implements Instruction, Comparable<SaveSequence>
 	}//SaveSequence
 
 
-	public static void setService( SequenceService service)
-	{
-		sequenceService = service;
-	}//setService
-
-
 	/**
 	 * Actualiza la secuencia con su nuevo valor
 	 */
@@ -42,9 +35,8 @@ public class SaveSequence implements Instruction, Comparable<SaveSequence>
 	{
 		try
 		{
-			synchronized(sequenceService)
-			{
-				sequenceService.update(sequence);
+			synchronized(sequence)
+			{   SequenceService.getInstance().update(sequence);				
 			}
 		} catch ( Throwable t)
 		{

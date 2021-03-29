@@ -60,11 +60,13 @@ import com.f.thoth.backend.repositories.ProductRepository;
 import com.f.thoth.backend.repositories.RetentionRepository;
 import com.f.thoth.backend.repositories.RoleRepository;
 import com.f.thoth.backend.repositories.SchemaRepository;
+import com.f.thoth.backend.repositories.SequenceRepository;
 import com.f.thoth.backend.repositories.TenantRepository;
 import com.f.thoth.backend.repositories.UserGroupRepository;
 import com.f.thoth.backend.repositories.UserRepository;
 import com.f.thoth.backend.repositories.VolumeInstanceRepository;
 import com.f.thoth.backend.repositories.VolumeRepository;
+import com.f.thoth.backend.service.SequenceService;
 import com.f.thoth.backend.service.TenantService;
 import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.spring.annotation.SpringComponent;
@@ -127,7 +129,7 @@ public class DataGenerator implements HasLogger
          ExpedienteRepository expedienteRepository, VolumeRepository volumeRepository, VolumeInstanceRepository volumeInstanceRepository,
          MetadataRepository metadataRepository, FieldRepository fieldRepository, SchemaRepository schemaRepository,
          LevelRepository levelRepository, RetentionRepository retentionRepository, UserGroupRepository userGroupRepository,
-         Numerator numerator, PasswordEncoder passwordEncoder)
+         Numerator numerator, SequenceRepository sequenceRepository, PasswordEncoder passwordEncoder)
    {
       this.tenantService                 = tenantService;
       this.orderRepository               = orderRepository;
@@ -152,6 +154,8 @@ public class DataGenerator implements HasLogger
       this.passwordEncoder               = passwordEncoder;
       this.retentionRepository           = retentionRepository;
       this.userGroupRepository           = userGroupRepository;
+      
+      SequenceService.setRepository(sequenceRepository);
 
    }//DataGenerator
 
@@ -333,7 +337,7 @@ public class DataGenerator implements HasLogger
       {
          Node node         = jcrSession.getRootNode();
          Node jcrWorkspace = node.addNode(workspacePath.substring(1));
-         getLogger().info("    ... tenant["+ tenant.getName()+ "] creo workspace["+ name+ "], path["+ jcrWorkspace.getPath()+ "]");
+         getLogger().info("    >>> Tenant["+ tenant.getName()+ "] workspace["+ name+ "], path["+ jcrWorkspace.getPath()+ "]");
          if ( !workspacePath.equals( jcrWorkspace.getPath()))
             throw new RepositoryException("Workspace path["+ workspacePath+ "] diferente del path en repositorio["+ jcrWorkspace.getPath()+ "]");
       }

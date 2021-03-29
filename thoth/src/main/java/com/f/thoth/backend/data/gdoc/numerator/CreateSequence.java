@@ -9,7 +9,6 @@ import com.f.thoth.backend.service.SequenceService;
 public class CreateSequence implements Instruction, Comparable<CreateSequence>
 {
 	private Sequence                sequence;
-	private static SequenceService  sequenceService;
 
 	@SuppressWarnings("unused")
 	private CreateSequence() {}   // No permita uso del constructor nulo
@@ -25,11 +24,6 @@ public class CreateSequence implements Instruction, Comparable<CreateSequence>
 	}//CreateSequence
 
 
-	public static void setService( SequenceService service)
-	{
-		sequenceService = service;
-	}//setService
-
 
 	/**
 	 * Crea la secuencia en su medio externo
@@ -38,11 +32,8 @@ public class CreateSequence implements Instruction, Comparable<CreateSequence>
 	{
 		try
 		{
-			synchronized(sequenceService)
-			{
-				System.out.println("A crear["+ sequence.getCode()); System.out.flush();
-				sequenceService.add(sequence);
-				System.out.println("Creó["+ sequence.getCode()); System.out.flush();
+			synchronized(sequence)
+			{ SequenceService.getInstance().add(sequence);
 			}
 		}catch( Throwable t)
 		{

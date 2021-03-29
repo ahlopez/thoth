@@ -1,6 +1,5 @@
 package com.f.thoth.backend.data.gdoc.numerator;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.f.thoth.backend.data.cache.CacheManager;
@@ -17,13 +16,9 @@ public class Numerator
    private CacheManager<String,Sequence>  seqs;
    private static final int CACHE_SIZE = 100;
 
-   @Autowired
-   public Numerator(SequenceService sequenceService)
+   public Numerator()
    {
-      this.seqs = new CacheManager<>( sequenceService, CACHE_SIZE);
-      CreateSequence.setService(sequenceService);
-      SaveSequence.setService(sequenceService);
-      CloseSequence.setService(sequenceService);
+      this.seqs = new CacheManager<>( SequenceService.getInstance(), CACHE_SIZE);
    }//Numerator
 
    /**
