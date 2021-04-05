@@ -32,9 +32,7 @@ public class CreateSequence implements Instruction, Comparable<CreateSequence>
 	{
 		try
 		{
-			synchronized(sequence)
-			{ SequenceService.getInstance().add(sequence);
-			}
+			SequenceService.getInstance().add(sequence);
 		}catch( Throwable t)
 		{
 			throw new IllegalStateException("\nNo pudo crear secuencia "+ sequence.getCode()+ ".Razón\n"+ t);
@@ -50,13 +48,24 @@ public class CreateSequence implements Instruction, Comparable<CreateSequence>
 	 */
 	public boolean merge ( Instruction other)
 	{
-		CreateSequence that = (CreateSequence) other;
-		return this.equals(other) && setGreatestValue(that.getValue());
+		boolean merged = false;
+		if (other instanceof CreateSequence)
+		{
+			CreateSequence that = (CreateSequence) other;
+			merged = this.getCode().equals(that.getCode()) && this.setGreatestValue(that.getValue());
+		}
+		
+        if (other instanceof SaveSequence)
+		{
+			SaveSequence that = (SaveSequence) other;
+			merged = this.getCode().equals(that.getCode()) && this.setGreatestValue(that.getValue());
+		}	
+        return merged;
 	}// merge
 
-	private String   getCode()                     { return sequence.getCode();}
-	private Long     getValue()                    { return sequence.getValue();}
-	private boolean  setGreatestValue( Long value) { return sequence.setGreatestValue(value);}
+	public  String   getCode()                     { return sequence.getCode();}
+	public  Long     getValue()                    { return sequence.getValue();}
+	public  boolean  setGreatestValue( Long value) { return sequence.setGreatestValue(value);}
 
 	// --------------- Object methods --------------------
 

@@ -36,7 +36,6 @@ final class PersistConsumer implements Runnable
       while (true)
       {
          Instruction command = (Instruction)buff.get(this.number);
-         System.out.println(" Thread["+ number+ "] instruction["+ command.toString()+ "]");
          command.execute();
       }
    }//run

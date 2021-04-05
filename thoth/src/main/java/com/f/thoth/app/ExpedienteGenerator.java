@@ -3,6 +3,7 @@ package com.f.thoth.app;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
@@ -23,6 +24,8 @@ import com.f.thoth.backend.data.gdoc.expediente.Volume;
 import com.f.thoth.backend.data.gdoc.expediente.VolumeInstance;
 import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
+import com.f.thoth.backend.data.gdoc.numerator.Numerator;
+import com.f.thoth.backend.data.gdoc.numerator.Sequence;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
@@ -135,7 +138,7 @@ public class ExpedienteGenerator implements HasLogger
 		LeafExpediente leaf = creeLeafExpediente  (tenant, user, classificationClass, owner);
 		return leaf.getExpediente();
 
-	}//creeRootExpediente
+	}//creeExpediente
 
 
 	private BranchExpediente creeBranchExpediente(Tenant tenant, User user, Classification classificationClass, BranchExpediente owner)
@@ -263,7 +266,11 @@ public class ExpedienteGenerator implements HasLogger
 
 	private String assignExpedienteCode(BaseExpediente padre, Classification classificationClass)
 	{
-		return null; //TODO:
+		int year = LocalDate.now().getYear();
+		String seqKey = classificationClass.getRootCode()+year+ "E";
+		Numerator numerador = Numerator.getInstance();
+		Sequence expedienteSequence = numerador.obtenga(seqKey);
+		return expedienteSequence.next();
 	}//assignExpedienteCode
 
 

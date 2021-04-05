@@ -306,7 +306,7 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
    public Integer                   getCategory() {return objectToProtect.getCategory();}
    public void                      setCategory(Integer category) {objectToProtect.setCategory(category);}
 
-   public User                getUserOwner() {return objectToProtect.getUserOwner();}
+   public User                      getUserOwner() {return objectToProtect.getUserOwner();}
    public void                      setUserOwner(User userOwner) {objectToProtect.setUserOwner(userOwner);}
 
    public Role                      getRoleOwner() {return objectToProtect.getRoleOwner();}
@@ -344,16 +344,17 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
    {
 	   return level.isRoot();
    }//isRoot
-
    
-   public String getSequenceName()
+   
+   public String getRootCode()
    {
        Classification parent  = owner;	   
 	   while (!parent.isRoot())
 	   {   parent  = parent.owner;		   
 	   }
-	   return parent.code;
-   }//getSequenceName
+	   return parent.getClassCode();
+
+   }//getRootCode
    
 
    protected synchronized Integer nextExpedienteNumber()

@@ -35,9 +35,7 @@ public class SaveSequence implements Instruction, Comparable<SaveSequence>
 	{
 		try
 		{
-			synchronized(sequence)
-			{   SequenceService.getInstance().update(sequence);				
-			}
+			SequenceService.getInstance().update(sequence);
 		} catch ( Throwable t)
 		{
 			throw new IllegalStateException("No pudo guardar secuencia["+ sequence.getCode()+ "], valor["+ sequence.getValue()+ "]. Razon\n"+ t);
@@ -54,13 +52,24 @@ public class SaveSequence implements Instruction, Comparable<SaveSequence>
 	 */
 	public boolean merge ( Instruction other)
 	{
-		SaveSequence that = (SaveSequence)other;
-		return this.equals(other) && setGreatestValue(that.getValue());
+		boolean merged = false;
+		if (other instanceof CreateSequence)
+		{
+			CreateSequence that = (CreateSequence) other;
+			merged = this.getCode().equals(that.getCode()) && this.setGreatestValue(that.getValue());
+		}
+		
+        if (other instanceof SaveSequence)
+		{
+			SaveSequence that = (SaveSequence) other;
+			merged = this.getCode().equals(that.getCode()) && this.setGreatestValue(that.getValue());
+		}	
+        return merged;
 	}// merge
 
-	private String   getCode()                     { return sequence.getCode();}
-	private Long     getValue()                    { return sequence.getValue();}
-	private boolean  setGreatestValue( Long value) { return sequence.setGreatestValue(value);}
+	public String   getCode()                     { return sequence.getCode();}
+	public Long     getValue()                    { return sequence.getValue();}
+	public boolean  setGreatestValue( Long value) { return sequence.setGreatestValue(value);}
 
 	// --------------- Object methods --------------------
 

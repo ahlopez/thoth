@@ -36,7 +36,7 @@ public class PersistProducer implements Observer
 	 * Obtiene una instancia del productor
 	 * @return PersistProducer La instancia solicitada del productor
 	 */
-	public static PersistProducer   getInstance()
+	public static synchronized PersistProducer   getInstance()
 	{
 		if( INSTANCE == null )
 			INSTANCE = new PersistProducer();
@@ -49,7 +49,7 @@ public class PersistProducer implements Observer
 	 * @param o La secuencia siendo observada
 	 * @param arg  Comando que identifica la naturaleza del cambio en la secuencia
 	 */
-	public void update(Observable obs, Object arg)
+	public synchronized void update(Observable obs, Object arg)
 	{
 		commandBuffer.put( (Instruction)arg);
 	}//update
