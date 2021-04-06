@@ -28,7 +28,7 @@ public class CacheManager<K,T>                     // K= Key type,  T=Cached obj
    * @param size   - Tamaño del caché
    * @throw NullPointerException cuando {@code server == null}
    */
-  public void reset(Cache.Fetcher<K,T> server, int size)
+  public synchronized void reset(Cache.Fetcher<K,T> server, int size)
   {
     if ( server == null )
       throw new NullPointerException("El proveedor de objetos del caché no puede ser nulo");
@@ -45,7 +45,7 @@ public class CacheManager<K,T>                     // K= Key type,  T=Cached obj
    * Adiciona un nuevo objeto al sistema
    * @param object El objeto a adicionar
    */
-  public void add(K key, T object)
+  public synchronized void add(K key, T object)
   {
     if ( server.fetch(key) == null)
     {
@@ -59,7 +59,7 @@ public class CacheManager<K,T>                     // K= Key type,  T=Cached obj
    * Actualiza un objeto en el sistema
    * @param object El nuevo objeto con la información actualizada
    */
-  public T update( K key, T object)
+  public synchronized T update( K key, T object)
   {
     server.update(key, object);
     return cache.replace(key, object);
@@ -70,7 +70,7 @@ public class CacheManager<K,T>                     // K= Key type,  T=Cached obj
    * @param id Identificador del objeto
    * @return El objeto solicitado si se encuentra; null si el objeto no se encuentra
    */
-  public T fetch( K id)
+  public synchronized T fetch( K id)
   {
     T theObject = cache.fetch(id);
     if ( theObject == null )
@@ -87,7 +87,7 @@ public class CacheManager<K,T>                     // K= Key type,  T=Cached obj
    * @param id Identificador del objeto
    * @return El objeto removido, si existe; null si no existe
    */
-  public T remove( K id)
+  public synchronized T remove( K id)
   {
     server.remove( id);
     return cache.remove( id);
@@ -99,7 +99,7 @@ public class CacheManager<K,T>                     // K= Key type,  T=Cached obj
    * @param id Identificador del objeto
    * @return El objeto removido, si existe; null si no existe
    */
-  public T invalidate( K id)
+  public synchronized T invalidate( K id)
   {
     return cache.remove(id);
   }//invalidate
@@ -108,7 +108,7 @@ public class CacheManager<K,T>                     // K= Key type,  T=Cached obj
    * Aplana la estructura del objeto en un String
    * @return String que representa el objeto
    */
-  public String toString()
+  public synchronized String toString()
   {
          return cache.toString()+ server.toString();
   }//toString

@@ -55,7 +55,7 @@ public class Cache<K,T>
    * para hacer campo para nuevos objetos
    * @param obj - The candidate for addition to the caché
    */
-  public void add(K key, T obj)
+  public synchronized void add(K key, T obj)
   {
     if ( cache.get(key) == null )
     {
@@ -96,7 +96,7 @@ public class Cache<K,T>
    * @return objeto solicitado, cuando se encuentra;
    * null si no se encuentra
    */
-  public T fetch(K key)
+  public synchronized T fetch(K key)
   {
     LinkedList<K,T> foundLink = cache.get(key);
     if ( foundLink == null )
@@ -130,7 +130,7 @@ public class Cache<K,T>
    * @return La versión antigua del objeto, si existe;
    * null si no existe
    */
-  public T replace( K key, T object)
+  public synchronized T replace( K key, T object)
   {
     LinkedList<K,T> foundLink = cache.get(key);
     if ( foundLink == null )
@@ -140,7 +140,7 @@ public class Cache<K,T>
     foundLink.object  = object;
     fetch( key);
     return oldObject;
-  }//update
+  }//replace(key, object)
 
 
   /**
@@ -148,7 +148,7 @@ public class Cache<K,T>
    * @param key Identificador del objeto a remover
    * @return El objeto removido, si existe; null si no existe
    */
-  public T remove( K key)
+  public synchronized T remove( K key)
   {
     LinkedList<K,T> foundLink = cache.remove(key);
     if ( foundLink == null )
@@ -181,13 +181,13 @@ public class Cache<K,T>
    * Aplana la estructura del caché en un String
    * @return String que representa el caché
    */
-  public String toString()
+  public synchronized String toString()
   {
     StringBuffer b = new StringBuffer();
     b.append("[Cache - size("+ cache.keySet().size()+ ")")
      .append( " maxSize("+ maxSize+ ")")
-     .append( " mru(").append(mru == null? "null": (mru.object == null? "nulo": mru.key)).append(")")
-     .append( " lru(").append(lru == null? "null": (lru.object == null? "nulo": lru.key)).append(")")
+     .append( " mru(").append(mru == null? "null": (mru.object == null? "null": mru.key)).append(")")
+     .append( " lru(").append(lru == null? "null": (lru.object == null? "null": lru.key)).append(")")
      .append( "\n");
 
     for( LinkedList<K,T> node= mru; node != null; node = node.next)
@@ -201,7 +201,7 @@ public class Cache<K,T>
   }//toString
 
   /** Limpia el caché  */
-  public void clear()
+  public synchronized void clear()
   {
      cache.clear();
      this.mru     = null;
