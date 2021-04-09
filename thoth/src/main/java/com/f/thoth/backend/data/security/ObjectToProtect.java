@@ -68,7 +68,7 @@ public class ObjectToProtect
    protected Integer         category;      // Security category
 
    @ManyToOne
-   protected User      userOwner;     // User that owns this object
+   protected User            userOwner;     // User that owns this object
 
    @ManyToOne
    protected Role            roleOwner;     // Role that owns this object
@@ -114,7 +114,7 @@ public class ObjectToProtect
    public Integer         getCategory() {return category;}
    public void            setCategory(Integer category) {this.category = category;}
 
-   public User      getUserOwner() {return userOwner;}
+   public User            getUserOwner() {return userOwner;}
    public void            setUserOwner(User userOwner) {this.userOwner = userOwner;}
 
    public Role            getRoleOwner() {return roleOwner;}
@@ -169,7 +169,7 @@ public class ObjectToProtect
 
    public boolean canBeAccessedBy(Integer userCategory) { return userCategory != null && category.compareTo(userCategory) <= 0;}
 
-   public boolean isOwnedBy( User user)           { return userOwner    != null && userOwner.equals(user);}
+   public boolean isOwnedBy( User user)                 { return userOwner    != null && userOwner.equals(user);}
 
    public boolean isOwnedBy( Role role)                 { return role         != null && roleOwner.equals(role);}
 

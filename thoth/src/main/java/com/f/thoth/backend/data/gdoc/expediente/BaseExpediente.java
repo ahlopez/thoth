@@ -125,11 +125,11 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
    protected ObjectToProtect   objectToProtect;             // Associated security object
 
    @NotNull  (message = "{evidentia.creator.required}")
-   @ManyToOne
+   @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
    protected User        createdBy;                         // User that created this expediente
 
    @NotNull(message = "{evidentia.class.required}")
-   @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+   @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
    protected Classification    classificationClass;        // Classification class to which this expediente belongs (Subserie si TRD)
 
    @OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
@@ -141,7 +141,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
    @NotNull(message = "{evidentia.dateclosed.required}")
    protected LocalDateTime     dateClosed;                 // Date expediente was closed
 
-   @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+   @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
    protected BranchExpediente  owner;                      // Expediente to which this Branch/Leaf/Volume belongs
 
    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)

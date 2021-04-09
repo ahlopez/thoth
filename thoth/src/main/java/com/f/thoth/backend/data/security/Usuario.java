@@ -54,7 +54,7 @@ public abstract class Usuario extends BaseEntity implements NeedsProtection, Com
    @NotNull(message = "{evidentia.date.required}")
    protected LocalDate         toDate;               // Final date it can be used. default end of year
 
-   @OneToMany( fetch = FetchType.EAGER)
+   @OneToMany( cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
    @JoinColumn(name="role_id")
    @BatchSize(size = 20)
    @Valid

@@ -46,6 +46,7 @@ import com.f.thoth.backend.data.security.UserGroup;
             @NamedAttributeNode("code"),
             @NamedAttributeNode("name"),
             @NamedAttributeNode("owner"),
+            @NamedAttributeNode("level"),
             @NamedAttributeNode("dateOpened"),
             @NamedAttributeNode("dateClosed"),
             @NamedAttributeNode("classCode"),
@@ -319,7 +320,7 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
 
    @Override public boolean         canBeAccessedBy(Integer userCategory) { return objectToProtect.canBeAccessedBy(userCategory);}
 
-   @Override public boolean         isOwnedBy( User user)           { return objectToProtect.isOwnedBy(user);}
+   @Override public boolean         isOwnedBy( User user)                 { return objectToProtect.isOwnedBy(user);}
 
    @Override public boolean         isOwnedBy( Role role)                 { return objectToProtect.isOwnedBy(role);}
 
@@ -348,13 +349,19 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
    
    public String getRootCode()
    {
-       Classification parent  = owner;	   
+       Classification parent  = this;	   	   	   
 	   while (!parent.isRoot())
 	   {   parent  = parent.owner;		   
 	   }
-	   return parent.getClassCode();
+	   return TextUtil.pad(parent.getClassCode(),3);
 
    }//getRootCode
+   
+   
+   public String getTenantCode()
+   {
+	   return "["+ tenant.getId()+ "]";
+   }//getTenantCode
    
 
    protected synchronized Integer nextExpedienteNumber()

@@ -47,11 +47,18 @@ public class CacheManager<K,T>                     // K= Key type,  T=Cached obj
    */
   public synchronized void add(K key, T object)
   {
+	if (cache.fetch(key) == null)
+	{
+		cache.add(key, object);
+        server.add(key, object);
+	}
+	/*
     if ( server.fetch(key) == null)
     {
     	cache.add (key, object);
         server.add(key, object);
     }
+    */
 
   }//add
 
