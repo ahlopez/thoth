@@ -69,7 +69,6 @@ public class SingleUserService implements FilterableCrudService<User>
    public User createNew(User currentUser)
    {
       User singleUser = new User();
-      singleUser.setTenant(ThothSession.getCurrentTenant());
       return singleUser;
    }//createNew
 

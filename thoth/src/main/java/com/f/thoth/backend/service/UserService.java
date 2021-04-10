@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.f.thoth.backend.data.security.User;
+import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.repositories.UserRepository;
 
 @Service
@@ -16,7 +16,7 @@ public class UserService implements FilterableCrudService<User>
 {
 
    public  static final String MODIFY_LOCKED_USER_NOT_PERMITTED = "Usuario bloqueado. No puede ser modificado ni borrado";
-   private static final String DELETING_SELF_NOT_PERMITTED      = "Usted no puede borrar su propio usuario";
+ //  private static final String DELETING_SELF_NOT_PERMITTED      = "Usted no puede borrar su propio usuario";
    private final UserRepository userRepository;
 
    @Autowired
@@ -30,8 +30,7 @@ public class UserService implements FilterableCrudService<User>
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return getRepository().findByEmailLikeIgnoreCaseOrNameLikeIgnoreCaseOrLastNameLikeIgnoreCase(
-                                repositoryFilter, repositoryFilter, repositoryFilter, pageable);
+         return getRepository().findByEmailLikeIgnoreCaseOrFirstNameLikeIgnoreCaseOrLastNameLikeIgnoreCase( repositoryFilter, repositoryFilter, repositoryFilter, pageable);
       } else
       {
          return find(pageable);
@@ -44,8 +43,7 @@ public class UserService implements FilterableCrudService<User>
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return userRepository.countByEmailLikeIgnoreCaseOrNameLikeIgnoreCaseOrLastNameLikeIgnoreCase(
-         repositoryFilter, repositoryFilter, repositoryFilter);
+         return userRepository.countByEmailLikeIgnoreCaseOrFirstNameLikeIgnoreCaseOrLastNameLikeIgnoreCase( repositoryFilter, repositoryFilter, repositoryFilter);
       } else
       {
          return count();
@@ -64,7 +62,7 @@ public class UserService implements FilterableCrudService<User>
    }//find
 
    @Override
-   public User save(User currentUser, User entity)
+   public User save(com.f.thoth.backend.data.security.User currentUser, User entity)
    {
       throwIfUserLocked(entity);
       return getRepository().saveAndFlush(entity);
@@ -72,13 +70,14 @@ public class UserService implements FilterableCrudService<User>
 
    @Override
    @Transactional
-   public void delete(User currentUser, User userToDelete)
+   public void delete(com.f.thoth.backend.data.security.User currentUser, User userToDelete)
    {
-      throwIfDeletingSelf(currentUser, userToDelete);
+     // throwIfDeletingSelf(currentUser, userToDelete);
       throwIfUserLocked(userToDelete);
       FilterableCrudService.super.delete(currentUser, userToDelete);
    }//delete
 
+   /*
    private void throwIfDeletingSelf(User currentUser, User user)
    {
       if (currentUser.equals(user))
@@ -86,7 +85,7 @@ public class UserService implements FilterableCrudService<User>
          throw new UserFriendlyDataException(DELETING_SELF_NOT_PERMITTED);
       }
    }//throwIfDeletingSelf
-
+    */
    private void throwIfUserLocked(User entity)
    {
       if (entity != null && entity.isLocked())
@@ -96,7 +95,7 @@ public class UserService implements FilterableCrudService<User>
    }//throwIfUserLocked
 
    @Override
-   public User createNew(User currentUser)
+   public User createNew(com.f.thoth.backend.data.security.User currentUser)
    {
       return new User();
    }//createNew

@@ -6,7 +6,6 @@ import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -37,12 +36,12 @@ public abstract class Usuario extends BaseEntity implements NeedsProtection, Com
    @NotBlank(message = "{evidentia.name.required}")
    @Size(min = 1, max = 255, message="{evidentia.name.min.max.length}")
    protected String            name;                 // user first name
-
+ 
    @NotNull     (message= "{evidentia.category.required}")
    @Min(value=0, message= "{evidentia.category.minvalue}")
    @Max(value=5, message= "{evidentia.category.maxvalue}")
    protected Integer           userCategory;         // Security category
-
+ 
    @NotNull(message = "{evidentia.objectToProtect.required}")
    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
    protected ObjectToProtect   objectToProtect;      // Associated security object
@@ -55,7 +54,7 @@ public abstract class Usuario extends BaseEntity implements NeedsProtection, Com
    protected LocalDate         toDate;               // Final date it can be used. default end of year
 
    @OneToMany( cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-   @JoinColumn(name="role_id")
+  // @JoinColumn(name="role_id")
    @BatchSize(size = 20)
    @Valid
    protected Set<Role>         roles;                // Roles assigned to it

@@ -31,7 +31,7 @@ import com.f.thoth.backend.data.gdoc.numerator.Numerator;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
-import com.f.thoth.backend.data.security.User;
+import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.security.UserGroup;
 import com.f.thoth.backend.repositories.BaseExpedienteRepository;
 import com.f.thoth.backend.repositories.BranchExpedienteRepository;
@@ -711,52 +711,39 @@ public class DataGenerator implements HasLogger
 */
    private User createBaker(UserRepository userRepository, PasswordEncoder passwordEncoder)
    {
-      return userRepository.save(
-            createUser("baker@vaadin.com", "Heidi", "Carter", passwordEncoder.encode("baker"), Role.BAKER, false));
+      return userRepository.save(createUser("baker@vaadin.com",   "Heidi", "Carter", passwordEncoder.encode("baker"),   Role.BAKER,  false));
    }//createBaker
 
    private User createBarista(UserRepository userRepository, PasswordEncoder passwordEncoder)
    {
-      return userRepository.save(createUser("barista@vaadin.com", "Malin", "Castro",
-            passwordEncoder.encode("barista"), Role.BARISTA, true));
+      return userRepository.save(createUser("barista@vaadin.com", "Malin", "Castro", passwordEncoder.encode("barista"), Role.BARISTA, true));
    }//createBarista
 
    private User createAdmin(UserRepository userRepository, SingleUserRepository singleUserRepository, PasswordEncoder passwordEncoder)
    {
 	  Set<com.f.thoth.backend.data.security.Role> roleSet = new TreeSet<>();
 	  roleSet.add(adminRole);
-	  Set<UserGroup> groups = new TreeSet<>();
+ 	  Set<UserGroup> groups = new TreeSet<>();
 	  com.f.thoth.backend.data.security.User administrador = createSingleUser (
-					   "admin@vaadin.com", "password", "Lopez", "Alvaro", groups,
+					   tenant1, "admin@vaadin.com", "password", "Lopez", "Alvaro", groups,
 					   new Integer(5), LocalDate.now(), LocalDate.now().plusYears(5), roleSet, true);
 
-      User admin =  userRepository.save(
-            createUser("admin@vaadin.com", "Göran", "Rich", passwordEncoder.encode("admin"), "admin", true));
+      User admin =  userRepository.save( createUser("admin@vaadin.com", "Göran", "Rich", passwordEncoder.encode("admin"), "admin", true));
       ThothSession.setUser(administrador);
       return admin;
 
    }//createAdmin
    
    
-   String            email;                // user email
-   String            passwordHash;         // user password
-   String            lastName;             // User last name
-   Set<UserGroup>    groups;               // groups it belongs
-   String            name;                 // user first name
-   Integer           userCategory;         // Security category
-   ObjectToProtect   objectToProtect;      // Associated security object
-   LocalDate         fromDate;             // Initial date it can be used. default = now
-   LocalDate         toDate;               // Final date it can be used. default end of year
-   Set<Role>         roles;                // Roles assigned to it
-   boolean           locked;               // Is the user locked?
-   
    private com.f.thoth.backend.data.security.User createSingleUser (
-		   String email, String password, String lastName, String name, Set<UserGroup> groups,
+		   Tenant tenant, String email, String password, String lastName, String name, Set<UserGroup> groups,
 		   Integer userCategory, LocalDate fromDate, LocalDate toDate, Set<com.f.thoth.backend.data.security.Role>roles, boolean locked)
    {
 	   com.f.thoth.backend.data.security.User user = new com.f.thoth.backend.data.security.User();
-	   user.setEmail(email);             
+	   user.setEmail(email);     
+	   user.buildCode();
 	   user.setPasswordHash(passwordEncoder.encode(password));
+	   user.setCategory(userCategory);
 	   user.setLastName(lastName);          
 	   user.setGroups(groups);            
 	   user.setName(name);              
@@ -766,27 +753,26 @@ public class DataGenerator implements HasLogger
 	   user.setLocked(locked); 
 	   
 	   ObjectToProtect userObject = new ObjectToProtect();
-	   userObject.setCategory(userCategory);   
 	   userObject.setRoleOwner(adminRole);
 	   user.setObjectToProtect(userObject);   
 
 	   singleUserRepository.saveAndFlush(user);
 	   return user;
    }//createSingleUser
+   
 
    private void createDeletableUsers(UserRepository userRepository, PasswordEncoder passwordEncoder)
    {
-      userRepository.save(
-            createUser("peter@vaadin.com", "Peter", "Bush", passwordEncoder.encode("peter"), Role.BARISTA, false));
-      userRepository
-      .save(createUser("mary@vaadin.com", "Mary", "Ocon", passwordEncoder.encode("mary"), Role.BAKER, true));
+      userRepository.save( createUser("peter@vaadin.com", "Peter", "Bush", passwordEncoder.encode("peter"), Role.BARISTA, false));
+      userRepository.save( createUser("mary@vaadin.com",  "Mary",  "Ocon", passwordEncoder.encode("mary"),  Role.BAKER,   true ));
    }//createDeletableUsers
+   
 
    private User createUser(String email, String firstName, String lastName, String passwordHash, String role, boolean locked)
    {
       User user = new User();
       user.setEmail       (email);
-      user.setName        (firstName);
+      user.setFirstName   (firstName);
       user.setLastName    (lastName);
       user.setPasswordHash(passwordHash);
       user.setRole        (role);

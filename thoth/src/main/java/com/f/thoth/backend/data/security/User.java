@@ -3,7 +3,7 @@ package com.f.thoth.backend.data.security;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.persistence.Column;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
@@ -13,7 +13,6 @@ import javax.persistence.NamedEntityGraph;
 import javax.persistence.NamedEntityGraphs;
 import javax.persistence.NamedSubgraph;
 import javax.persistence.OneToMany;
-import javax.persistence.OrderColumn;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
@@ -83,10 +82,9 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
             )
          })
 @Entity
-@Table(name = "SINGLE_USER", indexes = { @Index(columnList = "email"), @Index(columnList = "lastName, name") })
+@Table(name = "SINGLE_USER", indexes = { @Index(columnList = "tenant_id, email"), @Index(columnList = "tenant_id, lastName, name") })
 public class User extends Usuario
 {
-
    public static final String BRIEF = "User.brief";
    public static final String FULL  = "User.full";
 
@@ -94,40 +92,41 @@ public class User extends Usuario
    @NotEmpty(message = "{evidentia.email.required}")
    @Email
    @Size(min=3, max = 255, message="{evidentia.email.length}")
-   @Column(unique = true)
-   protected String email;           // user email
+   protected String email;                                          // user email
 
    @NotNull
    @Size(min = 4, max = 255)
-   protected String passwordHash;    // user password
+   protected String passwordHash;                                   // user password
 
    @NotNull (message = "{evidentia.lastname.required}")
    @NotBlank(message = "{evidentia.lastname.required}")
    @NotEmpty(message = "{evidentia.lastname.required}")
    @Size(min= 2, max = 255, message= "{evidentia.lastname.length}")
-   protected String lastName;        // User last name
+   protected String lastName;                                       // User last name
 
-   @OneToMany(fetch = FetchType.EAGER)
-   @OrderColumn
+   @OneToMany( cascade = CascadeType.ALL, fetch = FetchType.EAGER)
    @JoinColumn(name="group_id")
    @BatchSize(size = 10)
    @Valid
-   protected Set<UserGroup>  groups; // groups it belongs
+   protected Set<UserGroup>  groups;                                // groups it belongs
 
 
    // ----------------- Constructor -----------------
    public User()
    {
       super();
-      email     = "";
-      lastName  = "";
-      groups    = new TreeSet<>();
+      this.email     = "";
+      this.lastName  = "";
+      this.groups    = new TreeSet<>();
       buildCode();
-   }
+   }//User
 
-   public User( String email, String passwordHash, String lastName)
+   public User( Tenant tenant, String email, String passwordHash, String lastName)
    {
       super();
+      
+      if ( tenant == null)
+          throw new IllegalArgumentException("Tenant del nuevo usuario no puede ser nulo");
 
       if ( !TextUtil.isValidEmail(email))
          throw new IllegalArgumentException("Email["+ email+ "] inválido");
@@ -138,6 +137,7 @@ public class User extends Usuario
       if (TextUtil.isEmpty(lastName))
          throw new IllegalArgumentException("Apellido["+ lastName+ "] inválido");
 
+      this.tenant       = tenant;
       this.email        = email;
       this.passwordHash = passwordHash;
       this.lastName     = lastName;
@@ -156,7 +156,7 @@ public class User extends Usuario
 
    }//prepareData
 
-   @Override protected void buildCode(){this.code = (tenant == null? "[Tenant]": tenant.getCode())+ ">"+ (email==null? "[email]": email);}
+   @Override public void buildCode(){this.code = (tenant == null? "[Tenant]": tenant.getCode())+ ">"+ (email==null? "[email]": email);}
 
    // --------------- Getters & Setters -----------------
    public String getPasswordHash() { return passwordHash;}

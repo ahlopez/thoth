@@ -16,8 +16,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
 import com.f.thoth.backend.data.Role;
-import com.f.thoth.backend.data.security.User;
-import com.f.thoth.backend.repositories.UserRepository;
+import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.repositories.SingleUserRepository;
 import com.f.thoth.ui.utils.Constant;
 
 /**
@@ -58,11 +58,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
 
    @Bean
    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-   public CurrentUser currentUser(UserRepository userRepository) {
+   public CurrentUser currentUser(SingleUserRepository userRepository) 
+   {
       final String username = SecurityUtils.getUsername();
-      User user =
-         username != null ? userRepository.findByEmailIgnoreCase(username) :
-            null;
+      com.f.thoth.backend.data.security.User user = (username != null) ? userRepository.findByEmailIgnoreCase(ThothSession.getTenant(),  username) :  null;
       return () -> user;
    }
 

@@ -123,7 +123,7 @@ public class UserGroup extends Usuario implements HierarchicalEntity<UserGroup>
 
    @Override public boolean         canBeAccessedBy(Integer userCategory) { return objectToProtect.canBeAccessedBy(userCategory);}
 
-   @Override public boolean         isOwnedBy( User user)           { return objectToProtect.isOwnedBy(user);}
+   @Override public boolean         isOwnedBy( User user)                 { return objectToProtect.isOwnedBy(user);}
 
    @Override public boolean         isOwnedBy( Role role)                 { return objectToProtect.isOwnedBy(role);}
 

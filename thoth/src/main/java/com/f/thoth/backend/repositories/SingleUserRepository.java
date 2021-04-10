@@ -23,6 +23,10 @@ public interface SingleUserRepository extends JpaRepository<User, Long>
    Optional<User> findById(Long id);
 
    @EntityGraph(value = User.BRIEF, type = EntityGraphType.LOAD)
+   @Query("SELECT u FROM User u where u.tenant=?1 and u.email=?2")
+   User findByEmailIgnoreCase(Tenant tenant, String username);
+
+   @EntityGraph(value = User.BRIEF, type = EntityGraphType.LOAD)
    @Query("SELECT u FROM User u where u.tenant=?1")
    List<User> findAll(Tenant tenant);
 

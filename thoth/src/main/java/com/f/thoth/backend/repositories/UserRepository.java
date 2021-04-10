@@ -4,17 +4,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.f.thoth.backend.data.security.User;
+import com.f.thoth.backend.data.entity.User;
 
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, Long> 
+{
 
    User findByEmailIgnoreCase(String email);
 
    Page<User> findBy(Pageable pageable);
 
-   Page<User> findByEmailLikeIgnoreCaseOrNameLikeIgnoreCaseOrLastNameLikeIgnoreCase(
+   Page<User> findByEmailLikeIgnoreCaseOrFirstNameLikeIgnoreCaseOrLastNameLikeIgnoreCase(
          String emailLike, String firstNameLike, String lastNameLike, Pageable pageable);
 
-   long countByEmailLikeIgnoreCaseOrNameLikeIgnoreCaseOrLastNameLikeIgnoreCase(
-         String emailLike, String nameLike, String lastNameLike);
+   long countByEmailLikeIgnoreCaseOrFirstNameLikeIgnoreCaseOrLastNameLikeIgnoreCase(
+         String emailLike, String firstNameLike, String lastNameLike);
 }//UserRepository

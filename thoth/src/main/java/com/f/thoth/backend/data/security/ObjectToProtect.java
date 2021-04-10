@@ -65,7 +65,7 @@ public class ObjectToProtect
    @NotNull     (message= "{evidentia.category.required}")
    @Min(value=0, message= "{evidentia.category.minvalue}")
    @Max(value=5, message= "{evidentia.category.maxvalue}")
-   protected Integer         category;      // Security category
+   protected Integer         category;      // Minimum security category that can access this object
 
    @ManyToOne
    protected User            userOwner;     // User that owns this object

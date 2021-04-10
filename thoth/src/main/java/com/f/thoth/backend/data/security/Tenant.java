@@ -197,8 +197,8 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
    public int          getVersion() { return version; }
 
    public String       getCode() { return code; }
+   public String       quickCode()  {   return "["+ id+ "]"; }
    public void         setCode(String code) { this.code = code; }
-
 
    public String       getName()  { return name;}
    public void         setName( String name)
@@ -234,7 +234,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
    public Set<Role>          getRoles() { return roles;}
    public void               setRoles( Set<Role> roles) { this.roles = roles;}
 
-   public Set<User>    getSingleUsers() { return singleUsers;}
+   public Set<User>          getSingleUsers() { return singleUsers;}
    public void               setUsers( Set<User> singleUsers){ this.singleUsers = singleUsers;}
 
    public Set<UserGroup>     getUserGroups() { return userGroups;}
@@ -323,7 +323,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
       }
       return null;
    }//getTypeById
-
+   
 
 
 }//Tenant
