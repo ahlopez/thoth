@@ -3,7 +3,9 @@ package com.f.thoth.backend.data.gdoc.expediente;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -21,14 +23,14 @@ import com.f.thoth.backend.data.security.UserGroup;
 @Table(name = "VOLUME")
 public class Volume extends AbstractEntity implements  NeedsProtection, Comparable<Volume>
 {
-   @ManyToOne
+   @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
    @NotNull  (message = "{evidentia.expediente.required}")
    protected LeafExpediente       expediente;                              // Leaf expediente associated to the volume
 
    @NotNull  (message = "{evidentia.expediente.required}")
    protected Integer              currentInstance;                         // Current instace of this volume
 
-   @OneToMany
+   @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
    @NotNull  (message = "{evidentia.volume_instances.required}")
    protected Set<VolumeInstance>  instances;                               // Set of volume instances
 

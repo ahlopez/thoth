@@ -19,6 +19,7 @@ import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.BranchExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.Expediente;
+import com.f.thoth.backend.data.gdoc.expediente.ExpedienteIndex;
 import com.f.thoth.backend.data.gdoc.expediente.LeafExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.Volume;
 import com.f.thoth.backend.data.gdoc.expediente.VolumeInstance;
@@ -192,7 +193,7 @@ public class ExpedienteGenerator implements HasLogger
       base.setDateOpened          (LocalDateTime.now());
       base.setDateClosed          (LocalDateTime.MAX);
       base.setOwner               (parent);
-      base.setEntries             (new TreeSet<>());
+      base.setExpedienteIndex     (new ExpedienteIndex());
       base.setOpen                (true);
       base.setKeywords            (generateKeywords());
       base.setMac                 (generateMac());

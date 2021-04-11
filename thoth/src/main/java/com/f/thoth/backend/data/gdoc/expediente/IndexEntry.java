@@ -2,9 +2,11 @@ package com.f.thoth.backend.data.gdoc.expediente;
 
 import java.time.LocalDate;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -26,23 +28,24 @@ public class IndexEntry extends BaseEntity implements Comparable<IndexEntry>
    
    @NotNull     (message= "{evidentia.action.required}")
    @Enumerated(EnumType.STRING)
-   private Action               entryType;      // Tipo de operación realizada sobre el expediente
+   private Action               entryType;                            // Tipo de operación realizada sobre el expediente
    
-   @ManyToOne
-   private ExpedienteIndex     index;           
+   @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+   private ExpedienteIndex     index;                                 // Indice al que pertenece esta entrada 
    
-   @ManyToOne
-   private SchemaValues  attributes;
+   @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+   private SchemaValues        attributes;                            // Metadatos que describen la operación realizada
    
-   @ManyToOne
-   private ExpedienteIndex     expediente;
+   @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+   private BaseExpediente      expediente;                            // Expediente afectado por la operación           
    
-   @ManyToOne
-   private User    user;
+   @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+   private User                user;                                  // Usuario que realizó la operación   
    
-   private LocalDate     date;
+   @NotNull     (message= "{evidentia.date.required}")
+   private LocalDate           date;                                  // Fecha en que se realizó la operación
    
-   private String        reference;
+   private String              reference;                             // Nota de referencia asociada con la operación
 
 
    // TODO: Considerar implementar esto con Metadatos
@@ -52,10 +55,13 @@ public class IndexEntry extends BaseEntity implements Comparable<IndexEntry>
       buildCode();
    }
 
-   public IndexEntry(Action entryType, ExpedienteIndex expediente, User user, LocalDate date, String reference)
+   public IndexEntry(Action entryType, ExpedienteIndex index, BaseExpediente expediente, User user, LocalDate date, String reference)
    {
       if( entryType == null)
          throw new IllegalArgumentException("Tipo de entrada del índice no puede ser nula");
+
+      if( index == null)
+         throw new IllegalArgumentException("Índice al que pertenece la entrada no puede ser nulo");
 
       if( expediente == null)
          throw new IllegalArgumentException("Expediente del índice no puede ser nulo");
@@ -64,6 +70,7 @@ public class IndexEntry extends BaseEntity implements Comparable<IndexEntry>
          throw new IllegalArgumentException("Fecha de la entrada del índice no puede ser nula");
 
       this.entryType = entryType;
+      this.index     = index;
       this.expediente= expediente;
       this.user      = user;
       this.date      = date;
@@ -80,10 +87,10 @@ public class IndexEntry extends BaseEntity implements Comparable<IndexEntry>
    public Action           getEntryType() { return entryType; }
    public void             setEntryType(Action entryType) { this.entryType = entryType; }
 
-   public ExpedienteIndex        getExpediente() {  return expediente;}
-   public void             setExpediente(ExpedienteIndex expediente) {this.expediente = expediente;}
+   public BaseExpediente   getExpediente() {  return expediente;}
+   public void             setExpediente(BaseExpediente expediente) {this.expediente = expediente;}
 
-   public User       getUser() {return user;}
+   public User             getUser() {return user;}
    public void             setUser(User user) {this.user = user;}
 
    public LocalDate        getDate() {return date;}

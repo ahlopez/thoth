@@ -21,17 +21,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.f.thoth.backend.data.Role;
+import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.gdoc.classification.Level;
 import com.f.thoth.backend.data.gdoc.classification.Retention;
 import com.f.thoth.backend.data.gdoc.metadata.Field;
 import com.f.thoth.backend.data.gdoc.metadata.Metadata;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
+import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.gdoc.metadata.Type;
 import com.f.thoth.backend.data.gdoc.numerator.Numerator;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
-import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.security.UserGroup;
 import com.f.thoth.backend.repositories.BaseExpedienteRepository;
 import com.f.thoth.backend.repositories.BranchExpedienteRepository;
@@ -48,6 +49,7 @@ import com.f.thoth.backend.repositories.ProductRepository;
 import com.f.thoth.backend.repositories.RetentionRepository;
 import com.f.thoth.backend.repositories.RoleRepository;
 import com.f.thoth.backend.repositories.SchemaRepository;
+import com.f.thoth.backend.repositories.SchemaValuesRepository;
 import com.f.thoth.backend.repositories.SingleUserRepository;
 import com.f.thoth.backend.repositories.TenantRepository;
 import com.f.thoth.backend.repositories.UserGroupRepository;
@@ -101,6 +103,7 @@ public class DataGenerator implements HasLogger
    private VolumeInstanceRepository      volumeInstanceRepository;
    private LevelRepository               levelRepository;
    private SchemaRepository              schemaRepository;
+   private SchemaValuesRepository        schemaValuesRepository;
    private MetadataRepository            metadataRepository;
    private FieldRepository               fieldRepository;
    private RetentionRepository           retentionRepository;
@@ -118,9 +121,9 @@ public class DataGenerator implements HasLogger
          ClassificationRepository claseRepository, BaseExpedienteRepository baseExpedienteRepository,
          BranchExpedienteRepository branchExpedienteRepository, LeafExpedienteRepository leafExpedienteRepository,
          ExpedienteRepository expedienteRepository, VolumeRepository volumeRepository, VolumeInstanceRepository volumeInstanceRepository,
-         MetadataRepository metadataRepository, FieldRepository fieldRepository, SchemaRepository schemaRepository,
-         LevelRepository levelRepository, RetentionRepository retentionRepository, UserGroupRepository userGroupRepository,
-         SingleUserRepository singleUserRepository, Numerator numerator, PasswordEncoder passwordEncoder)
+         MetadataRepository metadataRepository, FieldRepository fieldRepository, SchemaRepository schemaRepository, 
+         SchemaValuesRepository schemaValuesRepository, LevelRepository levelRepository, RetentionRepository retentionRepository, 
+         UserGroupRepository userGroupRepository, SingleUserRepository singleUserRepository, Numerator numerator, PasswordEncoder passwordEncoder)
    {
       this.tenantService                 = tenantService;
 //      this.orderRepository               = orderRepository;
@@ -139,6 +142,7 @@ public class DataGenerator implements HasLogger
       this.volumeInstanceRepository      = volumeInstanceRepository;
       this.levelRepository               = levelRepository;
       this.schemaRepository              = schemaRepository;
+      this.schemaValuesRepository        = schemaValuesRepository;
       this.fieldRepository               = fieldRepository;
       this.metadataRepository            = metadataRepository;
       this.numerator                     = numerator;
@@ -181,12 +185,13 @@ public class DataGenerator implements HasLogger
          String[] roles2 = {"CEO", "Admin2", "CFO", "CIO", "COO"};
          createRoles(tenant2, roles2);
 
-         // ----------- Respetar este orden para la inicializacion de estos default -------------
+         // ----------- Respetar este orden para la inicializacion de los siguientes default -------------
          getLogger().info("... generating defaults");
 
          Schema.EMPTY.setTenant(tenant1);
          Schema.EMPTY.buildCode();
          schemaRepository.saveAndFlush(Schema.EMPTY);
+         schemaValuesRepository.saveAndFlush(SchemaValues.EMPTY);
 
          Level.DEFAULT.setTenant(tenant1);
          Level.DEFAULT.buildCode();

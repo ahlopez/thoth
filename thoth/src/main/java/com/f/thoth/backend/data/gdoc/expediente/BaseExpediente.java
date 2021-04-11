@@ -1,29 +1,23 @@
 package com.f.thoth.backend.data.gdoc.expediente;
 
 import java.time.LocalDateTime;
-import java.util.Set;
-import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
 import javax.persistence.NamedEntityGraphs;
 import javax.persistence.NamedSubgraph;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-
-import org.hibernate.annotations.BatchSize;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
@@ -34,6 +28,7 @@ import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
+import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.UserGroup;
 
@@ -79,7 +74,7 @@ import com.f.thoth.backend.data.security.UserGroup;
             @NamedAttributeNode("metadata"),
             @NamedAttributeNode("open"),
             @NamedAttributeNode("keywords"),
-            @NamedAttributeNode("entries"),
+            @NamedAttributeNode("expedienteIndex"),
             @NamedAttributeNode("mac"),
             @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)
          },
@@ -126,28 +121,27 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
    @NotNull  (message = "{evidentia.creator.required}")
    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
-   protected User        createdBy;                         // User that created this expediente
+   protected User              createdBy;                   // User that created this expediente
 
    @NotNull(message = "{evidentia.class.required}")
    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
-   protected Classification    classificationClass;        // Classification class to which this expediente belongs (Subserie si TRD)
+   protected Classification    classificationClass;         // Classification class to which this expediente belongs (Subserie si TRD)
 
    @OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-   protected SchemaValues      metadata;                   // Metadata values of the associated expediente
+   protected SchemaValues      metadata;                    // Metadata values of the associated expediente
 
    @NotNull(message = "{evidentia.dateopened.required}")
-   protected LocalDateTime     dateOpened;                 // Date expediente was opened
+   protected LocalDateTime     dateOpened;                  // Date expediente was opened
 
    @NotNull(message = "{evidentia.dateclosed.required}")
-   protected LocalDateTime     dateClosed;                 // Date expediente was closed
+   protected LocalDateTime     dateClosed;                  // Date expediente was closed
 
    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
    protected BranchExpediente  owner;                      // Expediente to which this Branch/Leaf/Volume belongs
 
-   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-   @JoinColumn(name="entry_id")
-   @BatchSize(size = 50)
-   protected Set<IndexEntry>   entries;                    // Expediente index entries
+   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+   @NotNull(message = "{evidentia.index.required}")
+   protected ExpedienteIndex   expedienteIndex;            // Expediente index entries
 
    @NotNull(message = "{evidentia.open.required}")
    protected Boolean           open;                       // Is the expediente currently open?
@@ -165,13 +159,13 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
       this.path                 = "";
       this.name                 = "";
       this.objectToProtect      = new ObjectToProtect();
-      this.createdBy            = null; // TODO: Current User
+      this.createdBy            = ThothSession.getCurrentUser();
       this.classificationClass  = null;
       this.metadata             = null;
       this.dateOpened           = LocalDateTime.MAX;
       this.dateClosed           = LocalDateTime.MAX;
       this.owner                = null;
-      this.entries              = new TreeSet<>();
+      this.expedienteIndex      = null;
       this.open                 = false;
       this.keywords             = null;
       this.mac                  = "";
@@ -181,7 +175,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
    public BaseExpediente( String expedienteCode, String path, String name, User createdBy, Classification classificationClass,
                           SchemaValues metadata, LocalDateTime dateOpened, LocalDateTime dateClosed, BranchExpediente owner,
-                          Boolean open, Set<IndexEntry> entries, String keywords, String mac)
+                          Boolean open, ExpedienteIndex expedienteIndex, String keywords, String mac)
    {
       if ( TextUtil.isEmpty(expedienteCode))
          throw new IllegalArgumentException("Código del expediente no puede ser nulo ni vacío");
@@ -202,7 +196,10 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
          throw new IllegalArgumentException("Clase del expediente no puede ser nula ni vacía");
 
       if ( dateOpened == null)
-         throw new IllegalArgumentException("Fecha de creación del expediente no puede ser nula");
+         throw new IllegalArgumentException("Estado de apertura del expediente es nulo. Debe ser true/false");
+
+      if ( expedienteIndex == null)
+         throw new IllegalArgumentException("Índice del expediente no puede ser nulo");
 
       this.objectToProtect     = new ObjectToProtect();
       this.expedienteCode      = expedienteCode;
@@ -214,8 +211,8 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
       this.dateOpened          = dateOpened;
       this.dateClosed          = dateClosed;
       this.owner               = owner;
-      this.entries             = (entries          == null? new TreeSet<>(): entries);
-      this.open                = (open             == null? false          : open);
+      this.expedienteIndex     = expedienteIndex;
+      this.open                = (open == null? false : open);
       this.keywords            = keywords;
       this.mac                 = mac;
 
@@ -252,7 +249,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
    public Classification    getClassificationClass() { return classificationClass;}
    public void              setClassificationClass( Classification classificationClass) { this.classificationClass = classificationClass;}
 
-   public User        getCreatedBy() { return createdBy;}
+   public User              getCreatedBy() { return createdBy;}
    public void              setCreatedBy( User createdBy){ this.createdBy = createdBy;}
 
    public LocalDateTime     getDateOpened() { return dateOpened;}
@@ -270,9 +267,8 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
    public String            getPath() { return path;}
    public void              setPath ( String path) { this.path = path;}
 
-   public Set<IndexEntry>   getEntries(){ return entries;}
-   public void              setEntries(Set<IndexEntry> entries){ this.entries = entries;}
-   public int               getIndexSize() { return entries.size();}
+   public ExpedienteIndex   getExpedienteIndex(){ return expedienteIndex;}
+   public void              setExpedienteIndex(ExpedienteIndex expedienteIndex){ this.expedienteIndex = expedienteIndex;}
 
    public String            getKeywords() { return keywords;}
    public void              setKeywords( String keywords) { this.keywords = keywords;}
@@ -313,7 +309,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
        .append( " dateClosed["+ TextUtil.formatDateTime(dateClosed)+ "]\n")
        .append( " objectToProtect["+ objectToProtect.toString()+ "]\n")
        .append( " expediente owner["+ (owner == null? "---": owner.getCode())+ "]")
-       .append( " n index-entries["+ entries.size()+ "]")
+       .append( " n index-entries["+ expedienteIndex.size()+ "]")
        .append( " path["+ path+ "]")
        .append( " mac=["+ mac+ "]")
        .append( " metadata["+ metadata.toString()+ "]")

@@ -2,6 +2,7 @@ package com.f.thoth.backend.data.gdoc.expediente;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -31,7 +32,6 @@ import org.hibernate.annotations.BatchSize;
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
-import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.document.jackrabbit.NodeType;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.security.NeedsProtection;
@@ -45,335 +45,325 @@ import com.f.thoth.backend.data.security.UserGroup;
  * Representa un indice de expediente
  */
 @NamedEntityGraphs({
-        @NamedEntityGraph(
-                        name = ExpedienteIndex.BRIEF,
-                        attributeNodes = {
-                                        @NamedAttributeNode("tenant"),
-                                        @NamedAttributeNode("code"),
-                                        @NamedAttributeNode("name"),
-                                        @NamedAttributeNode("type"),
-                                        @NamedAttributeNode("owner"),
-                                        @NamedAttributeNode("dateOpened"),
-                                        @NamedAttributeNode("dateClosed"),
-                                        @NamedAttributeNode("classificationClass"),
-                                        @NamedAttributeNode("path"),
-                                        @NamedAttributeNode("open"),
-                                        @NamedAttributeNode("path"),
-                                        @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF)
-                        },
-                        subgraphs = @NamedSubgraph(name = ObjectToProtect.BRIEF,
-                        attributeNodes = {
-                                        @NamedAttributeNode("category"),
-                                        @NamedAttributeNode("userOwner"),
-                                        @NamedAttributeNode("roleOwner"),
-                                        @NamedAttributeNode("restrictedTo")
-                        })
-                        ),
-        @NamedEntityGraph(
-                        name = ExpedienteIndex.FULL,
-                        attributeNodes = {
-                                        @NamedAttributeNode("tenant"),
-                                        @NamedAttributeNode("code"),
-                                        @NamedAttributeNode("name"),
-                                        @NamedAttributeNode("type"),
-                                        @NamedAttributeNode("owner"),
-                                        @NamedAttributeNode("createdBy"),
-                                        @NamedAttributeNode("dateOpened"),
-                                        @NamedAttributeNode("dateClosed"),
-                                        @NamedAttributeNode("classificationClass"),
-                                        @NamedAttributeNode("path"),
-                                        @NamedAttributeNode("metadata"),
-                                        @NamedAttributeNode("location"),
-                                        @NamedAttributeNode("mac"),
-                                        @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)
-                        },
-                        subgraphs = @NamedSubgraph(name = ObjectToProtect.FULL,
-                        attributeNodes = {
-                                        @NamedAttributeNode("category"),
-                                        @NamedAttributeNode("userOwner"),
-                                        @NamedAttributeNode("roleOwner"),
-                                        @NamedAttributeNode("restrictedTo"),
-                                        @NamedAttributeNode("acl")
-                        })
-                        // TODO:  Ojo, cargar el subgraph del Set<IndexEntry> entries
-                        // TODO:  Ojo, cargar el subraph del Set<String> keywords
-                        )
+   @NamedEntityGraph(
+   name = ExpedienteIndex.BRIEF,
+   attributeNodes = {
+      @NamedAttributeNode("tenant"),
+      @NamedAttributeNode("code"),
+      @NamedAttributeNode("name"),
+      @NamedAttributeNode("type"),
+      @NamedAttributeNode("owner"),
+      @NamedAttributeNode("expedienteCode"),
+      @NamedAttributeNode("dateOpened"),
+      @NamedAttributeNode("dateClosed"),
+      @NamedAttributeNode("path"),
+      @NamedAttributeNode("open"),
+      @NamedAttributeNode("path"),
+      @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF)
+   },
+   subgraphs = @NamedSubgraph(name = ObjectToProtect.BRIEF,
+   attributeNodes = {
+      @NamedAttributeNode("category"),
+      @NamedAttributeNode("userOwner"),
+      @NamedAttributeNode("roleOwner"),
+      @NamedAttributeNode("restrictedTo")
+   })
+   ),
+   @NamedEntityGraph(
+   name = ExpedienteIndex.FULL,
+   attributeNodes = {
+      @NamedAttributeNode("tenant"),
+      @NamedAttributeNode("code"),
+      @NamedAttributeNode("name"),
+      @NamedAttributeNode("type"),
+      @NamedAttributeNode("owner"),
+      @NamedAttributeNode("expedienteCode"),
+      @NamedAttributeNode("open"),
+      @NamedAttributeNode("createdBy"),
+      @NamedAttributeNode("dateOpened"),
+      @NamedAttributeNode("dateClosed"),
+      @NamedAttributeNode("path"),
+      @NamedAttributeNode("metadata"),
+      @NamedAttributeNode("keywords"),
+      @NamedAttributeNode("location"),
+      @NamedAttributeNode("mac"),
+      @NamedAttributeNode("entries"),
+      @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)
+   },
+   subgraphs = @NamedSubgraph(name = ObjectToProtect.FULL,
+   attributeNodes = {
+      @NamedAttributeNode("category"),
+      @NamedAttributeNode("userOwner"),
+      @NamedAttributeNode("roleOwner"),
+      @NamedAttributeNode("restrictedTo"),
+      @NamedAttributeNode("acl")
+   })
+   // TODO:  Ojo, cargar el subgraph del Set<IndexEntry> entries
+   )
 })
 
 @Entity
-@Table(name = "EXPEDIENTE_INDEX", indexes = { @Index(columnList = "code"), @Index(columnList= "keywords") })
+@Table(name = "EXPEDIENTE_INDEX", indexes = { @Index(columnList = "code"), @Index(columnList= "keywords")})
 public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, HierarchicalEntity<ExpedienteIndex>, Comparable<ExpedienteIndex>
 {
-        public static final String BRIEF = "ExpedienteIndex.brief";
-        public static final String FULL  = "ExpedienteIndex.full";
-
-        @NotNull  (message = "{evidentia.name.required}")
-        @NotBlank (message = "{evidentia.name.required}")
-        @NotEmpty (message = "{evidentia.name.required}")
-        @Size(max = 255)
-        @Column(unique = true)
-        protected String            name;                       // Expediente name
-
-        @NotNull(message = "{evidentia.objectToProtect.required}")
-        @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-        protected ObjectToProtect  objectToProtect;             // Associated security object
-
-        @NotNull(message = "{evidentia.level.required}")
-        @Enumerated(EnumType.STRING)
-        protected NodeType         type;                        // Node type: {EXPEDIENTE}
-
-        @ManyToOne
-        protected User             createdBy;                   // User that created this expediente
-
-        @NotNull(message = "{evidentia.class.required}")
-        @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-        protected Classification    classificationClass;        // Classification class to which this expediente belongs
-
-        @NotNull(message = "evidentia.metadata.required")
-        @OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-        protected SchemaValues      metadata;                   // Metadata values of the associated expediente
-
-        @NotNull(message = "{evidentia.dateopened.required}")
-        protected LocalDateTime     dateOpened;                 // Date expediente was opened
-
-        @NotNull(message = "{evidentia.dateclosed.required}")
-        protected LocalDateTime     dateClosed;                 // Date expediente was closed
-
-        @ManyToOne
-        protected ExpedienteIndex    owner;                     // Expediente to which this SUBEXPEDIENTE/VOLUMEN belongs
-
-        @NotNull(message = "{evidentia.expedientecode.required}")
-        protected String             expedienteCode;            // Expediente code
-
-        protected String             path;                      // Node path in document repository
-
-        @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-        @JoinColumn(name="entry_id")
-        @BatchSize(size = 50)
-        public Set<IndexEntry>       entries;                   // Entries in the index
-
-        @NotNull(message = "{evidentia.open.required}")
-        protected boolean            open;                      // Is the expediente currently open?
-
-        protected String             keywords;                  // Search keywords
+   public static final String BRIEF = "ExpedienteIndex.brief";
+   public static final String FULL  = "ExpedienteIndex.full";
+
+   @NotNull  (message = "{evidentia.name.required}")
+   @NotBlank (message = "{evidentia.name.required}")
+   @NotEmpty (message = "{evidentia.name.required}")
+   @Size(max = 255)
+   @Column(unique = true)
+   protected String             name;                       // Expediente name
+
+   @NotNull(message = "{evidentia.objectToProtect.required}")
+   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+   protected ObjectToProtect    objectToProtect;            // Associated security object
+
+   @NotNull(message = "{evidentia.type.required}")
+   @Enumerated(EnumType.STRING)
+   protected NodeType           type;                       // Node type: {EXPEDIENTE}
+
+   @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+   protected User               createdBy;                  // User that created this expediente
+
+   @NotNull(message = "evidentia.metadata.required")
+   @OneToOne(cascade= CascadeType.MERGE, fetch = FetchType.LAZY, orphanRemoval = true)
+   protected SchemaValues       metadata;                   // Metadata values of the associated expediente
+
+   @NotNull(message = "{evidentia.dateopened.required}")
+   protected LocalDateTime      dateOpened;                 // Date expediente was opened
+
+   @NotNull(message = "{evidentia.dateclosed.required}")
+   protected LocalDateTime      dateClosed;                 // Date expediente was closed
+
+   @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+   protected ExpedienteIndex    owner;                      // Expediente to which this SUBEXPEDIENTE/VOLUMEN belongs
+
+   @NotNull(message = "{evidentia.expedientecode.required}")
+   protected String             expedienteCode;             // Expediente code
+
+   protected String             path;                       // Node path in document repository
+
+   @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY, orphanRemoval = true)
+   @JoinColumn(name="entry_id")
+   @BatchSize(size = 50)
+   protected Set<IndexEntry>    entries;                    // Entries in the index
+
+   @NotNull(message = "{evidentia.open.required}")
+   protected boolean            open;                       // Is the expediente currently open?
+
+   protected String             keywords;                   // Search keywords
+
+   protected String             location;                   // Signatura topogrÃ¡fica
+
+   @NotNull(message = "{evidentia.mac.required}")
+   protected String             mac;                        // Message authentication code
+
+   // ------------- Constructors ------------------
+   public ExpedienteIndex()
+   {
+      super();
+      init();
+      objectToProtect = new ObjectToProtect();
+      buildCode();
+   }//ExpedienteIndex null constructor
 
-        protected String             location;                  // Signatura topográfica
+   public ExpedienteIndex( String name, String expedienteCode, ExpedienteIndex owner, ObjectToProtect objectToProtect)
+   {
+      if ( !TextUtil.isValidName(name))
+         throw new IllegalArgumentException("Nombre["+ name+ "] es inválido");
 
-        @NotNull(message = "{evidentia.mac.required}")
-        public String                mac;                       // Message authentication code
+      if ( TextUtil.isEmpty(name))
+         throw new IllegalArgumentException("Nombre del expediente no puede ser nulo ni vacío");
 
-        // ------------- Constructors ------------------
-        public ExpedienteIndex()
-        {
-                super();
-                init();
-                objectToProtect = new ObjectToProtect();
-                buildCode();
-        }//ExpedienteIndex null constructor
+      if ( objectToProtect == null)
+         throw new IllegalArgumentException("Objeto de seguridad del expediente no puede ser nulo");
+
+      init();
+      this.name                = TextUtil.nameTidy(name);
+      this.expedienteCode      = expedienteCode;
+      this.owner               = owner;
+      this.objectToProtect     = objectToProtect;
+      buildCode();
+   }//ExpedienteIndex constructor
+
+   private void init()
+   {
+      LocalDateTime now        = LocalDateTime.now();
+      this.name                = "[EXPEDIENTE_INDEX]";
+      this.type                = NodeType.EXPEDIENTE;
+      this.dateOpened          = now;
+      this.dateClosed          = LocalDateTime.MAX;
+      this.owner               = null;
+      this.metadata            = SchemaValues.EMPTY;
+      this.expedienteCode      = "[EXPEDIENTE_CODE]";
+      this.path                = "/";
+      this.entries             = new TreeSet<>();
+      this.mac                 = "";
+
+   }//init
+
+   @PrePersist
+   @PreUpdate
+   public void prepareData()
+   {
+      objectToProtect.prepareData();
+      buildCode();
+   }
 
-        public ExpedienteIndex( String name, Classification classificationClass, String expedienteCode, ExpedienteIndex owner, ObjectToProtect objectToProtect)
-        {
-                if ( !TextUtil.isValidName(name))
-                        throw new IllegalArgumentException("Nombre["+ name+ "] es invalido");
+   @Override protected void buildCode()
+   {
+      this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ "/"+ NodeType.EXPEDIENTE.getCode()+ "/"+
+                  (expedienteCode == null? "[expedienteCode]" : expedienteCode);
+      this.code = this.path;
+   }//buildCode
 
-                if ( TextUtil.isEmpty(name))
-                        throw new IllegalArgumentException("Nombre del expediente no puede ser nulo ni vacío");
 
-                if ( objectToProtect == null)
-                        throw new IllegalArgumentException("Objeto de seguridad del expediente no puede ser nulo");
+   // -------------- Getters & Setters ----------------
+   public void             setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect;}
+   public void             setOwner(ExpedienteIndex owner){ this.owner = owner;}
 
-                init();
-                this.name                = TextUtil.nameTidy(name);
-                this.classificationClass = classificationClass;
-                this.expedienteCode      = expedienteCode;
-                this.owner               = owner;
-                this.objectToProtect     = objectToProtect;
-                buildCode();
-        }//ExpedienteIndex constructor
-
-        private void init()
-        {
-                LocalDateTime now        = LocalDateTime.now();
-                this.dateOpened          = now;
-                this.dateClosed          = LocalDateTime.MAX;
-                this.owner               = null;
-                this.metadata            = null;
-                this.classificationClass = null;
-                this.expedienteCode      = null;
-                this.path                = "/";
-
-        }//init
-
-        @PrePersist
-        @PreUpdate
-        public void prepareData()
-        {
-                objectToProtect.prepareData();
-                buildCode();
-        }
+   public User             getCreatedBy() { return createdBy;}
+   public void             setCreatedBy( User createdBy){ this.createdBy = createdBy;}
 
-        @Override protected void buildCode()
-        {
-                this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ "/"+ NodeType.EXPEDIENTE.getCode()+ "/"+
-                                getOwnerPath(owner)+ (expedienteCode == null? "[expedienteCode]" : expedienteCode);
-                this.code = this.path;
-        }//buildCode
+   public LocalDateTime    getDateOpened() { return dateOpened;}
+   public void             setDateOpened( LocalDateTime dateOpened) { this.dateOpened = dateOpened;}
 
+   public LocalDateTime    getDateClosed() { return dateClosed;}
+   public void             setDateClosed( LocalDateTime dateClosed){ this.dateClosed = dateClosed;}
 
-        // -------------- Getters & Setters ----------------
-        public void             setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect; }
-        public void             setOwner(ExpedienteIndex owner){ this.owner = owner; }
+   public SchemaValues     getMetadata() { return metadata;}
+   public void             setMetadata ( SchemaValues metadata) { this.metadata = metadata;}
 
-        public Classification   getClassificationClass() { return classificationClass;}
-        public void             setClassificationClass( Classification classificationClass) { this.classificationClass = classificationClass;}
+   public String           getExpedienteCode() { return expedienteCode;}
+   public void             setExpedienteCode ( String expedienteCode) { this.expedienteCode = expedienteCode;}
 
-        public User       getCreatedBy() { return createdBy;}
-        public void             setCreatedBy( User createdBy){ this.createdBy = createdBy;}
+   public String           getPath() { return path;}
+   public void             setPath ( String path) { this.path = path;}
 
-        public LocalDateTime    getDateOpened() { return dateOpened;}
-        public void             setDateOpened( LocalDateTime dateOpened) { this.dateOpened = dateOpened;}
+   public Set<IndexEntry>  getEntries(){ return entries;}
+   public void             setEntries(Set<IndexEntry> entries){ this.entries = entries;}
+   public int              size() { return entries.size();}
 
-        public LocalDateTime    getDateClosed() { return dateClosed;}
-        public void             setDateClosed( LocalDateTime dateClosed){ this.dateClosed = dateClosed;}
+   public String           getKeywords() { return keywords;}
+   public void             setKeywords( String keywords) { this.keywords = keywords;}
 
-        public SchemaValues     getMetadata() { return metadata;}
-        public void             setMetadata ( SchemaValues metadata) { this.metadata = metadata;}
+   public String           getLocation() { return location;}
+   public void             setLocation(String location) { this.location = location;}
 
-        public Classification   getClassification() { return classificationClass;}
-        public void             setClassification ( Classification classificationClass) { this.classificationClass = classificationClass;}
+   public String           getMac() { return mac;}
+   public void             setMac(String mac) { this.mac = mac;}
 
-        public String           getExpedienteCode() { return expedienteCode;}
-        public void             setExpedienteCode ( String expedienteCode) { this.expedienteCode = expedienteCode;}
+   // --------------- Object methods ---------------------
 
-        public String           getPath() { return path;}
-        public void             setPath ( String path) { this.path = path;}
+   @Override public boolean equals( Object o)
+   {
+      if (this == o)
+         return true;
 
-        public Set<IndexEntry>  getEntries(){ return entries;}
-        public void             setEntries(Set<IndexEntry> entries){ this.entries = entries;}
-        public int              size() { return entries.size();}
+      if (!(o instanceof ExpedienteIndex ))
+         return false;
 
-        public String           getKeywords() { return keywords;}
-        public void             setKeywords( String keywords) { this.keywords = keywords;}
+      ExpedienteIndex that = (ExpedienteIndex) o;
+      return this.id != null && this.id.equals(that.id);
 
-        public String           getLocation() { return location;}
-        public void             setLocation(String location) { this.location = location;}
+   }//equals
 
-        public String           getMac() { return mac;}
-        public void             setMac(String mac) { this.mac = mac;}
+   @Override public int hashCode() { return id == null? 4027: id.hashCode();}
 
-        // --------------- Object methods ---------------------
+   @Override
+   public String toString()
+   {
+      StringBuilder s = new StringBuilder();
+      s.append( "ExpedienteIndex{")
+       .append(  super.toString())
+       .append(  "name["+ name+ "]")
+       .append( " expedienteCode["+ expedienteCode+ "]")
+       .append( " open["+ open+ "]")
+       .append( " type["+ type.getCode()+ "]")
+       .append( " createdBy["+ createdBy.getEmail()+ "]")
+       .append( " path["+ path+ "]")
+       .append( " dateOpened["+ TextUtil.formatDateTime(dateOpened)+ "]")
+       .append( " dateClosed["+ TextUtil.formatDateTime(dateClosed)+ "]\n")
+       .append( " objectToProtect["+ objectToProtect.toString()+ "]")
+       .append( " owner["+ owner.formatCode()+ "]")
+       .append( " path="+ path)
+       .append( " nEntries["+ entries.size()+ "]")
+       .append( " mac=["+ mac+ "]")
+       .append( " metadata["+ metadata.toString()+ "]")
+       .append( " keywords["+ keywords+ "]")
+       .append( " location["+ location+ "]")
+       .append("\n     }\n");
 
-        @Override public boolean equals( Object o)
-        {
-                if (this == o)
-                        return true;
+      return s.toString();
+   }//toString
 
-                if (!(o instanceof ExpedienteIndex ))
-                        return false;
 
-                ExpedienteIndex that = (ExpedienteIndex) o;
-                return this.id != null && this.id.equals(that.id);
+   @Override  public int compareTo(ExpedienteIndex that)
+   {
+      return this.equals(that)?  0 :
+      that == null?       1 :
+      this.getCode().compareTo(that.getCode());
 
-        }//equals
+   }// compareTo
 
-        @Override public int hashCode() { return id == null? 4027: id.hashCode();}
 
-        @Override
-        public String toString()
-        {
-                StringBuilder s = new StringBuilder();
-                s.append( "ExpedienteIndex{")
-                .append(  super.toString())
-                .append(  "name["+ name+ "]")
-                .append( " classCode["+ classificationClass.formatCode()+ "]")
-                .append( " expedienteCode["+ expedienteCode+ "]")
-                .append( " path["+ path+ "]")
-                .append( " dateOpened["+ TextUtil.formatDate(dateOpened.toLocalDate())+ "]")
-                .append( " dateClosed["+ TextUtil.formatDate(dateClosed.toLocalDate())+ "]\n")
-                .append( " objectToProtect["+ objectToProtect.toString()+ "]")
-                .append( " path="+ path)
-                .append( " mac=["+ mac+ "]")
-                .append("\n     }\n");
-                //TODO:  Revisar que estén todos los campos
+   // --------------- Implements NeedsProtection ------------------------------
 
-                return s.toString();
-        }//toString
+   public Integer       getCategory() {return objectToProtect.getCategory();}
+   public void          setCategory(Integer category) {objectToProtect.setCategory(category);}
 
+   public User          getUserOwner() {return objectToProtect.getUserOwner();}
+   public void          setUserOwner(User userOwner) {objectToProtect.setUserOwner(userOwner);}
 
-        @Override  public int compareTo(ExpedienteIndex that)
-        {
-                return this.equals(that)?  0 :
-                        that == null?       1 :
-                                this.getCode().compareTo(that.getCode());
+   public Role          getRoleOwner() {return objectToProtect.getRoleOwner();}
+   public void          setRoleOwner(Role roleOwner) {objectToProtect.setRoleOwner(roleOwner);}
 
-        }// compareTo
+   public UserGroup     getRestrictedTo() {return objectToProtect.getRestrictedTo();}
+   public void          setRestrictedTo(UserGroup restrictedTo) {objectToProtect.setRestrictedTo(restrictedTo);}
 
+   // --------------------------- Implements HierarchicalEntity ---------------------------------------
+   @Override public String            getName()   { return name;}
 
-        // --------------- Implements NeedsProtection ------------------------------
+   @Override public ExpedienteIndex   getOwner()  { return owner;}
 
-        public Integer               getCategory() {return objectToProtect.getCategory();}
-        public void                  setCategory(Integer category) {objectToProtect.setCategory(category);}
+   @Override public String            formatCode()
+   {
+      int i = TextUtil.indexOf(code, "/", 3);
+      String id = code.substring(i);
+      id = TextUtil.replace(id, "/", "-");
+      return id;
+   }//formatCode
 
-        public User            getUserOwner() {return objectToProtect.getUserOwner();}
-        public void                  setUserOwner(User userOwner) {objectToProtect.setUserOwner(userOwner);}
 
-        public Role                  getRoleOwner() {return objectToProtect.getRoleOwner();}
-        public void                  setRoleOwner(Role roleOwner) {objectToProtect.setRoleOwner(roleOwner);}
+   // -----------------  Implements NeedsProtection ----------------
 
-        public UserGroup             getRestrictedTo() {return objectToProtect.getRestrictedTo();}
-        public void                  setRestrictedTo(UserGroup restrictedTo) {objectToProtect.setRestrictedTo(restrictedTo);}
+   @Override public ObjectToProtect getObjectToProtect()                  { return objectToProtect;}
 
-        // --------------------------- Implements HierarchicalEntity ---------------------------------------
-        @Override public String           getName()   { return name;}
+   @Override public boolean         canBeAccessedBy(Integer userCategory) { return objectToProtect.canBeAccessedBy(userCategory);}
 
-        @Override public ExpedienteIndex   getOwner()  { return owner;}
+   @Override public boolean         isOwnedBy( User user)                 { return objectToProtect.isOwnedBy(user);}
 
-        @Override public String      formatCode()
-        {
-                int i = TextUtil.indexOf(code, "/", 3);
-                String id = code.substring(i);
-                id = TextUtil.replace(id, "/", "-");
-                return id;
-        }//formatCode
+   @Override public boolean         isOwnedBy( Role role)                 { return objectToProtect.isOwnedBy(role);}
 
+   @Override public boolean         isRestrictedTo( UserGroup userGroup)  { return objectToProtect.isRestrictedTo(userGroup);}
 
-        private String getOwnerPath(ExpedienteIndex owner)
-        {
-                String path = "";
-                while (owner != null)
-                {
-                        path = owner.getClassificationClass().getClassCode()+ "/"+ path;
-                        owner = owner.owner;
-                }
-                return  path;
-        }//getOwnerPath
+   @Override public boolean         admits( Role role)                    { return objectToProtect.admits(role);}
 
-        // -----------------  Implements NeedsProtection ----------------
+   @Override public void            grant( Permission  permission)        { objectToProtect.grant(permission);}
 
-        @Override public ObjectToProtect getObjectToProtect()                  { return objectToProtect;}
+   @Override public void            revoke(Permission permission)         { objectToProtect.revoke(permission);}
 
-        @Override public boolean         canBeAccessedBy(Integer userCategory) { return objectToProtect.canBeAccessedBy(userCategory);}
 
-        @Override public boolean         isOwnedBy( User user)           { return objectToProtect.isOwnedBy(user);}
+   // --------------- Logic ------------------------------
+   public boolean isOpen()
+   {
+      LocalDateTime now = LocalDateTime.now();
+      return open &&
+            ((now.equals(dateOpened) || now.equals(dateClosed)) ||
+            (now.isAfter(dateOpened) && now.isBefore(dateClosed))) ;
+   }//isOpen
 
-        @Override public boolean         isOwnedBy( Role role)                 { return objectToProtect.isOwnedBy(role);}
-
-        @Override public boolean         isRestrictedTo( UserGroup userGroup)  { return objectToProtect.isRestrictedTo(userGroup);}
-
-        @Override public boolean         admits( Role role)                    { return objectToProtect.admits(role);}
-
-        @Override public void            grant( Permission  permission)        { objectToProtect.grant(permission);}
-
-        @Override public void            revoke(Permission permission)         { objectToProtect.revoke(permission);}
-
-
-        // --------------- Logic ------------------------------
-        public boolean isOpen()
-        {
-          LocalDateTime now = LocalDateTime.now();
-          return open &&
-              ((now.equals(dateOpened) || now.equals(dateClosed)) ||
-                  (now.isAfter(dateOpened) && now.isBefore(dateClosed))) ;
-        }//isOpen
 
 }//ExpedienteIndex

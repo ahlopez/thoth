@@ -17,6 +17,8 @@ import com.f.thoth.ui.utils.Constant;
 @Table(name = "FIELD_VALUES")
 public class SchemaValues extends AbstractEntity implements SchemaValuesImporter, Comparable<SchemaValues>
 {
+   public static final SchemaValues  EMPTY = new SchemaValues();
+   
    @NotNull(message="{evientia.schema.required}")
    @ManyToOne
    @JoinColumn(name="esquema_id")

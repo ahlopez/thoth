@@ -3,7 +3,9 @@ package com.f.thoth.backend.data.gdoc.expediente;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -26,7 +28,7 @@ import com.f.thoth.backend.data.security.UserGroup;
 public class LeafExpediente extends AbstractEntity implements  NeedsProtection, Comparable<LeafExpediente>
 {
 
-   @OneToOne
+   @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
    @NotNull  (message = "{evidentia.expediente.required}")
    protected BaseExpediente    expediente;                 // Expediente that describes this leaf
 

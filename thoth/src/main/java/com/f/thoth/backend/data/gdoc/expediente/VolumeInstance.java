@@ -2,7 +2,9 @@ package com.f.thoth.backend.data.gdoc.expediente;
 
 import java.time.LocalDateTime;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
@@ -22,7 +24,7 @@ public class VolumeInstance extends AbstractEntity implements  Comparable<Volume
    @NotNull  (message = "{evidentia.volume.required}")
    protected Integer       instance;                                     // Index of the current volume
 
-   @ManyToOne
+   @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
    @NotNull  (message = "{evidentia.volume.required}")
    protected Volume        volume;                                       // Volume to which this instance belongs
 

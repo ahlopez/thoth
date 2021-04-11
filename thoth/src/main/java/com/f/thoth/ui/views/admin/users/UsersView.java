@@ -8,7 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.Role;
-import com.f.thoth.backend.data.security.User;
+import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.service.UserService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.crud.AbstractEvidentiaCrudView;
@@ -42,7 +42,7 @@ public class UsersView extends AbstractEvidentiaCrudView<User>
    public void setupGrid(Grid<User> grid) 
    {
       grid.addColumn(User::getEmail).setWidth("270px").setHeader("Email").setFlexGrow(5);
-      grid.addColumn(u -> u.getName() + " " + u.getLastName()).setHeader("Name").setWidth("200px").setFlexGrow(5);
+      grid.addColumn(u -> u.getFirstName() + " " + u.getLastName()).setHeader("Name").setWidth("200px").setFlexGrow(5);
     //  grid.addColumn(User::getRole).setHeader("Role").setWidth("150px");
    }
 
