@@ -30,7 +30,7 @@ public class Volume extends AbstractEntity implements  NeedsProtection, Comparab
    @NotNull  (message = "{evidentia.expediente.required}")
    protected Integer              currentInstance;                         // Current instace of this volume
 
-   @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
    @NotNull  (message = "{evidentia.volume_instances.required}")
    protected Set<VolumeInstance>  instances;                               // Set of volume instances
 
@@ -69,8 +69,8 @@ public class Volume extends AbstractEntity implements  NeedsProtection, Comparab
    public Integer                   getCategory()                           {return expediente.getCategory();}
    public void                      setCategory(Integer category)           {expediente.setCategory(category);}
 
-   public User                getUserOwner()                          {return expediente.getUserOwner();}
-   public void                      setUserOwner(User userOwner)      {expediente.setUserOwner(userOwner);}
+   public User                      getUserOwner()                          {return expediente.getUserOwner();}
+   public void                      setUserOwner(User userOwner)            {expediente.setUserOwner(userOwner);}
 
    public Role                      getRoleOwner()                          {return expediente.getRoleOwner();}
    public void                      setRoleOwner(Role roleOwner)            {expediente.setRoleOwner(roleOwner);}

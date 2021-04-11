@@ -167,13 +167,13 @@ public class ExpedienteGenerator implements HasLogger
       leaf.setExpediente(base);
       Set<DocumentType> admissibleTypes = generateAdmissibleTypes();
       leaf.setAdmissibleTypes(admissibleTypes);
+      leafExpedienteRepository.saveAndFlush(leaf);
       int  volProbability = random.nextInt(100);
       if ( volProbability < 15)
          createVolume(leaf);
       else
          createExpediente(leaf);
 
-      leafExpedienteRepository.saveAndFlush(leaf);
       return leaf;
 
    }//creeLeafExpediente
@@ -226,14 +226,12 @@ public class ExpedienteGenerator implements HasLogger
       VolumeInstance currentInstance = null;
       int nInstances = random.nextInt(3)+1;
       volume.setCurrentInstance(nInstances);
-      volumeRepository.saveAndFlush(volume);
       for (int instance=1; instance <= nInstances; instance++)
          currentInstance = createVolumeInstance(volume, instance);
 
-      volumeRepository.saveAndFlush(volume);
       currentInstance.setOpen(true);
       currentInstance.setDateOpened(LocalDateTime.now().minusDays((long)random.nextInt(1000)));
-      volumeInstanceRepository.saveAndFlush(currentInstance);
+      volumeRepository.saveAndFlush(volume);
    }//createVolume
 
 
@@ -254,11 +252,9 @@ public class ExpedienteGenerator implements HasLogger
       instance.setVolume(vol);
       instance.setInstance(i);
       instance.setPath(vol.getExpediente().getExpediente().getPath());
-      instance.setDateOpened(null);
-      instance.setDateClosed(null);
       instance.setOpen(false);
+      //volumeInstanceRepository.saveAndFlush(instance);
       vol.addInstance(instance);
-      volumeInstanceRepository.saveAndFlush(instance);
       return instance;
    }//createVolumeInstance
 

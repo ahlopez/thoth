@@ -13,6 +13,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.f.thoth.backend.data.entity.AbstractEntity;
+import com.f.thoth.backend.data.entity.util.TextUtil;
 
 /**
  * Representa un volumen documental (segun Moreq)
@@ -25,7 +26,7 @@ public class VolumeInstance extends AbstractEntity implements  Comparable<Volume
    protected Integer       instance;                                     // Index of the current volume
 
    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-   @NotNull  (message = "{evidentia.volume.required}")
+//   @NotNull  (message = "{evidentia.volume.required}")
    protected Volume        volume;                                       // Volume to which this instance belongs
 
    @NotNull  (message = "{evidentia.repopath.required}")
@@ -47,8 +48,8 @@ public class VolumeInstance extends AbstractEntity implements  Comparable<Volume
    public VolumeInstance()
    {
       super();
-      this.volume     = null;
       this.instance   = 0;
+      this.volume     = null;
       this.path       = "";
       this.dateOpened = LocalDateTime.MAX;
       this.dateClosed = LocalDateTime.MAX;
@@ -76,8 +77,8 @@ public class VolumeInstance extends AbstractEntity implements  Comparable<Volume
       if ( dateClosed == null)
          throw new IllegalArgumentException("Fecha de cierre del volumen no puede ser nula");
 
-      this.volume        = volume;
       this.instance      = instance;
+      this.volume        = volume;
       this.path          = path;
       this.dateOpened    = dateOpened;
       this.dateClosed    = dateClosed;
@@ -131,8 +132,8 @@ public class VolumeInstance extends AbstractEntity implements  Comparable<Volume
        .append( volume.toString())
        .append( " instance["   + instance+ "]")
        .append( " path["       + path+ "]")
-       .append( " date opened["+ dateOpened+ "]")
-       .append( " date closed["+ dateClosed+ "]")
+       .append( " date opened["+ TextUtil.formatDateTime(dateOpened)+ "]")
+       .append( " date closed["+ TextUtil.formatDateTime(dateClosed)+ "]")
        .append( " open["       + open+ "]}\n");
 
       return s.toString();
@@ -144,8 +145,12 @@ public class VolumeInstance extends AbstractEntity implements  Comparable<Volume
       if (other == null)
          return 1;
 
-      Volume that = other.getVolume();
-      return this.volume.compareTo(that);
+      Volume otherVolume = other.getVolume();
+      int compareVol = (this.volume == null? -1: this.volume.compareTo(otherVolume));
+      if ( compareVol != 0)
+    	  return compareVol;
+      
+      return this.instance == null? -1 : this.instance.compareTo(other.instance);
    }// compareTo
 
 
