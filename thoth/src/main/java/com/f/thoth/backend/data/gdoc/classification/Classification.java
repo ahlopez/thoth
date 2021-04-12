@@ -304,33 +304,33 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
 
    // -----------------  Implements NeedsProtection ----------------
 
-   public Integer                   getCategory() {return objectToProtect.getCategory();}
-   public void                      setCategory(Integer category) {objectToProtect.setCategory(category);}
+   public Integer                   getCategory()                           {return objectToProtect.getCategory();}
+   public void                      setCategory(Integer category)           {objectToProtect.setCategory(category);}
 
-   public User                      getUserOwner() {return objectToProtect.getUserOwner();}
-   public void                      setUserOwner(User userOwner) {objectToProtect.setUserOwner(userOwner);}
+   public User                      getUserOwner()                          {return objectToProtect.getUserOwner();}
+   public void                      setUserOwner(User userOwner)            {objectToProtect.setUserOwner(userOwner);}
 
-   public Role                      getRoleOwner() {return objectToProtect.getRoleOwner();}
-   public void                      setRoleOwner(Role roleOwner) {objectToProtect.setRoleOwner(roleOwner);}
+   public Role                      getRoleOwner()                          {return objectToProtect.getRoleOwner();}
+   public void                      setRoleOwner(Role roleOwner)            {objectToProtect.setRoleOwner(roleOwner);}
 
-   public UserGroup                 getRestrictedTo() {return objectToProtect.getRestrictedTo();}
+   public UserGroup                 getRestrictedTo()                       {return objectToProtect.getRestrictedTo();}
    public void                      setRestrictedTo(UserGroup restrictedTo) {objectToProtect.setRestrictedTo(restrictedTo);}
 
-   @Override public ObjectToProtect getObjectToProtect()                  { return objectToProtect;}
+   @Override public ObjectToProtect getObjectToProtect()                    { return objectToProtect;}
 
-   @Override public boolean         canBeAccessedBy(Integer userCategory) { return objectToProtect.canBeAccessedBy(userCategory);}
+   @Override public boolean         canBeAccessedBy(Integer userCategory)   { return objectToProtect.canBeAccessedBy(userCategory);}
 
-   @Override public boolean         isOwnedBy( User user)                 { return objectToProtect.isOwnedBy(user);}
+   @Override public boolean         isOwnedBy( User user)                   { return objectToProtect.isOwnedBy(user);}
 
-   @Override public boolean         isOwnedBy( Role role)                 { return objectToProtect.isOwnedBy(role);}
+   @Override public boolean         isOwnedBy( Role role)                   { return objectToProtect.isOwnedBy(role);}
 
-   @Override public boolean         isRestrictedTo( UserGroup userGroup)  { return objectToProtect.isRestrictedTo(userGroup);}
+   @Override public boolean         isRestrictedTo( UserGroup userGroup)    { return objectToProtect.isRestrictedTo(userGroup);}
 
-   @Override public boolean         admits( Role role)                    { return objectToProtect.admits(role);}
+   @Override public boolean         admits( Role role)                      { return objectToProtect.admits(role);}
 
-   @Override public void            grant( Permission  permission)        { objectToProtect.grant(permission);}
+   @Override public void            grant( Permission  permission)          { objectToProtect.grant(permission);}
 
-   @Override public void            revoke(Permission permission)         { objectToProtect.revoke(permission);}
+   @Override public void            revoke(Permission permission)           { objectToProtect.revoke(permission);}
 
 
    // --------------- Logic ------------------------------

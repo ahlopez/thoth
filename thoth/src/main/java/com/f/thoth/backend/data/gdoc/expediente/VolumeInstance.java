@@ -26,7 +26,7 @@ public class VolumeInstance extends AbstractEntity implements  Comparable<Volume
    protected Integer       instance;                                     // Index of the current volume
 
    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
-//   @NotNull  (message = "{evidentia.volume.required}")
+   @NotNull  (message = "{evidentia.volume.required}")
    protected Volume        volume;                                       // Volume to which this instance belongs
 
    @NotNull  (message = "{evidentia.repopath.required}")
@@ -58,7 +58,7 @@ public class VolumeInstance extends AbstractEntity implements  Comparable<Volume
    }//Volume
 
 
-   public VolumeInstance(Volume volume, Integer instance, String path, LocalDateTime  dateOpened, LocalDateTime  dateClosed)
+   public VolumeInstance(Volume volume, Integer instance, String parentPath, LocalDateTime  dateOpened, LocalDateTime  dateClosed)
    {
       super();
 
@@ -79,7 +79,7 @@ public class VolumeInstance extends AbstractEntity implements  Comparable<Volume
 
       this.instance      = instance;
       this.volume        = volume;
-      this.path          = path;
+      this.path          = parentPath + "/"+ instance;
       this.dateOpened    = dateOpened;
       this.dateClosed    = dateClosed;
       this.open          = false;

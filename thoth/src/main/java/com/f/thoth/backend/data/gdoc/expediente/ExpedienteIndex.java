@@ -5,7 +5,6 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -103,7 +102,7 @@ import com.f.thoth.backend.data.security.UserGroup;
 })
 
 @Entity
-@Table(name = "EXPEDIENTE_INDEX", indexes = { @Index(columnList = "code"), @Index(columnList= "keywords")})
+@Table(name = "EXPEDIENTE_INDEX", indexes = {@Index(columnList= "keywords")})
 public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, HierarchicalEntity<ExpedienteIndex>, Comparable<ExpedienteIndex>
 {
    public static final String BRIEF = "ExpedienteIndex.brief";
@@ -113,7 +112,6 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
    @NotBlank (message = "{evidentia.name.required}")
    @NotEmpty (message = "{evidentia.name.required}")
    @Size(max = 255)
-   @Column(unique = true)
    protected String             name;                       // Expediente name
 
    @NotNull(message = "{evidentia.objectToProtect.required}")
@@ -128,7 +126,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
    protected User               createdBy;                  // User that created this expediente
 
    @NotNull(message = "evidentia.metadata.required")
-   @OneToOne(cascade= CascadeType.MERGE, fetch = FetchType.LAZY, orphanRemoval = true)
+   @OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
    protected SchemaValues       metadata;                   // Metadata values of the associated expediente
 
    @NotNull(message = "{evidentia.dateopened.required}")
@@ -137,7 +135,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
    @NotNull(message = "{evidentia.dateclosed.required}")
    protected LocalDateTime      dateClosed;                 // Date expediente was closed
 
-   @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+   @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
    protected ExpedienteIndex    owner;                      // Expediente to which this SUBEXPEDIENTE/VOLUMEN belongs
 
    @NotNull(message = "{evidentia.expedientecode.required}")
@@ -160,44 +158,35 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
    @NotNull(message = "{evidentia.mac.required}")
    protected String             mac;                        // Message authentication code
 
+
    // ------------- Constructors ------------------
    public ExpedienteIndex()
    {
+	  this( null);
+   }//ExpedienteIndex null constructor
+   
+   public ExpedienteIndex(String code)
+   {
       super();
+    //  init(code);
       init();
       objectToProtect = new ObjectToProtect();
       buildCode();
-   }//ExpedienteIndex null constructor
-
-   public ExpedienteIndex( String name, String expedienteCode, ExpedienteIndex owner, ObjectToProtect objectToProtect)
-   {
-      if ( !TextUtil.isValidName(name))
-         throw new IllegalArgumentException("Nombre["+ name+ "] es inválido");
-
-      if ( TextUtil.isEmpty(name))
-         throw new IllegalArgumentException("Nombre del expediente no puede ser nulo ni vacío");
-
-      if ( objectToProtect == null)
-         throw new IllegalArgumentException("Objeto de seguridad del expediente no puede ser nulo");
-
-      init();
-      this.name                = TextUtil.nameTidy(name);
-      this.expedienteCode      = expedienteCode;
-      this.owner               = owner;
-      this.objectToProtect     = objectToProtect;
-      buildCode();
    }//ExpedienteIndex constructor
 
+
+  // private void init(String code)
    private void init()
-   {
+   { 
       LocalDateTime now        = LocalDateTime.now();
+	  this.code                = null;
       this.name                = "[EXPEDIENTE_INDEX]";
-      this.type                = NodeType.EXPEDIENTE;
+      this.type                = NodeType.EXPEDIENTE_INDEX;
       this.dateOpened          = now;
       this.dateClosed          = LocalDateTime.MAX;
       this.owner               = null;
       this.metadata            = SchemaValues.EMPTY;
-      this.expedienteCode      = "[EXPEDIENTE_CODE]";
+      this.expedienteCode      = obtainExpedienteCode(code);
       this.path                = "/";
       this.entries             = new TreeSet<>();
       this.mac                 = "";
@@ -214,15 +203,29 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
 
    @Override protected void buildCode()
    {
-      this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ "/"+ NodeType.EXPEDIENTE.getCode()+ "/"+
+      this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ "/"+ NodeType.EXPEDIENTE_INDEX.getCode()+ "/"+
                   (expedienteCode == null? "[expedienteCode]" : expedienteCode);
+     
       this.code = this.path;
    }//buildCode
+   
+   
+   private String  obtainExpedienteCode( String code)
+   {
+	   int i = code == null? -1 : code.lastIndexOf("/");
+	   String expedienteCode = i < 0? code: code.substring(i);
+	   return expedienteCode;
+   }//obtainExpedienteCode
 
 
    // -------------- Getters & Setters ----------------
    public void             setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect;}
    public void             setOwner(ExpedienteIndex owner){ this.owner = owner;}
+   
+   public void             setName( String name) { this.name = name;}
+   
+   public NodeType         getType() { return type;}
+   public void             setType( NodeType type) { this.type = type;}
 
    public User             getCreatedBy() { return createdBy;}
    public void             setCreatedBy( User createdBy){ this.createdBy = createdBy;}
@@ -245,6 +248,9 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
    public Set<IndexEntry>  getEntries(){ return entries;}
    public void             setEntries(Set<IndexEntry> entries){ this.entries = entries;}
    public int              size() { return entries.size();}
+   
+   public Boolean          getOpen() { return open;}
+   public void             setOpen( Boolean open) { this.open = open; }
 
    public String           getKeywords() { return keywords;}
    public void             setKeywords( String keywords) { this.keywords = keywords;}
@@ -357,13 +363,6 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
 
 
    // --------------- Logic ------------------------------
-   public boolean isOpen()
-   {
-      LocalDateTime now = LocalDateTime.now();
-      return open &&
-            ((now.equals(dateOpened) || now.equals(dateClosed)) ||
-            (now.isAfter(dateOpened) && now.isBefore(dateClosed))) ;
-   }//isOpen
 
 
 }//ExpedienteIndex

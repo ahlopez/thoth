@@ -28,7 +28,7 @@ import com.f.thoth.backend.data.security.UserGroup;
 public class LeafExpediente extends AbstractEntity implements  NeedsProtection, Comparable<LeafExpediente>
 {
 
-   @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
    @NotNull  (message = "{evidentia.expediente.required}")
    protected BaseExpediente    expediente;                 // Expediente that describes this leaf
 
@@ -115,8 +115,8 @@ public class LeafExpediente extends AbstractEntity implements  NeedsProtection, 
    public Integer                   getCategory()                           {return expediente.getCategory();}
    public void                      setCategory(Integer category)           {expediente.setCategory(category);}
 
-   public User                getUserOwner()                          {return expediente.getUserOwner();}
-   public void                      setUserOwner(User userOwner)      {expediente.setUserOwner(userOwner);}
+   public User                      getUserOwner()                          {return expediente.getUserOwner();}
+   public void                      setUserOwner(User userOwner)            {expediente.setUserOwner(userOwner);}
 
    public Role                      getRoleOwner()                          {return expediente.getRoleOwner();}
    public void                      setRoleOwner(Role roleOwner)            {expediente.setRoleOwner(roleOwner);}
@@ -128,7 +128,7 @@ public class LeafExpediente extends AbstractEntity implements  NeedsProtection, 
 
    @Override public boolean         canBeAccessedBy(Integer userCategory)   { return expediente.canBeAccessedBy(userCategory);}
 
-   @Override public boolean         isOwnedBy( User user)             { return expediente.isOwnedBy(user);}
+   @Override public boolean         isOwnedBy( User user)                   { return expediente.isOwnedBy(user);}
 
    @Override public boolean         isOwnedBy( Role role)                   { return expediente.isOwnedBy(role);}
 
@@ -141,6 +141,7 @@ public class LeafExpediente extends AbstractEntity implements  NeedsProtection, 
    @Override public void            revoke(Permission permission)           { expediente.revoke(permission);}
 
    // --------------- Logic ------------------------------
-
+   
+   public String  getPath()   {  return expediente.getPath();}
 
 }//LeafExpediente

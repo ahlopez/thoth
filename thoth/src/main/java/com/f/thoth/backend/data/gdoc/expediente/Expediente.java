@@ -1,6 +1,8 @@
 package com.f.thoth.backend.data.gdoc.expediente;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
@@ -20,7 +22,7 @@ import com.f.thoth.backend.data.security.UserGroup;
 @Table(name = "EXPEDIENTE")
 public class Expediente  extends AbstractEntity implements  NeedsProtection, Comparable<Expediente>
 {
-	  @ManyToOne
+	  @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
       @NotNull  (message = "{evidentia.expediente.required}")
       protected LeafExpediente       expediente;                              // Leaf expediente associated to the expediente
 

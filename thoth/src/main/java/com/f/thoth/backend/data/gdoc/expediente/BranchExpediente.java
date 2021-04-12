@@ -4,7 +4,9 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -26,11 +28,11 @@ import com.f.thoth.backend.data.security.UserGroup;
 @Table(name = "BRANCH_EXPEDIENTE")
 public class BranchExpediente extends AbstractEntity implements  NeedsProtection, HierarchicalEntity<BranchExpediente>, Comparable<BranchExpediente>
 {
-	@OneToOne
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@NotNull  (message = "{evidentia.expediente.required}")
 	protected BaseExpediente       expediente;                 // Expediente that describes this branch
 
-	@OneToMany
+	@OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
 	protected Set<BaseExpediente>  children;                   // Children of this expediente
 
 	// ------------- Constructors ------------------
@@ -78,8 +80,8 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 	public Integer                   getCategory()                           {return expediente.getCategory();}
 	public void                      setCategory(Integer category)           {expediente.setCategory(category);}
 
-	public User                getUserOwner()                          {return expediente.getUserOwner();}
-	public void                      setUserOwner(User userOwner)      {expediente.setUserOwner(userOwner);}
+	public User                      getUserOwner()                          {return expediente.getUserOwner();}
+	public void                      setUserOwner(User userOwner)            {expediente.setUserOwner(userOwner);}
 
 	public Role                      getRoleOwner()                          {return expediente.getRoleOwner();}
 	public void                      setRoleOwner(Role roleOwner)            {expediente.setRoleOwner(roleOwner);}
@@ -91,7 +93,7 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 
 	@Override public boolean         canBeAccessedBy(Integer userCategory)   { return expediente.canBeAccessedBy(userCategory);}
 
-	@Override public boolean         isOwnedBy( User user)             { return expediente.isOwnedBy(user);}
+	@Override public boolean         isOwnedBy( User user)                   { return expediente.isOwnedBy(user);}
 
 	@Override public boolean         isOwnedBy( Role role)                   { return expediente.isOwnedBy(role);}
 

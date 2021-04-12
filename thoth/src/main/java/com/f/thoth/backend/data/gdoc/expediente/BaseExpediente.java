@@ -1,6 +1,7 @@
 package com.f.thoth.backend.data.gdoc.expediente;
 
 import java.time.LocalDateTime;
+import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -74,6 +75,7 @@ import com.f.thoth.backend.data.security.UserGroup;
             @NamedAttributeNode("metadata"),
             @NamedAttributeNode("open"),
             @NamedAttributeNode("keywords"),
+            @NamedAttributeNode("location"),
             @NamedAttributeNode("expedienteIndex"),
             @NamedAttributeNode("mac"),
             @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)
@@ -146,6 +148,8 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
    @NotNull(message = "{evidentia.open.required}")
    protected Boolean           open;                       // Is the expediente currently open?
 
+   protected String            location;                   // Signatura topográfica
+
    protected String            keywords;                   // Search keywords
 
    @NotNull(message = "{evidentia.mac.required}")
@@ -217,6 +221,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
       this.mac                 = mac;
 
       buildCode();
+      createIndex();
    }//BaseExpediente constructor
 
    public void prepareData()
@@ -355,8 +360,8 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
    public Integer                   getCategory()                           {return objectToProtect.getCategory();}
    public void                      setCategory(Integer category)           {objectToProtect.setCategory(category);}
 
-   public User                getUserOwner()                          {return objectToProtect.getUserOwner();}
-   public void                      setUserOwner(User userOwner)      {objectToProtect.setUserOwner(userOwner);}
+   public User                      getUserOwner()                          {return objectToProtect.getUserOwner();}
+   public void                      setUserOwner(User userOwner)            {objectToProtect.setUserOwner(userOwner);}
 
    public Role                      getRoleOwner()                          {return objectToProtect.getRoleOwner();}
    public void                      setRoleOwner(Role roleOwner)            {objectToProtect.setRoleOwner(roleOwner);}
@@ -368,7 +373,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
    @Override public boolean         canBeAccessedBy(Integer userCategory)   { return objectToProtect.canBeAccessedBy(userCategory);}
 
-   @Override public boolean         isOwnedBy( User user)             { return objectToProtect.isOwnedBy(user);}
+   @Override public boolean         isOwnedBy( User user)                   { return objectToProtect.isOwnedBy(user);}
 
    @Override public boolean         isOwnedBy( Role role)                   { return objectToProtect.isOwnedBy(role);}
 
@@ -408,6 +413,28 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
          closeIndex();
       }
    }//closeExpediente
+
+   public void  createIndex()
+   {
+       expedienteIndex    = new ExpedienteIndex();
+       ObjectToProtect idxObjectToProtect = new ObjectToProtect();
+       idxObjectToProtect.setRoleOwner(getRoleOwner()); //TODO: El rol de acceso debe ser ADMIN
+       expedienteIndex.setObjectToProtect( idxObjectToProtect);
+       expedienteIndex.setName(name);
+       expedienteIndex.setType(NodeType.EXPEDIENTE_INDEX);
+       expedienteIndex.setCreatedBy(createdBy);
+       expedienteIndex.setMetadata(metadata);
+       expedienteIndex.setDateOpened(dateOpened);
+       expedienteIndex.setDateClosed(dateClosed);
+       expedienteIndex.setOwner(owner == null? null: owner.getExpediente().getExpedienteIndex());
+       expedienteIndex.setExpedienteCode(expedienteCode);
+       expedienteIndex.setEntries( new TreeSet<>());
+       expedienteIndex.setOpen(open);
+       expedienteIndex.setKeywords(keywords);
+       expedienteIndex.setLocation(location);
+       expedienteIndex.buildCode();
+       expedienteIndex.setMac("");  // TODO: El mac debe ser calculado internamente
+   }//createIndex
 
    protected void closeIndex()
    {

@@ -19,7 +19,6 @@ import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.BranchExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.Expediente;
-import com.f.thoth.backend.data.gdoc.expediente.ExpedienteIndex;
 import com.f.thoth.backend.data.gdoc.expediente.LeafExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.Volume;
 import com.f.thoth.backend.data.gdoc.expediente.VolumeInstance;
@@ -143,7 +142,7 @@ public class ExpedienteGenerator implements HasLogger
 
    private BranchExpediente creeBranchExpediente(Tenant tenant, User user, Classification classificationClass, BranchExpediente owner)
    {
-      BaseExpediente   base   = createBase( classificationClass,  owner);
+      BaseExpediente   base   = createBase( classificationClass, user, owner);
       BranchExpediente branch = new BranchExpediente();
       branch.setExpediente(base);
       int nChildren = random.nextInt(10)+1;
@@ -153,7 +152,8 @@ public class ExpedienteGenerator implements HasLogger
          branch.addChild(child);
       }
       branchExpedienteRepository.saveAndFlush(branch);
-
+      nExpedientes++;
+      
       return branch;
 
    }//creeBranchExpediente
@@ -162,29 +162,30 @@ public class ExpedienteGenerator implements HasLogger
 
    private LeafExpediente  creeLeafExpediente(Tenant tenant, User user, Classification classificationClass, BranchExpediente owner)
    {
-      BaseExpediente   base   = createBase( classificationClass,  owner);
+      BaseExpediente   base   = createBase( classificationClass, user, owner);
       LeafExpediente   leaf   = new LeafExpediente();
       leaf.setExpediente(base);
       Set<DocumentType> admissibleTypes = generateAdmissibleTypes();
       leaf.setAdmissibleTypes(admissibleTypes);
-      leafExpedienteRepository.saveAndFlush(leaf);
+   //   leafExpedienteRepository.saveAndFlush(leaf);
       int  volProbability = random.nextInt(100);
       if ( volProbability < 15)
          createVolume(leaf);
       else
          createExpediente(leaf);
 
+      nExpedientes++;
       return leaf;
 
    }//creeLeafExpediente
 
 
-   private BaseExpediente createBase(Classification classificationClass, BranchExpediente parent)
+   private BaseExpediente createBase(Classification classificationClass, User user, BranchExpediente parent)
    {
       BaseExpediente base     =   new BaseExpediente();
-      base.setPath                (assignExpedienteCode(base, classificationClass));
+      base.setExpedienteCode      (buildExpedienteCode(base, classificationClass));
+      base.setPath                (buildExpedientePath(base, base.getExpedienteCode()));
       base.setCode                (base.getPath());
-      base.setExpedienteCode      (base.formatCode());
       base.setName                (generateName());
       base.setObjectToProtect     (new ObjectToProtect());
       base.setCreatedBy           (user);
@@ -193,14 +194,14 @@ public class ExpedienteGenerator implements HasLogger
       base.setDateOpened          (LocalDateTime.now());
       base.setDateClosed          (LocalDateTime.MAX);
       base.setOwner               (parent);
-      base.setExpedienteIndex     (new ExpedienteIndex());
       base.setOpen                (true);
       base.setKeywords            (generateKeywords());
       base.setMac                 (generateMac());
-      baseExpedienteRepository.saveAndFlush(base);
+      base.createIndex();
+   //   baseExpedienteRepository.saveAndFlush(base);
 
       creeJCRNodo( base.getPath());
-      nExpedientes++;
+   
       return base;
 
    }//createBase
@@ -226,6 +227,7 @@ public class ExpedienteGenerator implements HasLogger
       VolumeInstance currentInstance = null;
       int nInstances = random.nextInt(3)+1;
       volume.setCurrentInstance(nInstances);
+      volumeRepository.save(volume);
       for (int instance=1; instance <= nInstances; instance++)
          currentInstance = createVolumeInstance(volume, instance);
 
@@ -251,23 +253,32 @@ public class ExpedienteGenerator implements HasLogger
       VolumeInstance instance = new VolumeInstance();
       instance.setVolume(vol);
       instance.setInstance(i);
-      instance.setPath(vol.getExpediente().getExpediente().getPath());
+      instance.setPath(vol.getPath()+ "/"+ i);
       instance.setOpen(false);
-      //volumeInstanceRepository.saveAndFlush(instance);
+      volumeInstanceRepository.saveAndFlush(instance);
       vol.addInstance(instance);
       return instance;
    }//createVolumeInstance
+   
+   
+
+   private String buildExpedientePath(BaseExpediente padre, String expedienteCode)
+   {
+	  String path = padre.getPath() + expedienteCode;
+      return path;
+   }//buildExpedientePath
 
 
 
-   private String assignExpedienteCode(BaseExpediente padre, Classification classificationClass)
+   private String buildExpedienteCode(BaseExpediente padre, Classification classificationClass)
    {
       int year = LocalDate.now().getYear();
       String seqKey = classificationClass.getTenantCode()+ classificationClass.getRootCode()+year+ "E";
       Numerator numerador = Numerator.getInstance();
       Sequence expedienteSequence = numerador.obtenga(seqKey);
-      return expedienteSequence.next();
-   }//assignExpedienteCode
+      String expedienteCode = expedienteSequence.next();
+      return expedienteCode;
+   }//buildExpedienteCode
 
 
 

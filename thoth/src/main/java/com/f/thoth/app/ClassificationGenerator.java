@@ -467,7 +467,7 @@ public class ClassificationGenerator implements HasLogger
       String prefix    = seqCode+ year;
       String suffix    = "E";
       String seqName   = prefix+ suffix;
-      numerator.getSequence(tenant, seqName, prefix, suffix, 0L, 1, 12);
+      numerator.getSequence(tenant, seqName, prefix, suffix, 0L, 1, 5);
       getLogger().info("    >>> Sequence["+seqName+ "] created");
    }//createSequence
 

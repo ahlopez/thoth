@@ -23,14 +23,14 @@ import com.f.thoth.backend.data.security.UserGroup;
 @Table(name = "VOLUME")
 public class Volume extends AbstractEntity implements  NeedsProtection, Comparable<Volume>
 {
-   @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+   @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
    @NotNull  (message = "{evidentia.expediente.required}")
    protected LeafExpediente       expediente;                              // Leaf expediente associated to the volume
 
    @NotNull  (message = "{evidentia.expediente.required}")
    protected Integer              currentInstance;                         // Current instace of this volume
 
-   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+   @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
    @NotNull  (message = "{evidentia.volume_instances.required}")
    protected Set<VolumeInstance>  instances;                               // Set of volume instances
 
@@ -54,35 +54,35 @@ public class Volume extends AbstractEntity implements  NeedsProtection, Comparab
 
 
    // ---------------------- getters & setters ---------------------
-   public LeafExpediente       getExpediente() { return expediente;}
-   public void                 setExpediente(LeafExpediente expediente){ this.expediente = expediente;}
+   public LeafExpediente            getExpediente() { return expediente;}
+   public void                      setExpediente(LeafExpediente expediente){ this.expediente = expediente;}
 
-   public Integer              getCurrentInstance() { return currentInstance;}
-   public void                 setCurrentInstance ( Integer currentInstance) { this.currentInstance = currentInstance;}
+   public Integer                   getCurrentInstance() { return currentInstance;}
+   public void                      setCurrentInstance ( Integer currentInstance) { this.currentInstance = currentInstance;}
 
-   public Set<VolumeInstance>  getInstances() {  return instances;}
-   public void                 setInstances(Set<VolumeInstance> instances) { this.instances = instances;}
+   public Set<VolumeInstance>       getInstances() {  return instances;}
+   public void                      setInstances(Set<VolumeInstance> instances) { this.instances = instances;}
 
 
    // -----------------  Implements NeedsProtection ----------------
 
-   public Integer                   getCategory()                           {return expediente.getCategory();}
-   public void                      setCategory(Integer category)           {expediente.setCategory(category);}
+   public Integer                   getCategory()                           { return expediente.getCategory();}
+   public void                      setCategory(Integer category)           { expediente.setCategory(category);}
 
-   public User                      getUserOwner()                          {return expediente.getUserOwner();}
-   public void                      setUserOwner(User userOwner)            {expediente.setUserOwner(userOwner);}
+   public User                      getUserOwner()                          { return expediente.getUserOwner();}
+   public void                      setUserOwner(User userOwner)            { expediente.setUserOwner(userOwner);}
 
-   public Role                      getRoleOwner()                          {return expediente.getRoleOwner();}
-   public void                      setRoleOwner(Role roleOwner)            {expediente.setRoleOwner(roleOwner);}
+   public Role                      getRoleOwner()                          { return expediente.getRoleOwner();}
+   public void                      setRoleOwner(Role roleOwner)            { expediente.setRoleOwner(roleOwner);}
 
-   public UserGroup                 getRestrictedTo()                       {return expediente.getRestrictedTo();}
-   public void                      setRestrictedTo(UserGroup restrictedTo) {expediente.setRestrictedTo(restrictedTo);}
+   public UserGroup                 getRestrictedTo()                       { return expediente.getRestrictedTo();}
+   public void                      setRestrictedTo(UserGroup restrictedTo) { expediente.setRestrictedTo(restrictedTo);}
 
    @Override public ObjectToProtect getObjectToProtect()                    { return expediente.getObjectToProtect();}
 
    @Override public boolean         canBeAccessedBy(Integer userCategory)   { return expediente.canBeAccessedBy(userCategory);}
 
-   @Override public boolean         isOwnedBy( User user)             { return expediente.isOwnedBy(user);}
+   @Override public boolean         isOwnedBy( User user)                   { return expediente.isOwnedBy(user);}
 
    @Override public boolean         isOwnedBy( Role role)                   { return expediente.isOwnedBy(role);}
 
@@ -133,9 +133,9 @@ public class Volume extends AbstractEntity implements  NeedsProtection, Comparab
    }//compareTo
 
    // ----------------------- Logic --------------------------
-   public void  addInstance( VolumeInstance instance)
-   {
-      instances.add(instance);
-   }
+   public void  addInstance( VolumeInstance instance) { instances.add(instance); }
+   
+   public String getPath() { return expediente.getPath();}
+   
 
 }//Volume
