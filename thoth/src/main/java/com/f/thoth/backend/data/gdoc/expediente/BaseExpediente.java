@@ -92,7 +92,7 @@ import com.f.thoth.backend.data.security.UserGroup;
     })
 
 @Entity
-@Table(name = "BASE_EXPEDIENTE", indexes = { @Index(columnList = "code"), @Index(columnList ="expedienteCode")}) //TODO: debe ser "tenant, expedienteCode"
+@Table(name = "BASE_EXPEDIENTE", indexes = { @Index(columnList = "code"), @Index(columnList ="tenant_id, expedienteCode")}) 
 public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comparable<BaseExpediente>
 {
    public static final String BRIEF = "BaseExpediente.brief";
@@ -129,7 +129,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
    protected Classification    classificationClass;         // Classification class to which this expediente belongs (Subserie si TRD)
 
-   @OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+   @OneToOne(cascade= CascadeType.MERGE, fetch = FetchType.LAZY, orphanRemoval = true)
    protected SchemaValues      metadata;                    // Metadata values of the associated expediente
 
    @NotNull(message = "{evidentia.dateopened.required}")
@@ -141,7 +141,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
    protected BranchExpediente  owner;                      // Expediente to which this Branch/Leaf/Volume belongs
 
-   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+   @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER, orphanRemoval = true)
    @NotNull(message = "{evidentia.index.required}")
    protected ExpedienteIndex   expedienteIndex;            // Expediente index entries
 
@@ -434,6 +434,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
        expedienteIndex.setLocation(location);
        expedienteIndex.buildCode();
        expedienteIndex.setMac("");  // TODO: El mac debe ser calculado internamente
+       setExpedienteIndex(expedienteIndex);
    }//createIndex
 
    protected void closeIndex()

@@ -33,6 +33,7 @@ import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.repositories.BaseExpedienteRepository;
 import com.f.thoth.backend.repositories.BranchExpedienteRepository;
 import com.f.thoth.backend.repositories.ClassificationRepository;
+import com.f.thoth.backend.repositories.ExpedienteIndexRepository;
 import com.f.thoth.backend.repositories.ExpedienteRepository;
 import com.f.thoth.backend.repositories.LeafExpedienteRepository;
 import com.f.thoth.backend.repositories.VolumeInstanceRepository;
@@ -42,8 +43,8 @@ public class ExpedienteGenerator implements HasLogger
 {
    private ClassificationRepository   claseRepository;
    private BaseExpedienteRepository   baseExpedienteRepository;
+   private ExpedienteIndexRepository  expedienteIndexRepository;
    private BranchExpedienteRepository branchExpedienteRepository;
-   private LeafExpedienteRepository   leafExpedienteRepository;
    private ExpedienteRepository       expedienteRepository;
    private VolumeRepository           volumeRepository;
    private VolumeInstanceRepository   volumeInstanceRepository;
@@ -74,15 +75,17 @@ public class ExpedienteGenerator implements HasLogger
 
 
    public ExpedienteGenerator(
-         ClassificationRepository claseRepository, Session jcrSession, BaseExpedienteRepository baseExpedienteRepository,
-         BranchExpedienteRepository branchExpedienteRepository, LeafExpedienteRepository leafExpedienteRepository,
-         ExpedienteRepository expedienteRepository, VolumeRepository volumeRepository, VolumeInstanceRepository volumeInstanceRepository
+         ClassificationRepository claseRepository, Session jcrSession,
+         BaseExpedienteRepository baseExpedienteRepository,
+         ExpedienteIndexRepository expedienteIndexRepository, BranchExpedienteRepository branchExpedienteRepository, 
+         LeafExpedienteRepository leafExpedienteRepository,   ExpedienteRepository expedienteRepository, 
+         VolumeRepository volumeRepository, VolumeInstanceRepository volumeInstanceRepository
          )
    {
       this.claseRepository            = claseRepository;
       this.baseExpedienteRepository   = baseExpedienteRepository;
+      this.expedienteIndexRepository  = expedienteIndexRepository;
       this.branchExpedienteRepository = branchExpedienteRepository;
-      this.leafExpedienteRepository   = leafExpedienteRepository;
       this.expedienteRepository       = expedienteRepository;
       this.volumeRepository           = volumeRepository;
       this.volumeInstanceRepository   = volumeInstanceRepository;
@@ -145,6 +148,7 @@ public class ExpedienteGenerator implements HasLogger
       BaseExpediente   base   = createBase( classificationClass, user, owner);
       BranchExpediente branch = new BranchExpediente();
       branch.setExpediente(base);
+      branchExpedienteRepository.saveAndFlush(branch);
       int nChildren = random.nextInt(10)+1;
       for( int i=0; i< nChildren; i++)
       {
@@ -190,7 +194,7 @@ public class ExpedienteGenerator implements HasLogger
       base.setObjectToProtect     (new ObjectToProtect());
       base.setCreatedBy           (user);
       base.setClassificationClass (classificationClass);
-      base.setMetadata            (new SchemaValues());
+      base.setMetadata            (SchemaValues.EMPTY);
       base.setDateOpened          (LocalDateTime.now());
       base.setDateClosed          (LocalDateTime.MAX);
       base.setOwner               (parent);
@@ -198,7 +202,8 @@ public class ExpedienteGenerator implements HasLogger
       base.setKeywords            (generateKeywords());
       base.setMac                 (generateMac());
       base.createIndex();
-   //   baseExpedienteRepository.saveAndFlush(base);
+      expedienteIndexRepository.saveAndFlush(base.getExpedienteIndex());
+      baseExpedienteRepository.saveAndFlush(base);
 
       creeJCRNodo( base.getPath());
    

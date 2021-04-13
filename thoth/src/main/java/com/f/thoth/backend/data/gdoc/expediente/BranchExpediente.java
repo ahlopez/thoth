@@ -28,7 +28,7 @@ import com.f.thoth.backend.data.security.UserGroup;
 @Table(name = "BRANCH_EXPEDIENTE")
 public class BranchExpediente extends AbstractEntity implements  NeedsProtection, HierarchicalEntity<BranchExpediente>, Comparable<BranchExpediente>
 {
-	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+	@OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
 	@NotNull  (message = "{evidentia.expediente.required}")
 	protected BaseExpediente       expediente;                 // Expediente that describes this branch
 

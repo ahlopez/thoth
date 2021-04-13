@@ -126,7 +126,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
    protected User               createdBy;                  // User that created this expediente
 
    @NotNull(message = "evidentia.metadata.required")
-   @OneToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+   @OneToOne(cascade= CascadeType.MERGE, fetch = FetchType.LAZY, orphanRemoval = true)
    protected SchemaValues       metadata;                   // Metadata values of the associated expediente
 
    @NotNull(message = "{evidentia.dateopened.required}")
@@ -135,7 +135,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
    @NotNull(message = "{evidentia.dateclosed.required}")
    protected LocalDateTime      dateClosed;                 // Date expediente was closed
 
-   @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+   @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
    protected ExpedienteIndex    owner;                      // Expediente to which this SUBEXPEDIENTE/VOLUMEN belongs
 
    @NotNull(message = "{evidentia.expedientecode.required}")
