@@ -41,7 +41,7 @@ import com.f.thoth.backend.repositories.VolumeRepository;
 
 public class ExpedienteGenerator implements HasLogger
 {
-   private ClassificationRepository   claseRepository;
+   private ClassificationRepository   claseRepository; 
    private BaseExpedienteRepository   baseExpedienteRepository;
    private ExpedienteIndexRepository  expedienteIndexRepository;
    private BranchExpedienteRepository branchExpedienteRepository;
