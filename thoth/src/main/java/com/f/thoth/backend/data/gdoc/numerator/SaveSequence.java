@@ -58,17 +58,17 @@ public class SaveSequence implements Instruction, Comparable<SaveSequence>
 			CreateSequence that = (CreateSequence) other;
 			merged = this.getCode().equals(that.getCode()) && this.setGreatestValue(that.getValue());
 		}
-		
-        if (other instanceof SaveSequence)
+
+		if (other instanceof SaveSequence)
 		{
 			SaveSequence that = (SaveSequence) other;
 			merged = this.getCode().equals(that.getCode()) && this.setGreatestValue(that.getValue());
 		}	
-        return merged;
+		return merged;
 	}// merge
 
 	public String   getCode()                     { return sequence.getCode();}
-	public Long     getValue()                    { return sequence.getValue();}
+	public Long     getValue()                    { return sequence.getValue().longValue();}
 	public boolean  setGreatestValue( Long value) { return sequence.setGreatestValue(value);}
 
 	// --------------- Object methods --------------------

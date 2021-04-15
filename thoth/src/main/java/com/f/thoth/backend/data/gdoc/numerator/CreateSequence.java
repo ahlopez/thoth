@@ -64,7 +64,7 @@ public class CreateSequence implements Instruction, Comparable<CreateSequence>
 	}// merge
 
 	public  String   getCode()                     { return sequence.getCode();}
-	public  Long     getValue()                    { return sequence.getValue();}
+	public  Long     getValue()                    { return sequence.getValue().longValue();}
 	public  boolean  setGreatestValue( Long value) { return sequence.setGreatestValue(value);}
 
 	// --------------- Object methods --------------------

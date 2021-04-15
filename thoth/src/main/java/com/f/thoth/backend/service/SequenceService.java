@@ -17,7 +17,7 @@ public class SequenceService implements Cache.Fetcher<String, Sequence>
 
 	/** Obtiene una instancia del encargado de persistir las secuencias */
 	@Autowired
-	private SequenceService(SequenceRepository sequenceRepository)
+	public SequenceService(SequenceRepository sequenceRepository)
 	{
 		this.sequenceRepository = sequenceRepository;
 		INSTANCE   = this;
@@ -92,7 +92,7 @@ public class SequenceService implements Cache.Fetcher<String, Sequence>
 	 */
 	public synchronized Sequence update(Sequence sequence)
 	{
-		sequenceRepository.saveAndFlush(sequence);
+		sequenceRepository.update( sequence.getId(), sequence.getValue());
 		return sequence;
 	}//update
 
@@ -104,7 +104,7 @@ public class SequenceService implements Cache.Fetcher<String, Sequence>
 	 */
 	public Sequence update(String key, Sequence sequence)
 	{
-		sequenceRepository.saveAndFlush(sequence);
+		sequenceRepository.update( Long.parseLong(key), sequence.getValue());
 		return sequence;
 	}//update
 

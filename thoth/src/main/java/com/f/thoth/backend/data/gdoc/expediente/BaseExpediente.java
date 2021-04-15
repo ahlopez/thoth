@@ -141,7 +141,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
    protected BranchExpediente  owner;                      // Expediente to which this Branch/Leaf/Volume belongs
 
-   @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER, orphanRemoval = true)
+   @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
    @NotNull(message = "{evidentia.index.required}")
    protected ExpedienteIndex   expedienteIndex;            // Expediente index entries
 
@@ -179,7 +179,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
    public BaseExpediente( String expedienteCode, String path, String name, User createdBy, Classification classificationClass,
                           SchemaValues metadata, LocalDateTime dateOpened, LocalDateTime dateClosed, BranchExpediente owner,
-                          Boolean open, ExpedienteIndex expedienteIndex, String keywords, String mac)
+                          Boolean open,String keywords, String mac)
    {
       if ( TextUtil.isEmpty(expedienteCode))
          throw new IllegalArgumentException("Código del expediente no puede ser nulo ni vacío");
@@ -202,9 +202,6 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
       if ( dateOpened == null)
          throw new IllegalArgumentException("Estado de apertura del expediente es nulo. Debe ser true/false");
 
-      if ( expedienteIndex == null)
-         throw new IllegalArgumentException("Índice del expediente no puede ser nulo");
-
       this.objectToProtect     = new ObjectToProtect();
       this.expedienteCode      = expedienteCode;
       this.path                = path;
@@ -215,13 +212,12 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
       this.dateOpened          = dateOpened;
       this.dateClosed          = dateClosed;
       this.owner               = owner;
-      this.expedienteIndex     = expedienteIndex;
       this.open                = (open == null? false : open);
       this.keywords            = keywords;
+      this.expedienteIndex     = null;
       this.mac                 = mac;
 
       buildCode();
-      createIndex();
    }//BaseExpediente constructor
 
    public void prepareData()
@@ -416,7 +412,8 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
    public void  createIndex()
    {
-       expedienteIndex    = new ExpedienteIndex();
+	   //TODO:  Iniciar el blockchain del indice
+       ExpedienteIndex expedienteIndex    = new ExpedienteIndex();
        ObjectToProtect idxObjectToProtect = new ObjectToProtect();
        idxObjectToProtect.setRoleOwner(getRoleOwner()); //TODO: El rol de acceso debe ser ADMIN
        expedienteIndex.setObjectToProtect( idxObjectToProtect);
@@ -436,6 +433,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
        expedienteIndex.setMac("");  // TODO: El mac debe ser calculado internamente
        setExpedienteIndex(expedienteIndex);
    }//createIndex
+   
 
    protected void closeIndex()
    {

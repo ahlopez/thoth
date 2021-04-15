@@ -15,8 +15,8 @@ public class PersistProducer implements Observer
 	 *  commandBuffer - Acciones sobre la imagen persistente de la secuencia
 	 *  INSTANCE      - La N instancia del singleton
 	 */
-	private static final int                   N_THREADS = 1;
-	private static final int                   MAX_QUEUE = 500;
+	private static final int                   N_THREADS = 3;
+	private static final int                   MAX_QUEUE = 5000;
 	private static PersistProducer              INSTANCE = null;
 	private static CommBuffer<Instruction> commandBuffer = null;
 

@@ -29,13 +29,7 @@ webdriver/
 /build-tools/yarn.lock
 
 # NPM
-#node/
-#node_modules/
-node_modules
+/node_modules/
+/node/
 webpack.generated.js
 
-#/package.json
-#/package-lock.json
-#/.metadata/.mylyn/
-#/.metadata/.plugins/
-#/.metadata/

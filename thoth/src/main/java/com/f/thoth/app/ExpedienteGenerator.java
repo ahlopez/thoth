@@ -41,7 +41,7 @@ import com.f.thoth.backend.repositories.VolumeRepository;
 
 public class ExpedienteGenerator implements HasLogger
 {
-   private ClassificationRepository   claseRepository; 
+   private ClassificationRepository   claseRepository;  
    private BaseExpedienteRepository   baseExpedienteRepository;
    private ExpedienteIndexRepository  expedienteIndexRepository;
    private BranchExpedienteRepository branchExpedienteRepository;
@@ -76,13 +76,13 @@ public class ExpedienteGenerator implements HasLogger
 
    public ExpedienteGenerator(
          ClassificationRepository claseRepository, Session jcrSession,
-         BaseExpedienteRepository baseExpedienteRepository,
-         ExpedienteIndexRepository expedienteIndexRepository, BranchExpedienteRepository branchExpedienteRepository, 
-         LeafExpedienteRepository leafExpedienteRepository,   ExpedienteRepository expedienteRepository, 
-         VolumeRepository volumeRepository, VolumeInstanceRepository volumeInstanceRepository
+         BaseExpedienteRepository baseExpedienteRepository, ExpedienteIndexRepository expedienteIndexRepository, 
+         BranchExpedienteRepository branchExpedienteRepository, LeafExpedienteRepository leafExpedienteRepository,   
+         ExpedienteRepository expedienteRepository, VolumeRepository volumeRepository, 
+         VolumeInstanceRepository volumeInstanceRepository
          )
    {
-      this.claseRepository            = claseRepository;
+      this.claseRepository            = claseRepository; 
       this.baseExpedienteRepository   = baseExpedienteRepository;
       this.expedienteIndexRepository  = expedienteIndexRepository;
       this.branchExpedienteRepository = branchExpedienteRepository;
@@ -131,7 +131,8 @@ public class ExpedienteGenerator implements HasLogger
 
    private BaseExpediente creeExpediente( Tenant tenant, User user, Classification classificationClass, BranchExpediente owner)
    {
-      int branchProbability =  random.nextInt(100);
+	//      int branchProbability =  random.nextInt(100);
+	      int branchProbability =  100;
       if ( branchProbability < 20)
       {
          BranchExpediente branch = creeBranchExpediente(tenant, user, classificationClass, owner);
@@ -149,7 +150,7 @@ public class ExpedienteGenerator implements HasLogger
       BranchExpediente branch = new BranchExpediente();
       branch.setExpediente(base);
       branchExpedienteRepository.saveAndFlush(branch);
-      int nChildren = random.nextInt(10)+1;
+      int nChildren = random.nextInt(4)+1;
       for( int i=0; i< nChildren; i++)
       {
          BaseExpediente child = creeExpediente( tenant, user, classificationClass, branch);
@@ -206,6 +207,7 @@ public class ExpedienteGenerator implements HasLogger
       baseExpedienteRepository.saveAndFlush(base);
 
       creeJCRNodo( base.getPath());
+      getLogger().info("    >>> Creó Base["+ base.getExpedienteCode()+ "]");
    
       return base;
 

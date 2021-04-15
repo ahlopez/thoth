@@ -350,7 +350,7 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
    public String getRootCode()
    {
        Classification parent  = this;	   	   	   
-	   while (!parent.isRoot())
+	   while ( !parent.isRoot() )
 	   {   parent  = parent.owner;		   
 	   }
 	   return TextUtil.pad(parent.getClassCode(),3);

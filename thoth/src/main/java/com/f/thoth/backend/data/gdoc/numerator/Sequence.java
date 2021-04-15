@@ -4,10 +4,12 @@ import java.util.Observable;
 import java.util.Observer;
 import java.util.concurrent.atomic.AtomicLong;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -45,7 +47,7 @@ public class Sequence extends Observable implements Comparable<Sequence>
 	protected String      code;                                   // Business id
 
 	@NotNull (message = "{evidentia.tenant.required}")
-	@ManyToOne
+	@ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
 	protected Tenant      tenant;                                 // Tenant owner of the sequence
 
 	@NotNull (message = "{evidentia.name.required}")
@@ -148,7 +150,7 @@ public class Sequence extends Observable implements Comparable<Sequence>
 	public  String      getSufijo()                     { return sufijo;}
 	public  void        setSufijo(String sufijo)        { this.sufijo = sufijo;}
 
-	public  Long        getValue()                      { return value.longValue();}
+	public  AtomicLong  getValue()                      { return value;}
 	public  void        setValue(Long value)            { this.value.set(value);}
 
 	public  Integer     getIncrement()                  { return increment;}
@@ -203,8 +205,8 @@ public class Sequence extends Observable implements Comparable<Sequence>
 	@Override  public int compareTo(Sequence that)
 	{
 		return this.equals(that)?  0 :
-			that == null?       1 :
-				this.code.compareTo(that.code);
+		       that == null?       1 :
+			   this.code.compareTo(that.code);
 
 	}// compareTo
 
