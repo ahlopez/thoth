@@ -1,7 +1,6 @@
 package com.f.thoth.backend.data.gdoc.expediente;
 
 import java.time.LocalDateTime;
-import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -46,7 +45,7 @@ import com.f.thoth.backend.data.security.UserGroup;
             @NamedAttributeNode("name"),
             @NamedAttributeNode("path"),
             @NamedAttributeNode("classificationClass"),
-            @NamedAttributeNode("owner"),
+            @NamedAttributeNode("ownerPath"),
             @NamedAttributeNode("open"),
             @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF)
          },
@@ -68,7 +67,7 @@ import com.f.thoth.backend.data.security.UserGroup;
             @NamedAttributeNode("name"),
             @NamedAttributeNode("classificationClass"),
             @NamedAttributeNode("createdBy"),
-            @NamedAttributeNode("owner"),
+            @NamedAttributeNode("ownerPath"),
             @NamedAttributeNode("path"),
             @NamedAttributeNode("dateOpened"),
             @NamedAttributeNode("dateClosed"),
@@ -76,7 +75,7 @@ import com.f.thoth.backend.data.security.UserGroup;
             @NamedAttributeNode("open"),
             @NamedAttributeNode("keywords"),
             @NamedAttributeNode("location"),
-            @NamedAttributeNode("expedienteIndex"),
+            //@NamedAttributeNode("expedienteIndex"),
             @NamedAttributeNode("mac"),
             @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)
          },
@@ -138,12 +137,15 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
    @NotNull(message = "{evidentia.dateclosed.required}")
    protected LocalDateTime     dateClosed;                  // Date expediente was closed
 
-   @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
-   protected BranchExpediente  owner;                      // Expediente to which this Branch/Leaf/Volume belongs
+   //@ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+   //protected BranchExpediente  owner;                      // Expediente to which this Branch/Leaf/Volume belongs
+   protected String             ownerPath;                   // Branch Expediente to which this Branch/Leaf/Volume belongs
 
-   @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+   /*
+   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
    @NotNull(message = "{evidentia.index.required}")
    protected ExpedienteIndex   expedienteIndex;            // Expediente index entries
+   */
 
    @NotNull(message = "{evidentia.open.required}")
    protected Boolean           open;                       // Is the expediente currently open?
@@ -168,17 +170,18 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
       this.metadata             = null;
       this.dateOpened           = LocalDateTime.MAX;
       this.dateClosed           = LocalDateTime.MAX;
-      this.owner                = null;
-      this.expedienteIndex      = null;
+      this.ownerPath            = null;
+    //  this.expedienteIndex      = null;
       this.open                 = false;
       this.keywords             = null;
       this.mac                  = "";
 
       buildCode();
    }//BaseExpediente null constructor
+   
 
    public BaseExpediente( String expedienteCode, String path, String name, User createdBy, Classification classificationClass,
-                          SchemaValues metadata, LocalDateTime dateOpened, LocalDateTime dateClosed, BranchExpediente owner,
+                          SchemaValues metadata, LocalDateTime dateOpened, LocalDateTime dateClosed, String ownerPath,
                           Boolean open,String keywords, String mac)
    {
       if ( TextUtil.isEmpty(expedienteCode))
@@ -211,25 +214,27 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
       this.metadata            = metadata;
       this.dateOpened          = dateOpened;
       this.dateClosed          = dateClosed;
-      this.owner               = owner;
+      this.ownerPath           = ownerPath;
       this.open                = (open == null? false : open);
       this.keywords            = keywords;
-      this.expedienteIndex     = null;
+     // this.expedienteIndex     = null;
       this.mac                 = mac;
 
       buildCode();
    }//BaseExpediente constructor
+   
 
    public void prepareData()
    {
       objectToProtect.prepareData();
       buildCode();
    }//prepareData
+   
 
    @Override protected void buildCode()
    {
       this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ "/"+ NodeType.EXPEDIENTE.getCode()+ "/"+
-                  getOwnerPath(owner)+ (expedienteCode == null? "[expedienteCode]" : expedienteCode);
+                  (ownerPath == null ? "[ROOT]/": ownerPath)+ (expedienteCode == null? "[expedienteCode]" : expedienteCode);
       this.code = this.path;
    }//buildCode
 
@@ -244,8 +249,8 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
    public void              setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect;}
 
-   public BranchExpediente  getOwner() { return owner;}
-   public void              setOwner(BranchExpediente owner){ this.owner = owner;}
+   public String            getOwnerPath() { return ownerPath;}
+   public void              setOwnerPath(String ownerPath){ this.ownerPath = ownerPath;}
 
    public Classification    getClassificationClass() { return classificationClass;}
    public void              setClassificationClass( Classification classificationClass) { this.classificationClass = classificationClass;}
@@ -267,15 +272,16 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
    public String            getPath() { return path;}
    public void              setPath ( String path) { this.path = path;}
-
+/*
    public ExpedienteIndex   getExpedienteIndex(){ return expedienteIndex;}
    public void              setExpedienteIndex(ExpedienteIndex expedienteIndex){ this.expedienteIndex = expedienteIndex;}
-
+*/
    public String            getKeywords() { return keywords;}
    public void              setKeywords( String keywords) { this.keywords = keywords;}
 
    public String            getMac() { return mac;}
    public void              setMac(String mac) { this.mac = mac;}
+   
 
    // --------------- Object methods ---------------------
 
@@ -309,8 +315,8 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
        .append( " dateOpened["+ TextUtil.formatDateTime(dateOpened)+ "]")
        .append( " dateClosed["+ TextUtil.formatDateTime(dateClosed)+ "]\n")
        .append( " objectToProtect["+ objectToProtect.toString()+ "]\n")
-       .append( " expediente owner["+ (owner == null? "---": owner.getCode())+ "]")
-       .append( " n index-entries["+ expedienteIndex.size()+ "]")
+       .append( " expediente owner["+ (ownerPath == null? "[ROOT]": ownerPath)+ "]")
+//       .append( " n index-entries["+ expedienteIndex.size()+ "]")
        .append( " path["+ path+ "]")
        .append( " mac=["+ mac+ "]")
        .append( " metadata["+ metadata.toString()+ "]")
@@ -338,7 +344,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
       return formattedCode;
    }//formatCode
 
-
+/*
    private String getOwnerPath(BranchExpediente owner)
    {
       String path = "";
@@ -349,7 +355,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
       }
       return  path;
    }//getOwnerPath
-
+*/
 
    // -----------------  Implements NeedsProtection ----------------
 
@@ -390,6 +396,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
            ((now.equals(dateOpened) || now.equals(dateClosed)) ||
             (now.isAfter(dateOpened) && now.isBefore(dateClosed))) ;
    }//isOpen
+   
 
    public void openExpediente()
    {
@@ -399,6 +406,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
          setDateOpened(LocalDateTime.now());
       }
    }//openExpediente
+   
 
    public void closeExpediente()
    {
@@ -409,8 +417,9 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
          closeIndex();
       }
    }//closeExpediente
+   
 
-   public void  createIndex()
+   public ExpedienteIndex  createIndex()
    {
 	   //TODO:  Iniciar el blockchain del indice
        ExpedienteIndex expedienteIndex    = new ExpedienteIndex();
@@ -423,15 +432,15 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
        expedienteIndex.setMetadata(metadata);
        expedienteIndex.setDateOpened(dateOpened);
        expedienteIndex.setDateClosed(dateClosed);
-       expedienteIndex.setOwner(owner == null? null: owner.getExpediente().getExpedienteIndex());
+       expedienteIndex.setOwnerPath(ownerPath);
        expedienteIndex.setExpedienteCode(expedienteCode);
-       expedienteIndex.setEntries( new TreeSet<>());
+//       expedienteIndex.setEntries( new TreeSet<>());
        expedienteIndex.setOpen(open);
        expedienteIndex.setKeywords(keywords);
        expedienteIndex.setLocation(location);
        expedienteIndex.buildCode();
        expedienteIndex.setMac("");  // TODO: El mac debe ser calculado internamente
-       setExpedienteIndex(expedienteIndex);
+       return expedienteIndex;
    }//createIndex
    
 

@@ -28,11 +28,11 @@ import com.f.thoth.backend.data.security.UserGroup;
 public class LeafExpediente extends AbstractEntity implements  NeedsProtection, Comparable<LeafExpediente>
 {
 
-   @OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
    @NotNull  (message = "{evidentia.expediente.required}")
    protected BaseExpediente    expediente;                 // Expediente that describes this leaf
 
-   @OneToMany
+   @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
    @NotNull  (message = "{evidentia.types.required}")
    protected Set<DocumentType> admissibleTypes;            // Admisible document types that can be included in the expediente
 

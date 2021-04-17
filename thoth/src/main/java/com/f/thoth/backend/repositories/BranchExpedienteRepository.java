@@ -41,7 +41,7 @@ public interface BranchExpedienteRepository extends JpaRepository<BranchExpedien
           "JOIN  BaseExpediente base "+
           "WHERE base.id = branch.expediente.id AND base.tenant = :tenant AND lower(base.name) LIKE lower(concat('%', :name,'%'))")
    Page<BranchExpediente> countByNameLikeIgnoreCase(@Param("tenant") Tenant tenant, @Param("name") String name, Pageable page);
-
+   
 
    //   ----------- Hierarchical handling ----------------
    Optional<BranchExpediente> findById(Long id);

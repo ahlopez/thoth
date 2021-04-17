@@ -1,13 +1,8 @@
 package com.f.thoth.backend.data.gdoc.expediente;
 
-import java.util.Iterator;
-import java.util.Set;
-import java.util.TreeSet;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -26,24 +21,26 @@ import com.f.thoth.backend.data.security.UserGroup;
  */
 @Entity
 @Table(name = "BRANCH_EXPEDIENTE")
-public class BranchExpediente extends AbstractEntity implements  NeedsProtection, HierarchicalEntity<BranchExpediente>, Comparable<BranchExpediente>
+public class BranchExpediente extends AbstractEntity implements  NeedsProtection, HierarchicalEntity<String>, Comparable<BranchExpediente>
 {
-	@OneToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@NotNull  (message = "{evidentia.expediente.required}")
 	protected BaseExpediente       expediente;                 // Expediente that describes this branch
-
+/*
 	@OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
 	protected Set<BaseExpediente>  children;                   // Children of this expediente
-
+*/
 	// ------------- Constructors ------------------
 	public BranchExpediente()
 	{
 		super();
 		this.expediente = null;
-		this.children   = new TreeSet<>();
+	//	this.children   = new TreeSet<>();
 	}//BranchExpediente null constructor
+	
+	
 
-	public BranchExpediente( BaseExpediente expediente, Set<BaseExpediente> children)
+	public BranchExpediente( BaseExpediente expediente)// , Set<BaseExpediente> children)
 	{
 		super();
 
@@ -51,19 +48,22 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 			throw new IllegalArgumentException("Expediente asociado a la rama no puede ser nulo");
 
 		this.expediente = expediente;
-		this.children   = (children == null? new TreeSet<>(): children);
+	//	this.children   = (children == null? new TreeSet<>(): children);
 
 	}//BranchExpediente constructor
+	
+	
 
 	// -------------- Getters & Setters ----------------
 
 	public BaseExpediente       getExpediente() { return expediente;}
 	public void                 setExpediente(BaseExpediente expediente){ this.expediente = expediente;}
-
+/*
 	public Set<BaseExpediente>  getChildren() { return children;}
 	public void                 setChildren( Set<BaseExpediente> children) { this.children = children;}
-
+*/
 	public  String              getExpedienteCode() { return expediente.getExpedienteCode();}
+	
 
 	// --------------------------- Implements HierarchicalEntity ---------------------------------------
 
@@ -71,9 +71,10 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 
 	@Override public String            getCode()           { return expediente.getCode();}
 
-	@Override public BranchExpediente  getOwner()          { return expediente.getOwner();}
+	@Override public String            getOwner()          { return expediente.getOwnerPath();}
 
 	@Override public String            formatCode()        { return expediente.formatCode();}
+	
 
 	// -----------------  Implements NeedsProtection ----------------
 
@@ -104,6 +105,8 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 	@Override public void            grant( Permission  permission)          { expediente.grant(permission);}
 
 	@Override public void            revoke(Permission permission)           { expediente.revoke(permission);}
+	
+	
 
 	// --------------- Object methods ---------------------
 
@@ -127,17 +130,18 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 		StringBuilder s = new StringBuilder();
 		s.append( "BranchExpediente{")
 		 .append( super.toString())
-		 .append( "expediente["+ expediente.getCode()+ "]\n children[");
-
+		 .append( "expediente["+ expediente.getCode()) //+ "]\n children[");
+/*
 		for ( BaseExpediente child: children )
 			s.append( child.toString()+ "\n");
-
-		s.append("]\n     }\n");
+*/
+		 .append("]\n     }\n");
 
 		return s.toString();
 	}//toString
 
 	@Override  public int compareTo(BranchExpediente that) { return that == null? 1: expediente.compareTo(that.getExpediente());}
+	
 
 	// --------------- Logic ------------------------------
 
@@ -146,9 +150,10 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 		if ( !expediente.isOpen())
 		{
 			expediente.openExpediente();
-			for( BaseExpediente child: children)
+/*			for( BaseExpediente child: children)
 				child.openExpediente();
-		}
+*/
+	    }
 	}//openExpediente
 
 
@@ -157,21 +162,24 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 		if( expediente.isOpen())
 		{
 			expediente.closeExpediente();
+			/*
 			for( BaseExpediente child: children)
 				child.closeExpediente();
+		    */
 		}
 	}//closeExpediente
 
-
+/*
 	public boolean addChild(BaseExpediente child)
 	{
 		return children.add(child);
 	}//addChild
 
+
 	public Iterator<BaseExpediente> childIterator()
 	{
 		return children.iterator();
 	}//childIterator
-
+*/
 
 }//BranchExpediente
