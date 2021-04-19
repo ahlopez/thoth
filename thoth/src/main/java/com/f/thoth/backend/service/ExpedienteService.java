@@ -109,9 +109,9 @@ public class ExpedienteService implements FilterableCrudService<Expediente>, Per
    //  ----- implements HierarchicalService ------
    @Override public List<Expediente> findAll() { return expedienteRepository.findAll(ThothSession.getCurrentTenant()); }
    @Override public Optional<Expediente> findById(Long id)                  { return expedienteRepository.findById( id);}
-   @Override public List<Expediente>  findByParent ( Expediente owner)      { return expedienteRepository.findByParent(owner); }
-   @Override public int               countByParent ( Expediente owner)     { return expedienteRepository.countByParent (owner); }
-   @Override public boolean           hasChildren   ( Expediente Expediente){ return expedienteRepository.countByChildren(Expediente) > 0; }
+   @Override public List<Expediente>  findByParent  ( Expediente owner)     { return expedienteRepository.findByParent(owner.getPath()); }
+   @Override public int               countByParent ( Expediente owner)     { return expedienteRepository.countByParent (owner.getPath()); }
+   @Override public boolean           hasChildren   ( Expediente expediente){ return expedienteRepository.countByChildren(expediente.getPath()) > 0; }
 
    @Override public List<Expediente> findByNameLikeIgnoreCase (Tenant tenant, String name)
                           { return expedienteRepository.findByNameLikeIgnoreCase (tenant, name); }

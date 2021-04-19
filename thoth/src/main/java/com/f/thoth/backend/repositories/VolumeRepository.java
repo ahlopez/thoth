@@ -52,20 +52,20 @@ public interface VolumeRepository extends JpaRepository<Volume, Long>
    @Query("SELECT v FROM Volume v "+
           "JOIN LeafExpediente leaf "+
           "JOIN BaseExpediente base "+
-          "WHERE ((base.owner IS null AND :owner IS null) OR base.owner = :owner) AND v.expediente.id = leaf.id AND leaf.expediente.id = base.id")
-   List<Volume> findByParent( @Param("owner") Volume owner);
+          "WHERE ((base.ownerPath IS null AND :owner IS null) OR base.ownerPath = :owner) AND v.expediente.id = leaf.id AND leaf.expediente.id = base.id")
+   List<Volume> findByParent( @Param("owner") String parentPath);
 
    @Query("SELECT COUNT(v) FROM Volume v "+
           "JOIN LeafExpediente leaf "+
           "JOIN BaseExpediente base "+
-          "WHERE ((base.owner IS null AND :owner IS null) OR base.owner = :owner) AND v.expediente.id = leaf.id AND leaf.expediente.id = base.id")
-   int countByParent( @Param("owner") Volume owner);
+          "WHERE ((base.ownerPath IS null AND :owner IS null) OR base.ownerPath = :owner) AND v.expediente.id = leaf.id AND leaf.expediente.id = base.id")
+   int countByParent( @Param("owner") String parentPath);
 
    @Query("SELECT COUNT(v) FROM Volume v "+
           "JOIN LeafExpediente leaf "+
           "JOIN BaseExpediente base "+
-          "WHERE ((base.owner IS null AND :group is null) or base.owner = :group) AND v.expediente.id = leaf.id AND leaf.expediente.id = base.id")
-   int countByChildren( @Param("group") Volume group);
+          "WHERE ((base.ownerPath IS null AND :group is null) or base.ownerPath = :group) AND v.expediente.id = leaf.id AND leaf.expediente.id = base.id")
+   int countByChildren( @Param("group") String groupPath);
 
    @Query("SELECT v FROM Volume v "+
           "JOIN LeafExpediente leaf "+

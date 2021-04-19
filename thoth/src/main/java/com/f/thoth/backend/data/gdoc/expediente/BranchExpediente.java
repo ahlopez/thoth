@@ -144,6 +144,8 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 	
 
 	// --------------- Logic ------------------------------
+	
+	public String  getPath()   {  return expediente.getPath();}
 
 	public void openExpediente()
 	{

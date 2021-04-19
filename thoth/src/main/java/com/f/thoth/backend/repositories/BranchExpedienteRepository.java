@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.BranchExpediente;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
@@ -48,18 +47,18 @@ public interface BranchExpedienteRepository extends JpaRepository<BranchExpedien
 
    @Query("SELECT branch FROM BranchExpediente branch "+
           "JOIN BaseExpediente base "+
-          "WHERE ((base.owner IS null AND :owner IS null) OR base.owner = :owner) AND base.id = branch.expediente.id")
-   List<BranchExpediente> findByParent( @Param("owner") BaseExpediente owner);
+          "WHERE ((base.ownerPath IS null AND :owner IS null) OR base.ownerPath = :owner) AND base.id = branch.expediente.id")
+   List<BranchExpediente> findByParent( @Param("owner") String ownerPath);
 
    @Query("SELECT count(branch) FROM BranchExpediente branch "+
           "JOIN BaseExpediente base "+
-          "WHERE ((base.owner IS null AND :owner IS null) OR (base.owner = :owner)) AND base.id = branch.expediente.id")
-   int countByParent( @Param("owner") BaseExpediente owner);
+          "WHERE ((base.ownerPath IS null AND :owner IS null) OR (base.ownerPath = :owner)) AND base.id = branch.expediente.id")
+   int countByParent( @Param("owner") String ownerPath);
 
    @Query("SELECT count(branch) FROM BranchExpediente branch "+
           "JOIN BaseExpediente base "+
-          "WHERE (base.owner IS null AND :group IS null) OR (base.owner = :group AND base.id = branch.expediente.id)")
-   int countByChildren(@Param("group") BaseExpediente group);
+          "WHERE (base.ownerPath IS null AND :group IS null) OR (base.ownerPath = :group AND base.id = branch.expediente.id)")
+   int countByChildren(@Param("group") String group);
 
    @Query("SELECT branch FROM BranchExpediente branch "+
           "JOIN BaseExpediente base "+

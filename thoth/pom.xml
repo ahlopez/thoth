@@ -28,7 +28,7 @@
     <!-- Dependencies -->
     <vaadin.version>14.4.3</vaadin.version>
     <!--  <vaadin.crudui.version>4.3.2</vaadin.crudui.version> -->
-		
+
     <!--jackrabbit.oak.version>1.36</jackrabbit.oak.version-->
     <jackrabbit.oak.version>1.36</jackrabbit.oak.version>
     <jcr.version>2.0</jcr.version>
@@ -201,7 +201,7 @@
       <version>${spring.data.provider.version}</version>
     </dependency>
 
-    <!-- Vaadin crud addon 
+    <!-- Vaadin crud addon
     <dependency>
       <groupId>org.vaadin.crudui</groupId>
       <artifactId>crudui</artifactId>
@@ -268,13 +268,13 @@
       <artifactId>spring-data-mongodb</artifactId>
       <!--  version>${spring.data.mongodb.version}</version>-->
     </dependency>
-    
+
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-validation</artifactId>
     </dependency>
 
-        
+
     <!-- :::::::::::::::::::::::::::::::::::::::End Spring:::::::::::::::::::::::::::::::::::::: -->
 
     <!--Add JAXB explicitly as the java.xml.bind module is not included by default anymore in Java 9-->
@@ -291,7 +291,7 @@
       <artifactId>oak-jcr</artifactId>
       <version>${jackrabbit.oak.version}</version>
     </dependency>
-		
+
 
     <!-- https://mvnrepository.com/artifact/javax.jcr/jcr ...(JackRabbit) -->
     <dependency>
@@ -307,26 +307,26 @@
       <artifactId>mongo-java-driver</artifactId>
       <version>${mongodb.driver.version}</version>
     </dependency>
-    
+
     <!-- https://mvnrepository.com/artifact/org.mongodb/mongodb-driver-core -->
     <dependency>
       <groupId>org.mongodb</groupId>
       <artifactId>mongodb-driver-core</artifactId>
       <!-- version>${mongodb.driver.core.version}</version> -->
     </dependency>
-    
-    
+
+
     <!-- https://mvnrepository.com/artifact/org.apache.jackrabbit/oak-store-document -->
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>oak-store-document</artifactId>
       <version>1.36</version>
     </dependency>
-    
+
 
     <!-- ::::::::::::::::::::::::::::::::::End jackrabbit, Oak, Mongodb:::::::::::::::::::::::::::::::::;;; -->
 
-         
+
     <!-- Compile scope is needed to run on WildFly -->
     <dependency>
       <groupId>org.reactivestreams</groupId>
@@ -345,7 +345,7 @@
 
   <build>
     <defaultGoal>spring-boot:run</defaultGoal>
-    <!-- The `pluginManagement` section allows listing plugin versions and 
+    <!-- The `pluginManagement` section allows listing plugin versions and
       their global configuration in one place. -->
     <pluginManagement>
 
@@ -520,22 +520,22 @@
               </systemPropertyVariables>
             </configuration>
           </plugin>
-          
+
           <!-- Plugin for automatically download Chrome Driver for tests -->
           <plugin>
             <!-- https://mvnrepository.com/artifact/com.lazerycode.selenium/driver-binary-downloader-maven-plugin -->
             <groupId>com.lazerycode.selenium</groupId>
             <artifactId>driver-binary-downloader-maven-plugin</artifactId>
             <version>${selenium.downloader.maven.version}</version>
-            
-            <!--             
+
+            <!--
             <configuration>
               <!- - root directory that downloaded driver binaries will be stored in - ->
               <onlyGetDriversForHostOperatingSystem>true</onlyGetDriversForHostOperatingSystem>
               <rootStandaloneServerDirectory>.driver</rootStandaloneServerDirectory>
               <customRepositoryMap>webdrivers.xml</customRepositoryMap>
             </configuration>
- 
+
             <executions>
               <execution>
                 <goals>
@@ -610,7 +610,7 @@
             <groupId>com.saucelabs.maven.plugin</groupId>
             <artifactId>sauce-connect-plugin</artifactId>
             <version>${sauce.connect.plugin.version}</version>
-            <!--  
+            <!--
             <configuration>
               <systemPropertyVariables>
                 <sauce.user>${sauce.user}</sauce.user>
@@ -621,9 +621,9 @@
               <sauceAccessKey>${sauce.sauceAccessKey}</sauceAccessKey>
               <options>${sauce.options}</options>
             </configuration>
-  
+
             <dependencies>
-              
+
               <!- - https://mvnrepository.com/artifact/com.saucelabs/ci-sauce - ->
               <dependency>
                 <groupId>com.saucelabs</groupId>
