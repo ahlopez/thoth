@@ -89,7 +89,8 @@ public class LeafExpediente extends AbstractEntity implements  NeedsProtection, 
       StringBuilder s = new StringBuilder();
       s.append( "LeafExpediente{")
        .append( super.toString())
-       .append( " expediente["+ expediente.getCode()+ "]\nAdmissibleTypes[\n");
+       .append( " expediente["+ expediente.getCode())
+       .append( "]\nAdmissibleTypes[\n");
 
       for ( DocumentType docType: admissibleTypes )
          s.append( " "+ docType.getName());

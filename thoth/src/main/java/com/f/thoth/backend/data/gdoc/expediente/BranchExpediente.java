@@ -26,16 +26,12 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@NotNull  (message = "{evidentia.expediente.required}")
 	protected BaseExpediente       expediente;                 // Expediente that describes this branch
-/*
-	@OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
-	protected Set<BaseExpediente>  children;                   // Children of this expediente
-*/
+	
 	// ------------- Constructors ------------------
 	public BranchExpediente()
 	{
 		super();
 		this.expediente = null;
-	//	this.children   = new TreeSet<>();
 	}//BranchExpediente null constructor
 	
 	
@@ -48,7 +44,6 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 			throw new IllegalArgumentException("Expediente asociado a la rama no puede ser nulo");
 
 		this.expediente = expediente;
-	//	this.children   = (children == null? new TreeSet<>(): children);
 
 	}//BranchExpediente constructor
 	
@@ -58,10 +53,7 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 
 	public BaseExpediente       getExpediente() { return expediente;}
 	public void                 setExpediente(BaseExpediente expediente){ this.expediente = expediente;}
-/*
-	public Set<BaseExpediente>  getChildren() { return children;}
-	public void                 setChildren( Set<BaseExpediente> children) { this.children = children;}
-*/
+	
 	public  String              getExpedienteCode() { return expediente.getExpedienteCode();}
 	
 
@@ -130,11 +122,7 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 		StringBuilder s = new StringBuilder();
 		s.append( "BranchExpediente{")
 		 .append( super.toString())
-		 .append( "expediente["+ expediente.getCode()) //+ "]\n children[");
-/*
-		for ( BaseExpediente child: children )
-			s.append( child.toString()+ "\n");
-*/
+		 .append( "expediente["+ expediente.getCode())
 		 .append("]\n     }\n");
 
 		return s.toString();
@@ -150,11 +138,7 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 	public void openExpediente()
 	{
 		if ( !expediente.isOpen())
-		{
-			expediente.openExpediente();
-/*			for( BaseExpediente child: children)
-				child.openExpediente();
-*/
+		{  expediente.openExpediente();
 	    }
 	}//openExpediente
 
@@ -162,26 +146,8 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 	public void closeExpediente()
 	{
 		if( expediente.isOpen())
-		{
-			expediente.closeExpediente();
-			/*
-			for( BaseExpediente child: children)
-				child.closeExpediente();
-		    */
+		{  expediente.closeExpediente();
 		}
 	}//closeExpediente
-
-/*
-	public boolean addChild(BaseExpediente child)
-	{
-		return children.add(child);
-	}//addChild
-
-
-	public Iterator<BaseExpediente> childIterator()
-	{
-		return children.iterator();
-	}//childIterator
-*/
 
 }//BranchExpediente

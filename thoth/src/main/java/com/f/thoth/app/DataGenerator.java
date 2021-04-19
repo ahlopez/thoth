@@ -96,10 +96,10 @@ public class DataGenerator implements HasLogger
 //   private PickupLocationRepository      pickupLocationRepository;
    private PasswordEncoder               passwordEncoder;
    private ClassificationRepository      claseRepository;
-   private BaseExpedienteRepository      baseExpedienteRepository;
+//   private BaseExpedienteRepository      baseExpedienteRepository;
    private ExpedienteIndexRepository     expedienteIndexRepository;
    private BranchExpedienteRepository    branchExpedienteRepository;
-   private LeafExpedienteRepository      leafExpedienteRepository;
+//   private LeafExpedienteRepository      leafExpedienteRepository;
    private ExpedienteRepository          expedienteRepository;
    private VolumeRepository              volumeRepository;
    private VolumeInstanceRepository      volumeInstanceRepository;
@@ -136,10 +136,10 @@ public class DataGenerator implements HasLogger
       this.roleRepository                = roleRepository;
       this.operationRepository           = operationRepository;
       this.claseRepository               = claseRepository;
-      this.baseExpedienteRepository      = baseExpedienteRepository;
+//      this.baseExpedienteRepository      = baseExpedienteRepository;
       this.expedienteIndexRepository     = expedienteIndexRepository;
       this.branchExpedienteRepository    = branchExpedienteRepository;
-      this.leafExpedienteRepository      = leafExpedienteRepository;
+//      this.leafExpedienteRepository      = leafExpedienteRepository;
       this.expedienteRepository          = expedienteRepository;
       this.volumeRepository              = volumeRepository;
       this.volumeInstanceRepository      = volumeInstanceRepository;
@@ -245,10 +245,9 @@ public class DataGenerator implements HasLogger
          getLogger().info("... generating expedientes and documents");
          ExpedienteGenerator  expedienteGenerator =
                new ExpedienteGenerator(
-                     claseRepository, jcrSession,
-                     baseExpedienteRepository, expedienteIndexRepository,
-                     branchExpedienteRepository, leafExpedienteRepository,
-                     expedienteRepository, volumeRepository, volumeInstanceRepository
+                     claseRepository, jcrSession, expedienteIndexRepository,
+                     branchExpedienteRepository, expedienteRepository, 
+                     volumeRepository, volumeInstanceRepository
                      );
 
          int nExpedientes = expedienteGenerator.registerExpedientes(tenant1);
