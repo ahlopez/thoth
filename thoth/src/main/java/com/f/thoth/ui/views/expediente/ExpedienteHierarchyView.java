@@ -53,7 +53,7 @@ class ExpedienteHierarchyView extends VerticalLayout implements HasUrlParameter<
 
 		content.setSizeFull();
 		add( content);
-		//   Notification.show("LLequé a jerarquía de expedientes");
+	    Notification.show("LLequé a jerarquía de expedientes");
 
 
 		/*

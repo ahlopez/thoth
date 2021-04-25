@@ -1,6 +1,8 @@
 package com.f.thoth.app;
 
 import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
@@ -32,6 +34,8 @@ public class ClassificationGenerator implements HasLogger
    private Level[]                   level;
    private Session                   session;
    private int                       nClasses=0;
+   private int                       nSequences=0;
+   private Set<String>               seqNumbers;
 
    public ClassificationGenerator( ClassificationRepository claseRepository,
                                  LevelRepository levelRepository,
@@ -47,7 +51,9 @@ public class ClassificationGenerator implements HasLogger
       this.numerator          = numerator;
       this.level              = level;
       this.session            = session;
-   }
+      this.seqNumbers         = new TreeSet<>();
+      
+   }//ClassificationGenerator constructor
 
    @SuppressWarnings("unused")
    public void registerClasses( Tenant tenant) throws RepositoryException
@@ -390,8 +396,31 @@ public class ClassificationGenerator implements HasLogger
       Classification clase335 = createClass( tenant, classificationRootPath,        Constant.TITLE_CTG_SUBSERIE_ADM_EDIFICACIONES           , "01",  /* 07060101*/ level[3], clase334);  //   Cartagena, Edificaciones
       Classification clase336 = createClass( tenant, classificationRootPath,        Constant.TITLE_CTG_SUBSERIE_ADM_SERVICIOS               , "02",  /* 07060102*/ level[3], clase334);  //   Cartagena, Servicios publicos
       getLogger().info("    ... "+ nClasses+ " classes created");
+      printSequenceStats();
 
    }//registerClasses
+   
+   private void   printSequenceStats()
+   {
+	      getLogger().info("    ... Secuencias creadas ["+ nSequences+ "]" );
+		  StringBuilder line = new StringBuilder();
+		  int i = 0;
+	      for (String num: seqNumbers)
+	      {
+	    	  if ( (i % 4 == 3))
+	    	  {
+		    	getLogger().info("       "+ line);
+		    	line.setLength(0);	    		  
+	    	  }else if( (i % 3 != 0))
+	    	  { line.append(", ");
+	    	  }
+	    	  line.append( num); 
+	    	  i++;
+	      }
+		  if ((i % 4) != 0)
+		     getLogger().info("       "+ line);
+	   
+   }//printSequenceStats
 
    private String initJcrClassification(Tenant tenant, String classificationCode) throws RepositoryException
    {
@@ -442,6 +471,7 @@ public class ClassificationGenerator implements HasLogger
       return classificationClass;
 
    }//createClass
+   
 
    private void storeClassInRepository( Classification classificationClass, String classificationRootPath)
    {
@@ -457,18 +487,23 @@ public class ClassificationGenerator implements HasLogger
       }
 
    }//storeClassInRepository
+   
 
    private synchronized void createSequence(Tenant tenant, Classification classificationClass)
    {
-      int    year      = LocalDateTime.now().getYear();
+      String year      = ""+ LocalDateTime.now().getYear();
       String classCode = classificationClass.getCode();
-      String seqCode   = classCode.substring( classCode.lastIndexOf("/")+1);
-      seqCode          = TextUtil.pad(seqCode , 3);
-      String prefix    = seqCode+ year;
+      String seqName   = classCode.substring( classCode.lastIndexOf("/")+1);
+      seqName          = TextUtil.pad(seqName , 3);
+      String prefix    = year;
       String suffix    = "E";
-      String seqName   = prefix+ suffix;
-      numerator.getSequence(tenant, seqName, prefix, suffix, 0L, 1, 5);
-      getLogger().info("    >>> Sequence["+seqName+ "] created");
+      if ( !numerator.sequenceExists(tenant, seqName, prefix, suffix) )
+      {
+         seqNumbers.add( Numerator.sequenceName(tenant, seqName, prefix, suffix));
+         nSequences++;
+         numerator.getSequence(tenant, seqName, prefix, suffix, 0L, 1, 5);
+      }
+      //getLogger().info("    >>> Sequence["+seqName+ "] created");
    }//createSequence
 
 

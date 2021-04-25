@@ -141,7 +141,7 @@ public class ExpedienteView extends HorizontalLayout
 
       BeanValidationBinder<Classification> binder = new BeanValidationBinder<>(Classification.class);
       binder.forField(ownerClass)
-      .bind("owner");
+            .bind("owner");
 
       return ownerClass;
 

@@ -76,6 +76,21 @@ public class Numerator
       return seq;
 
    }//getSequence
+   
+   
+   /**
+    * Verifica si una secuencia ya existe en el numerador
+    * @param tenant     Tenant al que pertenece la secuencia
+    * @param nombre     Nombre publico de la secuencia
+    * @param prefijo    Prefijo del numero
+    * @param sufijo     Sufijo del numero
+    */
+   public boolean sequenceExists(final Tenant tenant, final String nombre, final String prefijo, final String sufijo)
+   {
+	   String seqName = sequenceName( tenant, nombre, prefijo, sufijo);
+	   return  seqs.fetch( seqName) != null;
+   }//sequenceExists
+   
 
    /*
     * Obtiene el nombre unico de la secuencia en el sistema
@@ -87,9 +102,9 @@ public class Numerator
     *
     * @return String Identificador unico de la secuencia
     */
-   private static String sequenceName( Tenant tenant, String nombre, String prefijo, String sufijo)
+   public static String sequenceName( Tenant tenant, String nombre, String prefijo, String sufijo)
    {
-      return("["+ tenant.getId()+ "]"+ nombre).toUpperCase();
+      return("["+ tenant.getId()+ "]"+ prefijo+":"+ nombre+ ":"+ sufijo).toUpperCase();
    }//sequenceName
 
 

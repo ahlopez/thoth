@@ -246,7 +246,7 @@ public class DataGenerator implements HasLogger
          ExpedienteGenerator  expedienteGenerator =
                new ExpedienteGenerator(
                      claseRepository, jcrSession, expedienteIndexRepository,
-                     branchExpedienteRepository, expedienteRepository, 
+                     branchExpedienteRepository, expedienteRepository,
                      volumeRepository, volumeInstanceRepository
                      );
 
@@ -734,10 +734,10 @@ public class DataGenerator implements HasLogger
      roleSet.add(adminRole);
      Set<UserGroup> groups = new TreeSet<>();
      com.f.thoth.backend.data.security.User administrador = createSingleUser (
-                  tenant1, "admin@vaadin.com", "password", "Lopez", "Alvaro", groups,
+                  tenant1, "admin@vaadin.com", "admin", "Lopez", "Alvaro", groups,
                   new Integer(5), LocalDate.now(), LocalDate.now().plusYears(5), roleSet, true);
 
-      User admin =  userRepository.save( createUser("admin@vaadin.com", "Göran", "Rich", passwordEncoder.encode("admin"), "admin", true));
+      User admin =  userRepository.save( createUser("admin@vaadin.com", "Lopez", "Alvaro", passwordEncoder.encode("admin"), "admin", true));
       ThothSession.setUser(administrador);
       return admin;
 
