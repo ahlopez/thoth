@@ -251,7 +251,7 @@ public class DataGenerator implements HasLogger
                      );
 
          int nExpedientes = expedienteGenerator.registerExpedientes(tenant1);
-         getLogger().info("    >>> "+ nExpedientes+ " expedientes generated");
+         getLogger().info("    >>> End expedientes generation. "+ nExpedientes+ " expedientes generated");
 /*
          getLogger().info("... generating products");
          // A set of products that will be used for creating orders.
@@ -265,7 +265,7 @@ public class DataGenerator implements HasLogger
          getLogger().info("... generating orders");
          createOrders(orderRepository, productSupplier, pickupLocationSupplier, barista, baker);
 */
-         getLogger().info("Generated demo data");
+         getLogger().info("Generated evidentia test data");
 
       } catch (Exception e)
       {

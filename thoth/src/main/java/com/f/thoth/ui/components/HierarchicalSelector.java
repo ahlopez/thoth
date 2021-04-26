@@ -17,7 +17,6 @@ import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.treegrid.TreeGrid;
@@ -28,8 +27,8 @@ import com.vaadin.flow.shared.Registration;
 
 @CssImport(value="./styles/grid-tree-toggle-adjust.css", themeFor="vaadin-grid-tree-toggle")
 public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends HasValue.ValueChangeEvent<T>>
-extends  VerticalLayout
-implements HasValue<E, T>
+       extends  VerticalLayout
+       implements HasValue<E, T>
 {
    private TreeDataProvider<T>          dataProvider;
    private final Tenant                 tenant;
@@ -124,7 +123,6 @@ implements HasValue<E, T>
          {
             T selected = first.get();
             boolean selectable = !(onlyLeaves && service.hasChildren(selected));
-            Notification.show("selectable["+ selectable+ "]");
             if ( selectable)
                 setValue( selected );
          }
@@ -137,7 +135,6 @@ implements HasValue<E, T>
             if ( value != null )
             {
                boolean selectable = !(onlyLeaves && service.hasChildren(value));
-               Notification.show ("selectable["+ selectable+ "]");
                if ( selectable)
                   actionOnSelect.accept(value);
             }
@@ -193,7 +190,6 @@ implements HasValue<E, T>
       }
 
       sGrid.setSelectionMode(selectionMode);
-      //addValueChangeListener(sGrid, tGrid);
 
       return sGrid;
 
@@ -451,7 +447,7 @@ implements HasValue<E, T>
       if (value == null || (onlyLeaves && service.hasChildren(value)))
          return;
 
-      Notification.show ("setValue.selected ["+ value.formatCode()+ "]");
+      //Notification.show ("setValue.selected ["+ value.formatCode()+ "]");
 
       if ( selectionMode != Grid.SelectionMode.MULTI)
          result.clear();
