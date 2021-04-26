@@ -197,8 +197,8 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
 
    @Override protected void buildCode()
    {
-      this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ "/"+ NodeType.EXPEDIENTE_INDEX.getCode()+ 
-                  ownerPath+ "/"+ (expedienteCode == null? "[expedienteCode]" : expedienteCode);
+      this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ "/"+ NodeType.EXPEDIENTE_INDEX.getCode()+ "/"+
+                  (ownerPath == null? "" : ownerPath)+ "/"+ (expedienteCode == null? "[expedienteCode]" : expedienteCode);
      
       this.code = this.path;
    }//buildCode

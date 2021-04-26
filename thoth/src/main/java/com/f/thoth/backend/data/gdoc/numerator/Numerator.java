@@ -102,9 +102,10 @@ public class Numerator
     *
     * @return String Identificador unico de la secuencia
     */
-   public static String sequenceName( Tenant tenant, String nombre, String prefijo, String sufijo)
+   public static String sequenceName( final Tenant tenant, final String nombre, String prefijo, String sufijo)
    {
-      return("["+ tenant.getId()+ "]"+ prefijo+":"+ nombre+ ":"+ sufijo).toUpperCase();
+	  String name =  (nombre == null)? prefijo+ "-"+ sufijo: nombre;
+      return("["+ tenant.getId()+ "]"+ name).toUpperCase();
    }//sequenceName
 
 

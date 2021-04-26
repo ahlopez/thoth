@@ -395,14 +395,15 @@ public class ClassificationGenerator implements HasLogger
       Classification clase334 = createClass( tenant, classificationRootPath,     Constant.TITLE_CTG_SERIE_ACTIVOS_FIJOS                     , "01",  /* 070601*/   level[2], clase333);  //   Cartagena, Activos fijos
       Classification clase335 = createClass( tenant, classificationRootPath,        Constant.TITLE_CTG_SUBSERIE_ADM_EDIFICACIONES           , "01",  /* 07060101*/ level[3], clase334);  //   Cartagena, Edificaciones
       Classification clase336 = createClass( tenant, classificationRootPath,        Constant.TITLE_CTG_SUBSERIE_ADM_SERVICIOS               , "02",  /* 07060102*/ level[3], clase334);  //   Cartagena, Servicios publicos
-      getLogger().info("    ... "+ nClasses+ " classes created");
+      getLogger().info("    >>> "+ nClasses+ " classes created");
       printSequenceStats();
 
    }//registerClasses
    
+   
    private void   printSequenceStats()
    {
-	      getLogger().info("    ... Secuencias creadas ["+ nSequences+ "]" );
+	      getLogger().info("    >>> Secuencias creadas ["+ nSequences+ "]" );
 		  StringBuilder line = new StringBuilder();
 		  int i = 0;
 	      for (String num: seqNumbers)
@@ -417,10 +418,11 @@ public class ClassificationGenerator implements HasLogger
 	    	  line.append( num); 
 	    	  i++;
 	      }
-		  if ((i % 4) != 0)
+		  if (i > 0)
 		     getLogger().info("       "+ line);
 	   
    }//printSequenceStats
+   
 
    private String initJcrClassification(Tenant tenant, String classificationCode) throws RepositoryException
    {
@@ -491,19 +493,17 @@ public class ClassificationGenerator implements HasLogger
 
    private synchronized void createSequence(Tenant tenant, Classification classificationClass)
    {
-      String year      = ""+ LocalDateTime.now().getYear();
       String classCode = classificationClass.getCode();
-      String seqName   = classCode.substring( classCode.lastIndexOf("/")+1);
-      seqName          = TextUtil.pad(seqName , 3);
-      String prefix    = year;
+      String rootClass = TextUtil.pad(classCode.substring( classCode.lastIndexOf("/")+1), 3);
+      String prefix    = rootClass+ "-"+ LocalDateTime.now().getYear();;
       String suffix    = "E";
+	  String seqName   = prefix+ "-"+ suffix;
       if ( !numerator.sequenceExists(tenant, seqName, prefix, suffix) )
       {
          seqNumbers.add( Numerator.sequenceName(tenant, seqName, prefix, suffix));
          nSequences++;
          numerator.getSequence(tenant, seqName, prefix, suffix, 0L, 1, 5);
       }
-      //getLogger().info("    >>> Sequence["+seqName+ "] created");
    }//createSequence
 
 

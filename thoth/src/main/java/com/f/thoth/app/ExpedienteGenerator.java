@@ -290,8 +290,7 @@ public class ExpedienteGenerator implements HasLogger
 
    private String buildExpedienteCode(BaseExpediente padre, Classification classificationClass)
    {
-      int year = LocalDate.now().getYear();
-      String seqKey = classificationClass.getTenantCode()+ classificationClass.getRootCode()+year+ "E";
+      String seqKey = Numerator.sequenceName( classificationClass.getTenant(),  null , classificationClass.getRootCode()+ "-"+ LocalDate.now().getYear(), "E");
       Numerator numerador = Numerator.getInstance();
       Sequence expedienteSequence = numerador.obtenga(seqKey);
       String expedienteCode = expedienteSequence.next();
