@@ -27,7 +27,7 @@ import com.vaadin.flow.router.Route;
  * [1] Obtiene la clase a la que pertenece el expediente
  * [2] Selecciona el expediente navegando la jerarquía de expedientes en la clase
  * [3] Crea, actualiza, elimina expedientes en el expediente seleccionado
- * Esta vista corresponde a los pasos [2], [3]. El paso [1] se ejeccuta en ExpedienteView
+ * Esta vista corresponde a los pasos [2], [3]. El paso [1] se ejeccuta en ExpedienteClassSelectorView
  */
 @Route(value = PAGE_JERARQUIA_EXPEDIENTES, layout = MainView.class)
 @PageTitle(TITLE_JERARQUIA_EXPEDIENTES)

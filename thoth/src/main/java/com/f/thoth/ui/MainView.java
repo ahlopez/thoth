@@ -19,7 +19,7 @@ import com.f.thoth.ui.views.classification.ClassificationView;
 import com.f.thoth.ui.views.classification.LevelView;
 import com.f.thoth.ui.views.classification.RetentionView;
 import com.f.thoth.ui.views.dashboard.DashboardView;
-import com.f.thoth.ui.views.expediente.ExpedienteView;
+import com.f.thoth.ui.views.expediente.ExpedienteClassSelectorView;
 import com.f.thoth.ui.views.metadata.DocumentTypeView;
 import com.f.thoth.ui.views.metadata.MetadataSchemaView;
 import com.f.thoth.ui.views.metadata.MetadataView;
@@ -230,7 +230,7 @@ public class MainView extends AppLayout
 		expedienteMenu.setOpenOnClick(true);
 
 		if (SecurityUtils.isAccessGranted(OperationView.class))
-			expedienteMenu.addItem(createRoute(VaadinIcon.FOLDER_O, Constant.TITLE_EXPEDIENTES, ExpedienteView.class));
+			expedienteMenu.addItem(createRoute(VaadinIcon.FOLDER_O, Constant.TITLE_EXPEDIENTES_SELECTOR_CLASE, ExpedienteClassSelectorView.class));
 
 		if (SecurityUtils.isAccessGranted(OperationView.class))
 			expedienteMenu.addItem(createRoute(VaadinIcon.FILE_TREE_SMALL, Constant.TITLE_SUBEXPEDIENTES, OperationView.class));

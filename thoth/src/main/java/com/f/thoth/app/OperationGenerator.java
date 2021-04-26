@@ -42,7 +42,7 @@ public class OperationGenerator
       Operation obj19 = createOperation( tenant,    Constant.TITLE_RETENCION                            , obj17);  // Niveles
       Operation obj20 = createOperation( tenant,    Constant.TITLE_ESQUEMAS_CLASIFICACION               , obj17);  // Esquemas de clasificación
       Operation obj21 = createOperation( tenant, Constant.TITLE_ADMIN_EXPEDIENTES                       , null );  // Gestion expedientes
-      Operation obj22 = createOperation( tenant,    Constant.TITLE_EXPEDIENTES                          , obj21);  // Expedientes mayores
+      Operation obj22 = createOperation( tenant,    Constant.TITLE_EXPEDIENTES_SELECTOR_CLASE           , obj21);  // Seleccion clase a que pertenece expediente
       Operation obj23 = createOperation( tenant,    Constant.TITLE_SUBEXPEDIENTES                       , obj21);  // Sub-expedientes
       Operation obj24 = createOperation( tenant,    Constant.TITLE_VOLUMENES                            , obj21);  // Volumenes
       Operation obj25 = createOperation( tenant,    Constant.TITLE_INDICE                               , obj21);  // Indice de expedientes

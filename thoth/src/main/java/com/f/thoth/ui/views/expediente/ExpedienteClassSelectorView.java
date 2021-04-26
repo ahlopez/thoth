@@ -1,8 +1,8 @@
 package com.f.thoth.ui.views.expediente;
 
 
-import static com.f.thoth.ui.utils.Constant.PAGE_EXPEDIENTES;
-import static com.f.thoth.ui.utils.Constant.TITLE_EXPEDIENTES;
+import static com.f.thoth.ui.utils.Constant.PAGE_SELECTOR_CLASE;
+import static com.f.thoth.ui.utils.Constant.TITLE_EXPEDIENTES_SELECTOR_CLASE;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
@@ -33,10 +33,10 @@ import com.vaadin.flow.router.Route;
  * [3] Crea, actualiza, elimina expedientes en el expediente seleccionado
  * Esta vista corresponde al paso [1]. Los pasos [2], [3] se ejeccutan en ExpedienteHierarchyView
  */
-@Route(value = PAGE_EXPEDIENTES, layout = MainView.class)
-@PageTitle(TITLE_EXPEDIENTES)
+@Route(value = PAGE_SELECTOR_CLASE, layout = MainView.class)
+@PageTitle(TITLE_EXPEDIENTES_SELECTOR_CLASE)
 @Secured(Role.ADMIN)
-public class ExpedienteView extends HorizontalLayout
+public class ExpedienteClassSelectorView extends HorizontalLayout
 {
    private ClassificationService classificationService;
    private VerticalLayout        leftSection;
@@ -47,7 +47,7 @@ public class ExpedienteView extends HorizontalLayout
 
 
    @Autowired
-   public ExpedienteView(ClassificationService classificationService)
+   public ExpedienteClassSelectorView(ClassificationService classificationService)
    {
       this.classificationService = classificationService;
 
@@ -72,7 +72,7 @@ public class ExpedienteView extends HorizontalLayout
      
    }//ExpedienteView
 
-   protected String getBasePage() { return PAGE_EXPEDIENTES; }
+   protected String getBasePage() { return PAGE_SELECTOR_CLASE; }
 
 
    private Component configureClassSelector()
