@@ -130,4 +130,4 @@ public class ExpedienteClassSelectorView extends HorizontalLayout
       ownerClass.refresh();
    }//updateSelector
 
-}//ExpedienteView
+}//ExpedienteClassSelectorView
