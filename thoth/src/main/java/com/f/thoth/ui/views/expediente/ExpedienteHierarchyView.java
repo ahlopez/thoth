@@ -4,6 +4,8 @@ import static com.f.thoth.ui.utils.Constant.PAGE_JERARQUIA_EXPEDIENTES;
 import static com.f.thoth.ui.utils.Constant.PAGE_SELECTOR_CLASE;
 import static com.f.thoth.ui.utils.Constant.TITLE_JERARQUIA_EXPEDIENTES;
 
+import java.util.stream.Stream;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
@@ -12,8 +14,7 @@ import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
-import com.f.thoth.backend.service.ClassificationService;
-import com.f.thoth.backend.service.ExpedienteService;
+import com.f.thoth.backend.service.BaseExpedienteService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.components.HierarchicalSelector;
 import com.vaadin.flow.component.Component;
@@ -21,15 +22,14 @@ import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.formlayout.FormLayout.ResponsiveStep;
-import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.data.binder.BeanValidationBinder;
+import com.vaadin.flow.component.treegrid.TreeGrid;
+import com.vaadin.flow.data.provider.hierarchy.AbstractBackEndHierarchicalDataProvider;
+import com.vaadin.flow.data.provider.hierarchy.HierarchicalDataProvider;
+import com.vaadin.flow.data.provider.hierarchy.HierarchicalQuery;
 import com.vaadin.flow.router.AfterNavigationEvent;
 import com.vaadin.flow.router.AfterNavigationObserver;
 import com.vaadin.flow.router.BeforeEvent;
@@ -40,7 +40,7 @@ import com.vaadin.flow.router.Route;
 /**
  * La gestión de expedientes procede por pasos:
  * [1] Obtiene la clase a la que pertenece el expediente
- * [2] Selecciona el expediente navegando la jerarquía de expedientes en la clase
+ * [2] Selecciona el expediente de interés navegando la jerarquía de expedientes en la clase
  * [3] Crea, actualiza, elimina expedientes en el expediente seleccionado
  * Esta vista corresponde a los pasos [2], [3]. El paso [1] se ejeccuta en ExpedienteClassSelectorView
  */
@@ -50,8 +50,7 @@ import com.vaadin.flow.router.Route;
 class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParameter<String>, AfterNavigationObserver
 {
 
-	private ClassificationService classificationService;
-	private ExpedienteService     expedienteService;
+	private BaseExpedienteService baseExpedienteService;
 	private User                  currentUser;
 	private BaseExpediente        currentExpediente;
 	private String                classCode;
@@ -60,7 +59,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 	private VerticalLayout        content;
 	private VerticalLayout        rightSection;
 
-	private HierarchicalSelector<Classification, HasValue.ValueChangeEvent<Classification>> ownerClass;
+	private HierarchicalSelector<Classification, HasValue.ValueChangeEvent<Classification>> ownerExpediente;
 
 	private Button add      = new Button("+ Nuevo Expediente");
 	private Button save     = new Button("Guardar expediente");
@@ -69,10 +68,9 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 
 
 	@Autowired
-	public ExpedienteHierarchyView(ClassificationService classificationService, ExpedienteService expedienteService)
+	public ExpedienteHierarchyView(BaseExpedienteService baseExpedienteService)
 	{
-		this.classificationService = classificationService;
-		this.expedienteService     = expedienteService;
+		this.baseExpedienteService = baseExpedienteService;
 		this.currentUser           = ThothSession.getCurrentUser();
 
 		addClassName("main-view");
@@ -95,6 +93,35 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 		updateSelector();
 
 	}//ExpedienteHierarchyView
+
+	private Component configureExpedienteSelector()
+	{
+		TreeGrid<BaseExpediente> grid = new TreeGrid<>();
+		grid.addHierarchyColumn(BaseExpediente::getName).setHeader("Nombre expediente");
+		grid.addColumn(BaseExpediente::getCode).setHeader("Código");
+
+		HierarchicalDataProvider<BaseExpediente, Void> dataProvider =	new AbstractBackEndHierarchicalDataProvider<BaseExpediente, Void>() 
+		{
+
+			@Override
+			public int getChildCount(HierarchicalQuery<BaseExpediente, Void> query) 
+			{ return (int) baseExpedienteService.countByParent(query.getParent());
+			}
+
+			@Override
+			public boolean hasChildren(BaseExpediente item) 
+			{ return baseExpedienteService.hasChildren(item);
+			}
+
+			@Override
+			protected Stream<BaseExpediente> fetchChildrenFromBackEnd(	HierarchicalQuery<BaseExpediente, Void> query) 
+			{ return baseExpedienteService.findByParent(query.getParent()).stream();
+			}
+		};
+
+		grid.setDataProvider(dataProvider);
+		return grid;	
+	}//configureSelector
 
 
 	private Component configureButtons()
@@ -124,19 +151,19 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 
 	protected String getBasePage() { return PAGE_SELECTOR_CLASE; }
 
-
-	private Component configureExpedienteSelector()
+/*
+	private Component configureBaseExpedienteSelector()
 	{
-		ownerClass = new HierarchicalSelector<>( classificationService,
+		ownerExpediente = new HierarchicalSelector<>( classificationService,
 				Grid.SelectionMode.SINGLE,
 				"Seleccione el Expediente de interés",
 				true,
 				true,
 				this::selectedOwnerClass
 				);
-		ownerClass.getElement().setAttribute("colspan", "3");
+		ownerExpediente.getElement().setAttribute("colspan", "3");
 
-		FormLayout form = new FormLayout(ownerClass);
+		FormLayout form = new FormLayout(ownerExpediente);
 		form.setResponsiveSteps( new ResponsiveStep("30em", 1),
 				new ResponsiveStep("30em", 2),
 				new ResponsiveStep("30em", 3),
@@ -144,20 +171,20 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 				);
 
 		BeanValidationBinder<Classification> binder = new BeanValidationBinder<>(Classification.class);
-		binder.forField(ownerClass)
+		binder.forField(ownerExpediente)
 		.bind("owner");
 
-		return ownerClass;
+		return ownerExpediente;
 
 	}//configureExpedienteSelector
 
-	private void selectedOwnerClass(Classification ownerClass)
+	private void selectedOwnerClass(Classification ownerExpediente)
 	{
-		if (ownerClass == null)
+		if (ownerExpediente == null)
 		{  Notification.show("Expediente seleccionado = null");
 		}else
 		{
-			getUI().ifPresent(ui -> ui.navigate(ExpedienteHierarchyView.class, ownerClass.formatCode()));
+			getUI().ifPresent(ui -> ui.navigate(ExpedienteHierarchyView.class, ownerExpediente.formatCode()));
 			closeEditor();
 		}
 		closeEditor();
@@ -173,7 +200,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 		removeClassName              ("main-view");
 
 	}//closeEditor
-
+*/
 	private void addExpediente()
 	{
 
@@ -200,7 +227,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 
 	private void updateSelector()
 	{
-		ownerClass.refresh();
+		//ownerExpediente.refresh();
 	}//updateSelector
 
 
@@ -216,6 +243,6 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 		//Notification.show("Voy a navegar con parámetro["+ parameter+ "]");
 		this.classCode = parameter;
 	}
-
+	
 
 }//ExpedienteHierarchyView

@@ -29,7 +29,7 @@ import com.vaadin.flow.router.Route;
 /**
  * La gestión de expedientes procede por pasos:
  * [1] Obtiene la clase a la que pertenece el expediente
- * [2] Selecciona el expediente navegando la jerarquía de expedientes en la clase
+ * [2] Selecciona el expediente de interés navegando la jerarquía de expedientes en la clase
  * [3] Crea, actualiza, elimina expedientes en el expediente seleccionado
  * Esta vista corresponde al paso [1]. Los pasos [2], [3] se ejeccutan en ExpedienteHierarchyView
  */

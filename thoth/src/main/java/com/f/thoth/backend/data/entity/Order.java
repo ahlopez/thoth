@@ -65,6 +65,7 @@ public class Order extends AbstractEntity implements OrderSummary {
    @NotEmpty
    @Valid
    private List<OrderItem> items;
+
    @NotNull(message = "{bakery.status.required}")
    private OrderState state;
 
