@@ -104,11 +104,11 @@ public class BaseExpedienteService implements FilterableCrudService<BaseExpedien
 
 
 	//  ----- implements HierarchicalService ------
-	@Override public List<BaseExpediente>     findAll()                            {return baseExpedienteRepository.findAll(ThothSession.getCurrentTenant());}
-	@Override public Optional<BaseExpediente> findById(Long id)                    {return baseExpedienteRepository.findById( id);}
-	@Override public List<BaseExpediente>     findByParent( BaseExpediente owner)  {return baseExpedienteRepository.findByParent(owner == null? "[ROOT]" :owner.getOwnerPath());}
-	@Override public int        countByParent ( BaseExpediente owner)              {return baseExpedienteRepository.countByParent (owner == null? "[ROOT]" :owner.getOwnerPath());}
-	@Override public boolean    hasChildren   ( BaseExpediente expediente)         {return baseExpedienteRepository.countByChildren(expediente.getPath())> 0;}
+	@Override public List<BaseExpediente>     findAll()                           {return baseExpedienteRepository.findAll(ThothSession.getCurrentTenant());}
+	@Override public Optional<BaseExpediente> findById(Long id)                   {return baseExpedienteRepository.findById( id);}
+	@Override public List<BaseExpediente>     findByParent( BaseExpediente owner) {return baseExpedienteRepository.findByParent  (owner == null? null :owner.getPath());}
+	@Override public int        countByParent ( BaseExpediente owner)             {return baseExpedienteRepository.countByParent (owner == null? null :owner.getPath());}
+	@Override public boolean    hasChildren   ( BaseExpediente expediente)        {return baseExpedienteRepository.countByChildren(expediente == null? null :expediente.getPath())> 0;}
 
 	@Override public List<BaseExpediente> findByNameLikeIgnoreCase (Tenant tenant, String name)
 	{ return baseExpedienteRepository.findByNameLikeIgnoreCase (tenant, name);}

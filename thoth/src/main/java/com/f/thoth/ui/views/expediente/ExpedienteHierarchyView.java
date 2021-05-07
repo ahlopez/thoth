@@ -4,21 +4,20 @@ import static com.f.thoth.ui.utils.Constant.PAGE_JERARQUIA_EXPEDIENTES;
 import static com.f.thoth.ui.utils.Constant.PAGE_SELECTOR_CLASE;
 import static com.f.thoth.ui.utils.Constant.TITLE_JERARQUIA_EXPEDIENTES;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
 import com.f.thoth.backend.data.Role;
-import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.service.BaseExpedienteService;
 import com.f.thoth.ui.MainView;
-import com.f.thoth.ui.components.HierarchicalSelector;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -58,8 +57,6 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 	private VerticalLayout        leftSection;
 	private VerticalLayout        content;
 	private VerticalLayout        rightSection;
-
-	private HierarchicalSelector<Classification, HasValue.ValueChangeEvent<Classification>> ownerExpediente;
 
 	private Button add      = new Button("+ Nuevo Expediente");
 	private Button save     = new Button("Guardar expediente");
@@ -105,17 +102,89 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 
 			@Override
 			public int getChildCount(HierarchicalQuery<BaseExpediente, Void> query) 
-			{ return (int) baseExpedienteService.countByParent(query.getParent());
+			{   
+				int childCount = 0;
+				if (query != null)
+				{
+					System.out.println( ">>> getChildCount("+ query.toString()+ ")"); System.out.flush();
+					BaseExpediente base = query.getParent();
+					if (base != null)
+					{
+						childCount = baseExpedienteService.countByParent(base);
+						System.out.println(">>> getChildCount("+ base.getCode() + ") ->["+ childCount+ "]");
+						System.out.flush();
+					}
+					else 
+					{
+						System.out.println("*** base = null");
+						System.out.flush();
+						childCount = baseExpedienteService.countByParent(base);
+						System.out.println(">>> getChildCount(base=null)->["+childCount+ "]");
+						System.out.flush();
+					}
+				}
+				else 
+				{
+					System.out.println( "*** query = null"); 
+					System.out.flush();
+				}
+				return childCount;
 			}
 
 			@Override
 			public boolean hasChildren(BaseExpediente item) 
-			{ return baseExpedienteService.hasChildren(item);
+			{ 
+				boolean hasChild = baseExpedienteService.hasChildren(item);
+				System.out.println(">>> hasChildren("+ (item == null? "null" : item.getCode())+ ") ->["+ hasChild+ "]");
+				System.out.flush();
+				return hasChild;
 			}
 
 			@Override
 			protected Stream<BaseExpediente> fetchChildrenFromBackEnd(	HierarchicalQuery<BaseExpediente, Void> query) 
-			{ return baseExpedienteService.findByParent(query.getParent()).stream();
+			{ 
+				System.out.println(">>> Entre a fetchChildrenFromBackend");  System.out.flush();
+				Stream<BaseExpediente> empty = new ArrayList<BaseExpediente>().stream();
+				System.out.println(">>> Después de definir el Stream empty en fetchChildrenFromBackend");  System.out.flush();
+
+				if ( query != null)
+				{
+					BaseExpediente base = query.getParent();
+					System.out.println(">>> fetchChildrenFromBackend,  base = "+ (base == null? "null" : base.getCode())); System.out.flush();
+					if ( base != null)
+					{
+						List<BaseExpediente> children = baseExpedienteService.findByParent(base);	
+						System.out.println(">>> fetchChildrenFromBackEnd -> Children of("+ base == null? "null" : base.getCode()+ ")");
+						System.out.flush();
+						if ( children != null)
+						{
+							for ( BaseExpediente b: children)
+							{
+								System.out.println("    ....{"+ (b == null? "null-[null]": b.getCode()+ "-["+ b.getName()+ "]")+ "}");
+								System.out.flush();
+							}
+							return baseExpedienteService.findByParent(base).stream();
+						} else
+						{
+							System.out.println(">>> fetchChildrenFromBackEnd -> children = null");
+							System.out.flush();
+							return empty;
+						}
+					}
+					else 
+					{
+						System.out.println(">>> fetchChildrenFromBackEnd -> base = null");
+						System.out.flush();
+					//	return empty;
+						return baseExpedienteService.findByParent(base).stream();
+					}
+				}
+				else
+				{
+					System.out.println("*** fetchChildrenFromBackEnd -> query = null");
+					System.out.flush();
+					return empty;
+				}
 			}
 		};
 
@@ -151,7 +220,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 
 	protected String getBasePage() { return PAGE_SELECTOR_CLASE; }
 
-/*
+	/*
 	private Component configureBaseExpedienteSelector()
 	{
 		ownerExpediente = new HierarchicalSelector<>( classificationService,
@@ -200,7 +269,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 		removeClassName              ("main-view");
 
 	}//closeEditor
-*/
+	 */
 	private void addExpediente()
 	{
 
@@ -243,6 +312,6 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 		//Notification.show("Voy a navegar con parámetro["+ parameter+ "]");
 		this.classCode = parameter;
 	}
-	
+
 
 }//ExpedienteHierarchyView

@@ -121,7 +121,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 	protected ObjectToProtect   objectToProtect;             // Associated security object
 
 	@NotNull  (message = "{evidentia.creator.required}")
-	@ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
 	protected User              createdBy;                   // User that created this expediente
 
 	@NotNull(message = "{evidentia.class.required}")
@@ -305,24 +305,25 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
 	@Override public String toString()
 	{
+		User owner = objectToProtect.getUserOwner();
 		StringBuilder s = new StringBuilder();
 		s.append( "BaseExpediente{")
 		.append( super.toString())
 		.append( " name["+ name+ "]")
 		.append( " open["+ open+ "]")
-		.append( " user owner["+ objectToProtect.getUserOwner().getEmail()+ "]")
-		.append( " createdBy["+ createdBy.getEmail()+ "]")
-		.append( " classCode["+ classificationClass.formatCode()+ "]")
+		.append( " user owner["+ (owner == null? "---" : owner.getEmail())+ "]")
+		.append( " createdBy["+  (createdBy == null? "---" :createdBy.getEmail())+ "]")
+		.append( " classCode["+  (classificationClass == null? "---" : classificationClass.formatCode())+ "]")
 		.append( " expedienteCode["+ expedienteCode+ "]")
 		.append( " path["+ path+ "]")
 		.append( " dateOpened["+ TextUtil.formatDateTime(dateOpened)+ "]")
 		.append( " dateClosed["+ TextUtil.formatDateTime(dateClosed)+ "]\n")
-		.append( " objectToProtect["+ objectToProtect.toString()+ "]\n")
+		.append( " objectToProtect["+ (objectToProtect == null? "---" : objectToProtect.toString())+ "]\n")
 		.append( " expediente owner["+ (ownerPath == null? "[ROOT]": ownerPath)+ "]")
 		//       .append( " n index-entries["+ expedienteIndex.size()+ "]")
 		.append( " path["+ path+ "]")
 		.append( " mac=["+ mac+ "]")
-		.append( " metadata["+ metadata.toString()+ "]")
+		.append( " metadata["+ (metadata == null? "---": metadata.toString())+ "]")
 		.append( " keywords["+ keywords+ "]")
 		.append("     }\n");
 

@@ -77,6 +77,8 @@ public class ExpedienteGenerator implements HasLogger
          "responsabilidad"};
 
 
+
+
    public ExpedienteGenerator(
          ClassificationRepository claseRepository, Session jcrSession, ExpedienteIndexRepository expedienteIndexRepository,
          BranchExpedienteRepository branchExpedienteRepository, ExpedienteRepository expedienteRepository,
@@ -304,7 +306,7 @@ public class ExpedienteGenerator implements HasLogger
       String name = "";
       try
       {  // Los nombres han sido pre-generados
-         name = expedienteNamesReader.readLine();
+         name =  expedienteNamesReader.readLine();
       } catch (Exception e)
       { throw new IllegalStateException("No pudo leer archivo de nombres de expediente");
       }

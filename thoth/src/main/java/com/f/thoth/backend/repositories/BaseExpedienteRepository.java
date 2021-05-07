@@ -41,7 +41,7 @@ public interface BaseExpedienteRepository extends JpaRepository<BaseExpediente, 
 
 	@Query("SELECT base FROM BaseExpediente base "+
 			"WHERE (base.ownerPath IS null AND :owner IS null) OR base.ownerPath = :owner")
-	List<BaseExpediente> findByParent( @Param("owner") String ownerPath);
+	List<BaseExpediente> findByParent( @Param("owner") String owner);
 
 	@Query("SELECT count(base) FROM BaseExpediente base "+
 			"WHERE (base.ownerPath IS null AND :owner IS null) OR (base.ownerPath = :owner)")
