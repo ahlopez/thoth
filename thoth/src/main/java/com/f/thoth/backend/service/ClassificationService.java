@@ -43,7 +43,11 @@ public class ClassificationService implements FilterableCrudService<Classificati
       this.permissionRepository          = permissionRepository;
       this.levelRepository               = levelRepository;
       this.objectToProtectRepository     = objectToProtectRepository;
-   }
+   }//ClassificationService constructor
+   
+   
+   public Classification findByCode( String classCode) {  return claseRepository.findByCode(ThothSession.getCurrentTenant(), classCode); }
+   
 
    @Override public Page<Classification> findAnyMatching(Optional<String> filter, Pageable pageable)
    {
@@ -109,8 +113,8 @@ public class ClassificationService implements FilterableCrudService<Classificati
    @Override public Optional<Classification> findById(Long id)  { return claseRepository.findById( id);}
 
    @Override public List<Classification>  findByParent  ( Classification owner) { return claseRepository.findByParent(owner); }
-   @Override public int         countByParent ( Classification owner) { return claseRepository.countByParent (owner); }
-   @Override public boolean     hasChildren   ( Classification clase){ return claseRepository.countByChildren(clase) > 0; }
+   @Override public int                   countByParent ( Classification owner) { return claseRepository.countByParent (owner); }
+   @Override public boolean               hasChildren   ( Classification clase) { return claseRepository.countByChildren(clase) > 0; }
 
    @Override public List<Classification> findByNameLikeIgnoreCase (Tenant tenant, String name)
        { return claseRepository.findByNameLikeIgnoreCase (tenant, name); }

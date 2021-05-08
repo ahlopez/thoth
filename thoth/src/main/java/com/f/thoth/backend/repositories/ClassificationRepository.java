@@ -30,6 +30,9 @@ public interface ClassificationRepository extends JpaRepository<Classification, 
 
    @Query("SELECT count(c) FROM Classification c where c.tenant= ?1 and c.name like ?2")
    Page<Classification> countByNameLikeIgnoreCase(Tenant tenant, String name, Pageable page);
+   
+   @Query("SELECT c FROM Classification c WHERE  c.tenant = ?1 and c.classCode = ?2")
+   Classification findByCode( Tenant tenant, String classCode );
 
 
    //   ----------- Hierarchical handling ----------------

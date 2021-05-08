@@ -6,16 +6,19 @@ import static com.f.thoth.ui.utils.Constant.TITLE_JERARQUIA_EXPEDIENTES;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
 import com.f.thoth.backend.data.Role;
+import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.service.BaseExpedienteService;
+import com.f.thoth.backend.service.ClassificationService;
 import com.f.thoth.ui.MainView;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
@@ -23,6 +26,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Label;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.treegrid.TreeGrid;
@@ -52,7 +56,10 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 	private BaseExpedienteService baseExpedienteService;
 	private User                  currentUser;
 	private BaseExpediente        currentExpediente;
+
+	private ClassificationService classificationService;
 	private String                classCode;
+	private Classification        classificationClass;
 
 	private VerticalLayout        leftSection;
 	private VerticalLayout        content;
@@ -65,10 +72,11 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 
 
 	@Autowired
-	public ExpedienteHierarchyView(BaseExpedienteService baseExpedienteService)
+	public ExpedienteHierarchyView(BaseExpedienteService baseExpedienteService, ClassificationService classificationService)
 	{
 		this.baseExpedienteService = baseExpedienteService;
 		this.currentUser           = ThothSession.getCurrentUser();
+		this.classificationService = classificationService;
 
 		addClassName("main-view");
 		setSizeFull();
@@ -118,7 +126,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 					{
 						System.out.println("*** base = null");
 						System.out.flush();
-						childCount = baseExpedienteService.countByParent(base);
+						childCount = baseExpedienteService.countByClass(classificationClass);
 						System.out.println(">>> getChildCount(base=null)->["+childCount+ "]");
 						System.out.flush();
 					}
@@ -154,7 +162,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 					if ( base != null)
 					{
 						List<BaseExpediente> children = baseExpedienteService.findByParent(base);	
-						System.out.println(">>> fetchChildrenFromBackEnd -> Children of("+ base == null? "null" : base.getCode()+ ")");
+						System.out.println(">>> fetchChildrenFromBackEnd -> Children of("+  base.getCode()+ ")");
 						System.out.flush();
 						if ( children != null)
 						{
@@ -175,8 +183,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 					{
 						System.out.println(">>> fetchChildrenFromBackEnd -> base = null");
 						System.out.flush();
-					//	return empty;
-						return baseExpedienteService.findByParent(base).stream();
+						return baseExpedienteService.findByClass(classificationClass).stream();
 					}
 				}
 				else
@@ -309,9 +316,18 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 	@Override
 	public void setParameter(BeforeEvent event, String parameter)
 	{
-		//Notification.show("Voy a navegar con parámetro["+ parameter+ "]");
-		this.classCode = parameter;
-	}
+		Notification.show("Voy a navegar con parámetro["+ parameter+ "]");
+		Optional<Classification> cls =  classificationService.findById(Long.parseLong(parameter));
+		if ( cls.isPresent())
+		{
+			this.classificationClass =  cls.get();
+			this.classCode = classificationClass.formatCode();
+		} else
+		{
+			this.classificationClass = null;
+			this.classCode = "---";
+		}   
+	}//setParameter
 
 
 }//ExpedienteHierarchyView

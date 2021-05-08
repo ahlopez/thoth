@@ -125,10 +125,10 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 	protected User              createdBy;                   // User that created this expediente
 
 	@NotNull(message = "{evidentia.class.required}")
-	@ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+	@ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
 	protected Classification    classificationClass;         // Classification class to which this expediente belongs (Subserie si TRD)
 
-	@OneToOne(cascade= CascadeType.MERGE, fetch = FetchType.LAZY, orphanRemoval = true)
+	@OneToOne(cascade= CascadeType.MERGE, fetch = FetchType.EAGER, orphanRemoval = true)
 	protected SchemaValues      metadata;                    // Metadata values of the associated expediente
 
 	@NotNull(message = "{evidentia.dateopened.required}")

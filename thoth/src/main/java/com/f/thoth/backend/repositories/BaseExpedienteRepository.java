@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
@@ -40,12 +41,22 @@ public interface BaseExpedienteRepository extends JpaRepository<BaseExpediente, 
 	Optional<BaseExpediente> findById(Long id);
 
 	@Query("SELECT base FROM BaseExpediente base "+
-			"WHERE (base.ownerPath IS null AND :owner IS null) OR base.ownerPath = :owner")
-	List<BaseExpediente> findByParent( @Param("owner") String owner);
+			"WHERE base.ownerPath IS null AND base.classificationClass = :clase")
+	List<BaseExpediente>   findByClass(@Param("clase") Classification clase);
 
 	@Query("SELECT count(base) FROM BaseExpediente base "+
-			"WHERE (base.ownerPath IS null AND :owner IS null) OR (base.ownerPath = :owner)")
-	int countByParent( @Param("owner") String ownerPath);
+			"WHERE base.ownerPath IS null AND base.classificationClass = :clase")
+	int countByClass(@Param("clase") Classification clase);
+	
+	
+
+	@Query("SELECT base FROM BaseExpediente base "+
+			"WHERE (base.ownerPath IS null AND base.classificationClass = :clase) OR base.ownerPath = :owner")
+	List<BaseExpediente> findByParent( @Param("owner") String owner, @Param("clase") Classification clase);
+
+	@Query("SELECT count(base) FROM BaseExpediente base "+
+			"WHERE (base.ownerPath IS null AND base.classificationClass = :clase) OR (base.ownerPath = :owner)")
+	int countByParent( @Param("owner") String ownerPath, @Param("clase") Classification clase);
 
 	@Query("SELECT count(base) FROM BaseExpediente base "+
 			"WHERE (base.ownerPath IS null AND :group IS null) OR base.ownerPath = :group")

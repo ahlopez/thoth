@@ -107,7 +107,7 @@ public class ExpedienteClassSelectorView extends HorizontalLayout
       {  Notification.show("Owner class = null");
       }else
       {
-         getUI().ifPresent(ui -> ui.navigate(ExpedienteHierarchyView.class, ownerClass.formatCode()));
+         getUI().ifPresent(ui -> ui.navigate(ExpedienteHierarchyView.class, ownerClass.getId().toString()));
          closeEditor();
       }
       closeEditor();
