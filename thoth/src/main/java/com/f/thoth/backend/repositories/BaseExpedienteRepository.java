@@ -47,20 +47,42 @@ public interface BaseExpedienteRepository extends JpaRepository<BaseExpediente, 
 	@Query("SELECT count(base) FROM BaseExpediente base "+
 			"WHERE base.ownerPath IS null AND base.classificationClass = :clase")
 	int countByClass(@Param("clase") Classification clase);
-	
-	
 
 	@Query("SELECT base FROM BaseExpediente base "+
-			"WHERE (base.ownerPath IS null AND base.classificationClass = :clase) OR base.ownerPath = :owner")
+		   "WHERE ( base.ownerPath IS null AND base.classificationClass = :clase AND base.path <> :owner) OR (base.ownerPath IS NOT NULL AND base.ownerPath = :owner)")
 	List<BaseExpediente> findByParent( @Param("owner") String owner, @Param("clase") Classification clase);
 
+	@Query("SELECT base FROM BaseExpediente base "+
+		   "WHERE base.ownerPath = :owner")
+	List<BaseExpediente> findByParent( @Param("owner") String owner);
+
+	@Query("SELECT base FROM BaseExpediente base "+
+		   "WHERE base.ownerPath IS null AND base.classificationClass = :clase")
+	List<BaseExpediente> findByParent(@Param("clase") Classification clase);
+
 	@Query("SELECT count(base) FROM BaseExpediente base "+
-			"WHERE (base.ownerPath IS null AND base.classificationClass = :clase) OR (base.ownerPath = :owner)")
+		   "WHERE ( base.ownerPath IS null AND base.classificationClass = :clase AND base.path <> :owner) OR (base.ownerPath IS NOT NULL AND  base.ownerPath = :owner)")
 	int countByParent( @Param("owner") String ownerPath, @Param("clase") Classification clase);
 
 	@Query("SELECT count(base) FROM BaseExpediente base "+
-			"WHERE (base.ownerPath IS null AND :group IS null) OR base.ownerPath = :group")
+		   "WHERE base.ownerPath = :owner")
+	int countByParent( @Param("owner") String ownerPath);
+
+	@Query("SELECT count(base) FROM BaseExpediente base "+
+		   "WHERE base.ownerPath IS null AND base.classificationClass = :clase")
+	int countByParent( @Param("clase") Classification clase);
+
+	@Query("SELECT count(base) FROM BaseExpediente base "+
+		   "WHERE ( base.ownerPath IS null AND base.classificationClass = :clase) OR (base.ownerPath IS NOT NULL AND base.ownerPath = :group)")
+	int countByChildren(@Param("group") String group, @Param("clase") Classification clase);
+
+	@Query("SELECT count(base) FROM BaseExpediente base "+
+		   "WHERE base.ownerPath = :group")
 	int countByChildren(@Param("group") String group);
+
+	@Query("SELECT count(base) FROM BaseExpediente base "+
+		   "WHERE base.ownerPath IS null AND base.classificationClass = :clase")
+	int countByChildren(@Param("clase") Classification clase);
 
 	@Query("SELECT base FROM BaseExpediente base "+
 			"WHERE base.tenant = :tenant AND lower(base.name) LIKE lower(concat('%', :name,'%'))")
