@@ -245,11 +245,16 @@ public class ExpedienteGenerator implements HasLogger
       int nInstances = random.nextInt(3)+1;
       volume.setCurrentInstance(nInstances);
       volumeRepository.save(volume);
+      LocalDateTime dateOpened =  LocalDateTime.now().minusDays(365L*4);
+      LocalDateTime dateClosed =  dateOpened.plusDays(365L);
       for (int instance=1; instance <= nInstances; instance++)
-      {  currentInstance = createVolumeInstance(volume, instance);
+      {  
+    	 currentInstance = createVolumeInstance(volume, instance, dateOpened, dateClosed);
+         dateOpened = dateClosed.plusDays(1L);
+         dateClosed = dateOpened.plusDays(365L);
       }
       currentInstance.setOpen(true);
-      currentInstance.setDateOpened(LocalDateTime.now().minusDays((long)random.nextInt(1000)));
+      currentInstance.setDateClosed(LocalDateTime.MAX);
       volumeInstanceRepository.saveAndFlush(currentInstance);
       nVolumes++;
 
@@ -267,13 +272,11 @@ public class ExpedienteGenerator implements HasLogger
 
 
 
+    
 
-   private VolumeInstance createVolumeInstance( Volume vol, int i)
+   private VolumeInstance createVolumeInstance( Volume vol, int instanceNumber, LocalDateTime dateOpened, LocalDateTime dateClosed)
    {
-      VolumeInstance instance = new VolumeInstance();
-      instance.setVolume(vol);
-      instance.setInstance(i);
-      instance.setPath(vol.getPath()+ "/"+ i);
+      VolumeInstance instance = new VolumeInstance( vol, instanceNumber, "[Loc]", dateOpened , dateClosed);
       instance.setOpen(false);
       volumeInstanceRepository.saveAndFlush(instance);
       nInstances++;
