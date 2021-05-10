@@ -21,7 +21,7 @@ import com.f.thoth.backend.data.security.UserGroup;
  */
 @Entity
 @Table(name = "BRANCH_EXPEDIENTE")
-public class BranchExpediente extends AbstractEntity implements  NeedsProtection, HierarchicalEntity<String>, Comparable<BranchExpediente>
+public class BranchExpediente extends AbstractEntity implements  NeedsProtection, HierarchicalEntity<String>, Comparable<BranchExpediente>, ExpedienteType
 {
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@NotNull  (message = "{evidentia.expediente.required}")
@@ -31,7 +31,8 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 	public BranchExpediente()
 	{
 		super();
-		this.expediente = null;
+		this.expediente = new BaseExpediente();
+		setType();
 	}//BranchExpediente null constructor
 	
 	
@@ -41,9 +42,10 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 		super();
 
 		if ( expediente == null )
-			throw new IllegalArgumentException("Expediente asociado a la rama no puede ser nulo");
+			throw new IllegalArgumentException("Expediente base del grupo de expedientes no puede ser nulo");
 
 		this.expediente = expediente;
+		setType();
 
 	}//BranchExpediente constructor
 	
@@ -51,10 +53,21 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 
 	// -------------- Getters & Setters ----------------
 
-	public BaseExpediente       getExpediente() { return expediente;}
+	public BaseExpediente       getExpediente()      { return expediente;}
 	public void                 setExpediente(BaseExpediente expediente){ this.expediente = expediente;}
 	
-	public  String              getExpedienteCode() { return expediente.getExpedienteCode();}
+	@Override public Type       getType()            { setType(); return expediente.getType();}
+	@Override public boolean    isOfType( Type type) { return expediente != null && expediente.isOfType(type);}
+	
+	public  String              getPath()            {  return expediente.getPath();}
+	
+	public  String              getExpedienteCode()  { return expediente.getExpedienteCode();}
+	
+	private void                setType()
+	{
+		if( expediente != null && !isOfType(Type.BRANCH))
+			expediente.setType(Type.BRANCH);
+	}
 	
 
 	// --------------------------- Implements HierarchicalEntity ---------------------------------------
@@ -62,7 +75,7 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 	@Override public String            getName()           { return expediente.getName();}
 
 	@Override public String            getCode()           { return expediente.getCode();}
-
+	
 	@Override public String            getOwner()          { return expediente.getOwnerPath();}
 
 	@Override public String            formatCode()        { return expediente.formatCode();}
@@ -132,8 +145,6 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 	
 
 	// --------------- Logic ------------------------------
-	
-	public String  getPath()   {  return expediente.getPath();}
 
 	public void openExpediente()
 	{

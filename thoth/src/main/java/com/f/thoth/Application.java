@@ -32,7 +32,11 @@ import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.User;
+import com.f.thoth.backend.repositories.BaseExpedienteRepository;
+import com.f.thoth.backend.repositories.BranchExpedienteRepository;
 import com.f.thoth.backend.repositories.ClassificationRepository;
+import com.f.thoth.backend.repositories.ExpedienteRepository;
+import com.f.thoth.backend.repositories.LeafExpedienteRepository;
 import com.f.thoth.backend.repositories.LevelRepository;
 import com.f.thoth.backend.repositories.OperationRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
@@ -41,13 +45,19 @@ import com.f.thoth.backend.repositories.RoleRepository;
 import com.f.thoth.backend.repositories.SequenceRepository;
 import com.f.thoth.backend.repositories.TenantRepository;
 import com.f.thoth.backend.repositories.UserRepository;
+import com.f.thoth.backend.repositories.VolumeRepository;
+import com.f.thoth.backend.service.BaseExpedienteService;
+import com.f.thoth.backend.service.BranchExpedienteService;
 import com.f.thoth.backend.service.ClassificationService;
+import com.f.thoth.backend.service.ExpedienteService;
+import com.f.thoth.backend.service.LeafExpedienteService;
 import com.f.thoth.backend.service.LevelService;
 import com.f.thoth.backend.service.OperationService;
 import com.f.thoth.backend.service.RetentionService;
 import com.f.thoth.backend.service.SequenceService;
 import com.f.thoth.backend.service.TenantService;
 import com.f.thoth.backend.service.UserService;
+import com.f.thoth.backend.service.VolumeService;
 import com.f.thoth.ui.MainView;
 
 /**
@@ -64,6 +74,11 @@ import com.f.thoth.ui.MainView;
             UserService.class,
             OperationService.class,
             ClassificationService.class,
+            BaseExpedienteService.class,
+            LeafExpedienteService.class,
+            ExpedienteService.class,
+            BranchExpedienteService.class,
+            VolumeService.class,
             LevelService.class,
             TenantService.class,
             RetentionService.class,
@@ -99,6 +114,11 @@ import com.f.thoth.ui.MainView;
             RoleRepository.class,
             PermissionRepository.class,
             ClassificationRepository.class,
+            BaseExpedienteRepository.class,
+            BranchExpedienteRepository.class,
+            LeafExpedienteRepository.class,
+            ExpedienteRepository.class,
+            VolumeRepository.class,
             SequenceRepository.class,
             RetentionRepository.class,
             LevelRepository.class

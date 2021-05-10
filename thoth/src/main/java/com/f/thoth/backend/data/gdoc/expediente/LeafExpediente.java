@@ -25,7 +25,7 @@ import com.f.thoth.backend.data.security.UserGroup;
  */
 @Entity
 @Table(name = "LEAF_EXPEDIENTE")
-public class LeafExpediente extends AbstractEntity implements  NeedsProtection, Comparable<LeafExpediente>
+public class LeafExpediente extends AbstractEntity implements  NeedsProtection, Comparable<LeafExpediente>, ExpedienteType
 {
 
    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
@@ -40,7 +40,7 @@ public class LeafExpediente extends AbstractEntity implements  NeedsProtection, 
    public LeafExpediente()
    {
       super();
-      this.expediente           = null;
+      this.expediente           = new BaseExpediente();
       this.admissibleTypes      = new TreeSet<>();
    }//LeafExpediente null constructor
 
@@ -54,6 +54,7 @@ public class LeafExpediente extends AbstractEntity implements  NeedsProtection, 
       if ( expediente == null )
          throw new IllegalArgumentException("Expediente asociado a la rama no puede ser nulo");
 
+	  expediente.setType(Type.LEAF);
       this.admissibleTypes  = (admissibleTypes  == null? new TreeSet<>(): admissibleTypes);
 
    }//LeafExpediente constructor
@@ -63,9 +64,17 @@ public class LeafExpediente extends AbstractEntity implements  NeedsProtection, 
 
    public BaseExpediente    getExpediente() { return expediente;}
    public void              setExpediente(BaseExpediente expediente){ this.expediente = expediente;}
+	
+   @Override public Type    getType()            { return expediente == null? null: expediente.getType();}
+   @Override public boolean isOfType( Type type) { return expediente != null && expediente.isOfType(type);}
+   public  void             setType( Type type)  { expediente.setType(type);}
 
    public Set<DocumentType> getAdmissibleTypes() {  return admissibleTypes;}
    public void              setAdmissibleTypes(Set<DocumentType> admissibleTypes) { this.admissibleTypes = admissibleTypes;}
+   
+   public String            getPath()            {  return expediente.getPath();}
+   
+   public String            getOwner()           {  return expediente.getOwnerPath();}
 
    // --------------- Object methods ---------------------
 
@@ -142,9 +151,5 @@ public class LeafExpediente extends AbstractEntity implements  NeedsProtection, 
    @Override public void            revoke(Permission permission)           { expediente.revoke(permission);}
 
    // --------------- Logic ------------------------------
-   
-   public String  getPath()   {  return expediente.getPath();}
-   
-   public String  getOwner()  {  return expediente.getOwnerPath();}
 
 }//LeafExpediente

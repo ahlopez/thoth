@@ -21,7 +21,7 @@ import com.f.thoth.backend.data.security.UserGroup;
 
 @Entity
 @Table(name = "VOLUME")
-public class Volume extends AbstractEntity implements  NeedsProtection, Comparable<Volume>
+public class Volume extends AbstractEntity implements  NeedsProtection, Comparable<Volume>, ExpedienteType
 {
    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
    @NotNull  (message = "{evidentia.expediente.required}")
@@ -36,7 +36,7 @@ public class Volume extends AbstractEntity implements  NeedsProtection, Comparab
 
    public Volume()
    {
-      this.expediente      = null;
+      this.expediente      = new LeafExpediente();
       this.currentInstance = 0;
       this.instances       = new TreeSet<>();
    }//Volume constructor
@@ -50,18 +50,28 @@ public class Volume extends AbstractEntity implements  NeedsProtection, Comparab
       this.expediente      = expediente;
       this.currentInstance = (currentInstance == null? 0: currentInstance);
       this.instances       = (instances       == null? new TreeSet<>(): instances);
+      setType();
    }//Volume constructor
 
 
    // ---------------------- getters & setters ---------------------
-   public LeafExpediente            getExpediente() { return expediente;}
-   public void                      setExpediente(LeafExpediente expediente){ this.expediente = expediente;}
+   public LeafExpediente            getExpediente()      { return expediente;}
+   public void                      setExpediente(LeafExpediente expediente){ this.expediente = expediente;} 	
+	
+   @Override public Type            getType()            { setType(); return expediente.getType();}
+   @Override public boolean         isOfType( Type type) { return expediente != null && expediente.isOfType(type);}
 
    public Integer                   getCurrentInstance() { return currentInstance;}
    public void                      setCurrentInstance ( Integer currentInstance) { this.currentInstance = currentInstance;}
 
-   public Set<VolumeInstance>       getInstances() {  return instances;}
+   public Set<VolumeInstance>       getInstances()       {  return instances;}
    public void                      setInstances(Set<VolumeInstance> instances) { this.instances = instances;}
+ 	
+   private void                     setType()
+   {
+		if( expediente != null && !isOfType(Type.VOLUME))
+			expediente.setType(Type.VOLUME);
+   }//setType
 
 
    // -----------------  Implements NeedsProtection ----------------
@@ -134,8 +144,9 @@ public class Volume extends AbstractEntity implements  NeedsProtection, Comparab
 
    // ----------------------- Logic --------------------------
    public void  addInstance( VolumeInstance instance) { instances.add(instance); }
-   
+
    public String getPath() { return expediente.getPath();}
-   
+
 
 }//Volume
+

@@ -20,9 +20,9 @@ import com.f.thoth.backend.data.security.UserGroup;
 
 @Entity
 @Table(name = "EXPEDIENTE")
-public class Expediente  extends AbstractEntity implements  NeedsProtection, Comparable<Expediente>
+public class Expediente  extends AbstractEntity implements  NeedsProtection, Comparable<Expediente>, ExpedienteType
 {
-	  @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
       @NotNull  (message = "{evidentia.expediente.required}")
       protected LeafExpediente       expediente;                              // Leaf expediente associated to the expediente
 
@@ -38,7 +38,7 @@ public class Expediente  extends AbstractEntity implements  NeedsProtection, Com
 
       public Expediente()
       {
-         this.expediente = null;
+         this.expediente = new LeafExpediente();
          this.path       = "";
          this.location   = "";
       }//Expediente constructor
@@ -54,18 +54,28 @@ public class Expediente  extends AbstractEntity implements  NeedsProtection, Com
          this.expediente = expediente;
          this.path       = path;
          this.location   = (location   == null? "" : location);
+         setType();
 
       }//Expediente constructor
 
       // ---------------------- getters & setters ---------------------
-      public LeafExpediente    getExpediente() { return expediente;}
+      public LeafExpediente    getExpediente()              { return expediente;}
       public void              setExpediente(LeafExpediente expediente){ this.expediente = expediente;}
+  	  	
+      @Override public Type    getType()                    { return expediente == null? null: expediente.getType();}
+      @Override public boolean isOfType( Type type)         { return expediente != null && expediente.isOfType(type);}
 
-      public String            getPath() { return path;}
-      public void              setPath ( String path) { this.path = path;}
+      public String            getPath()                    { return path;}
+      public void              setPath ( String path)       { this.path = path;}
 
-      public String            getLocation() {  return location;}
+      public String            getLocation()                { return location;}
       public void              setLocation(String location) { this.location = location;}
+  	
+      private void             setType()
+      {
+  		if( expediente != null && !isOfType(Type.EXPEDIENTE))
+  			expediente.setType(Type.EXPEDIENTE);
+  	  }//setType
 
 
       // -----------------  Implements NeedsProtection ----------------
@@ -138,3 +148,4 @@ public class Expediente  extends AbstractEntity implements  NeedsProtection, Com
       }//compareTo
 
 }//Expediente
+

@@ -5,6 +5,8 @@ import java.time.LocalDateTime;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Index;
 import javax.persistence.ManyToOne;
@@ -42,6 +44,7 @@ import com.f.thoth.backend.data.security.UserGroup;
 					@NamedAttributeNode("tenant"),
 					@NamedAttributeNode("code"),           // DB human id. Includes [tenant, type, path+]
 					@NamedAttributeNode("expedienteCode"), // Business id unique inside the owner (class or expediente), vg 001,002, etc
+					@NamedAttributeNode("type"),
 					@NamedAttributeNode("name"),
 					@NamedAttributeNode("path"),
 					@NamedAttributeNode("classificationClass"),
@@ -64,6 +67,7 @@ import com.f.thoth.backend.data.security.UserGroup;
 					@NamedAttributeNode("tenant"),
 					@NamedAttributeNode("code"),
 					@NamedAttributeNode("expedienteCode"),
+					@NamedAttributeNode("type"),
 					@NamedAttributeNode("name"),
 					@NamedAttributeNode("classificationClass"),
 					@NamedAttributeNode("createdBy"),
@@ -92,7 +96,7 @@ import com.f.thoth.backend.data.security.UserGroup;
 
 @Entity
 @Table(name = "BASE_EXPEDIENTE", indexes = { @Index(columnList = "code"), @Index(columnList ="tenant_id, expedienteCode")}) 
-public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comparable<BaseExpediente>
+public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comparable<BaseExpediente>, ExpedienteType
 {
 	public static final String BRIEF = "BaseExpediente.brief";
 	public static final String FULL  = "BaseExpediente.full";
@@ -102,6 +106,10 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 	@NotEmpty (message = "{evidentia.code.required}")
 	@Size(max = 255)
 	protected String            expedienteCode;              // Business id unique inside the owner (class or expediente), vg 001,002, etc
+	
+	@NotNull(message = "{evidentia.disposicion.required}")
+	@Enumerated(EnumType.STRING)
+	private Type                type;                        //  Expediente tipo BRANCH/ LEAF/ EXPEDIENTE/ VOLUME
 
 	@NotNull  (message = "{evidentia.repopath.required}")
 	@NotBlank (message = "{evidentia.repopath.required}")
@@ -162,6 +170,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 	{
 		super();
 		this.expedienteCode       = "";
+		this.type                 = Type.EXPEDIENTE;
 		this.path                 = "";
 		this.name                 = "";
 		this.objectToProtect      = new ObjectToProtect();
@@ -180,12 +189,15 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 	}//BaseExpediente null constructor
 
 
-	public BaseExpediente( String expedienteCode, String path, String name, User createdBy, Classification classificationClass,
+	public BaseExpediente( String expedienteCode, Type type, String path, String name, User createdBy, Classification classificationClass,
 			SchemaValues metadata, LocalDateTime dateOpened, LocalDateTime dateClosed, String ownerPath,
 			Boolean open,String keywords, String mac)
 	{
 		if ( TextUtil.isEmpty(expedienteCode))
 			throw new IllegalArgumentException("Código del expediente no puede ser nulo ni vacío");
+		
+		if ( type == null)
+			throw new IllegalArgumentException("Tipo del expediente no puede ser nulo");
 
 		if ( TextUtil.isEmpty(path))
 			throw new IllegalArgumentException("Path del expediente en el repositorio no puede ser nulo ni vacío");
@@ -207,6 +219,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
 		this.objectToProtect     = new ObjectToProtect();
 		this.expedienteCode      = expedienteCode;
+		this.type                = type;
 		this.path                = path;
 		this.name                = name;
 		this.createdBy           = createdBy;
@@ -246,6 +259,10 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
 	public String            getName() { return name;}
 	public void              setName ( String name) { this.name = name;}
+
+	@Override public Type    getType() { return type;}
+	@Override public boolean isOfType( Type type) { return this.type == null? false: this.type.equals(type);}
+	public void              setType ( Type type) { this.type = type;}
 
 	public Boolean           getOpen() { return open;}
 	public void              setOpen ( Boolean open) { this.open = open;}
@@ -308,24 +325,25 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 		User owner = objectToProtect.getUserOwner();
 		StringBuilder s = new StringBuilder();
 		s.append( "BaseExpediente{")
-		.append( super.toString())
-		.append( " name["+ name+ "]")
-		.append( " open["+ open+ "]")
-		.append( " user owner["+ (owner == null? "---" : owner.getEmail())+ "]")
-		.append( " createdBy["+  (createdBy == null? "---" :createdBy.getEmail())+ "]")
-		.append( " classCode["+  (classificationClass == null? "---" : classificationClass.formatCode())+ "]")
-		.append( " expedienteCode["+ expedienteCode+ "]")
-		.append( " path["+ path+ "]")
-		.append( " dateOpened["+ TextUtil.formatDateTime(dateOpened)+ "]")
-		.append( " dateClosed["+ TextUtil.formatDateTime(dateClosed)+ "]\n")
-		.append( " objectToProtect["+ (objectToProtect == null? "---" : objectToProtect.toString())+ "]\n")
-		.append( " expediente owner["+ (ownerPath == null? "[ROOT]": ownerPath)+ "]")
+		 .append( super.toString())
+	     .append( " type["+ type+ "]")
+		 .append( " name["+ name+ "]")
+		 .append( " open["+ open+ "]")
+		 .append( " user owner["+ (owner == null? "---" : owner.getEmail())+ "]")
+		 .append( " createdBy["+  (createdBy == null? "---" :createdBy.getEmail())+ "]")
+		 .append( " classCode["+  (classificationClass == null? "---" : classificationClass.formatCode())+ "]")
+		 .append( " expedienteCode["+ expedienteCode+ "]")
+		 .append( " path["+ path+ "]")
+		 .append( " dateOpened["+ TextUtil.formatDateTime(dateOpened)+ "]")
+		 .append( " dateClosed["+ TextUtil.formatDateTime(dateClosed)+ "]\n")
+		 .append( " objectToProtect["+ (objectToProtect == null? "---" : objectToProtect.toString())+ "]\n")
+		 .append( " expediente owner["+ (ownerPath == null? "[ROOT]": ownerPath)+ "]")
 		//       .append( " n index-entries["+ expedienteIndex.size()+ "]")
-		.append( " path["+ path+ "]")
-		.append( " mac=["+ mac+ "]")
-		.append( " metadata["+ (metadata == null? "---": metadata.toString())+ "]")
-		.append( " keywords["+ keywords+ "]")
-		.append("     }\n");
+		 .append( " path["+ path+ "]")
+		 .append( " mac=["+ mac+ "]")
+		 .append( " metadata["+ (metadata == null? "---": metadata.toString())+ "]")
+		 .append( " keywords["+ keywords+ "]")
+		 .append("     }\n");
 
 		return s.toString();
 	}//toString
