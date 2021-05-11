@@ -47,15 +47,15 @@ public class ClassificationView extends VerticalLayout
 
    private VerticalLayout        content;
    private VerticalLayout        rightSection;
-   
+
    private HierarchicalSelector<Classification, HasValue.ValueChangeEvent<Classification>> ownerClass;
    private Classification        currentClass= null;
-   
+
    private Button add      = new Button("+ Nueva Clase");
    private Button save     = new Button("Guardar clase");
    private Button delete   = new Button("Eliminar clase");
    private Button close    = new Button("Cancelar");
-   
+
    private Level[] levels;
    private List<Retention>  retentionSchedules;
 
@@ -65,7 +65,7 @@ public class ClassificationView extends VerticalLayout
    {
       this.classificationService = classificationService;
       this.currentUser           = ThothSession.getCurrentUser();
-      
+
       levels = getAllLevels( levelService);
       retentionSchedules = retentionService.findAll();
 
@@ -92,29 +92,29 @@ public class ClassificationView extends VerticalLayout
 
    protected String getBasePage() { return PAGE_ESQUEMAS_CLASIFICACION; }
 
-   
+
    private Level[] getAllLevels( LevelService levelService)
-   {       
-      List<Level> allLevels      = levelService.findAll();
-      int nLevels    = allLevels.size();
-      Level[] levels = new Level[nLevels];
+   {
+      List<Level> allLevels  = levelService.findAll();
+      int         nLevels    = allLevels.size();
+      Level[]     levels     = new Level[nLevels];
       for( int i=0; i < nLevels; i++)
-         levels[i] = allLevels.get(i);
-      
+      { levels[i] = allLevels.get(i);
+      }
       return levels;
    }//getAllLevels
 
    private Component configureGrid()
    {
       ownerClass = new HierarchicalSelector<>(
-                           classificationService, 
-                           Grid.SelectionMode.SINGLE, 
-                           "Seleccione la clase padre", 
+                           classificationService,
+                           Grid.SelectionMode.SINGLE,
+                           "Seleccione la clase padre",
                            true,
                            false,
                            this::editOwner
-                           
-                           );     
+
+                           );
       ownerClass.getElement().setAttribute("colspan", "3");
 
       FormLayout form = new FormLayout(ownerClass);
@@ -127,27 +127,27 @@ public class ClassificationView extends VerticalLayout
       BeanValidationBinder<Classification> binder = new BeanValidationBinder<>(Classification.class);
       binder.forField(ownerClass)
             .bind("owner");
-      
+
       return ownerClass;
 
    }//configureGrid
-     
+
 
    private Component configureButtons()
-   {      
+   {
       add.     addThemeVariants(ButtonVariant.LUMO_PRIMARY);
       save.    addThemeVariants(ButtonVariant.LUMO_PRIMARY);
       delete.  addThemeVariants(ButtonVariant.LUMO_ERROR);
       close.   addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-      
+
       save.addClickShortcut (Key.ENTER);
       close.addClickShortcut(Key.ESCAPE);
-      
+
       add .addClickListener  (click -> addClass());
       save.addClickListener  (click -> saveClass(currentClass));
       delete.addClickListener(click -> deleteClass(currentClass));
       close.addClickListener (click -> closeAll());
-      
+
       save.getElement().getStyle().set("margin-left", "auto");
       add .getElement().getStyle().set("margin-left", "auto");
 
@@ -168,13 +168,13 @@ public class ClassificationView extends VerticalLayout
 
    }//configureForm
 
-   
+
    private void editOwner(Classification owner)
    {
       this.currentClass = owner;
       editClass(currentClass);
    }//editOwner
-   
+
 
    private void addClass()
    {
@@ -185,30 +185,30 @@ public class ClassificationView extends VerticalLayout
       currentClass.setLevel(level);
       editClass(currentClass);
    }//addClass
-   
+
    private Level  getCurrentLevel( Classification owner)
    {
       Level level      = null;
       int currentLevel = owner.getLevel().getOrden()+ 1;
       if ( currentLevel >= levels.length)
-         Notifier.error("La clase del último nivel no puede tener hijos");       
+         Notifier.error("La clase del último nivel no puede tener hijos");
       else
          level = levels[currentLevel];
 
       return level;
-      
+
    }//getCurrentLevel
-   
-   
+
+
    private void saveClass( Classification classification)
    {
-	  if (classification == null)
-		  return;
-	  
+          if (classification == null)
+                  return;
+
       classificationService.save(currentUser, classification);
       closeEditor();
       currentClass = null;
-     
+
    }//saveClass
 
 
@@ -225,8 +225,8 @@ public class ClassificationView extends VerticalLayout
       updateSelector();
       closeEditor();
    }//deleteClass
-   
-   
+
+
    private void editClass(Classification classification)
    {
       if (classification == null)
@@ -243,7 +243,7 @@ public class ClassificationView extends VerticalLayout
          classificationForm.addClassName("selected-item-form");
       }
    }//editClass
-   
+
 
    private void closeEditor()
    {
@@ -252,15 +252,15 @@ public class ClassificationView extends VerticalLayout
       classificationForm.removeClassName("selected-item-form");
 
    }//closeEditor
-   
-   
+
+
    private void closeAll()
    {
       closeEditor();
       currentClass = null;
-      ownerClass.resetSelector();      
+      ownerClass.resetSelector();
    }//closeAll
-   
+
 
    private void updateSelector()
    {

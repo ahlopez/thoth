@@ -56,7 +56,7 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
       this.onlyLeaves     = onlyLeaves;
       setup(name, showId);
 
-   }//AbstractHierarchicalSelector constructor
+   }//HierarchicalSelector constructor
 
 
    private void setup( String name, boolean showId)
@@ -460,4 +460,4 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
 
    }//setValue
 
-}//AbstractHierarchicalSelector
+}//HierarchicalSelector

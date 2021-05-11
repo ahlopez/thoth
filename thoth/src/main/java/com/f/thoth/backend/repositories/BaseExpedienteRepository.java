@@ -92,6 +92,15 @@ public interface BaseExpedienteRepository extends JpaRepository<BaseExpediente, 
 			"WHERE base.tenant = :tenant AND lower(base.name) LIKE lower(concat('%', :name,'%'))")
 	long countByNameLikeIgnoreCase(@Param("tenant") Tenant tenant, @Param("name") String name);
 
+	@Query("SELECT base FROM BaseExpediente base "+
+			"WHERE base.tenant = :tenant AND base.classificationClass = :clase AND lower(base.name) LIKE lower(concat('%', :name,'%'))")
+	List<BaseExpediente> findByNameLikeIgnoreCase(@Param("tenant") Tenant tenant, @Param("name") String name, @Param("clase") Classification clase);
+
+	@Query("SELECT count(base) FROM BaseExpediente base "+
+			"WHERE base.tenant = :tenant AND base.classificationClass = :clase AND lower(base.name) LIKE lower(concat('%', :name,'%'))")
+	long countByNameLikeIgnoreCase(@Param("tenant") Tenant tenant, @Param("name") String name, @Param("clase")  Classification clase);
+
+	
 
 	//   ----------- ACL handling ----------------
 	@Query("SELECT DISTINCT base FROM BaseExpediente base "+
