@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,6 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.treegrid.TreeGrid;
@@ -40,6 +40,7 @@ import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.shared.Registration;
 
 /**
  * La gestion de expedientes procede por pasos:
@@ -53,244 +54,290 @@ import com.vaadin.flow.router.Route;
 @Secured(Role.ADMIN)
 class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParameter<String>, AfterNavigationObserver
 {
-	private BaseExpedienteService       baseExpedienteService;
-	//private BaseExpediente              currentExpediente;
-	//private User                        currentUser;
+  private BaseExpedienteService       baseExpedienteService;
+  //private BaseExpediente              currentExpediente;
+  //private User                        currentUser;
 
-	private ClassificationService       classificationService;
-	private Classification              selectedClass;
-	private String                      classCode = "";
-	private String                      className = "";
+  private ClassificationService       classificationService;
+  private Classification              selectedClass;
+  private String                      classCode = "";
+  private String                      className = "";
 
-	private VerticalLayout              content;
-	private VerticalLayout              rightSection;
-
-
-	private TreeGrid<BaseExpediente>    treeGrid;
-	private HierarchicalDataProvider<BaseExpediente, Void> dataProvider;
-
-	private Grid<BaseExpediente>        searchGrid;
-	private SearchBar                   searchBar;
-	private final List<BaseExpediente>  emptyGrid     = new ArrayList<>();
-	private final Set<BaseExpediente>   expandedNodes = new TreeSet<>();
+  private VerticalLayout              content;
+  private VerticalLayout              rightSection;
 
 
+  private TreeGrid<BaseExpediente>    treeGrid;
+  private HierarchicalDataProvider<BaseExpediente, Void> dataProvider;
 
-	@Autowired
-	public ExpedienteHierarchyView(BaseExpedienteService baseExpedienteService, ClassificationService classificationService)
-	{
-		this.baseExpedienteService = baseExpedienteService;
-		this.classificationService = classificationService;
-		//this.currentUser           = ThothSession.getCurrentUser();
-
-	}//ExpedienteHierarchyView
+  private Grid<BaseExpediente>        searchGrid;
+  private SearchBar                   searchBar;
+  private final List<BaseExpediente>  emptyGrid     = new ArrayList<>();
+  private final Set<BaseExpediente>   expandedNodes = new TreeSet<>();
 
 
 
-	@Override
-	public void afterNavigation(AfterNavigationEvent event)
-	{
-		addClassName("main-view");
-		setSizeFull();
+  @Autowired
+  public ExpedienteHierarchyView(BaseExpedienteService baseExpedienteService, ClassificationService classificationService)
+  {
+    this.baseExpedienteService = baseExpedienteService;
+    this.classificationService = classificationService;
+    //this.currentUser           = ThothSession.getCurrentUser();
 
-		rightSection = new VerticalLayout();
-	 	rightSection.addClassName ("right-section");
-	 	rightSection.setWidth("35%");
-		rightSection.add(new H3("RIGHT SECTION"));
-		//rightSection.add(configureForm(ExpedienteEditForm));
+  }//ExpedienteHierarchyView
 
-		content = new VerticalLayout();
-		content.addClassName ("selector");
-		content.setWidth("65%");
-		content.add(new H2("Expedientes de la clase "+ classCode+ " - "+ className));
-		content.add(new H3("Seleccione el expediente de interes"));
-		content.add(configureExpedienteSelector());
-		updateSelector();
-		closeEditor();
 
-	    add(content, rightSection);
+
+  @Override
+  public void afterNavigation(AfterNavigationEvent event)
+  {
+    addClassName("main-view");
+    setSizeFull();
+
+    rightSection = new VerticalLayout();
+    rightSection.addClassName ("right-section");
+    rightSection.setWidth("35%");
+    rightSection.add(new H3("RIGHT SECTION"));
+    //rightSection.add(configureForm(ExpedienteEditForm));
+
+    content = new VerticalLayout();
+    content.addClassName ("selector");
+    content.setWidth("65%");
+    content.add(new H2("Expedientes de la clase "+ classCode+ " - "+ className));
+    content.add(new H3("Seleccione el expediente de interes"));
+    content.add(configureExpedienteSelector());
+    updateSelector();
+    closeEditor();
+
+      add(content, rightSection);
 /*
-		HorizontalLayout panel=  new HorizontalLayout(content, rightSection);
-		panel.setWidthFull();
-		add( panel);
-*/	 
-	}//afterNavigation
+    HorizontalLayout panel=  new HorizontalLayout(content, rightSection);
+    panel.setWidthFull();
+    add( panel);
+*/
+  }//afterNavigation
 
 
-	@Override
-	public void setParameter(BeforeEvent event, String parameter)
-	{
-		Optional<Classification> cls =  classificationService.findById(Long.parseLong(parameter));
-		if ( cls.isPresent())
-		{
-			this.selectedClass = cls.get();
-			this.classCode     = selectedClass.formatCode();
-			this.className     = selectedClass.getName();
-		}
-		else
-		{
-			this.selectedClass = null;
-			this.classCode = "---";
-			this.className = "";
-		}
-	}//setParameter
+  @Override
+  public void setParameter(BeforeEvent event, String parameter)
+  {
+    Optional<Classification> cls =  classificationService.findById(Long.parseLong(parameter));
+    if ( cls.isPresent())
+    {
+      this.selectedClass = cls.get();
+      this.classCode     = selectedClass.formatCode();
+      this.className     = selectedClass.getName();
+    }
+    else
+    {
+      this.selectedClass = null;
+      this.classCode = "---";
+      this.className = "";
+    }
+  }//setParameter
 
 
-	private Component configureExpedienteSelector()
-	{
-		HorizontalLayout layout = new HorizontalLayout();
-		layout.setWidthFull();
-		treeGrid = buildSelector();
-		layout.add(treeGrid);
+  private Component configureExpedienteSelector()
+  {
+    HorizontalLayout layout = new HorizontalLayout();
+    layout.setWidthFull();
+    treeGrid = buildSelector();
+    layout.add(treeGrid);
 
-		this.searchGrid   = buildSearchGrid(treeGrid);
-		searchGrid.setWidth("79%");
-		this.searchBar    = buildSearchBar(searchGrid);
-		content.add(searchBar);
-		layout.add(searchGrid);
-		layout.setFlexGrow(1, treeGrid);
+    this.searchGrid   = buildSearchGrid(treeGrid);
+    searchGrid.setWidth("79%");
+    this.searchBar    = buildSearchBar(searchGrid);
+    content.add(searchBar);
+    layout.add(searchGrid);
+    layout.setFlexGrow(1, treeGrid);
 
-		refresh();
-		return layout;
+    refresh();
+    return layout;
 
-	}//configureSelector
-
-
-	private TreeGrid<BaseExpediente> buildSelector()
-	{
-		TreeGrid<BaseExpediente> grid = new TreeGrid<>();
-	    grid.getElement().setAttribute("colspan", "5");
-		grid.setSelectionMode(Grid.SelectionMode.SINGLE);
-		grid.setWidthFull();
-		grid.addHierarchyColumn(BaseExpediente::getName).setHeader("Nombre del expediente").setWidth("78%");
-		grid.addColumn(BaseExpediente::formatCode).setHeader("Código").setWidth("22%");
-		this.dataProvider = getDataProvider();
-		grid.setDataProvider(dataProvider);
-		buildSingleSelector(grid);
-		return grid;
-
-	}//buildSelector
+  }//configureSelector
 
 
-	private HierarchicalDataProvider<BaseExpediente, Void> getDataProvider()
-	{
-		return new AbstractBackEndHierarchicalDataProvider<BaseExpediente, Void>()
-		{
+  private TreeGrid<BaseExpediente> buildSelector()
+  {
+    TreeGrid<BaseExpediente> grid = new TreeGrid<>();
+      grid.getElement().setAttribute("colspan", "5");
+    grid.setSelectionMode(Grid.SelectionMode.SINGLE);
+    grid.setWidthFull();
+    grid.addHierarchyColumn(BaseExpediente::getName).setHeader("Nombre del expediente").setWidth("78%");
+    grid.addColumn(BaseExpediente::formatCode).setHeader("Código").setWidth("22%");
+    this.dataProvider = getDataProvider();
+    grid.setDataProvider(dataProvider);
+    buildSingleSelector(grid);
+    return grid;
 
-			@Override
-			public int getChildCount(HierarchicalQuery<BaseExpediente, Void> query)
-			{
-				if (query == null)
-					return 0;
-
-				BaseExpediente base = query.getParent();
-				return base != null? baseExpedienteService.countByParent(base):
-					baseExpedienteService.countByClass(selectedClass);
-			}//getChildCount
-
-			@Override
-			public boolean hasChildren(BaseExpediente expediente)
-			{
-				return baseExpedienteService.hasChildren(expediente, expediente == null? null: expediente.getClassificationClass());
-			}//hasChildren
-
-			@Override
-			protected Stream<BaseExpediente> fetchChildrenFromBackEnd(  HierarchicalQuery<BaseExpediente, Void> query)
-			{
-				Stream<BaseExpediente> empty = new ArrayList<BaseExpediente>().stream();
-				if ( query == null)
-					return empty;
-
-				BaseExpediente base = query.getParent();
-				return  base != null? baseExpedienteService.findByParent(base).stream():
-					baseExpedienteService.findByClass(selectedClass).stream();
-			}//fetchChildrenFromBackEnd
-
-		};// new AbstractBackEndHierarchicalDataProvider<>
-	}//getDataProvider
+  }//buildSelector
 
 
-	private void buildSingleSelector(TreeGrid<BaseExpediente> tGrid)
-	{
-		tGrid.addItemDoubleClickListener( e-> tGrid.deselect(e.getItem()));
-		tGrid.addExpandListener         ( e-> expandedNodes.addAll(e.getItems()));
-		tGrid.addSelectionListener      ( e->
-		{
-			Optional<BaseExpediente> first = e.getFirstSelectedItem();
-			if ( first.isPresent() )
-			{  // Aqui­ llamar el metodo que procesa la seleccion:
-				//  setValue( first.get() );
-			}
-		});
-	}//buildSingleSelector
+  private HierarchicalDataProvider<BaseExpediente, Void> getDataProvider()
+  {
+    return new AbstractBackEndHierarchicalDataProvider<BaseExpediente, Void>()
+    {
+
+      @Override
+      public int getChildCount(HierarchicalQuery<BaseExpediente, Void> query)
+      {
+        if (query == null)
+          return 0;
+
+        BaseExpediente base = query.getParent();
+        return base != null? baseExpedienteService.countByParent(base):
+          baseExpedienteService.countByClass(selectedClass);
+      }//getChildCount
+
+      @Override
+      public boolean hasChildren(BaseExpediente expediente)
+      {
+        return baseExpedienteService.hasChildren(expediente, expediente == null? null: expediente.getClassificationClass());
+      }//hasChildren
+
+      @Override
+      protected Stream<BaseExpediente> fetchChildrenFromBackEnd(  HierarchicalQuery<BaseExpediente, Void> query)
+      {
+        Stream<BaseExpediente> empty = new ArrayList<BaseExpediente>().stream();
+        if ( query == null)
+          return empty;
+
+        BaseExpediente base = query.getParent();
+        return  base != null? baseExpedienteService.findByParent(base).stream():
+          baseExpedienteService.findByClass(selectedClass).stream();
+      }//fetchChildrenFromBackEnd
+
+    };// new AbstractBackEndHierarchicalDataProvider<>
+  }//getDataProvider
 
 
-	private Grid<BaseExpediente> buildSearchGrid(TreeGrid<BaseExpediente> tGrid)
-	{
-		Grid<BaseExpediente> sGrid = new Grid<>();
-		sGrid.setVisible(false);
-		sGrid.setWidthFull();
-		sGrid.addColumn(BaseExpediente::getName).setHeader("Nombre de Expediente").setWidth("70%");
-		sGrid.addColumn(BaseExpediente::formatCode).setHeader("Código").setWidth("30%");
-		sGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
-		return sGrid;
-	}//buildSearchGrid
+  private void buildSingleSelector(TreeGrid<BaseExpediente> tGrid)
+  {
+    tGrid.addItemDoubleClickListener( e-> tGrid.deselect(e.getItem()));
+    tGrid.addExpandListener         ( e-> expandedNodes.addAll(e.getItems()));
+    tGrid.addSelectionListener      ( e->
+    {
+      Optional<BaseExpediente> first = e.getFirstSelectedItem();
+      if ( first.isPresent() )
+      {  // Aqui­ llamar el metodo que procesa la seleccion:
+        //  setValue( first.get() );
+      }
+    });
 
 
-	private SearchBar buildSearchBar(Grid<BaseExpediente> searchGrid)
-	{
-		SearchBar searchBar = new SearchBar();
-		searchBar.setActionText("Buscar ");
-		searchBar.getActionButton().getElement().setAttribute("new-button", false);
-		searchBar.addFilterChangeListener(e ->
-		{
-			String filter = searchBar.getFilter();
-			searchGrid.setVisible(false);
-			if ( TextUtil.isNotEmpty(filter))
-			{
-				Collection<BaseExpediente> items = baseExpedienteService.findByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), filter, selectedClass);
-				if ( items.size() > 0)
-				{
-					searchGrid.setVisible(true);
-					searchGrid.setItems(items);
-				}
-			}
-		});
-
-		return searchBar;
-
-	}//buildSearchBar
+  }//buildSingleSelector
 
 
-
-	public void resetSelector()
-	{
-		treeGrid.deselectAll();
-		treeGrid.collapse(expandedNodes);
-		expandedNodes.clear();
-		resetSearch();
-
-	}//resetSelector
-
-
-	private void resetSearch()
-	{
-		searchGrid.setItems(emptyGrid);
-		searchGrid.setVisible(false);
-		searchBar.clear();
-	}//resetSearch
+  private Grid<BaseExpediente> buildSearchGrid(TreeGrid<BaseExpediente> tGrid)
+  {
+    Grid<BaseExpediente> sGrid = new Grid<>();
+    sGrid.setVisible(false);
+    sGrid.setWidthFull();
+    sGrid.addColumn(BaseExpediente::getName).setHeader("Nombre de Expediente").setWidth("70%");
+    sGrid.addColumn(BaseExpediente::formatCode).setHeader("Código").setWidth("30%");
+    sGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
+    setupSingleselectListener( sGrid, tGrid);
+    return sGrid;
+  }//buildSearchGrid
 
 
-	public void refresh( )
-	{
-		resetSearch();
-		dataProvider.refreshAll();
-	}//refresh
+  private SearchBar buildSearchBar(Grid<BaseExpediente> searchGrid)
+  {
+    SearchBar searchBar = new SearchBar();
+    searchBar.setActionText("Buscar ");
+    searchBar.getActionButton().getElement().setAttribute("new-button", false);
+    searchBar.addFilterChangeListener(e ->
+    {
+      String filter = searchBar.getFilter();
+      searchGrid.setVisible(false);
+      if ( TextUtil.isNotEmpty(filter))
+      {
+        Collection<BaseExpediente> items = baseExpedienteService.findByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), filter, selectedClass);
+        if ( items.size() > 0)
+        {
+          searchGrid.setVisible(true);
+          searchGrid.setItems(items);
+        }
+      }
+    });
+
+    return searchBar;
+
+  }//buildSearchBar
 
 
-	protected String getBasePage() { return PAGE_JERARQUIA_EXPEDIENTES;}
 
-	/*
+  private Registration setupSingleselectListener( Grid<BaseExpediente> sGrid, TreeGrid<BaseExpediente> tGrid)
+  {
+     Registration registration = sGrid.asSingleSelect().addValueChangeListener(e ->
+     {
+        tGrid.deselectAll();
+        BaseExpediente value = e.getValue();
+        if (value != null)
+        {
+          // setValue(value);
+           backtrackParents(tGrid::expand, value);
+           tGrid.select(value);
+        }
+     });
+     return registration;
+  }//setupSingleselectListener (in selection grid)
+  
+
+
+
+  private void backtrackParents(Consumer<Collection<BaseExpediente>> fn, final BaseExpediente value)
+  {
+     final Set<BaseExpediente> path = new TreeSet<>();
+     BaseExpediente currentItem = value;
+     while (currentItem != null && currentItem.getOwnerPath() != null)
+     {
+        Optional<BaseExpediente> item = baseExpedienteService.findByPath(currentItem.getOwnerPath());
+        if (item.isPresent())
+        {
+           currentItem = item.get();
+           path.add(currentItem);
+        }
+        else
+        {
+           currentItem = null;
+        }
+     }// while currentItem...
+
+     fn.accept(path);
+
+  }//backtrackParents
+
+
+
+  public void resetSelector()
+  {
+    treeGrid.deselectAll();
+    treeGrid.collapse(expandedNodes);
+    expandedNodes.clear();
+    resetSearch();
+
+  }//resetSelector
+
+
+  private void resetSearch()
+  {
+    searchGrid.setItems(emptyGrid);
+    searchGrid.setVisible(false);
+    searchBar.clear();
+  }//resetSearch
+
+
+  public void refresh( )
+  {
+    resetSearch();
+    dataProvider.refreshAll();
+  }//refresh
+
+
+  protected String getBasePage() { return PAGE_JERARQUIA_EXPEDIENTES;}
+
+  /*
   private Component configureButtons()
   {
     add.     addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -372,17 +419,17 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   {
 
   }//saveExpediente
-	 */
+   */
 
-	private void closeEditor()
-	{
-		rightSection.removeClassName ("right-section");
-		content     .removeClassName ("selector");
-		removeClassName              ("main-view");
+  private void closeEditor()
+  {
+    rightSection.removeClassName ("right-section");
+    content     .removeClassName ("selector");
+    removeClassName              ("main-view");
 
-	}//closeEditor
+  }//closeEditor
 
-	/*
+  /*
   private void closeEditor()
   {
      classificationForm.setClassification(null);
@@ -397,20 +444,20 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
  {
 
  }//closeExpediente
-	 */
+   */
 
 
-	private void updateSelector()
-	{
-		//ownerExpediente.refresh();
-	}//updateSelector
+  private void updateSelector()
+  {
+    //ownerExpediente.refresh();
+  }//updateSelector
 
-	/*
+  /*
   private Button add      = new Button("+ Nuevo Expediente");
   private Button save     = new Button("Guardar expediente");
   private Button delete   = new Button("Eliminar expediente");
   private Button close    = new Button("Cancelar");
-	 */
+   */
 
 
 }//ExpedienteHierarchyView

@@ -21,6 +21,10 @@ public interface BaseExpedienteRepository extends JpaRepository<BaseExpediente, 
 	Page<BaseExpediente> findBy(@Param("tenant") Tenant tenant, Pageable page);
 
 	@Query("SELECT base FROM BaseExpediente base "+
+			"WHERE base.tenant = :tenant AND ((base.path IS null AND :path IS NULL) OR base.path = :path)")
+	Optional<BaseExpediente> findByPath(@Param("tenant") Tenant tenant,@Param("path") String path);
+
+	@Query("SELECT base FROM BaseExpediente base "+
 			"WHERE base.tenant = :tenant")
 	List<BaseExpediente> findAll(@Param("tenant") Tenant tenant);
 

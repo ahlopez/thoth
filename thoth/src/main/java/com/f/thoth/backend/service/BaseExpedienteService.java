@@ -126,11 +126,13 @@ public class BaseExpedienteService implements FilterableCrudService<BaseExpedien
 	public List<BaseExpediente>   findByClass (Classification clase)         {return baseExpedienteRepository.findByClass(clase);}
 	public int                    countByClass(Classification clase)         {return baseExpedienteRepository.countByClass(clase);}
 
-	public List<BaseExpediente> findByNameLikeIgnoreCase (Tenant tenant, String name, Classification clase)
+	public List<BaseExpediente>   findByNameLikeIgnoreCase (Tenant tenant, String name, Classification clase)
 	{ return baseExpedienteRepository.findByNameLikeIgnoreCase (tenant, name, clase);}
 
 	public long  countByNameLikeIgnoreCase(Tenant tenant, String name, Classification clase)
 	{ return baseExpedienteRepository.countByNameLikeIgnoreCase(tenant, name, clase);}
+	
+	public Optional<BaseExpediente> findByPath( String path)                 {return baseExpedienteRepository.findByPath(ThothSession.getCurrentTenant(), path);} 
 
 	//  --------  Permission handling ---------------------
 
