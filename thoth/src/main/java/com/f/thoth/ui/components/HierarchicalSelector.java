@@ -90,8 +90,8 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
 
       if (showId)
       {
-         tGrid.addHierarchyColumn(T::getName).setHeader("Nombre").setFlexGrow(80);
-         tGrid.addColumn(T::formatCode).setHeader("Id").setFlexGrow(20);
+         tGrid.addHierarchyColumn(T::getName).setHeader("Nombre").setWidth("80%");
+         tGrid.addColumn(T::formatCode).setHeader("Id").setWidth("20%");
       }else
       {
          tGrid.addHierarchyColumn(T::getName).setHeader("Nombre");
@@ -182,8 +182,8 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
       sGrid.setWidthFull();
       if (showId)
       {
-         sGrid.addColumn(T::getName).setHeader("Nombre").setFlexGrow(80);
-         sGrid.addColumn(T::formatCode).setHeader("Id").setFlexGrow(20);
+         sGrid.addColumn(T::getName).setHeader("Nombre").setWidth("70%");
+         sGrid.addColumn(T::formatCode).setHeader("Id").setWidth("30%");
       }else
       {
          sGrid.addColumn(T::getName).setHeader("Nombre");
