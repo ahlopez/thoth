@@ -58,8 +58,8 @@ public class Volume extends AbstractEntity implements  NeedsProtection, Comparab
    public LeafExpediente            getExpediente()      { return expediente;}
    public void                      setExpediente(LeafExpediente expediente){ this.expediente = expediente;} 	
 	
-   @Override public Type            getType()            { setType(); return expediente.getType();}
-   @Override public boolean         isOfType( Type type) { return expediente != null && expediente.isOfType(type);}
+   @Override public Nature            getType()            { setType(); return expediente.getType();}
+   @Override public boolean         isOfType( Nature type) { return expediente != null && expediente.isOfType(type);}
 
    public Integer                   getCurrentInstance() { return currentInstance;}
    public void                      setCurrentInstance ( Integer currentInstance) { this.currentInstance = currentInstance;}
@@ -69,8 +69,8 @@ public class Volume extends AbstractEntity implements  NeedsProtection, Comparab
  	
    private void                     setType()
    {
-		if( expediente != null && !isOfType(Type.VOLUME))
-			expediente.setType(Type.VOLUME);
+		if( expediente != null && !isOfType(Nature.VOLUMEN))
+			expediente.setType(Nature.VOLUMEN);
    }//setType
 
 

@@ -109,7 +109,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
   @NotNull(message = "{evidentia.disposicion.required}")
   @Enumerated(EnumType.STRING)
-  private Type                type;                        //  Expediente tipo BRANCH/ LEAF/ EXPEDIENTE/ VOLUME
+  private Nature                type;                        // Expediente tipo GRUPO/ HOJA/ EXPEDIENTE/ VOLUME
 
   @NotNull  (message = "{evidentia.repopath.required}")
   @NotBlank (message = "{evidentia.repopath.required}")
@@ -170,7 +170,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
   {
     super();
     this.expedienteCode       = "";
-    this.type                 = Type.EXPEDIENTE;
+    this.type                 = Nature.EXPEDIENTE;
     this.path                 = "";
     this.name                 = "";
     this.objectToProtect      = new ObjectToProtect();
@@ -189,7 +189,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
   }//BaseExpediente null constructor
 
 
-  public BaseExpediente( String expedienteCode, Type type, String path, String name, User createdBy, Classification classificationClass,
+  public BaseExpediente( String expedienteCode, Nature type, String path, String name, User createdBy, Classification classificationClass,
       SchemaValues metadata, LocalDateTime dateOpened, LocalDateTime dateClosed, String ownerPath,
       Boolean open,String keywords, String mac)
   {
@@ -260,9 +260,9 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
   public String            getName() { return name;}
   public void              setName ( String name) { this.name = name;}
 
-  @Override public Type    getType() { return type;}
-  @Override public boolean isOfType( Type type) { return this.type == null? false: this.type.equals(type);}
-  public void              setType ( Type type) { this.type = type;}
+  @Override public Nature    getType() { return type;}
+  @Override public boolean isOfType( Nature type) { return this.type == null? false: this.type.equals(type);}
+  public void              setType ( Nature type) { this.type = type;}
 
   public Boolean           getOpen() { return open;}
   public void              setOpen ( Boolean open) { this.open = open;}

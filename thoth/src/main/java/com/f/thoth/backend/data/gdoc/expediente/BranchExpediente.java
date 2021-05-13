@@ -56,8 +56,8 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 	public BaseExpediente       getExpediente()      { return expediente;}
 	public void                 setExpediente(BaseExpediente expediente){ this.expediente = expediente;}
 	
-	@Override public Type       getType()            { setType(); return expediente.getType();}
-	@Override public boolean    isOfType( Type type) { return expediente != null && expediente.isOfType(type);}
+	@Override public Nature       getType()            { setType(); return expediente.getType();}
+	@Override public boolean    isOfType( Nature type) { return expediente != null && expediente.isOfType(type);}
 	
 	public  String              getPath()            {  return expediente.getPath();}
 	
@@ -65,8 +65,8 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 	
 	private void                setType()
 	{
-		if( expediente != null && !isOfType(Type.BRANCH))
-			expediente.setType(Type.BRANCH);
+		if( expediente != null && !isOfType(Nature.GRUPO))
+			expediente.setType(Nature.GRUPO);
 	}
 	
 

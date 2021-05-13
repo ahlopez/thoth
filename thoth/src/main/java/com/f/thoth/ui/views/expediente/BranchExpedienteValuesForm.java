@@ -1,10 +1,10 @@
-package com.f.thoth.ui.views.classification;
+package com.f.thoth.ui.views.expediente;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.classification.Level;
+import com.f.thoth.backend.data.gdoc.expediente.BranchExpediente;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.gdoc.metadata.vaadin.SchemaToVaadinExporter;
@@ -22,9 +22,9 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.shared.Registration;
 
-public class ClassificationValuesForm extends VerticalLayout
+public class BranchExpedienteValuesForm extends VerticalLayout
 {
-   private Classification        classification = null;
+   private BranchExpediente      branch         = null;
    private SchemaValues          schemaValues   = null;
    private Schema                schema         = null;
 
@@ -35,39 +35,39 @@ public class ClassificationValuesForm extends VerticalLayout
    private Button          save ;
    private Button          close;
 
-   public ClassificationValuesForm()
+   public BranchExpedienteValuesForm()
    {
       schemaExporter = new SchemaToVaadinExporter();
       valuesExporter = new SchemaValuesToVaadinExporter();
       setWidthFull();
-   }//ClassificationValuesForm
+   }//BranchExpedienteValuesForm
 
 
-   public void setClassification( Classification classification)
+   public void setBranchExpediente( BranchExpediente branch)
    {
-      if (classification == null)
+      if (branch == null)
          return;
 
       removeAll();
-      this.classification  = classification;
-      this.schema          = classification.getLevel().getSchema();
-      this.schemaFields    = getFields( classification);
+      this.branch          = branch;
+      this.schema          = branch.getLevel().getSchema();
+      this.schemaFields    = getFields( branch);
 
       if (schemaFields != null)
          add( schemaFields);
 
       add(createButtonsLayout());
       startEditing();
-   }//setClassification
+   }//setBranchExpediente
 
 
-   private Component getFields( Classification classification)
+   private Component getFields( BranchExpediente branch)
    {
-      this.schemaValues    = classification.getMetadata();
+      this.schemaValues    = branch.getMetadata();
       if ( schemaValues != null)
           return (Component)schemaValues.export(valuesExporter);
 
-      Level level  = classification.getLevel();
+      Level level  = branch.getLevel();
       return ( level !=  null)? (Component)level.getSchema().export(schemaExporter): new FormLayout();
 
    }//getFields
@@ -91,9 +91,9 @@ public class ClassificationValuesForm extends VerticalLayout
    {
        String values = getValuesFromFields(schemaFields);
        SchemaValues vals = new SchemaValues(schema, values);
-       classification.setMetadata(vals);
+       branch.setMetadata(vals);
        endEditing();
-       fireEvent(new SaveEvent(this, classification));
+       fireEvent(new SaveEvent(this, branch));
    }//validateAndSave
 
    private String getValuesFromFields( Component schemaFields)
@@ -127,7 +127,7 @@ public class ClassificationValuesForm extends VerticalLayout
    private Component createButtonsLayout()
    {
       close=  new Button("Cancelar");
-      save =  new Button("Guardar clase");
+      save =  new Button("Guardar expediente");
 
       close.addThemeVariants (ButtonVariant.LUMO_TERTIARY);
       save.addThemeVariants  (ButtonVariant.LUMO_PRIMARY);
@@ -157,33 +157,33 @@ public class ClassificationValuesForm extends VerticalLayout
 
 
    // --------------------- Events -----------------------
-   public static abstract class ClassificationValuesEvent extends ComponentEvent<ClassificationValuesForm>
+   public static abstract class BranchExpedienteValuesEvent extends ComponentEvent<BranchExpedienteValuesForm>
    {
-      private Classification classification;
+      private BranchExpediente branch;
 
-      protected ClassificationValuesEvent(ClassificationValuesForm source, Classification classification)
+      protected BranchExpedienteValuesEvent(BranchExpedienteValuesForm source, BranchExpediente branch)
       {
          super(source, false);
-         this.classification = classification;
-      }//ClassificationValuesEvent
+         this.branch = branch;
+      }//BranchExpedienteValuesEvent
 
-      public Classification getClassification()
+      public BranchExpediente getBranchExpediente()
       {
-         return classification;
+         return branch;
       }
-   }//ClassificationValuesEvent
+   }//BranchExpedienteValuesEvent
 
-   public static class SaveEvent extends ClassificationValuesEvent
+   public static class SaveEvent extends BranchExpedienteValuesEvent
    {
-      SaveEvent(ClassificationValuesForm source, Classification classification)
+      SaveEvent(BranchExpedienteValuesForm source, BranchExpediente branch)
       {
-         super(source, classification);
+         super(source, branch);
       }
    }//SaveEvent
 
-   public static class CloseEvent extends ClassificationValuesEvent
+   public static class CloseEvent extends BranchExpedienteValuesEvent
    {
-      CloseEvent(ClassificationValuesForm source)
+      CloseEvent(BranchExpedienteValuesForm source)
       {
          super(source, null);
       }
@@ -194,4 +194,5 @@ public class ClassificationValuesForm extends VerticalLayout
       return getEventBus().addListener(eventType, listener);
    }//addListener
 
-}//ClassificationValuesForm
+
+}//BranchExpedienteValuesForm

@@ -62,8 +62,8 @@ public class Expediente  extends AbstractEntity implements  NeedsProtection, Com
       public LeafExpediente    getExpediente()              { return expediente;}
       public void              setExpediente(LeafExpediente expediente){ this.expediente = expediente;}
   	  	
-      @Override public Type    getType()                    { return expediente == null? null: expediente.getType();}
-      @Override public boolean isOfType( Type type)         { return expediente != null && expediente.isOfType(type);}
+      @Override public Nature    getType()                    { return expediente == null? null: expediente.getType();}
+      @Override public boolean isOfType( Nature type)         { return expediente != null && expediente.isOfType(type);}
 
       public String            getPath()                    { return path;}
       public void              setPath ( String path)       { this.path = path;}
@@ -73,8 +73,8 @@ public class Expediente  extends AbstractEntity implements  NeedsProtection, Com
   	
       private void             setType()
       {
-  		if( expediente != null && !isOfType(Type.EXPEDIENTE))
-  			expediente.setType(Type.EXPEDIENTE);
+  		if( expediente != null && !isOfType(Nature.EXPEDIENTE))
+  			expediente.setType(Nature.EXPEDIENTE);
   	  }//setType
 
 

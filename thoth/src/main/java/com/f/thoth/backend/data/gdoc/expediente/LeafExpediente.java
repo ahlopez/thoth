@@ -54,7 +54,7 @@ public class LeafExpediente extends AbstractEntity implements  NeedsProtection, 
       if ( expediente == null )
          throw new IllegalArgumentException("Expediente asociado a la rama no puede ser nulo");
 
-	  expediente.setType(Type.LEAF);
+          expediente.setType(Nature.HOJA);
       this.admissibleTypes  = (admissibleTypes  == null? new TreeSet<>(): admissibleTypes);
 
    }//LeafExpediente constructor
@@ -64,16 +64,16 @@ public class LeafExpediente extends AbstractEntity implements  NeedsProtection, 
 
    public BaseExpediente    getExpediente() { return expediente;}
    public void              setExpediente(BaseExpediente expediente){ this.expediente = expediente;}
-	
-   @Override public Type    getType()            { return expediente == null? null: expediente.getType();}
-   @Override public boolean isOfType( Type type) { return expediente != null && expediente.isOfType(type);}
-   public  void             setType( Type type)  { expediente.setType(type);}
+
+   @Override public Nature    getType()            { return expediente == null? null: expediente.getType();}
+   @Override public boolean isOfType( Nature type) { return expediente != null && expediente.isOfType(type);}
+   public  void             setType( Nature type)  { expediente.setType(type);}
 
    public Set<DocumentType> getAdmissibleTypes() {  return admissibleTypes;}
    public void              setAdmissibleTypes(Set<DocumentType> admissibleTypes) { this.admissibleTypes = admissibleTypes;}
-   
+
    public String            getPath()            {  return expediente.getPath();}
-   
+
    public String            getOwner()           {  return expediente.getOwnerPath();}
 
    // --------------- Object methods ---------------------
