@@ -25,6 +25,7 @@ import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.document.jackrabbit.NodeType;
+import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
@@ -75,6 +76,7 @@ import com.f.thoth.backend.data.security.UserGroup;
           @NamedAttributeNode("path"),
           @NamedAttributeNode("dateOpened"),
           @NamedAttributeNode("dateClosed"),
+          @NamedAttributeNode("metadataSchema"),
           @NamedAttributeNode("metadata"),
           @NamedAttributeNode("open"),
           @NamedAttributeNode("keywords"),
@@ -136,6 +138,9 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
   @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
   protected Classification    classificationClass;         // Classification class to which this expediente belongs (Subserie si TRD)
 
+  @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+  protected Schema            metadataSchema;              // Metadata Schema
+  
   @OneToOne(cascade= CascadeType.MERGE, fetch = FetchType.EAGER, orphanRemoval = true)
   protected SchemaValues      metadata;                    // Metadata values of the associated expediente
 
@@ -176,6 +181,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
     this.objectToProtect      = new ObjectToProtect();
     this.createdBy            = ThothSession.getCurrentUser();
     this.classificationClass  = null;
+    this.metadataSchema       = null;
     this.metadata             = null;
     this.dateOpened           = LocalDateTime.MAX;
     this.dateClosed           = LocalDateTime.MAX;
@@ -190,7 +196,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
 
   public BaseExpediente( String expedienteCode, Nature type, String path, String name, User createdBy, Classification classificationClass,
-      SchemaValues metadata, LocalDateTime dateOpened, LocalDateTime dateClosed, String ownerPath,
+         Schema metadataSchema, SchemaValues metadata, LocalDateTime dateOpened, LocalDateTime dateClosed, String ownerPath,
       Boolean open,String keywords, String mac)
   {
     if ( TextUtil.isEmpty(expedienteCode))
@@ -224,6 +230,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
     this.name                = name;
     this.createdBy           = createdBy;
     this.classificationClass = classificationClass;
+    this.metadataSchema      = metadataSchema;
     this.metadata            = metadata;
     this.dateOpened          = dateOpened;
     this.dateClosed          = dateClosed;
@@ -284,6 +291,9 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
   public LocalDateTime     getDateClosed() { return dateClosed;}
   public void              setDateClosed( LocalDateTime dateClosed){ this.dateClosed = dateClosed;}
 
+  public Schema            getMetadataSchema() { return metadataSchema;}
+  public void              setMetadataSchema( Schema metadataSchema) { this.metadataSchema = metadataSchema;}
+
   public SchemaValues      getMetadata() { return metadata;}
   public void              setMetadata ( SchemaValues metadata) { this.metadata = metadata;}
 
@@ -341,6 +351,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
     //       .append( " n index-entries["+ expedienteIndex.size()+ "]")
      .append( " path["+ path+ "]")
      .append( " mac=["+ mac+ "]")
+     .append( " schema["+ metadataSchema == null? "---": metadataSchema.getName()+ "]")
      .append( " metadata["+ (metadata == null? "---": metadata.toString())+ "]")
      .append( " keywords["+ keywords+ "]")
      .append("     }\n");

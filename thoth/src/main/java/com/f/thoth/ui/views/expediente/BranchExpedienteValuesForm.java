@@ -3,7 +3,6 @@ package com.f.thoth.ui.views.expediente;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.f.thoth.backend.data.gdoc.classification.Level;
 import com.f.thoth.backend.data.gdoc.expediente.BranchExpediente;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
@@ -50,7 +49,7 @@ public class BranchExpedienteValuesForm extends VerticalLayout
 
       removeAll();
       this.branch          = branch;
-      this.schema          = branch.getLevel().getSchema();
+      this.schema          = branch.getMetadata().getSchema();
       this.schemaFields    = getFields( branch);
 
       if (schemaFields != null)
@@ -63,13 +62,12 @@ public class BranchExpedienteValuesForm extends VerticalLayout
 
    private Component getFields( BranchExpediente branch)
    {
+	  Schema schema = branch.getMetadataSchema();
       this.schemaValues    = branch.getMetadata();
-      if ( schemaValues != null)
-          return (Component)schemaValues.export(valuesExporter);
-
-      Level level  = branch.getLevel();
-      return ( level !=  null)? (Component)level.getSchema().export(schemaExporter): new FormLayout();
-
+      return  schemaValues == null || SchemaValues.EMPTY.equals(schemaValues)?
+    		  schema == null?  new FormLayout()                              :  	      
+    	                       (Component)schema.export(schemaExporter)      :
+    	                       (Component)schemaValues.export(valuesExporter);
    }//getFields
 
 

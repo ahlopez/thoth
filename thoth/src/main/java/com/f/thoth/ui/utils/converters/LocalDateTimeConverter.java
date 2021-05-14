@@ -9,8 +9,6 @@ import com.vaadin.flow.templatemodel.ModelEncoder;
 
 public class LocalDateTimeConverter implements ModelEncoder<LocalDateTime, String>
 {
-
-
    private static final LocalTimeConverter TIME_FORMATTER = new LocalTimeConverter();
 
    @Override

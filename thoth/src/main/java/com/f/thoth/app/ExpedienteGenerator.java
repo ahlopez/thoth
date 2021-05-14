@@ -24,6 +24,7 @@ import com.f.thoth.backend.data.gdoc.expediente.LeafExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.Volume;
 import com.f.thoth.backend.data.gdoc.expediente.VolumeInstance;
 import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
+import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.gdoc.numerator.Numerator;
 import com.f.thoth.backend.data.gdoc.numerator.Sequence;
@@ -35,6 +36,7 @@ import com.f.thoth.backend.repositories.BranchExpedienteRepository;
 import com.f.thoth.backend.repositories.ClassificationRepository;
 import com.f.thoth.backend.repositories.ExpedienteIndexRepository;
 import com.f.thoth.backend.repositories.ExpedienteRepository;
+import com.f.thoth.backend.repositories.SchemaRepository;
 import com.f.thoth.backend.repositories.VolumeInstanceRepository;
 import com.f.thoth.backend.repositories.VolumeRepository;
 
@@ -56,6 +58,7 @@ public class ExpedienteGenerator implements HasLogger
    private int                        nLeavesFinal;
    private int                        nVolumes;
    private int                        nInstances;
+   private List<Schema>               availableSchemas;
 
    private static String KEYWORD_NAMES[] = {
          "belleza",      "escepticismo", "nostalgia",    "justicia",     "esperanza",    "tentación",   "nación",       "espiritualidad",
@@ -82,7 +85,7 @@ public class ExpedienteGenerator implements HasLogger
    public ExpedienteGenerator(
          ClassificationRepository claseRepository, Session jcrSession, ExpedienteIndexRepository expedienteIndexRepository,
          BranchExpedienteRepository branchExpedienteRepository, ExpedienteRepository expedienteRepository,
-         VolumeRepository volumeRepository, VolumeInstanceRepository volumeInstanceRepository
+         VolumeRepository volumeRepository, VolumeInstanceRepository volumeInstanceRepository, SchemaRepository schemaRepository
          )
    {
       this.claseRepository            = claseRepository;
@@ -91,6 +94,7 @@ public class ExpedienteGenerator implements HasLogger
       this.expedienteRepository       = expedienteRepository;
       this.volumeRepository           = volumeRepository;
       this.volumeInstanceRepository   = volumeInstanceRepository;
+      this.availableSchemas           = schemaRepository.findAll(ThothSession.getCurrentTenant());
       this.jcrSession                 = jcrSession;
       this.user                       = ThothSession.getUser();
 
@@ -206,6 +210,7 @@ public class ExpedienteGenerator implements HasLogger
       base.setObjectToProtect     (new ObjectToProtect());
       base.setCreatedBy           (user);
       base.setClassificationClass (classificationClass);
+      base.setMetadataSchema      (availableSchemas.get(random.nextInt(availableSchemas.size()))  );
       base.setMetadata            (SchemaValues.EMPTY);
       base.setDateOpened          (LocalDateTime.now());
       base.setDateClosed          (LocalDateTime.MAX);

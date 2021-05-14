@@ -193,7 +193,7 @@ public class DataGenerator implements HasLogger
 
          Schema.EMPTY.setTenant(tenant1);
          Schema.EMPTY.buildCode();
-         schemaRepository.saveAndFlush(Schema.EMPTY);
+         schemaRepository.saveAndFlush(Schema.EMPTY);         
          schemaValuesRepository.saveAndFlush(SchemaValues.EMPTY);
 
          Level.DEFAULT.setTenant(tenant1);
@@ -247,7 +247,7 @@ public class DataGenerator implements HasLogger
                new ExpedienteGenerator(
                      claseRepository, jcrSession, expedienteIndexRepository,
                      branchExpedienteRepository, expedienteRepository,
-                     volumeRepository, volumeInstanceRepository
+                     volumeRepository, volumeInstanceRepository, schemaRepository
                      );
 
          int nExpedientes = expedienteGenerator.registerExpedientes(tenant1);
