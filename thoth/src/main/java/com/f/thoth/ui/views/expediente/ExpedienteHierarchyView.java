@@ -189,8 +189,8 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 		//grid.getElement().setAttribute("colspan", "5");
 		grid.setSelectionMode(Grid.SelectionMode.SINGLE);
 		grid.setWidthFull();
-		grid.addHierarchyColumn(BaseExpediente::getName).setHeader("Nombre del expediente").setWidth("78%");
-		grid.addColumn(BaseExpediente::formatCode).setHeader("Código").setWidth("22%");
+		grid.addHierarchyColumn(BaseExpediente::getName).setHeader("Nombre del expediente").setWidth("76%");
+		grid.addColumn(BaseExpediente::formatCode).setHeader("Código").setWidth("24%");
 		this.dataProvider = getDataProvider();
 		grid.setDataProvider(dataProvider);
 		buildSingleSelector(grid);

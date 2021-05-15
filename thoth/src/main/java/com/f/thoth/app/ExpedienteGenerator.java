@@ -202,6 +202,7 @@ public class ExpedienteGenerator implements HasLogger
 
    private BaseExpediente createBase(Classification classificationClass, User user, String parentPath)
    {
+	  LocalDateTime  now      =   LocalDateTime.now();
       BaseExpediente base     =   new BaseExpediente();
       base.setExpedienteCode      (buildExpedienteCode(base, classificationClass));
       base.setPath                (buildExpedientePath(base, base.getExpedienteCode()));
@@ -212,8 +213,8 @@ public class ExpedienteGenerator implements HasLogger
       base.setClassificationClass (classificationClass);
       base.setMetadataSchema      (availableSchemas.get(random.nextInt(availableSchemas.size()))  );
       base.setMetadata            (SchemaValues.EMPTY);
-      base.setDateOpened          (LocalDateTime.now());
-      base.setDateClosed          (LocalDateTime.MAX);
+      base.setDateOpened          (now);
+      base.setDateClosed          (now.plusYears(200L));
       base.setOwnerPath           (parentPath);
       base.setOpen                (true);
       base.setKeywords            (generateKeywords());

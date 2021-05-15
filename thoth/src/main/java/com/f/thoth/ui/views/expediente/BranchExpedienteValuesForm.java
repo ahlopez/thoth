@@ -44,19 +44,20 @@ public class BranchExpedienteValuesForm extends VerticalLayout
 
    public void setBranchExpediente( BranchExpediente branch)
    {
-      if (branch == null)
-         return;
+	   removeAll();
+	   this.branch          = branch;
+	   if (branch != null)
+	   {
+		   SchemaValues  values = branch.getMetadata();
+		   this.schema          = values != null? values.getSchema(): branch.getMetadataSchema();
+		   this.schemaFields    = getFields( branch);
 
-      removeAll();
-      this.branch          = branch;
-      this.schema          = branch.getMetadata().getSchema();
-      this.schemaFields    = getFields( branch);
+		   if (schemaFields != null)
+			   add( schemaFields);
 
-      if (schemaFields != null)
-         add( schemaFields);
-
-      add(createButtonsLayout());
-      startEditing();
+		   add(createButtonsLayout());
+		   startEditing();
+	   }
    }//setBranchExpediente
 
 
@@ -125,7 +126,7 @@ public class BranchExpedienteValuesForm extends VerticalLayout
    private Component createButtonsLayout()
    {
       close=  new Button("Cancelar");
-      save =  new Button("Guardar expediente");
+      save =  new Button("Guardar grupo");
 
       close.addThemeVariants (ButtonVariant.LUMO_TERTIARY);
       save.addThemeVariants  (ButtonVariant.LUMO_PRIMARY);

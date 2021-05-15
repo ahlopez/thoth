@@ -46,8 +46,8 @@
 }
 .main-view .selector {
    align-items: flex-start;
-   min-width: 800px;
-   max-width: 800px;
+   min-width: 750px;
+   max-width: 750px;
    flex: 2;?
 }
 

@@ -14,6 +14,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -25,9 +26,13 @@ public class BranchExpedienteForm extends FormLayout
 {
    private static final Converter<LocalDateTime, LocalDateTime> DATE_CONVERTER   = new LocalDateTimeToLocalDateTime();
 
-   private Button save   = new Button("Guardar Grupo");
-   private Button close  = new Button("Cancelar");
-
+   private Button           save   = new Button("Guardar Grupo");
+   private Button          close  = new Button("Cancelar");
+   
+   private ComboBox<String>   open;
+   private DateTimePicker     dateOpened;
+   private DateTimePicker     dateClosed;
+   
    BranchExpediente  selectedBranch = null;
 
    Binder<BranchExpediente> binder       = new BeanValidationBinder<>(BranchExpediente.class);
@@ -46,24 +51,24 @@ public class BranchExpedienteForm extends FormLayout
       H3  title = new H3("Grupo de expedientes a actualizar");
       title.getElement().setAttribute("colspan", "2");
 
-      /*
+     /*
            Campos que falta considerar, si es que se necesitan
       private Type                type;                        // Expediente tipo GRUPO/ HOJA/ EXPEDIENTE/ VOLUME
       protected SchemaValues      metadata;                    // Metadata values of the associated expediente
       protected String            ownerPath;                   // Branch Expediente to which this Branch/Leaf/Volume belongs
       protected String            location;                    // Signatura topogr�fica
     */
-
+      /*
       TextField  expedienteCode    = new TextField("Código");
       expedienteCode.setRequired(true);
       expedienteCode.setRequiredIndicatorVisible(true);
       expedienteCode.getElement().setAttribute("colspan", "1");
       expedienteCode.setEnabled(false);
-
+      */
       TextField  name    = new TextField("Asunto");
       name.setRequired(true);
       name.setRequiredIndicatorVisible(true);
-      name.getElement().setAttribute("colspan", "3");
+      name.getElement().setAttribute("colspan", "4");
 
       TextField  classCode    = new TextField("Clase");
       classCode.setRequired(true);
@@ -71,52 +76,50 @@ public class BranchExpedienteForm extends FormLayout
       classCode.getElement().setAttribute("colspan", "1");
       classCode.setEnabled(false);
 
-      LocalDateTime now       = LocalDateTime.now();
-      LocalDateTime endOfTimes= now.plusYears(200L);
-
-      ComboBox<String> open = new ComboBox<>("Abierto");
-      open.setItems(new String[] {"SI", "NO"});
+      open = new ComboBox<>();
+      open.setItems(new String[] {"ABIERTO", "CERRADO"});
       open.setWidth("20%");
       open.setRequired(true);
-      open.getElement().setAttribute("colspan", "2");
-
-      DateTimePicker dateOpened = new DateTimePicker("Creado");
-      dateOpened.setValue(now);
-      dateOpened.setRequiredIndicatorVisible(true);
-      dateOpened.setWidth("40%");
-      dateOpened.getElement().setAttribute("colspan", "1");
-
-      DateTimePicker dateClosed   = new DateTimePicker("Cerrado");
-      dateClosed.setValue(endOfTimes);
-      dateClosed.setRequiredIndicatorVisible(true);
-      dateClosed.setWidth("40%");
-      dateClosed.getElement().setAttribute("colspan", "1");
-
-      TextField  keywords    = new TextField("Palabras clave");
-      keywords.setRequired(false);
-      keywords.setRequiredIndicatorVisible(true);
-      keywords.getElement().setAttribute("colspan", "3");
+      open.getElement().setAttribute("colspan", "1");
 
       TextField  createdBy    = new TextField("Creado Por");
       createdBy.setRequired(true);
       createdBy.setRequiredIndicatorVisible(true);
-      createdBy.getElement().setAttribute("colspan", "2");
+      createdBy.getElement().setAttribute("colspan", "1");
       createdBy.setEnabled(false);
 
+      dateOpened = new DateTimePicker("Creado");
+      dateOpened.setRequiredIndicatorVisible(true);
+      dateOpened.setWidth("40%");
+      dateOpened.getElement().setAttribute("colspan", "2");
+      dateOpened.setEnabled(false);
+
+      dateClosed   = new DateTimePicker("Cerrado");
+      dateClosed.setRequiredIndicatorVisible(true);
+      dateClosed.setWidth("40%");
+      dateClosed.getElement().setAttribute("colspan", "2");
+      dateClosed.setEnabled(false);
+
+      TextField  keywords    = new TextField("Palabras clave");
+      keywords.setRequired(false);
+      keywords.setRequiredIndicatorVisible(true);
+      keywords.getElement().setAttribute("colspan", "4");
 
       add(
-            expedienteCode       ,
+         //   expedienteCode       ,
             name                 ,
             classCode            ,
+            open                 ,
+            createdBy            ,
+            new Label("")        ,
             dateOpened           ,
             dateClosed           ,
             keywords             ,
-            createdBy            ,
             createButtonsLayout(),
             BranchExpedienteValuesForm
          );
 
-      binder.forField(expedienteCode).bind("expedienteCode");
+    //  binder.forField(expedienteCode).bind("expedienteCode");
 
       binder.forField(name).bind("name");
 
@@ -140,7 +143,7 @@ public class BranchExpedienteForm extends FormLayout
             .withValidator( dateTo ->
                             {
                                LocalDateTime dateFrom = dateOpened.getValue();
-                               boolean ok =  dateFrom != null && dateTo != null && ( dateTo.equals(dateFrom) || dateTo.isAfter(dateFrom));
+                               boolean ok =  dateFrom != null && dateTo != null && ( dateTo.equals(dateFrom) || dateTo.isAfter(dateFrom));                               
                                return ok;
                             },
                             "Fecha de cierre debe posterior a la de apertura")
@@ -160,9 +163,28 @@ public class BranchExpedienteForm extends FormLayout
    {
       binder.setBean(expediente);
       this.selectedBranch = expediente;
+      setStatus( expediente);
       BranchExpedienteValuesForm.setVisible(true);
       BranchExpedienteValuesForm.setBranchExpediente(selectedBranch);
    }//setExpediente
+   
+   
+   private void setStatus (BranchExpediente expediente)
+   {
+	   LocalDateTime now       = LocalDateTime.now();
+	   LocalDateTime endOfTimes= now.plusYears(200L);
+	   boolean isNew  = expediente == null || expediente.getOpen() == null;
+	   boolean isOpen = isNew || expediente.getOpen();
+	   open.setValue( isOpen? "ABIERTO" : "CERRADO");
+	   open.setEnabled(isOpen);
+	   if (isNew)
+	   {
+		  dateOpened.setValue(now);
+		  dateClosed.setValue(endOfTimes);
+	   }
+
+		   
+   }//setStatus
 
    private Component createButtonsLayout()
    {
@@ -172,17 +194,17 @@ public class BranchExpedienteForm extends FormLayout
       save.addClickShortcut (Key.ENTER);
       close.addClickShortcut(Key.ESCAPE);
 
-      save.  setWidth("20%");
-      save.getElement().getStyle().set("margin-left", "auto");
       close. setWidth("20%");
+      save.  setWidth("20%");
       // TODO: Botones para   + Grupo/ + Expediente/ + Volumen
 
       save.addClickListener  (click -> validateAndSave(binder.getBean()));
       close.addClickListener (click -> { close(); fireEvent(new CloseEvent(this));});
+      save.getElement().getStyle().set("margin-left", "auto");
 
       binder.addStatusChangeListener(evt -> save.setEnabled(binder.isValid()));
       HorizontalLayout buttons = new HorizontalLayout(close, save);
-      buttons.getElement().setAttribute("colspan", "3");
+      buttons.setWidthFull();
 
       return buttons;
    }//createButtonsLayout
@@ -191,10 +213,24 @@ public class BranchExpedienteForm extends FormLayout
    {
       if (binder.isValid())
       {
+    	 verifyClosing(expediente);
          close();
          fireEvent(new SaveEvent(this, expediente));
       }
    }//validateAndSave
+   
+   private void verifyClosing( BranchExpediente expediente)
+   {
+  	 boolean wasOpen = expediente.getOpen();
+  	 boolean isClosed= "CERRADO".equals(open.getValue());
+  	 if( wasOpen && isClosed)
+  	 {
+  	     expediente.setOpen( false);
+  	     LocalDateTime now = LocalDateTime.now();
+  	     dateClosed.setValue(now);
+  	     expediente.setDateClosed(now);
+  	 }
+   }//whenExpedienteCloses
 
    private void close() {  BranchExpedienteValuesForm.setVisible(false); }
 
