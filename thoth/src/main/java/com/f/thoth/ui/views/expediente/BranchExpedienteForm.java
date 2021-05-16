@@ -1,8 +1,11 @@
 package com.f.thoth.ui.views.expediente;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.f.thoth.backend.data.gdoc.expediente.BranchExpediente;
+import com.f.thoth.backend.data.gdoc.metadata.Schema;
+import com.f.thoth.backend.service.SchemaService;
 import com.f.thoth.ui.utils.converters.LocalDateTimeToLocalDateTime;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
@@ -14,7 +17,6 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -25,22 +27,27 @@ import com.vaadin.flow.shared.Registration;
 public class BranchExpedienteForm extends FormLayout
 {
    private static final Converter<LocalDateTime, LocalDateTime> DATE_CONVERTER   = new LocalDateTimeToLocalDateTime();
+   
 
-   private Button           save   = new Button("Guardar Grupo");
+   private Button           save  = new Button("Guardar Grupo");
    private Button          close  = new Button("Cancelar");
    
    private ComboBox<String>   open;
    private DateTimePicker     dateOpened;
    private DateTimePicker     dateClosed;
+   private ComboBox<Schema>   schema;
+   
+   SchemaService  schemaService;
    
    BranchExpediente  selectedBranch = null;
 
    Binder<BranchExpediente> binder       = new BeanValidationBinder<>(BranchExpediente.class);
 
-   BranchExpedienteValuesForm BranchExpedienteValuesForm = new BranchExpedienteValuesForm();
+   BranchExpedienteValuesForm branchExpedienteValuesForm = new BranchExpedienteValuesForm();
 
-   public BranchExpedienteForm(BranchExpediente selectedBranch)
+   public BranchExpedienteForm(SchemaService schemaService)
    {
+	  this.schemaService = schemaService;
       setWidthFull();
       setResponsiveSteps(
             new ResponsiveStep("30em", 1),
@@ -81,6 +88,20 @@ public class BranchExpedienteForm extends FormLayout
       open.setWidth("20%");
       open.setRequired(true);
       open.getElement().setAttribute("colspan", "1");
+      
+      schema = new ComboBox<>("Metadatos");
+      List<Schema> allSchemas = schemaService.findAll();
+      schema.setItems(allSchemas);
+      schema.addValueChangeListener(e -> 
+      { 
+    	selectedBranch.setMetadataSchema(e.getValue()); 
+        branchExpedienteValuesForm.setBranchExpediente(selectedBranch);
+      });
+      schema.setItemLabelGenerator(e-> e.getName());
+      schema.setWidth("30%");
+      schema.setRequired(true);
+      schema.setRequiredIndicatorVisible(true);
+      schema.getElement().setAttribute("colspan", "1");
 
       TextField  createdBy    = new TextField("Creado Por");
       createdBy.setRequired(true);
@@ -109,14 +130,14 @@ public class BranchExpedienteForm extends FormLayout
          //   expedienteCode       ,
             name                 ,
             classCode            ,
+            schema               ,
             open                 ,
             createdBy            ,
-            new Label("")        ,
             dateOpened           ,
             dateClosed           ,
             keywords             ,
             createButtonsLayout(),
-            BranchExpedienteValuesForm
+            branchExpedienteValuesForm
          );
 
     //  binder.forField(expedienteCode).bind("expedienteCode");
@@ -153,8 +174,8 @@ public class BranchExpedienteForm extends FormLayout
 
       binder.forField(createdBy).bind("createdBy.email");
 
-      BranchExpedienteValuesForm.addListener(BranchExpedienteValuesForm.SaveEvent.class, e->validateAndSave(e.getBranchExpediente()));
-      BranchExpedienteValuesForm.getElement().setAttribute("colspan", "4");
+      branchExpedienteValuesForm.addListener(BranchExpedienteValuesForm.SaveEvent.class, e->validateAndSave(e.getBranchExpediente()));
+      branchExpedienteValuesForm.getElement().setAttribute("colspan", "4");
 
    }//BranchExpedienteForm
 
@@ -164,8 +185,8 @@ public class BranchExpedienteForm extends FormLayout
       binder.setBean(expediente);
       this.selectedBranch = expediente;
       setStatus( expediente);
-      BranchExpedienteValuesForm.setVisible(true);
-      BranchExpedienteValuesForm.setBranchExpediente(selectedBranch);
+      branchExpedienteValuesForm.setVisible(true);
+      branchExpedienteValuesForm.setBranchExpediente(selectedBranch);
    }//setExpediente
    
    
@@ -173,16 +194,16 @@ public class BranchExpedienteForm extends FormLayout
    {
 	   LocalDateTime now       = LocalDateTime.now();
 	   LocalDateTime endOfTimes= now.plusYears(200L);
-	   boolean isNew  = expediente == null || expediente.getOpen() == null;
+	   boolean isNew  = expediente == null || expediente.getId() == null;
 	   boolean isOpen = isNew || expediente.getOpen();
 	   open.setValue( isOpen? "ABIERTO" : "CERRADO");
 	   open.setEnabled(isOpen);
+	   schema.setEnabled(isNew);
 	   if (isNew)
 	   {
 		  dateOpened.setValue(now);
 		  dateClosed.setValue(endOfTimes);
 	   }
-
 		   
    }//setStatus
 
@@ -204,6 +225,7 @@ public class BranchExpedienteForm extends FormLayout
 
       binder.addStatusChangeListener(evt -> save.setEnabled(binder.isValid()));
       HorizontalLayout buttons = new HorizontalLayout(close, save);
+      buttons.getElement().setAttribute("colspan", "4");
       buttons.setWidthFull();
 
       return buttons;
@@ -232,7 +254,7 @@ public class BranchExpedienteForm extends FormLayout
   	 }
    }//whenExpedienteCloses
 
-   private void close() {  BranchExpedienteValuesForm.setVisible(false); }
+   private void close() {  branchExpedienteValuesForm.setVisible(false); }
 
    // --------------------- Events -----------------------
    public static abstract class BranchExpedienteFormEvent extends ComponentEvent<BranchExpedienteForm>

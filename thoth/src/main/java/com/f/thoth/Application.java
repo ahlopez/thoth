@@ -42,6 +42,7 @@ import com.f.thoth.backend.repositories.OperationRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
 import com.f.thoth.backend.repositories.RetentionRepository;
 import com.f.thoth.backend.repositories.RoleRepository;
+import com.f.thoth.backend.repositories.SchemaRepository;
 import com.f.thoth.backend.repositories.SequenceRepository;
 import com.f.thoth.backend.repositories.TenantRepository;
 import com.f.thoth.backend.repositories.UserRepository;
@@ -54,11 +55,13 @@ import com.f.thoth.backend.service.LeafExpedienteService;
 import com.f.thoth.backend.service.LevelService;
 import com.f.thoth.backend.service.OperationService;
 import com.f.thoth.backend.service.RetentionService;
+import com.f.thoth.backend.service.SchemaService;
 import com.f.thoth.backend.service.SequenceService;
 import com.f.thoth.backend.service.TenantService;
 import com.f.thoth.backend.service.UserService;
 import com.f.thoth.backend.service.VolumeService;
 import com.f.thoth.ui.MainView;
+import com.f.thoth.ui.views.expediente.BranchExpedienteForm;
 
 /**
  * Spring boot web application initializer.
@@ -73,6 +76,7 @@ import com.f.thoth.ui.MainView;
             Application.class,
             UserService.class,
             OperationService.class,
+            SchemaService.class,
             ClassificationService.class,
             BaseExpedienteService.class,
             LeafExpedienteService.class,
@@ -113,6 +117,7 @@ import com.f.thoth.ui.MainView;
             TenantRepository.class,
             RoleRepository.class,
             PermissionRepository.class,
+            SchemaRepository.class,
             ClassificationRepository.class,
             BaseExpedienteRepository.class,
             BranchExpedienteRepository.class,

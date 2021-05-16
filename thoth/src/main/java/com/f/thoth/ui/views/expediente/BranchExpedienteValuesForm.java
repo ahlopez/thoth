@@ -48,8 +48,9 @@ public class BranchExpedienteValuesForm extends VerticalLayout
 	   this.branch          = branch;
 	   if (branch != null)
 	   {
-		   SchemaValues  values = branch.getMetadata();
-		   this.schema          = values != null? values.getSchema(): branch.getMetadataSchema();
+	//	   SchemaValues  values = branch.getMetadata();
+	//	   this.schema          = values != null? values.getSchema(): branch.getMetadataSchema();
+		   this.schema          = branch.getMetadataSchema();
 		   this.schemaFields    = getFields( branch);
 
 		   if (schemaFields != null)
@@ -63,7 +64,7 @@ public class BranchExpedienteValuesForm extends VerticalLayout
 
    private Component getFields( BranchExpediente branch)
    {
-	  Schema schema = branch.getMetadataSchema();
+	  Schema schema        = branch.getMetadataSchema();
       this.schemaValues    = branch.getMetadata();
       return  schemaValues == null || SchemaValues.EMPTY.equals(schemaValues)?
     		  schema == null?  new FormLayout()                              :  	      

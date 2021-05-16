@@ -48,6 +48,7 @@ public class SchemaService implements FilterableCrudService<Schema>
       Optional<Schema> schema = schemaRepository.findById(id);
       return  schema.isPresent()? schema.get(): null;
    }//findById
+   
 
    @Override
    public Page<Schema> findAnyMatching(Optional<String> filter, Pageable pageable)
@@ -60,6 +61,13 @@ public class SchemaService implements FilterableCrudService<Schema>
          return find(pageable);
       }
    }//findAnyMatching
+   
+
+   
+   public Schema findByName(String name)
+   {
+         return schemaRepository.findByName(ThothSession.getCurrentTenant(), name);
+   }//findByName
 
 
    @Override

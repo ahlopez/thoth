@@ -18,6 +18,9 @@ public interface SchemaRepository extends JpaRepository<Schema, Long>
 
    Optional<Schema> findById(Long id);
 
+   @Query("SELECT s FROM Schema s where s.tenant=?1 and s.name = ?2")
+   Schema findByName(Tenant tenant, String name);
+
    @Query("SELECT s FROM Schema s where s.tenant=?1")
    List<Schema> findAll(Tenant tenant);
 

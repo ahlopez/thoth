@@ -3,6 +3,7 @@ package com.f.thoth.ui.views.expediente;
 import static com.f.thoth.ui.utils.Constant.PAGE_JERARQUIA_EXPEDIENTES;
 import static com.f.thoth.ui.utils.Constant.TITLE_JERARQUIA_EXPEDIENTES;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -21,12 +22,15 @@ import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.BranchExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.Nature;
+import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
+import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.service.BaseExpedienteService;
 import com.f.thoth.backend.service.BranchExpedienteService;
 import com.f.thoth.backend.service.ClassificationService;
 import com.f.thoth.backend.service.ExpedienteService;
+import com.f.thoth.backend.service.SchemaService;
 import com.f.thoth.backend.service.VolumeService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.components.SearchBar;
@@ -65,11 +69,13 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 { 
 	private BranchExpedienteForm        branchExpedienteForm;
 	private BranchExpedienteService     branchExpedienteService;
-	private BranchExpediente            currentBranch;
+	private BranchExpediente            currentBranch;              // Branch that is presented on right panel
+//	private BranchExpediente            selectedBranch;             // Branch that is selected on content panel
 
 	private BaseExpedienteService       baseExpedienteService;
 	private ExpedienteService           expedienteService;
 	private VolumeService               volumeService;
+	private SchemaService               schemaService;
 	private BaseExpediente              currentExpediente;
 	private User                        currentUser;
 
@@ -102,6 +108,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 			                       BaseExpedienteService   baseExpedienteService, 
 			                       BranchExpedienteService branchExpedienteService,
 		                           ExpedienteService       expedienteService,
+		                           SchemaService           schemaService,
 			                       VolumeService           volumeService
 			                      )
 	{
@@ -110,6 +117,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 		this.branchExpedienteService = branchExpedienteService;
 		this.expedienteService       = expedienteService;
 		this.volumeService           = volumeService;
+		this.schemaService           = schemaService;
 		this.currentBranch           = null;
 		this.currentExpediente       = null;
 		this.currentUser             = ThothSession.getCurrentUser();
@@ -247,6 +255,8 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 			if ( first.isPresent() )
 			{
 				currentExpediente = first.get();
+			//	selectedBranch    = branchExpedienteService.findByCode(currentExpediente == null? null: currentExpediente.getCode());
+
 				// TODO: Aqui­ llamar el metodo que procesa la seleccion:
 			}
 		});
@@ -361,8 +371,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 
 	private BranchExpedienteForm configureForm(BaseExpediente selectedExpediente)
 	{
-		BranchExpediente selectedBranch = branchExpedienteService.findByCode(selectedExpediente == null? null: selectedExpediente.getCode());
-		branchExpedienteForm = new BranchExpedienteForm(selectedBranch);
+		branchExpedienteForm = new BranchExpedienteForm(schemaService);
 		branchExpedienteForm.addListener(BranchExpedienteForm.SaveEvent.class,   this::saveBranchExpediente );
 		branchExpedienteForm.addListener(BranchExpedienteForm.CloseEvent.class,  e -> closeEditor());
 		return branchExpedienteForm;
@@ -399,12 +408,36 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 
 	private void addBranchExpediente()
 	{
-		currentBranch = new BranchExpediente();
+		currentBranch = newBranch();
 		currentBranch.setClassificationClass(selectedClass);
 		String ownerPath = currentExpediente == null? null : currentExpediente.getPath();
 		currentBranch.setOwnerPath(ownerPath);
 		editBranch(currentBranch);
 	}//addBranchExpediente
+	
+	
+	
+	private  BranchExpediente   newBranch()
+	{
+		  currentBranch = new BranchExpediente();
+		  LocalDateTime  now      =   LocalDateTime.now();
+	      currentBranch.setExpedienteCode      (null);
+	      currentBranch.setPath                (null);
+	      currentBranch.setName                (" ");
+	      currentBranch.setObjectToProtect     (new ObjectToProtect());
+	      currentBranch.setCreatedBy           (currentUser);
+	      currentBranch.setClassificationClass (selectedClass);
+	      currentBranch.setMetadataSchema      (null);
+	      currentBranch.setMetadata            (SchemaValues.EMPTY);
+	      currentBranch.setDateOpened          (now);
+	      currentBranch.setDateClosed          (now.plusYears(200L));
+	      currentBranch.setOwnerPath           (null);
+	      currentBranch.setOpen                (true);
+	      currentBranch.setKeywords            ("keyword1, keyword2, keyword3");
+	      currentBranch.setMac                 ("[mac]");
+	      return currentBranch;
+
+	}//newBranch
 
 
 	private void saveBranchExpediente( BranchExpediente branch)
