@@ -5,9 +5,15 @@ import com.vaadin.flow.component.notification.Notification;
 
 public class Notifier
 {
-   private static Notification notification = new Notification();
+   private Notification notification;
    
-   public static void show( String text, String style, int duration, Notification.Position position)
+   public Notifier()
+   { 
+	   notification = new Notification();
+   }//Notifier constructor
+   
+   
+   public void show( String text, String style, int duration, Notification.Position position)
    {
       H2 label = new H2(text);
       label.addClassName(style);
@@ -18,12 +24,12 @@ public class Notifier
       notification.open();
    }//show
    
-   public static void error( String text)
+   public void error( String text)
    {
       show(text, "notifier-error", -1, Notification.Position.BOTTOM_CENTER);
    }//error
    
-   public static void accept( String text)
+   public void accept( String text)
    {
       show(text,  "notifier-accept",  4000,  Notification.Position.BOTTOM_CENTER);
    }//accept

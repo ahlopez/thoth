@@ -61,6 +61,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
    private Button                   save         = new Button("Guardar");
    private Button                   close        = new Button("Cancelar");
    private HierarchicalSelector<E, HasValue.ValueChangeEvent<E>> permissionSelector;
+   private Notifier                 notifier     = new Notifier();
 
    protected abstract String getBasePage();
 
@@ -223,7 +224,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
           saveGrants(role, permissionPeriod, permissionSelector.getValues());
        } catch (ValidationException e)
        {
-          Notifier.error( "Período inválido "+
+          notifier.error( "Período inválido "+
                 TextUtil.formatDate(permissionPeriod.getFromDate())+ " : "+
                 TextUtil.formatDate(permissionPeriod.getToDate())+ "]");
           clear();
@@ -234,7 +235,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
    private void saveGrants(Role role, Period period, Collection<E>grants)
    {
       permissionPresenter.grantRevoke( grants, role, period);
-      Notifier.accept("Permisos del rol "+ role.getName()+ " actualizados");
+      notifier.accept("Permisos del rol "+ role.getName()+ " actualizados");
       clear();
 
    }//saveGrants

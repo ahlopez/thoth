@@ -33,6 +33,7 @@ import com.f.thoth.backend.service.SchemaService;
 import com.f.thoth.backend.service.SchemaValuesService;
 import com.f.thoth.backend.service.VolumeService;
 import com.f.thoth.ui.MainView;
+import com.f.thoth.ui.components.Notifier;
 import com.f.thoth.ui.components.SearchBar;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
@@ -41,6 +42,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.treegrid.TreeGrid;
@@ -70,7 +72,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 	private BaseExpedienteForm          baseExpedienteForm;
 	private BranchExpedienteService     branchExpedienteService;
 	private BranchExpediente            currentBranch;              // Branch that is presented on right panel
-//	private BranchExpediente            selectedBranch;             // Branch that is selected on content panel
+	//	private BranchExpediente            selectedBranch;             // Branch that is selected on content panel
 
 	private BaseExpedienteService       baseExpedienteService;
 	private ExpedienteService           expedienteService;
@@ -96,21 +98,22 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 	private final List<BaseExpediente>  emptyGrid     = new ArrayList<>();
 	private final Set<BaseExpediente>   expandedNodes = new TreeSet<>();
 
-	private Button add            = new Button("+ Nuevo");
-	private Button save           = new Button("Guardar");
-	private Button delete         = new Button("Eliminar");
-	private Button close          = new Button("Cancelar");
+	private Button   add          = new Button("+ Nuevo");
+	private Button   save         = new Button("Guardar");
+	private Button   delete       = new Button("Eliminar");
+	private Button   close        = new Button("Cancelar");
+	private Notifier notifier     = new Notifier();
 
 
 	@Autowired
 	public ExpedienteHierarchyView(ClassificationService   classificationService,
-			                       BaseExpedienteService   baseExpedienteService, 
-			                       BranchExpedienteService branchExpedienteService,
-		                           ExpedienteService       expedienteService,
-		                           SchemaService           schemaService,
-		                           SchemaValuesService     schemaValuesService,
-			                       VolumeService           volumeService
-			                      )
+			BaseExpedienteService   baseExpedienteService, 
+			BranchExpedienteService branchExpedienteService,
+			ExpedienteService       expedienteService,
+			SchemaService           schemaService,
+			SchemaValuesService     schemaValuesService,
+			VolumeService           volumeService
+			)
 	{
 		this.classificationService   = classificationService;
 		this.baseExpedienteService   = baseExpedienteService;
@@ -195,7 +198,6 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 	private TreeGrid<BaseExpediente> buildSelector()
 	{
 		TreeGrid<BaseExpediente> grid = new TreeGrid<>();
-		//grid.getElement().setAttribute("colspan", "5");
 		grid.setSelectionMode(Grid.SelectionMode.SINGLE);
 		grid.setWidthFull();
 		grid.addHierarchyColumn(BaseExpediente::getName).setHeader("Nombre del expediente").setWidth("76%");
@@ -238,7 +240,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 				}
 				BaseExpediente base = query.getParent();
 				return  base != null? baseExpedienteService.findByParent(base).stream():
-				                      baseExpedienteService.findByClass(selectedClass).stream();
+					                  baseExpedienteService.findByClass(selectedClass).stream();
 			}//fetchChildrenFromBackEnd
 
 		};// new AbstractBackEndHierarchicalDataProvider<>
@@ -256,7 +258,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 			if ( first.isPresent() )
 			{
 				currentExpediente = first.get();
-			//	selectedBranch    = branchExpedienteService.findByCode(currentExpediente == null? null: currentExpediente.getCode());
+				//	selectedBranch    = branchExpedienteService.findByCode(currentExpediente == null? null: currentExpediente.getCode());
 
 				// TODO: Aqui­ llamar el metodo que procesa la seleccion:
 			}
@@ -331,7 +333,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 			Optional<BaseExpediente> item = baseExpedienteService.findByPath(currentItem.getOwnerPath());
 			if (item.isPresent())
 			{  currentItem = item.get();
-		       path.add(currentItem);
+			path.add(currentItem);
 			}else
 			{  currentItem = null;
 			}
@@ -415,28 +417,28 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 		currentBranch.setOwnerPath(ownerPath);
 		editBranch(currentBranch);
 	}//addBranchExpediente
-	
-	
-	
+
+
+
 	private  BranchExpediente   newBranch()
 	{
-		  currentBranch       = new BranchExpediente();
-		  LocalDateTime  now  = LocalDateTime.now();
-	      currentBranch.setExpedienteCode      (null);
-	      currentBranch.setPath                (null);
-	      currentBranch.setName                (" ");
-	      currentBranch.setObjectToProtect     (new ObjectToProtect());
-	      currentBranch.setCreatedBy           (currentUser);
-	      currentBranch.setClassificationClass (selectedClass);
-	      currentBranch.setMetadataSchema      (null);
-	      currentBranch.setMetadata            (SchemaValues.EMPTY);
-	      currentBranch.setDateOpened          (now);
-	      currentBranch.setDateClosed          (now.plusYears(200L));
-	      currentBranch.setOwnerPath           (null);
-	      currentBranch.setOpen                (true);
-	      currentBranch.setKeywords            ("keyword1, keyword2, keyword3");
-	      currentBranch.setMac                 ("[mac]");
-	      return currentBranch;
+		currentBranch       = new BranchExpediente();
+		LocalDateTime  now  = LocalDateTime.now();
+		currentBranch.setExpedienteCode      (null);
+		currentBranch.setPath                (null);
+		currentBranch.setName                (" ");
+		currentBranch.setObjectToProtect     (new ObjectToProtect());
+		currentBranch.setCreatedBy           (currentUser);
+		currentBranch.setClassificationClass (selectedClass);
+		currentBranch.setMetadataSchema      (null);
+		currentBranch.setMetadata            (SchemaValues.EMPTY);
+		currentBranch.setDateOpened          (now);
+		currentBranch.setDateClosed          (now.plusYears(200L));
+		currentBranch.setOwnerPath           (null);
+		currentBranch.setOpen                (true);
+		currentBranch.setKeywords            ("keyword1, keyword2, keyword3");
+		currentBranch.setMac                 ("[mac]");
+		return currentBranch;
 
 	}//newBranch
 
@@ -458,19 +460,28 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 	private void saveExpediente(BaseExpedienteForm.SaveEvent event)
 	{
 		BaseExpediente expediente = event.getBaseExpediente();
+		boolean isNew = expediente.getId() == null;
 		schemaValuesService.save(currentUser, expediente.getMetadata());
 		switch(expediente.getType())
 		{ 
 		case GRUPO:
 			saveBranchExpediente(currentBranch);
-		    break;
+			break;
 		case EXPEDIENTE:
 			break;
 		case VOLUMEN:
 			break;
 		case HOJA:
 		}
-		
+
+		if (isNew)
+		{
+			notifier.show("Expediente creado con código "+ expediente.formatCode(),  "notifier-accept",  6000,  Notification.Position.BOTTOM_CENTER);
+			updateSelector();
+		}else
+		{   notifier.show("Expediente "+ expediente.formatCode()+ " actualizado",    "notifier-accept",  3000,  Notification.Position.BOTTOM_CENTER);
+		}
+
 	}//saveBaseExpediente
 
 

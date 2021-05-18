@@ -50,11 +50,13 @@ public class ClassificationView extends VerticalLayout
 
    private HierarchicalSelector<Classification, HasValue.ValueChangeEvent<Classification>> ownerClass;
    private Classification        currentClass= null;
+   private Notifier              notifier    = new Notifier();
 
    private Button add      = new Button("+ Nueva Clase");
    private Button save     = new Button("Guardar clase");
    private Button delete   = new Button("Eliminar clase");
    private Button close    = new Button("Cancelar");
+
 
    private Level[] levels;
    private List<Retention>  retentionSchedules;
@@ -191,7 +193,7 @@ public class ClassificationView extends VerticalLayout
       Level level      = null;
       int currentLevel = owner.getLevel().getOrden()+ 1;
       if ( currentLevel >= levels.length)
-         Notifier.error("La clase del último nivel no puede tener hijos");
+         notifier.error("La clase del último nivel no puede tener hijos");
       else
          level = levels[currentLevel];
 
@@ -220,7 +222,7 @@ public class ClassificationView extends VerticalLayout
              classificationService.delete(currentUser, classification);
       } catch (Exception e)
       {
-         Notifier.error("Clase["+ classification.getName()+ "] tiene referencias. No puede ser borrada");
+         notifier.error("Clase["+ classification.getName()+ "] tiene referencias. No puede ser borrada");
       }
       updateSelector();
       closeEditor();

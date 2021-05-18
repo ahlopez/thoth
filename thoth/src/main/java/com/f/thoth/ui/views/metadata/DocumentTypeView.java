@@ -51,9 +51,10 @@ public class DocumentTypeView extends VerticalLayout
    private HierarchicalSelector<DocumentType, HasValue.ValueChangeEvent<DocumentType>> ownerDocType;
    private DocumentType          currentDocType= null;
    
-   private Button add      = new Button("+ Nuevo Tipo");
-   private Button delete   = new Button("Eliminar Tipo");
-   private Button close    = new Button("Cancelar");
+   private Button   add      = new Button("+ Nuevo Tipo");
+   private Button   delete   = new Button("Eliminar Tipo");
+   private Button   close    = new Button("Cancelar");   
+   private Notifier notifier = new Notifier();
    
    private List<Schema>  availableSchemas;
 
@@ -179,7 +180,7 @@ public class DocumentTypeView extends VerticalLayout
              documentTypeService.delete(currentUser, documentType);
       } catch (Exception e)
       {
-         Notifier.error("Tipo Documental["+ documentType.getName()+ "] tiene referencias. No puede ser borrado");
+         notifier.error("Tipo Documental["+ documentType.getName()+ "] tiene referencias. No puede ser borrado");
       }
       updateSelector();
       closeEditor();
