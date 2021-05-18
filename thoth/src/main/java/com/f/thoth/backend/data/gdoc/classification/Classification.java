@@ -367,15 +367,4 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
 	}//getTenantCode
 
 
-	protected synchronized Integer nextExpedienteNumber()
-	{
-		currentExpedienteNumber ++;
-		return currentExpedienteNumber;
-	}//nextExpedienteNumber
-
-	public String nextExpedienteCode()
-	{
-		return formatCode()+ "-"+ nextExpedienteNumber();
-	}//nextExpedienteCode
-
 }//Classification

@@ -61,7 +61,6 @@ import com.f.thoth.backend.service.TenantService;
 import com.f.thoth.backend.service.UserService;
 import com.f.thoth.backend.service.VolumeService;
 import com.f.thoth.ui.MainView;
-import com.f.thoth.ui.views.expediente.BranchExpedienteForm;
 
 /**
  * Spring boot web application initializer.

@@ -42,34 +42,52 @@ public class BranchExpedienteValuesForm extends VerticalLayout
    }//BranchExpedienteValuesForm
 
 
+   public Schema getBranchSchema(  BranchExpediente branch)
+   {
+      Schema schema = null;
+      if (branch != null)
+      {
+         schema            = branch.getMetadataSchema();
+         this.schemaFields = getFields( branch);
+
+         if (schemaFields != null)
+                 add( schemaFields);
+
+         add(createButtonsLayout());
+         startEditing();
+      }
+      return schema;
+   }//getBranchSchema
+
+
    public void setBranchExpediente( BranchExpediente branch)
    {
-	   removeAll();
-	   this.branch          = branch;
-	   if (branch != null)
-	   {
-	//	   SchemaValues  values = branch.getMetadata();
-	//	   this.schema          = values != null? values.getSchema(): branch.getMetadataSchema();
-		   this.schema          = branch.getMetadataSchema();
-		   this.schemaFields    = getFields( branch);
+           removeAll();
+           this.branch          = branch;
+           if (branch != null)
+           {
+              SchemaValues  values = branch.getMetadata();
+              this.schema          = values != null? values.getSchema(): branch.getMetadataSchema();
+              this.schema          = branch.getMetadataSchema();
+              this.schemaFields    = getFields( branch);
 
-		   if (schemaFields != null)
-			   add( schemaFields);
+              if (schemaFields != null)
+                 add( schemaFields);
 
-		   add(createButtonsLayout());
-		   startEditing();
-	   }
+              add(createButtonsLayout());
+              startEditing();
+           }
    }//setBranchExpediente
 
 
    private Component getFields( BranchExpediente branch)
    {
-	  Schema schema        = branch.getMetadataSchema();
+      Schema schema        = branch.getMetadataSchema();
       this.schemaValues    = branch.getMetadata();
       return  schemaValues == null || SchemaValues.EMPTY.equals(schemaValues)?
-    		  schema == null?  new FormLayout()                              :  	      
-    	                       (Component)schema.export(schemaExporter)      :
-    	                       (Component)schemaValues.export(valuesExporter);
+                  schema == null?  new FormLayout()                          :
+                               (Component)schema.export(schemaExporter)      :
+                               (Component)schemaValues.export(valuesExporter);
    }//getFields
 
 

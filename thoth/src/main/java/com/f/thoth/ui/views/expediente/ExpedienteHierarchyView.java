@@ -67,7 +67,7 @@ import com.vaadin.flow.shared.Registration;
 @Secured(Role.ADMIN)
 class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParameter<String>, AfterNavigationObserver
 { 
-	private BranchExpedienteForm        branchExpedienteForm;
+	private BaseExpedienteForm          baseExpedienteForm;
 	private BranchExpedienteService     branchExpedienteService;
 	private BranchExpediente            currentBranch;              // Branch that is presented on right panel
 //	private BranchExpediente            selectedBranch;             // Branch that is selected on content panel
@@ -369,12 +369,12 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 	protected String getBasePage() { return PAGE_JERARQUIA_EXPEDIENTES;}
 
 
-	private BranchExpedienteForm configureForm(BaseExpediente selectedExpediente)
+	private BaseExpedienteForm configureForm(BaseExpediente selectedExpediente)
 	{
-		branchExpedienteForm = new BranchExpedienteForm(schemaService);
-		branchExpedienteForm.addListener(BranchExpedienteForm.SaveEvent.class,   this::saveBranchExpediente );
-		branchExpedienteForm.addListener(BranchExpedienteForm.CloseEvent.class,  e -> closeEditor());
-		return branchExpedienteForm;
+		baseExpedienteForm = new BaseExpedienteForm(schemaService);
+		baseExpedienteForm.addListener(BaseExpedienteForm.SaveEvent.class,   this::saveExpediente );
+		baseExpedienteForm.addListener(BaseExpedienteForm.CloseEvent.class,  e -> closeEditor());
+		return baseExpedienteForm;
 
 	}//configureForm
 
@@ -419,8 +419,8 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 	
 	private  BranchExpediente   newBranch()
 	{
-		  currentBranch = new BranchExpediente();
-		  LocalDateTime  now      =   LocalDateTime.now();
+		  currentBranch       = new BranchExpediente();
+		  LocalDateTime  now  = LocalDateTime.now();
 	      currentBranch.setExpedienteCode      (null);
 	      currentBranch.setPath                (null);
 	      currentBranch.setName                (" ");
@@ -454,11 +454,22 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 	}//saveBranchExpediente
 
 
-	private void saveBranchExpediente(BranchExpedienteForm.SaveEvent event)
+	private void saveExpediente(BaseExpedienteForm.SaveEvent event)
 	{
-		BranchExpediente branch = event.getBranchExpediente();
-		saveBranchExpediente(branch);
-	}//saveBranchExpediente
+		BaseExpediente expediente = event.getBaseExpediente();
+		switch(expediente.getType())
+		{ 
+		case GRUPO:  
+			saveBranchExpediente(currentBranch);
+		    break;
+		case EXPEDIENTE:
+			break;
+		case VOLUMEN:
+			break;
+		case HOJA:
+		}
+		
+	}//saveBaseExpediente
 
 
 	private void deleteBranchExpediente(BranchExpediente branch)
@@ -508,9 +519,9 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 			if( branch.isPersisted())
 				branch = branchExpedienteService.load(branch.getId());
 
-			branchExpedienteForm.setVisible(true);
-			branchExpedienteForm.addClassName("selected-item-form");
-			branchExpedienteForm.setExpediente(branch);
+			baseExpedienteForm.setVisible(true);
+			baseExpedienteForm.addClassName("selected-item-form");
+			baseExpedienteForm.setExpediente(branch.getExpediente());
 			rightSection.setVisible(true);
 		}
 	}//editBranch
@@ -518,9 +529,9 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 
 	private void closeEditor()
 	{
-		branchExpedienteForm.setExpediente(null);
-		branchExpedienteForm.setVisible(false);
-		branchExpedienteForm.removeClassName("selected-item-form");
+		baseExpedienteForm.setExpediente(null);
+		baseExpedienteForm.setVisible(false);
+		baseExpedienteForm.removeClassName("selected-item-form");
 	}//closeEditor
 
 

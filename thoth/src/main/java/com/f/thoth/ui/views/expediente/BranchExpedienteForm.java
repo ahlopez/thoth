@@ -94,8 +94,14 @@ public class BranchExpedienteForm extends FormLayout
       schema.setItems(allSchemas);
       schema.addValueChangeListener(e -> 
       { 
-    	selectedBranch.setMetadataSchema(e.getValue()); 
-        branchExpedienteValuesForm.setBranchExpediente(selectedBranch);
+    	Schema selectedSchema = e.getValue();
+    	if (selectedSchema != null)
+    	{
+    	    selectedBranch.setMetadataSchema(e.getValue());
+    	    selectedBranch.setMetadata(null);
+            branchExpedienteValuesForm.setBranchExpediente(selectedBranch);
+    	}
+    	branchExpedienteValuesForm.setVisible(selectedSchema != null);
       });
       schema.setItemLabelGenerator(e-> e.getName());
       schema.setWidth("30%");
@@ -185,8 +191,8 @@ public class BranchExpedienteForm extends FormLayout
       binder.setBean(expediente);
       this.selectedBranch = expediente;
       setStatus( expediente);
-      branchExpedienteValuesForm.setVisible(true);
       branchExpedienteValuesForm.setBranchExpediente(selectedBranch);
+      branchExpedienteValuesForm.setVisible(selectedBranch == null || selectedBranch.getMetadataSchema() != null);
    }//setExpediente
    
    
