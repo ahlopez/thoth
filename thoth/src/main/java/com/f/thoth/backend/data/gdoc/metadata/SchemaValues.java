@@ -11,6 +11,8 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import com.f.thoth.backend.data.entity.AbstractEntity;
+import com.f.thoth.backend.data.security.Tenant;
+import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.ui.utils.Constant;
 
 @Entity
@@ -18,6 +20,10 @@ import com.f.thoth.ui.utils.Constant;
 public class SchemaValues extends AbstractEntity implements SchemaValuesImporter, Comparable<SchemaValues>
 {
    public static final SchemaValues  EMPTY = new SchemaValues();
+   
+   @ManyToOne
+   @NotNull (message = "{evidentia.tenant.required}")
+   protected Tenant tenant;
    
    @NotNull(message="{evientia.schema.required}")
    @ManyToOne
@@ -29,6 +35,7 @@ public class SchemaValues extends AbstractEntity implements SchemaValuesImporter
    public SchemaValues()
    {  
       super();
+      tenant  = ThothSession.getCurrentTenant();
       schema  = Schema.EMPTY;
       valores = null;
   
@@ -41,6 +48,7 @@ public class SchemaValues extends AbstractEntity implements SchemaValuesImporter
       if (schema == null)
           throw new IllegalArgumentException("Esquema de los valores no puede ser nulo");
 
+      this.tenant  = ThothSession.getCurrentTenant();
       this.schema  = schema;
       this.valores = values;
 
@@ -50,6 +58,7 @@ public class SchemaValues extends AbstractEntity implements SchemaValuesImporter
    public SchemaValues( SchemaValues.ImporterDirector importerDirector)
    {
       super();
+      
       schema  = null;
       valores = null;
       importerDirector.dirija( this);
@@ -71,6 +80,9 @@ public class SchemaValues extends AbstractEntity implements SchemaValuesImporter
    
 
    // ------------------------   Getters && Setters ----------------------------
+
+   public Tenant         getTenant() { return tenant; }
+   public void           setTenant(Tenant tenant) { this.tenant = tenant; }
 
    public Schema         getSchema() { return schema; }
    @Override public void setSchema(Schema schema) { this.schema = schema; }
@@ -133,7 +145,8 @@ public class SchemaValues extends AbstractEntity implements SchemaValuesImporter
    {
       StringBuilder s = new StringBuilder();
       s.append( "SchemaValues{"+super.toString())
-       .append(  schema.toString())
+       .append(  "tenant["+ tenant.getCode()+ "] ")
+       .append(  "schema["+ schema.getName()+ "] ")
        .append(  "value["+ valores+ "]}\n");
 
       return s.toString();

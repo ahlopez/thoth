@@ -54,7 +54,7 @@ public class Schema extends BaseEntity implements Comparable<Schema>
       buildCode();
    }
 
-   public Schema( String name, Set<Field> fields)
+   public Schema(String name, Set<Field> fields)
    {
       super();
       if( !TextUtil.isValidName(name))
@@ -76,7 +76,10 @@ public class Schema extends BaseEntity implements Comparable<Schema>
       buildCode();
    }//prepareData
 
-   @Override public void buildCode(){ this.code = (tenant == null? "[Tenant]": tenant.getCode())+ "[SCM]"+ (name == null? "[Name]": name);}
+   @Override public void buildCode()
+   {  if (this.code == null)
+	     this.code = (tenant == null? "[Tenant]": tenant.getCode())+ "[SCM]"+ (name == null? "[Name]": name);
+   }//buildCode
 
    // -------------- Getters & Setters ----------------
 

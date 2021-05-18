@@ -36,6 +36,7 @@ public class BaseExpedienteForm extends FormLayout
 
   private Button             save;
   private Button             close;
+  private Component          buttons;
 
   private ReadOnlyHasValue<String> theTitle;
   private H3                 title;
@@ -105,7 +106,11 @@ public class BaseExpedienteForm extends FormLayout
         selectedExpediente.setMetadataSchema(e.getValue());
         selectedExpediente.setMetadata(null);
         metadataEditor.setSchema(selectedSchema, null);
+        buttons.setVisible(false);
+      }else
+      { buttons.setVisible(true);
       }
+      buttons.setVisible(true);
       metadataEditor.setVisible(selectedSchema != null);
     });
     schema.setItemLabelGenerator(e-> e.getName());
@@ -138,6 +143,8 @@ public class BaseExpedienteForm extends FormLayout
     keywords.setRequired(false);
     keywords.setRequiredIndicatorVisible(true);
     keywords.getElement().setAttribute("colspan", "4");
+    
+    buttons = createButtonsLayout();
 
     add(
         title                ,
@@ -150,7 +157,7 @@ public class BaseExpedienteForm extends FormLayout
         dateClosed           ,
         classCode            ,
         keywords             ,
-        createButtonsLayout()
+        buttons
        );
 
     binder.forField(name)          .bind("name");
@@ -262,10 +269,10 @@ public class BaseExpedienteForm extends FormLayout
 
   private void validateAndSave(SchemaValues metadataValues)
   {
-  if (selectedExpediente != null)
-  {   selectedExpediente.setMetadata(metadataValues);
-  }
-  saveBaseExpediente(selectedExpediente);
+	  if (selectedExpediente != null)
+	  {   selectedExpediente.setMetadata(metadataValues);
+	  }
+	  saveBaseExpediente(selectedExpediente);
   }//validateAndSave
 
 

@@ -89,10 +89,11 @@ public class BranchExpedienteService implements FilterableCrudService<BranchExpe
    @Override public BranchExpediente save(User currentUser, BranchExpediente expediente)
    {
       try {
+    	  /*
          ObjectToProtect associatedObject = expediente.getObjectToProtect();
          if ( !associatedObject.isPersisted())
             objectToProtectRepository.saveAndFlush( associatedObject);
-
+          */
          return FilterableCrudService.super.save(currentUser, expediente);
       } catch (DataIntegrityViolationException e) {
          throw new UserFriendlyDataException("Ya hay un expediente con esa identificación. Por favor escoja un identificador único para el expediente");

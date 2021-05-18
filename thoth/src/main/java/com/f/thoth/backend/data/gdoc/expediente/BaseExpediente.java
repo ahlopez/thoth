@@ -1,5 +1,6 @@
 package com.f.thoth.backend.data.gdoc.expediente;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import javax.persistence.CascadeType;
@@ -15,6 +16,8 @@ import javax.persistence.NamedEntityGraph;
 import javax.persistence.NamedEntityGraphs;
 import javax.persistence.NamedSubgraph;
 import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
@@ -27,6 +30,8 @@ import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.document.jackrabbit.NodeType;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
+import com.f.thoth.backend.data.gdoc.numerator.Numerator;
+import com.f.thoth.backend.data.gdoc.numerator.Sequence;
 import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
@@ -127,7 +132,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
   protected String            name;                        // Expediente name
 
   @NotNull(message = "{evidentia.objectToProtect.required}")
-  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
   protected ObjectToProtect   objectToProtect;             // Associated security object
 
   @NotNull  (message = "{evidentia.creator.required}")
@@ -140,7 +145,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
   @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
   protected Schema            metadataSchema;              // Metadata Schema
-  
+
   @OneToOne(cascade= CascadeType.MERGE, fetch = FetchType.EAGER, orphanRemoval = true)
   protected SchemaValues      metadata;                    // Metadata values of the associated expediente
 
@@ -191,7 +196,6 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
     this.keywords             = null;
     this.mac                  = "";
 
-    buildCode();
   }//BaseExpediente null constructor
 
 
@@ -240,10 +244,10 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
     // this.expedienteIndex     = null;
     this.mac                 = mac;
 
-    buildCode();
   }//BaseExpediente constructor
 
-
+  @PrePersist
+  @PreUpdate
   public void prepareData()
   {
     objectToProtect.prepareData();
@@ -253,64 +257,75 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
   @Override protected void buildCode()
   {
-    if (code == null)
-    {
-      this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ "/"+ NodeType.EXPEDIENTE.getCode()+ "/"+
-          (ownerPath == null ? "/": ownerPath)+ (expedienteCode == null? "[expedienteCode]" : expedienteCode);
-      this.code = this.path;
-    }
+	  if (expedienteCode == null)
+	  {
+		  String seqKey = Numerator.sequenceName( classificationClass.getTenant(),  null , classificationClass.getRootCode()+ "-"+ LocalDate.now().getYear(), "E");
+		  Numerator numerador = Numerator.getInstance();
+		  Sequence expedienteSequence = numerador.obtenga(seqKey);
+		  expedienteCode = expedienteSequence.next();
+
+		  this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ "/"+ NodeType.EXPEDIENTE.getCode()+ "/"+
+				  (ownerPath == null ? "/": ownerPath)+ (expedienteCode == null? "[expedienteCode]" : expedienteCode);
+		  this.code = this.path;
+	  }
   }//buildCode
+
+
+  protected void assignExpedienteCode()
+  {
+
+  }//assignExpedienteCode
 
 
   // -------------- Getters & Setters ----------------
 
-  public String            getName() { return name;}
-  public void              setName ( String name) { this.name = name;}
+  public String            getName()                                  { return name;}
+  public void              setName ( String name)                     { this.name = name;}
 
-  @Override public Nature    getType() { return type;}
-  @Override public boolean isOfType( Nature type) { return this.type == null? false: this.type.equals(type);}
-  public void              setType ( Nature type) { this.type = type;}
+  @Override public Nature  getType()                                  { return type;}
+  @Override public boolean isOfType( Nature type)                     { return this.type == null? false: this.type.equals(type);}
+  public void              setType ( Nature type)                     { this.type = type;}
 
-  public Boolean           getOpen() { return open;}
-  public void              setOpen ( Boolean open) { this.open = open;}
+  public Boolean           getOpen()                                  { return open;}
+  public void              setOpen ( Boolean open)                    { this.open = open;}
 
-  public void              setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect;}
+  public void              setObjectToProtect(ObjectToProtect objectToProtect)  { this.objectToProtect = objectToProtect;}
 
-  public String            getOwnerPath() { return ownerPath;}
-  public void              setOwnerPath(String ownerPath){ this.ownerPath = ownerPath;}
+  public String            getOwnerPath()                             { return ownerPath;}
+  public void              setOwnerPath(String ownerPath)             { this.ownerPath = ownerPath;}
 
-  public Classification    getClassificationClass() { return classificationClass;}
+  public Classification    getClassificationClass()                                    { return classificationClass;}
   public void              setClassificationClass( Classification classificationClass) { this.classificationClass = classificationClass;}
 
-  public User              getCreatedBy() { return createdBy;}
-  public void              setCreatedBy( User createdBy){ this.createdBy = createdBy;}
+  public User              getCreatedBy()                             { return createdBy;}
+  public void              setCreatedBy( User createdBy)              { this.createdBy = createdBy;}
 
-  public LocalDateTime     getDateOpened() { return dateOpened;}
-  public void              setDateOpened( LocalDateTime dateOpened) { this.dateOpened = dateOpened;}
+  public LocalDateTime     getDateOpened()                            { return dateOpened;}
+  public void              setDateOpened( LocalDateTime dateOpened)   { this.dateOpened = dateOpened;}
 
-  public LocalDateTime     getDateClosed() { return dateClosed;}
-  public void              setDateClosed( LocalDateTime dateClosed){ this.dateClosed = dateClosed;}
+  public LocalDateTime     getDateClosed()                            { return dateClosed;}
+  public void              setDateClosed( LocalDateTime dateClosed)   { this.dateClosed = dateClosed;}
 
-  public Schema            getMetadataSchema() { return metadataSchema;}
-  public void              setMetadataSchema( Schema metadataSchema) { this.metadataSchema = metadataSchema;}
+  public Schema            getMetadataSchema()                        { return metadataSchema;}
+  public void              setMetadataSchema( Schema metadataSchema)  { this.metadataSchema = metadataSchema;}
 
-  public SchemaValues      getMetadata() { return metadata;}
-  public void              setMetadata ( SchemaValues metadata) { this.metadata = metadata;}
+  public SchemaValues      getMetadata()                              { return metadata;}
+  public void              setMetadata ( SchemaValues metadata)       { this.metadata = metadata;}
 
-  public String            getExpedienteCode() { return expedienteCode;}
+  public String            getExpedienteCode()                        { return expedienteCode;}
   public void              setExpedienteCode ( String expedienteCode) { this.expedienteCode = expedienteCode;}
 
-  public String            getPath() { return path;}
-  public void              setPath ( String path) { this.path = path;}
+  public String            getPath()                                  { return path;}
+  public void              setPath ( String path)                     { this.path = path;}
   /*
    public ExpedienteIndex   getExpedienteIndex(){ return expedienteIndex;}
    public void              setExpedienteIndex(ExpedienteIndex expedienteIndex){ this.expedienteIndex = expedienteIndex;}
    */
-  public String            getKeywords() { return keywords;}
-  public void              setKeywords( String keywords) { this.keywords = keywords;}
+  public String            getKeywords()                              { return keywords;}
+  public void              setKeywords( String keywords)              { this.keywords = keywords;}
 
-  public String            getMac() { return mac;}
-  public void              setMac(String mac) { this.mac = mac;}
+  public String            getMac()                                   { return mac;}
+  public void              setMac(String mac)                         { this.mac = mac;}
 
 
   // --------------- Object methods ---------------------

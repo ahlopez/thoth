@@ -193,7 +193,8 @@ public class DataGenerator implements HasLogger
 
          Schema.EMPTY.setTenant(tenant1);
          Schema.EMPTY.buildCode();
-         schemaRepository.saveAndFlush(Schema.EMPTY);         
+         schemaRepository.saveAndFlush(Schema.EMPTY);    
+         SchemaValues.EMPTY.setTenant(tenant1);
          schemaValuesRepository.saveAndFlush(SchemaValues.EMPTY);
 
          Level.DEFAULT.setTenant(tenant1);

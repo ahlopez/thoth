@@ -107,21 +107,18 @@ public class MetadataEditor extends VerticalLayout
 
   private Component createButtonsLayout()
   {
-    close=  new Button("Cancelar");
     save =  new Button("Guardar");
-
-    close.addThemeVariants (ButtonVariant.LUMO_TERTIARY);
     save.addThemeVariants  (ButtonVariant.LUMO_PRIMARY);
-
-    close.addClickShortcut(Key.ESCAPE);
     save.addClickShortcut (Key.ENTER);
-
-    close. setWidth("20%");
     save.  setWidth("20%");
-
-    close.addClickListener (click -> close());
     save .addClickListener (click -> validateAndSave());
     save.getElement().getStyle().set("margin-left", "auto");
+
+    close=  new Button("Cancelar");
+    close.addThemeVariants (ButtonVariant.LUMO_TERTIARY);
+    close.addClickShortcut(Key.ESCAPE);
+    close. setWidth("20%");
+    close.addClickListener (click -> close());
 
     HorizontalLayout buttons = new HorizontalLayout( close, save);
     buttons.setWidthFull();

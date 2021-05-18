@@ -21,7 +21,6 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.BranchExpediente;
-import com.f.thoth.backend.data.gdoc.expediente.Nature;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.ThothSession;
@@ -31,6 +30,7 @@ import com.f.thoth.backend.service.BranchExpedienteService;
 import com.f.thoth.backend.service.ClassificationService;
 import com.f.thoth.backend.service.ExpedienteService;
 import com.f.thoth.backend.service.SchemaService;
+import com.f.thoth.backend.service.SchemaValuesService;
 import com.f.thoth.backend.service.VolumeService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.components.SearchBar;
@@ -76,6 +76,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 	private ExpedienteService           expedienteService;
 	private VolumeService               volumeService;
 	private SchemaService               schemaService;
+	private SchemaValuesService         schemaValuesService;
 	private BaseExpediente              currentExpediente;
 	private User                        currentUser;
 
@@ -95,8 +96,6 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 	private final List<BaseExpediente>  emptyGrid     = new ArrayList<>();
 	private final Set<BaseExpediente>   expandedNodes = new TreeSet<>();
 
-
-	private Nature nature         = null;     // Tipo de expediente a trabajar: GRUPO/ HOJA/ EXPEDIENTE/ VOLUMEN;
 	private Button add            = new Button("+ Nuevo");
 	private Button save           = new Button("Guardar");
 	private Button delete         = new Button("Eliminar");
@@ -109,6 +108,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 			                       BranchExpedienteService branchExpedienteService,
 		                           ExpedienteService       expedienteService,
 		                           SchemaService           schemaService,
+		                           SchemaValuesService     schemaValuesService,
 			                       VolumeService           volumeService
 			                      )
 	{
@@ -118,6 +118,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 		this.expedienteService       = expedienteService;
 		this.volumeService           = volumeService;
 		this.schemaService           = schemaService;
+		this.schemaValuesService     = schemaValuesService;
 		this.currentBranch           = null;
 		this.currentExpediente       = null;
 		this.currentUser             = ThothSession.getCurrentUser();
@@ -457,9 +458,10 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 	private void saveExpediente(BaseExpedienteForm.SaveEvent event)
 	{
 		BaseExpediente expediente = event.getBaseExpediente();
+		schemaValuesService.save(currentUser, expediente.getMetadata());
 		switch(expediente.getType())
 		{ 
-		case GRUPO:  
+		case GRUPO:
 			saveBranchExpediente(currentBranch);
 		    break;
 		case EXPEDIENTE:
