@@ -36,26 +36,23 @@ public class BranchExpedienteEditor extends VerticalLayout
   private Notifier notifier     = new Notifier();
 
 
-  public BranchExpedienteEditor( BranchExpedienteService branchExpedienteService, SchemaService schemaService, SchemaValuesService schemaValuesService)
+  public BranchExpedienteEditor( BranchExpedienteService branchExpedienteService, 
+		                         SchemaService schemaService, 
+		                         SchemaValuesService schemaValuesService,
+		                         Classification classificationClass)
   {
     this.branchExpedienteService = branchExpedienteService;
     this.schemaService           = schemaService;
     this.schemaValuesService     = schemaValuesService;
     this.currentUser             = ThothSession.getCurrentUser();
-    this.classificationClass     = null;
+    this.classificationClass     = classificationClass;
     this.currentBranch           = null;
     this.parentBranch            = null;
 
     add(configureEditor());
+    setVisible(false);
 
   }//BranchExpedienteEditor
-
-
-
-  public void setParentClass( Classification classificationClass)
-  {
-    this.classificationClass = classificationClass;
-  }//setParentClass
 
 
   public void resetEditor()
@@ -131,7 +128,7 @@ public class BranchExpedienteEditor extends VerticalLayout
   }//createBranch
 
 
-  private void editBranchExpediente(BranchExpediente branch)
+  public void editBranchExpediente(BranchExpediente branch)
   {
     if (branch == null)
     {  closeEditor();
@@ -141,6 +138,7 @@ public class BranchExpedienteEditor extends VerticalLayout
       {  branch = branchExpedienteService.load(branch.getId());
       }
       registerListeners();
+      setVisible(true);
       baseExpedienteForm.setVisible(true);
       baseExpedienteForm.addClassName("selected-item-form");
       baseExpedienteForm.setExpediente(branch.getExpediente());
@@ -184,7 +182,7 @@ public class BranchExpedienteEditor extends VerticalLayout
   }//deleteExpediente
 
 
-  private void closeEditor()
+  public void closeEditor()
   {
     baseExpedienteForm.setExpediente(null);
     baseExpedienteForm.setVisible(false);

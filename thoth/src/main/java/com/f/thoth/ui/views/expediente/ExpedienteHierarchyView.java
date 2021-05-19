@@ -3,7 +3,6 @@ package com.f.thoth.ui.views.expediente;
 import static com.f.thoth.ui.utils.Constant.PAGE_JERARQUIA_EXPEDIENTES;
 import static com.f.thoth.ui.utils.Constant.TITLE_JERARQUIA_EXPEDIENTES;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -21,10 +20,8 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.BranchExpediente;
-import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
-import com.f.thoth.backend.data.security.ObjectToProtect;
+import com.f.thoth.backend.data.gdoc.expediente.Nature;
 import com.f.thoth.backend.data.security.ThothSession;
-import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.service.BaseExpedienteService;
 import com.f.thoth.backend.service.BranchExpedienteService;
 import com.f.thoth.backend.service.ClassificationService;
@@ -33,7 +30,6 @@ import com.f.thoth.backend.service.SchemaService;
 import com.f.thoth.backend.service.SchemaValuesService;
 import com.f.thoth.backend.service.VolumeService;
 import com.f.thoth.ui.MainView;
-import com.f.thoth.ui.components.Notifier;
 import com.f.thoth.ui.components.SearchBar;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Key;
@@ -42,7 +38,6 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.treegrid.TreeGrid;
@@ -70,9 +65,10 @@ import com.vaadin.flow.shared.Registration;
 class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParameter<String>, AfterNavigationObserver
 {
   private BaseExpedienteForm          baseExpedienteForm;
+  private BranchExpedienteEditor      branchExpedienteEditor;
   private BranchExpedienteService     branchExpedienteService;
   private BranchExpediente            currentBranch;              // Branch that is presented on right panel
-  //  private BranchExpediente            selectedBranch;             // Branch that is selected on content panel
+  private BranchExpediente            selectedBranch;             // Branch that is selected on content panel
 
   private BaseExpedienteService       baseExpedienteService;
   private ExpedienteService           expedienteService;
@@ -80,7 +76,6 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   private SchemaService               schemaService;
   private SchemaValuesService         schemaValuesService;
   private BaseExpediente              currentExpediente;
-  private User                        currentUser;
 
   private ClassificationService       classificationService;
   private Classification              selectedClass;
@@ -98,11 +93,10 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   private final List<BaseExpediente>  emptyGrid     = new ArrayList<>();
   private final Set<BaseExpediente>   expandedNodes = new TreeSet<>();
 
-  private Button   add          = new Button("+ Nuevo");
-  private Button   save         = new Button("Guardar");
-  private Button   delete       = new Button("Eliminar");
+  private Button   addGrupo     = new Button("+Grupo");
+  private Button   addExpediente= new Button("+Expediente");
+  private Button   addVolumen   = new Button("+Volumen");
   private Button   close        = new Button("Cancelar");
-  private Notifier notifier     = new Notifier();
 
 
   @Autowired
@@ -124,7 +118,6 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     this.schemaValuesService     = schemaValuesService;
     this.currentBranch           = null;
     this.currentExpediente       = null;
-    this.currentUser             = ThothSession.getCurrentUser();
 
   }//ExpedienteHierarchyView
 
@@ -140,7 +133,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     rightSection.addClassName ("right-section");
     rightSection.setWidth("35%");
     rightSection.add(new H3("RIGHT SECTION"));
-    rightSection.add(configureForm(currentExpediente));
+    rightSection.add(branchExpedienteEditor);
 
     content = new VerticalLayout();
     content.addClassName ("selector");
@@ -150,7 +143,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     content.add(configureExpedienteSelector());
     content.add(configureButtons());
     updateSelector();
-    closeEditor();
+    closeAll();
 
     add(content, rightSection);
   }//afterNavigation
@@ -164,7 +157,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     {
       this.selectedClass = cls.get();
       this.classCode     = selectedClass.formatCode();
-      this.className     = selectedClass.getName();
+      this.className     = selectedClass.getName();     
     }
     else
     {
@@ -172,6 +165,8 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
       this.classCode = "---";
       this.className = "";
     }
+    this.branchExpedienteEditor  = new BranchExpedienteEditor(branchExpedienteService, schemaService, schemaValuesService, selectedClass);
+
   }//setParameter
 
 
@@ -214,7 +209,6 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   {
     return new AbstractBackEndHierarchicalDataProvider<BaseExpediente, Void>()
     {
-
       @Override
       public int getChildCount(HierarchicalQuery<BaseExpediente, Void> query)
       {
@@ -258,9 +252,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
       if ( first.isPresent() )
       {
         currentExpediente = first.get();
-        //  selectedBranch    = branchExpedienteService.findByCode(currentExpediente == null? null: currentExpediente.getCode());
-
-        // TODO: Aqui­ llamar el metodo que procesa la seleccion:
+        selectExpediente(currentExpediente);
       }
     });
 
@@ -372,195 +364,57 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   protected String getBasePage() { return PAGE_JERARQUIA_EXPEDIENTES;}
 
 
-  private BaseExpedienteForm configureForm(BaseExpediente selectedExpediente)
-  {
-    baseExpedienteForm = new BaseExpedienteForm(schemaService);
-    baseExpedienteForm.addListener(BaseExpedienteForm.SaveEvent.class,   this::saveExpediente );
-    baseExpedienteForm.addListener(BaseExpedienteForm.CloseEvent.class,  e -> closeEditor());
-    return baseExpedienteForm;
-
-  }//configureForm
-
-
-
   private Component configureButtons()
   {
-    add.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-    add.addClickListener(click -> addExpediente());
-    add.getElement().getStyle().set("margin-left", "auto");
+    addGrupo.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+    addGrupo.addClickListener(click -> branchExpedienteEditor.addBranchExpediente(selectedBranch));
+    addGrupo.getElement().getStyle().set("margin-left", "auto");
 
-    save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-    save.addClickShortcut(Key.ENTER);
-    save.addClickListener(click -> saveExpediente(currentExpediente));
-    save.getElement().getStyle().set("margin-left", "auto");
+    addExpediente.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+    addExpediente.addClickShortcut(Key.ENTER);
+    addExpediente.addClickListener(click -> addLeaf());
+    addExpediente.getElement().getStyle().set("margin-left", "auto");
 
-    delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
-    delete.addClickListener(click -> deleteExpediente(currentExpediente));
+    addVolumen.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+    addVolumen.addClickShortcut(Key.ENTER);
+    addVolumen.addClickListener(click -> addVolume());
+    addVolumen.getElement().getStyle().set("margin-left", "auto");
 
     close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
     close.addClickShortcut(Key.ESCAPE);
     close.addClickListener (click -> closeAll());
 
-
     HorizontalLayout buttons = new HorizontalLayout();
     buttons.setWidthFull();
     buttons.setPadding(true);
-    buttons.add( delete, save, close, add);
+    buttons.add(close, addVolumen, addExpediente, addGrupo);
     return buttons;
   }//configureButtons
-
-
-  private void addBranchExpediente()
+  
+  private void addLeaf() {}
+  private void addVolume() {}
+  
+  
+  private void selectExpediente(BaseExpediente currentExpediente)
   {
-    currentBranch = newBranch();
-    currentBranch.setClassificationClass(selectedClass);
-    String ownerPath = currentExpediente == null? null : currentExpediente.getPath();
-    currentBranch.setOwnerPath(ownerPath);
-    editBranch(currentBranch);
-  }//addBranchExpediente
+	  if( currentExpediente != null && currentExpediente.isOfType(Nature.GRUPO))
+	  {  
+		  selectedBranch = branchExpedienteService.findByCode(currentExpediente.getCode());
+		  currentBranch  = selectedBranch;
+		  branchExpedienteEditor.editBranchExpediente(currentBranch);
+	  }
+  }//selectExpediente
 
 
-  public void editBranchExpediente( BranchExpediente branch)
+  private void closeEditors()
   {
-    currentBranch = branchExpedienteService.load(branch.getId());
-    if(  currentBranch != null )
-    {   editBranch(currentBranch);
-    }
-  }//editBranchExpediente
-
-
-
-  private  BranchExpediente   newBranch()
-  {
-    BranchExpediente currentBranch = new BranchExpediente();
-    LocalDateTime  now  = LocalDateTime.now();
-    currentBranch.setExpedienteCode      (null);
-    currentBranch.setPath                (null);
-    currentBranch.setName                (" ");
-    currentBranch.setObjectToProtect     (new ObjectToProtect());
-    currentBranch.setCreatedBy           (currentUser);
-    currentBranch.setClassificationClass (selectedClass);
-    currentBranch.setMetadataSchema      (null);
-    currentBranch.setMetadata            (SchemaValues.EMPTY);
-    currentBranch.setDateOpened          (now);
-    currentBranch.setDateClosed          (now.plusYears(200L));
-    currentBranch.setOwnerPath           (null);
-    currentBranch.setOpen                (true);
-    currentBranch.setKeywords            ("keyword1, keyword2, keyword3");
-    currentBranch.setMac                 ("[mac]");
-    return currentBranch;
-
-  }//newBranch
-
-
-  private void saveBranchExpediente( BranchExpediente branch)
-  {
-    if (branch == null)
-      return;
-
-    branchExpedienteService.save(currentUser, branch);
-    updateSelector();
-    closeEditor();
-    currentBranch     = null;
-    currentExpediente = null;
-
-  }//saveBranchExpediente
-
-
-  private void saveExpediente(BaseExpedienteForm.SaveEvent event)
-  {
-    BaseExpediente expediente = event.getBaseExpediente();
-    boolean isNew = expediente.getId() == null;
-    schemaValuesService.save(currentUser, expediente.getMetadata());
-    switch(expediente.getType())
-    {
-    case GRUPO:
-      saveBranchExpediente(currentBranch);
-      break;
-    case EXPEDIENTE:
-      break;
-    case VOLUMEN:
-      break;
-    case HOJA:
-    }
-
-    if (isNew)
-    {
-      notifier.show("Expediente creado con código "+ expediente.formatCode(),  "notifier-accept",  6000,  Notification.Position.BOTTOM_CENTER);
-      updateSelector();
-    }else
-    {   notifier.show("Expediente "+ expediente.formatCode()+ " actualizado",    "notifier-accept",  3000,  Notification.Position.BOTTOM_CENTER);
-    }
-
-  }//saveBaseExpediente
-
-
-  private void deleteBranchExpediente(BranchExpediente branch)
-  {
-    if (branch == null)
-      return;
-
-    branchExpedienteService.delete(currentUser, branch);
-    updateSelector();
-    closeEditor();
-    currentBranch     = null;
-    currentExpediente = null;
-  }//deleteBranchExpediente
-
-
-  private void addExpediente()
-  {
-    addBranchExpediente();
-    // Presentar ventana emergente con el tipo GRUPO/EXPEDIENTE/VOLUMEN A CREAR en la clase
-    // Crear el objeto correspondiente al expediente seleccionado
-    // Editar el expediente creado
-  }//addExpediente
-
-
-  private void saveExpediente(BaseExpediente currentExpediente)
-  {
-    saveBranchExpediente(currentBranch);
-  }//saveExpediente
-
-  private void deleteExpediente(BaseExpediente currentExpediente)
-  {
-    deleteBranchExpediente(currentBranch);
-    // Borrar el expediente seleccionado si:
-    //   a. Existe
-    //   b. No tiene hijos
-    //   c. No tiene documentos
-  }//deleteExpediente
-
-
-  private void editBranch(BranchExpediente branch)
-  {
-    if (branch == null)
-    {
-      closeEditor();
-    } else
-    {
-      if( branch.isPersisted())
-        branch = branchExpedienteService.load(branch.getId());
-
-      baseExpedienteForm.setVisible(true);
-      baseExpedienteForm.addClassName("selected-item-form");
-      baseExpedienteForm.setExpediente(branch.getExpediente());
-      rightSection.setVisible(true);
-    }
-  }//editBranch
-
-
-  private void closeEditor()
-  {
-    baseExpedienteForm.setExpediente(null);
-    baseExpedienteForm.setVisible(false);
-    baseExpedienteForm.removeClassName("selected-item-form");
-  }//closeEditor
+    branchExpedienteEditor.closeEditor();
+  }//closeEditors
 
 
   private void closeAll()
-  {  // Cancel operation
-    closeEditor();
+  {  
+    closeEditors();
     currentBranch     = null;
     currentExpediente = null;
     resetSelector();
