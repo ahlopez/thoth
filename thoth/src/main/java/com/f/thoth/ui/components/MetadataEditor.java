@@ -40,12 +40,14 @@ public class MetadataEditor extends VerticalLayout
 
   public void setSchema( Schema schema, SchemaValues values)
   {
-    this.schema  = schema;
+    this.schema       = schema;
+    this.schemaFields =  schema == null?  new FormLayout() : (Component)schema.export(schemaExporter); 
     removeAll();
     add(getEditor( schema, values));
     add(createButtonsLayout());
   }//setSchema
-
+  
+ 
 
   public Component getEditor( Schema schema, SchemaValues values)
   {

@@ -64,11 +64,10 @@ import com.vaadin.flow.shared.Registration;
 @Secured(Role.ADMIN)
 class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParameter<String>, AfterNavigationObserver
 {
-  private BaseExpedienteForm          baseExpedienteForm;
   private BranchExpedienteEditor      branchExpedienteEditor;
   private BranchExpedienteService     branchExpedienteService;
   private BranchExpediente            currentBranch;              // Branch that is presented on right panel
-  private BranchExpediente            selectedBranch;             // Branch that is selected on content panel
+  private BranchExpediente            parentBranch;             // Branch that is selected on hierarchical selector  (content panel)
 
   private BaseExpedienteService       baseExpedienteService;
   private ExpedienteService           expedienteService;
@@ -308,7 +307,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
         backtrackParents(tGrid::expand, value);
         tGrid.select(value);
         currentExpediente = value;
-        //llamar el método que procesa la selección
+        //llamar el método que [procesa] la selección
       }
     });
     return registration;
@@ -367,7 +366,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   private Component configureButtons()
   {
     addGrupo.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-    addGrupo.addClickListener(click -> branchExpedienteEditor.addBranchExpediente(selectedBranch));
+    addGrupo.addClickListener(click -> branchExpedienteEditor.addBranchExpediente(parentBranch));
     addGrupo.getElement().getStyle().set("margin-left", "auto");
 
     addExpediente.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -399,8 +398,8 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   {
 	  if( currentExpediente != null && currentExpediente.isOfType(Nature.GRUPO))
 	  {  
-		  selectedBranch = branchExpedienteService.findByCode(currentExpediente.getCode());
-		  currentBranch  = selectedBranch;
+		  parentBranch = branchExpedienteService.findByCode(currentExpediente.getCode());
+		  currentBranch  = parentBranch;
 		  branchExpedienteEditor.editBranchExpediente(currentBranch);
 	  }
   }//selectExpediente

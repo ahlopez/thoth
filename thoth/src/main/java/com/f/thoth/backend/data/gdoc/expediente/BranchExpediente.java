@@ -59,7 +59,7 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
   // -------------- Getters & Setters ----------------
 
   public BaseExpediente       getExpediente()      { return expediente;}
-  public void                 setExpediente(BaseExpediente expediente){ this.expediente = expediente;}
+  public void                 setExpediente(BaseExpediente expediente){ this.expediente = expediente; setType();}
 
   private void                setType()
   {

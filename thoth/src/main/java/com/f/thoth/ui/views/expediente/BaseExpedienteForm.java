@@ -19,6 +19,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -40,7 +41,7 @@ public class BaseExpedienteForm extends FormLayout
 
   private ReadOnlyHasValue<String> theTitle;
   private H3                 title;
-  private TextField          classCode;    
+  private TextField          classCode;
   private ComboBox<String>   open;
   private DateTimePicker     dateOpened;
   private DateTimePicker     dateClosed;
@@ -61,7 +62,10 @@ public class BaseExpedienteForm extends FormLayout
                       new ResponsiveStep("30em", 4));
 
     title = new H3("(((( TITULO ))))");
-    title.getElement().setAttribute("colspan", "3");
+    title.getElement().setAttribute("colspan", "4");
+    title.getElement().setAttribute("background-color", "snow"); 
+    title.getElement().setAttribute("color",            "blue");
+    title.getElement().setAttribute("font-weight",      "bold");
 
     /*
           Campos que falta considerar, si es que se necesitan
@@ -103,7 +107,7 @@ public class BaseExpedienteForm extends FormLayout
       Schema selectedSchema = e.getValue();
       if (selectedSchema != null)
       {
-        selectedExpediente.setMetadataSchema(e.getValue());
+        selectedExpediente.setMetadataSchema(selectedSchema);
         selectedExpediente.setMetadata(null);
         metadataEditor.setSchema(selectedSchema, null);
         buttons.setVisible(false);
@@ -143,7 +147,7 @@ public class BaseExpedienteForm extends FormLayout
     keywords.setRequired(false);
     keywords.setRequiredIndicatorVisible(true);
     keywords.getElement().setAttribute("colspan", "4");
-    
+
     buttons = createButtonsLayout();
 
     add(
@@ -220,32 +224,39 @@ public class BaseExpedienteForm extends FormLayout
     classCode.setValue(expediente.getClassificationClass().formatCode());
     open.setValue( isOpen? "ABIERTO" : "CERRADO");
     open.setEnabled(isOpen);
+    schema.setValue(expediente.getMetadataSchema());
     schema.setEnabled(isNew);
 
     theTitle = new ReadOnlyHasValue<>( text ->title.setText(text));
-    binder.forField(theTitle)
-          .bind(e->getTitle(), null);
-    
+    binder.forField(theTitle).bind(e->getTitle(), null);
+
     if (isNew)
     {
-      schema.setValue(null);
       dateOpened.setValue(now);
       dateClosed.setValue(endOfTimes);
     }
 
   }//setStatus
   
+
   private String  getTitle()
   {
-     return selectedExpediente == null?                "Nuevo Expediente"
-          : selectedExpediente.getOwnerPath() != null? "Expediente del Grupo "  + selectedExpediente.getOwnerPath()
-                                                     : "Expediente de la Clase "+ selectedExpediente.getClassificationClass().formatCode();
- }//getTitle
+	  String oldOrNew = selectedExpediente == null?        ""
+			  : !selectedExpediente.isPersisted()? "NUEVO "+ selectedExpediente.getType()
+			  :                                    selectedExpediente.getType()+ " "+ selectedExpediente.formatCode()+ " - "+ selectedExpediente.getName();
+
+	  String classOrGroup = selectedExpediente == null?                          ""
+			  : selectedExpediente.getOwnerPath() != null?           ", EN GRUPO "+ selectedExpediente.getOwnerPath()
+			  : selectedExpediente.getClassificationClass() != null? ", EN CLASE "+ selectedExpediente.getClassificationClass().formatCode() : "";
+
+	  return oldOrNew + classOrGroup;
+
+  }//getTitle
 
 
   private Component createButtonsLayout()
   {
-	save = new Button("Guardar Grupo");
+    save = new Button("Guardar Grupo");
     save.addClickShortcut (Key.ENTER);
     save.addThemeVariants  (ButtonVariant.LUMO_PRIMARY);
     save.getElement().getStyle().set("margin-left", "auto");
@@ -253,7 +264,7 @@ public class BaseExpedienteForm extends FormLayout
     save.addClickListener  (click -> saveBaseExpediente(binder.getBean()));
     binder.addStatusChangeListener(evt -> save.setEnabled(binder.isValid()));
 
-	close= new Button("Cancelar");
+    close= new Button("Cancelar");
     close.addThemeVariants (ButtonVariant.LUMO_TERTIARY);
     close.addClickShortcut(Key.ESCAPE);
     close. setWidth("20%");
@@ -269,10 +280,10 @@ public class BaseExpedienteForm extends FormLayout
 
   private void validateAndSave(SchemaValues metadataValues)
   {
-	  if (selectedExpediente != null)
-	  {   selectedExpediente.setMetadata(metadataValues);
-	  }
-	  saveBaseExpediente(selectedExpediente);
+    if (selectedExpediente != null)
+    {   selectedExpediente.setMetadata(metadataValues);
+    }
+    saveBaseExpediente(selectedExpediente);
   }//validateAndSave
 
 

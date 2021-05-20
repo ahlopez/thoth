@@ -28,18 +28,18 @@ public class BranchExpedienteEditor extends VerticalLayout
   private BranchExpediente            parentBranch;             // Branch that is parent of currentBranch in expediente hierarchy
   private Classification              classificationClass;
   private User                        currentUser;
-  
+
   private BaseExpedienteForm          baseExpedienteForm;
-  private Registration                saveListener;          
+  private Registration                saveListener;
   private Registration                deleteListener;
   private Registration                closeListener;
   private Notifier notifier     = new Notifier();
 
 
-  public BranchExpedienteEditor( BranchExpedienteService branchExpedienteService, 
-		                         SchemaService schemaService, 
-		                         SchemaValuesService schemaValuesService,
-		                         Classification classificationClass)
+  public BranchExpedienteEditor( BranchExpedienteService branchExpedienteService,
+                                         SchemaService schemaService,
+                                         SchemaValuesService schemaValuesService,
+                                         Classification classificationClass)
   {
     this.branchExpedienteService = branchExpedienteService;
     this.schemaService           = schemaService;
@@ -69,28 +69,28 @@ public class BranchExpedienteEditor extends VerticalLayout
 
   private void registerListeners()
   {
-	  saveListener   = baseExpedienteForm.addListener(BaseExpedienteForm.SaveEvent.class,    this::saveExpediente );
-	  closeListener  = baseExpedienteForm.addListener(BaseExpedienteForm.CloseEvent.class,   e -> closeEditor());
-	  deleteListener = baseExpedienteForm.addListener(BaseExpedienteForm.DeleteEvent.class,  this::deleteExpediente);
+     saveListener   = baseExpedienteForm.addListener(BaseExpedienteForm.SaveEvent.class,    this::saveExpediente );
+     closeListener  = baseExpedienteForm.addListener(BaseExpedienteForm.CloseEvent.class,   e -> closeEditor());
+     deleteListener = baseExpedienteForm.addListener(BaseExpedienteForm.DeleteEvent.class,  this::deleteExpediente);
   }//registerListeners
-  
+
   private void removeListeners()
   {
-	if( saveListener != null)
-	{  saveListener.remove();
-	   saveListener = null;
-	}
-	if( closeListener != null)
-	{ closeListener.remove();
-	  closeListener = null;
-	}
-	if( deleteListener != null)
-	{  deleteListener.remove();
-	   deleteListener = null;
-	}
+        if( saveListener != null)
+        {  saveListener.remove();
+           saveListener = null;
+        }
+        if( closeListener != null)
+        { closeListener.remove();
+          closeListener = null;
+        }
+        if( deleteListener != null)
+        {  deleteListener.remove();
+           deleteListener = null;
+        }
   }//removeListeners
 
-  
+
   public void addBranchExpediente(BranchExpediente parentBranch)
   {
     this.parentBranch  = parentBranch;
@@ -148,37 +148,37 @@ public class BranchExpedienteEditor extends VerticalLayout
 
   private void saveExpediente(BaseExpedienteForm.SaveEvent event)
   {
-	  BaseExpediente expediente = event.getBaseExpediente();
-	  if ( expediente.isOfType(Nature.GRUPO))
-	  {  
-		  boolean isNew = !expediente.isPersisted();
-		  schemaValuesService.save(currentUser, expediente.getMetadata());
-		  if (currentBranch != null)
-		  {  branchExpedienteService.save(currentUser, currentBranch);
-		     if (isNew)
-		     {  notifier.show("Grupo de expedientes creado con código "+ expediente.formatCode(),  "notifier-accept",  6000,  Notification.Position.BOTTOM_CENTER);
-	         }else
-		     {  notifier.show("Grupo de expedientes "+ expediente.formatCode()+ " actualizado",    "notifier-accept",  3000,  Notification.Position.BOTTOM_CENTER);
-		     }
-		  }   
-	  }
-	  closeEditor();
+          BaseExpediente expediente = event.getBaseExpediente();
+          if ( expediente.isOfType(Nature.GRUPO))
+          {
+                  boolean isNew = !expediente.isPersisted();
+                  schemaValuesService.save(currentUser, expediente.getMetadata());
+                  if (currentBranch != null)
+                  {  branchExpedienteService.save(currentUser, currentBranch);
+                     if (isNew)
+                     {  notifier.show("Grupo de expedientes creado con código "+ expediente.formatCode(),  "notifier-accept",  6000,  Notification.Position.BOTTOM_CENTER);
+                 }else
+                     {  notifier.show("Grupo de expedientes "+ expediente.formatCode()+ " actualizado",    "notifier-accept",  3000,  Notification.Position.BOTTOM_CENTER);
+                     }
+                  }
+          }
+          closeEditor();
   }//saveExpediente
-  
-  
+
+
   private void deleteExpediente(BaseExpedienteForm.DeleteEvent event)
   {
-	  BaseExpediente expediente = event.getBaseExpediente();
-	  if (expediente.isOfType(Nature.GRUPO) && expediente.isPersisted())
-	  {  
-	    if (!branchExpedienteService.hasChildren(currentBranch))
-	    {  branchExpedienteService.delete(currentUser, currentBranch);
-	       notifier.show("Grupo de expedientes "+ expediente.formatCode()+ " eliminado",    "notifier-accept",  3000,  Notification.Position.BOTTOM_CENTER);
-	    }else
-	    {  notifier.error("Grupo de expedientes no puede ser eliminado pues tiene expedientes hijos");
-	    }
-	  }
-	  closeEditor();
+          BaseExpediente expediente = event.getBaseExpediente();
+          if (expediente.isOfType(Nature.GRUPO) && expediente.isPersisted())
+          {
+            if (!branchExpedienteService.hasChildren(currentBranch))
+            {  branchExpedienteService.delete(currentUser, currentBranch);
+               notifier.show("Grupo de expedientes "+ expediente.formatCode()+ " eliminado",    "notifier-accept",  3000,  Notification.Position.BOTTOM_CENTER);
+            }else
+            {  notifier.error("Grupo de expedientes no puede ser eliminado pues tiene expedientes hijos");
+            }
+          }
+          closeEditor();
   }//deleteExpediente
 
 
