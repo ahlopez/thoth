@@ -172,8 +172,8 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     searchGrid.setWidth("79%");
     this.searchBar    = buildSearchBar(searchGrid);
     content.add(searchBar);
-    layout.add(searchGrid);
-    layout.setFlexGrow(1, treeGrid);
+    layout .add(searchGrid);
+    layout .setFlexGrow(1, treeGrid);
 
     refresh();
     return layout;
