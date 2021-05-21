@@ -293,7 +293,7 @@ public class BaseExpedienteForm extends FormLayout
       boolean valid =binder.isValid();
       if (valid)
       {
-        verifyClosing(expediente);
+    	whenExpedienteCloses(expediente);
         close();
         fireEvent(new SaveEvent(this, expediente));
       }
@@ -301,7 +301,7 @@ public class BaseExpedienteForm extends FormLayout
   }//saveBaseExpediente
 
 
-  private void verifyClosing( BaseExpediente expediente)
+  private void whenExpedienteCloses( BaseExpediente expediente)
   {
     boolean wasOpen = expediente.getOpen();
     boolean isClosed= "CERRADO".equals(open.getValue());

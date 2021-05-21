@@ -48,7 +48,7 @@ import com.f.thoth.backend.data.security.UserGroup;
       name = BaseExpediente.BRIEF,
       attributeNodes = {
           @NamedAttributeNode("tenant"),
-          @NamedAttributeNode("code"),           // DB human id. Includes [tenant, type, path+]
+          @NamedAttributeNode("code"),           // DB, human id
           @NamedAttributeNode("expedienteCode"), // Business id unique inside the owner (class or expediente), vg 001,002, etc
           @NamedAttributeNode("type"),
           @NamedAttributeNode("name"),
@@ -116,7 +116,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
   @NotNull(message = "{evidentia.disposicion.required}")
   @Enumerated(EnumType.STRING)
-  private Nature                type;                        // Expediente tipo GRUPO/ HOJA/ EXPEDIENTE/ VOLUME
+  private Nature              type;                        // Expediente tipo GRUPO/ HOJA/ EXPEDIENTE/ VOLUME
 
   @NotNull  (message = "{evidentia.repopath.required}")
   @NotBlank (message = "{evidentia.repopath.required}")
@@ -155,9 +155,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
   @NotNull(message = "{evidentia.dateclosed.required}")
   protected LocalDateTime     dateClosed;                  // Date expediente was closed
 
-  //@ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
-  //protected BranchExpediente  owner;                      // Expediente to which this Branch/Leaf/Volume belongs
-  protected String             ownerPath;                   // Branch Expediente to which this Branch/Leaf/Volume belongs
+  protected String            ownerPath;                   // Branch Expediente to which this Branch/Leaf/Volume belongs
 
   /*
    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -166,14 +164,14 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
    */
 
   @NotNull(message = "{evidentia.open.required}")
-  protected Boolean           open;                       // Is the expediente currently open?
+  protected Boolean           open;                        // Is the expediente currently open?
 
-  protected String            location;                   // Signatura topográfica
+  protected String            location;                    // Signatura topográfica
 
-  protected String            keywords;                   // Search keywords
+  protected String            keywords;                    // Search keywords
 
   @NotNull(message = "{evidentia.mac.required}")
-  protected String            mac;                        // Message authentication code
+  protected String            mac;                         // Message authentication code
 
   // ------------- Constructors ------------------
   public BaseExpediente()
@@ -200,8 +198,8 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
 
   public BaseExpediente( String expedienteCode, Nature type, String path, String name, User createdBy, Classification classificationClass,
-         Schema metadataSchema, SchemaValues metadata, LocalDateTime dateOpened, LocalDateTime dateClosed, String ownerPath,
-      Boolean open,String keywords, String mac)
+                         Schema metadataSchema, SchemaValues metadata, LocalDateTime dateOpened, LocalDateTime dateClosed, String ownerPath,
+                         Boolean open,String keywords, String mac)
   {
     if ( TextUtil.isEmpty(expedienteCode))
       throw new IllegalArgumentException("Código del expediente no puede ser nulo ni vacío");
@@ -257,24 +255,18 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
   @Override protected void buildCode()
   {
-	  if (expedienteCode == null)
-	  {
-		  String seqKey = Numerator.sequenceName( classificationClass.getTenant(),  null , classificationClass.getRootCode()+ "-"+ LocalDate.now().getYear(), "E");
-		  Numerator numerador = Numerator.getInstance();
-		  Sequence expedienteSequence = numerador.obtenga(seqKey);
-		  expedienteCode = expedienteSequence.next();
+    if (expedienteCode == null)
+    {
+      String seqKey = Numerator.sequenceName( classificationClass.getTenant(),  null , classificationClass.getRootCode()+ "-"+ LocalDate.now().getYear(), "E");
+      Numerator numerador = Numerator.getInstance();
+      Sequence expedienteSequence = numerador.obtenga(seqKey);
+      expedienteCode = expedienteSequence.next();
 
-		  this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ "/"+ NodeType.EXPEDIENTE.getCode()+ "/"+
-				  (ownerPath == null ? "/": ownerPath)+ (expedienteCode == null? "[expedienteCode]" : expedienteCode);
-		  this.code = this.path;
-	  }
+      this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ "/"+ NodeType.EXPEDIENTE.getCode()+ "/"+
+              (ownerPath == null ? "/": ownerPath)+ (expedienteCode == null? "[expedienteCode]" : expedienteCode);
+      this.code = this.path;
+    }
   }//buildCode
-
-
-  protected void assignExpedienteCode()
-  {
-
-  }//assignExpedienteCode
 
 
   // -------------- Getters & Setters ----------------
@@ -351,7 +343,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
     StringBuilder s = new StringBuilder();
     s.append( "BaseExpediente{")
      .append( super.toString())
-       .append( " type["+ type+ "]")
+     .append( " type["+ type+ "]")
      .append( " name["+ name+ "]")
      .append( " open["+ open+ "]")
      .append( " user owner["+ (owner == null? "---" : owner.getEmail())+ "]")
@@ -386,24 +378,14 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
   // ------------------ code & path -------------------------
   public String            formatCode()
   {
-    int i = TextUtil.indexOf(code, "/", 3);
-    String formattedCode = code.substring(i+1);
-    formattedCode = TextUtil.replace(formattedCode, "/", "-");
+  String formattedCode = "";
+  if (code != null)
+  {
+       int i = TextUtil.indexOf(code, "/", 3);
+       formattedCode = TextUtil.replace(code.substring(i+1), "/", "-");
+  }
     return formattedCode;
   }//formatCode
-
-  /*
-   private String getOwnerPath(BranchExpediente owner)
-   {
-      String path = "";
-      while (owner != null)
-      {
-         path = owner.getExpedienteCode()+ "/"+ path;
-         owner = owner.getOwner();
-      }
-      return  path;
-   }//getOwnerPath
-   */
 
   // -----------------  Implements NeedsProtection ----------------
 

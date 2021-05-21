@@ -39,9 +39,9 @@ public class BranchExpedienteEditor extends VerticalLayout
 
 
   public BranchExpedienteEditor( BranchExpedienteService branchExpedienteService,
-                                         SchemaService schemaService,
-                                         SchemaValuesService schemaValuesService,
-                                         Classification classificationClass)
+                                 SchemaService schemaService,
+                                 SchemaValuesService schemaValuesService,
+                                 Classification classificationClass)
   {
     this.branchExpedienteService = branchExpedienteService;
     this.schemaService           = schemaService;
@@ -78,18 +78,18 @@ public class BranchExpedienteEditor extends VerticalLayout
 
   private void removeListeners()
   {
-        if( saveListener != null)
-        {  saveListener.remove();
-           saveListener = null;
-        }
-        if( closeListener != null)
-        { closeListener.remove();
-          closeListener = null;
-        }
-        if( deleteListener != null)
-        {  deleteListener.remove();
-           deleteListener = null;
-        }
+     if( saveListener != null)
+     {  saveListener.remove();
+        saveListener = null;
+     }
+     if( closeListener != null)
+     { closeListener.remove();
+       closeListener = null;
+     }
+     if( deleteListener != null)
+     {  deleteListener.remove();
+        deleteListener = null;
+     }
   }//removeListeners
 
 
@@ -122,8 +122,7 @@ public class BranchExpedienteEditor extends VerticalLayout
     newBranch.setKeywords            ("keyword1, keyword2, keyword3");
     newBranch.setMac                 ("[mac]");
     if (parentBranch != null)
-    {
-      currentBranch.setOwnerPath(parentBranch.getPath());
+    {  currentBranch.setOwnerPath(parentBranch.getPath());
     }
     return newBranch;
 
@@ -134,9 +133,8 @@ public class BranchExpedienteEditor extends VerticalLayout
   {
     if (branch == null)
     {  closeEditor();
-    }  else
-    {
-      if ( branch.isPersisted())
+    } else
+    { if ( branch.isPersisted())
       {  branch = branchExpedienteService.load(branch.getId());
       }
       registerListeners();
@@ -150,36 +148,36 @@ public class BranchExpedienteEditor extends VerticalLayout
 
   private void saveExpediente(BaseExpedienteForm.SaveEvent event)
   {
-	  BaseExpediente expediente = event.getBaseExpediente();
-	  if ( expediente != null)
-	  {
-		  schemaValuesService.save(currentUser, expediente.getMetadata());
-		  boolean isNew = !expediente.isPersisted();
-		  int  duration = isNew? 6000 : 3000;
-		  String businessCode = expediente.formatCode();
-		  String msg          = isNew? "Grupo de expedientes creado con código "+ businessCode: "Grupo de expedientes "+ businessCode+ " actualizado";
-		  if (currentBranch != null)
-		  { branchExpedienteService.save(currentUser, currentBranch);
-		    notifier.show(msg, "notifier-accept", duration, Notification.Position.BOTTOM_CENTER);
-		  }
-		  closeEditor();
-	  }
+     BaseExpediente expediente = event.getBaseExpediente();
+     if ( expediente != null)
+     {
+        schemaValuesService.save(currentUser, expediente.getMetadata());
+        boolean isNew = !expediente.isPersisted();
+        int  duration = isNew? 6000 : 3000;
+        if (currentBranch != null)
+        {  branchExpedienteService.save(currentUser, currentBranch);
+           String businessCode = expediente.formatCode();
+           String msg          = isNew? "Grupo de expedientes creado con código "+ businessCode: "Grupo de expedientes "+ businessCode+ " actualizado";
+           notifier.show(msg, "notifier-accept", duration, Notification.Position.BOTTOM_CENTER);
+        }
+        closeEditor();
+     }
   }//saveExpediente
 
 
   private void deleteExpediente(BaseExpedienteForm.DeleteEvent event)
   {
-          BaseExpediente expediente = event.getBaseExpediente();
-          if (expediente.isOfType(Nature.GRUPO) && expediente.isPersisted())
-          {
-            if (!branchExpedienteService.hasChildren(currentBranch))
-            {  branchExpedienteService.delete(currentUser, currentBranch);
-               notifier.show("Grupo de expedientes "+ expediente.formatCode()+ " eliminado",    "notifier-accept",  3000,  Notification.Position.BOTTOM_CENTER);
-            }else
-            {  notifier.error("Grupo de expedientes no puede ser eliminado pues tiene expedientes hijos");
-            }
-          }
-          closeEditor();
+    BaseExpediente expediente = event.getBaseExpediente();
+    if (expediente.isOfType(Nature.GRUPO) && expediente.isPersisted())
+    {
+      if (!branchExpedienteService.hasChildren(currentBranch))
+      {  branchExpedienteService.delete(currentUser, currentBranch);
+         notifier.show("Grupo de expedientes "+ expediente.formatCode()+ " eliminado",    "notifier-accept",  3000,  Notification.Position.BOTTOM_CENTER);
+      }else
+      {  notifier.error("Grupo de expedientes no puede ser eliminado pues tiene expedientes hijos");
+      }
+    }
+    closeEditor();
   }//deleteExpediente
 
 
@@ -189,7 +187,6 @@ public class BranchExpedienteEditor extends VerticalLayout
     baseExpedienteForm.setVisible(false);
     baseExpedienteForm.removeClassName("selected-item-form");
     removeListeners();
-    currentBranch = null;
     fireEvent(new CloseEvent(this, currentBranch));
   }//closeEditor
 
@@ -206,7 +203,7 @@ public class BranchExpedienteEditor extends VerticalLayout
 
     public BranchExpediente getBranchExpediente(){ return branchExpediente;  }
     public BaseExpediente   getExpediente()      { return branchExpediente == null? null: branchExpediente.getExpediente();}
-    
+
   }//BranchExpedienteEditorEvent
 
   public static class SaveEvent extends BranchExpedienteEditorEvent

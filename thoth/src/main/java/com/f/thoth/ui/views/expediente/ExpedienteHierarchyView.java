@@ -443,9 +443,8 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   {
 	treeGrid.deselectAll();
     if (base != null)
-    {
-      backtrackParents(treeGrid::expand, base);
-   //   tGrid.select(base);
+    {   backtrackParents(treeGrid::expand, base);
+        treeGrid.select(base);
     }
   }//selectInGrid
 
