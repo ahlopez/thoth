@@ -14,6 +14,8 @@ import com.f.thoth.backend.service.BranchExpedienteService;
 import com.f.thoth.backend.service.SchemaService;
 import com.f.thoth.backend.service.SchemaValuesService;
 import com.f.thoth.ui.components.Notifier;
+import com.vaadin.flow.component.ComponentEvent;
+import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.shared.Registration;
@@ -148,21 +150,20 @@ public class BranchExpedienteEditor extends VerticalLayout
 
   private void saveExpediente(BaseExpedienteForm.SaveEvent event)
   {
-          BaseExpediente expediente = event.getBaseExpediente();
-          if ( expediente.isOfType(Nature.GRUPO))
-          {
-                  boolean isNew = !expediente.isPersisted();
-                  schemaValuesService.save(currentUser, expediente.getMetadata());
-                  if (currentBranch != null)
-                  {  branchExpedienteService.save(currentUser, currentBranch);
-                     if (isNew)
-                     {  notifier.show("Grupo de expedientes creado con código "+ expediente.formatCode(),  "notifier-accept",  6000,  Notification.Position.BOTTOM_CENTER);
-                 }else
-                     {  notifier.show("Grupo de expedientes "+ expediente.formatCode()+ " actualizado",    "notifier-accept",  3000,  Notification.Position.BOTTOM_CENTER);
-                     }
-                  }
-          }
-          closeEditor();
+	  BaseExpediente expediente = event.getBaseExpediente();
+	  if ( expediente != null)
+	  {
+		  schemaValuesService.save(currentUser, expediente.getMetadata());
+		  boolean isNew = !expediente.isPersisted();
+		  int  duration = isNew? 6000 : 3000;
+		  String businessCode = expediente.formatCode();
+		  String msg          = isNew? "Grupo de expedientes creado con código "+ businessCode: "Grupo de expedientes "+ businessCode+ " actualizado";
+		  if (currentBranch != null)
+		  { branchExpedienteService.save(currentUser, currentBranch);
+		    notifier.show(msg, "notifier-accept", duration, Notification.Position.BOTTOM_CENTER);
+		  }
+		  closeEditor();
+	  }
   }//saveExpediente
 
 
@@ -189,6 +190,49 @@ public class BranchExpedienteEditor extends VerticalLayout
     baseExpedienteForm.removeClassName("selected-item-form");
     removeListeners();
     currentBranch = null;
+    fireEvent(new CloseEvent(this, currentBranch));
   }//closeEditor
+
+
+  // --------------------- Events -----------------------
+  public static abstract class BranchExpedienteEditorEvent extends ComponentEvent<BranchExpedienteEditor>
+  {
+    private BranchExpediente branchExpediente;
+
+    protected BranchExpedienteEditorEvent(BranchExpedienteEditor source, BranchExpediente branchExpediente)
+    {  super(source, false);
+       this.branchExpediente = branchExpediente;
+    }//BranchExpedienteEditorEvent
+
+    public BranchExpediente getBranchExpediente(){ return branchExpediente;  }
+    public BaseExpediente   getExpediente()      { return branchExpediente == null? null: branchExpediente.getExpediente();}
+    
+  }//BranchExpedienteEditorEvent
+
+  public static class SaveEvent extends BranchExpedienteEditorEvent
+  {
+    SaveEvent(BranchExpedienteEditor source, BranchExpediente branchExpediente)
+    {  super(source, branchExpediente);
+    }
+  }//SaveEvent
+
+  public static class DeleteEvent extends BranchExpedienteEditorEvent
+  {
+    DeleteEvent(BranchExpedienteEditor source, BranchExpediente branchExpediente)
+    {  super(source, branchExpediente);
+    }
+  }//DeleteEvent
+
+  public static class CloseEvent extends BranchExpedienteEditorEvent
+  {
+    CloseEvent(BranchExpedienteEditor source, BranchExpediente branchExpediente)
+    {  super(source, branchExpediente);
+    }
+  }//CloseEvent
+
+  public <T extends ComponentEvent<?>> Registration addListener(Class<T> eventType, ComponentEventListener<T> listener)
+  {
+    return getEventBus().addListener(eventType, listener);
+  }//addListener
 
 }//BranchExpedienteEditor

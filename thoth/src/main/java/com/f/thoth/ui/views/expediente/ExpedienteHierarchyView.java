@@ -67,7 +67,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   private BranchExpedienteEditor      branchExpedienteEditor;
   private BranchExpedienteService     branchExpedienteService;
   private BranchExpediente            currentBranch;              // Branch that is presented on right panel
-  private BranchExpediente            parentBranch;             // Branch that is selected on hierarchical selector  (content panel)
+  private BranchExpediente            parentBranch;               // Branch that is selected on hierarchical selector  (content panel)
 
   private BaseExpedienteService       baseExpedienteService;
   private ExpedienteService           expedienteService;
@@ -152,20 +152,12 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   public void setParameter(BeforeEvent event, String parameter)
   {
     Optional<Classification> cls =  classificationService.findById(Long.parseLong(parameter));
-    if ( cls.isPresent())
-    {
-      this.selectedClass = cls.get();
-      this.classCode     = selectedClass.formatCode();
-      this.className     = selectedClass.getName();     
-    }
-    else
-    {
-      this.selectedClass = null;
-      this.classCode = "---";
-      this.className = "";
-    }
+    boolean clsPresent = cls != null && cls.isPresent();
+    this.selectedClass =  clsPresent? cls.get()                  : null;
+    this.classCode     =  clsPresent? selectedClass.formatCode() : "---";
+    this.className     =  clsPresent? selectedClass.getName()    : "";
     this.branchExpedienteEditor  = new BranchExpedienteEditor(branchExpedienteService, schemaService, schemaValuesService, selectedClass);
-
+    this.branchExpedienteEditor.addListener(BranchExpedienteEditor.CloseEvent.class, e->selectInGrid(e.getExpediente()));
   }//setParameter
 
 
@@ -215,8 +207,8 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
           return 0;
 
         BaseExpediente base = query.getParent();
-        return base != null? baseExpedienteService.countByParent(base):
-          baseExpedienteService.countByClass(selectedClass);
+        return base != null? baseExpedienteService.countByParent(base)
+                           : baseExpedienteService.countByClass(selectedClass);
       }//getChildCount
 
       @Override
@@ -306,14 +298,24 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
       {
         backtrackParents(tGrid::expand, value);
         tGrid.select(value);
+        updateGrid(value);
         currentExpediente = value;
-        //llamar el método que [procesa] la selección
+        //TODO: llamar el método que [procesa] la selección
       }
     });
     return registration;
   }//setupSingleSelectListener (in selection grid)
 
-
+  private void updateGrid( BaseExpediente selectedExpediente)
+  {
+      if (selectedExpediente != null)
+      {
+        backtrackParents(treeGrid::expand, selectedExpediente);
+        treeGrid.select(selectedExpediente);
+        currentExpediente = selectedExpediente;
+        //llamar el método que [procesa] la selección
+      }
+  }//updateGrid
 
   private void backtrackParents(Consumer<Collection<BaseExpediente>> fn, final BaseExpediente value)
   {
@@ -324,7 +326,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
       Optional<BaseExpediente> item = baseExpedienteService.findByPath(currentItem.getOwnerPath());
       if (item.isPresent())
       {  currentItem = item.get();
-      path.add(currentItem);
+         path.add(currentItem);
       }else
       {  currentItem = null;
       }
@@ -341,7 +343,9 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     treeGrid.collapse(expandedNodes);
     expandedNodes.clear();
     resetSearch();
-
+    addGrupo.setVisible(true);
+    addExpediente.setVisible(true);
+    addVolumen.setVisible(true);
   }//resetSelector
 
 
@@ -389,19 +393,28 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     buttons.add(close, addVolumen, addExpediente, addGrupo);
     return buttons;
   }//configureButtons
-  
+
   private void addLeaf() {}
   private void addVolume() {}
-  
-  
+
+
   private void selectExpediente(BaseExpediente currentExpediente)
   {
-	  if( currentExpediente != null && currentExpediente.isOfType(Nature.GRUPO))
-	  {  
-		  parentBranch = branchExpedienteService.findByCode(currentExpediente.getCode());
-		  currentBranch  = parentBranch;
-		  branchExpedienteEditor.editBranchExpediente(currentBranch);
-	  }
+    if( currentExpediente != null && currentExpediente.isOfType(Nature.GRUPO))
+    {
+      parentBranch   = branchExpedienteService.findByCode(currentExpediente.getCode());
+      currentBranch  = parentBranch;
+      branchExpedienteEditor.editBranchExpediente(currentBranch);
+      addGrupo.setVisible     (true);
+      addExpediente.setVisible(true);
+      addVolumen.setVisible   (true);
+    }else
+    {
+      addGrupo.setVisible     (false);
+      addExpediente.setVisible(false);
+      addVolumen.setVisible   (false);
+    }
+
   }//selectExpediente
 
 
@@ -412,7 +425,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 
 
   private void closeAll()
-  {  
+  {
     closeEditors();
     currentBranch     = null;
     currentExpediente = null;
@@ -424,5 +437,16 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   {
     refresh();
   }//updateSelector
+
+
+  private void selectInGrid(BaseExpediente base)
+  {
+	treeGrid.deselectAll();
+    if (base != null)
+    {
+      backtrackParents(treeGrid::expand, base);
+   //   tGrid.select(base);
+    }
+  }//selectInGrid
 
 }//ExpedienteHierarchyView

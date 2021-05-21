@@ -19,7 +19,6 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
@@ -63,7 +62,7 @@ public class BaseExpedienteForm extends FormLayout
 
     title = new H3("(((( TITULO ))))");
     title.getElement().setAttribute("colspan", "4");
-    title.getElement().setAttribute("background-color", "snow"); 
+    title.getElement().setAttribute("background-color", "snow");
     title.getElement().setAttribute("color",            "blue");
     title.getElement().setAttribute("font-weight",      "bold");
 
@@ -237,19 +236,19 @@ public class BaseExpedienteForm extends FormLayout
     }
 
   }//setStatus
-  
+
 
   private String  getTitle()
   {
-	  String oldOrNew = selectedExpediente == null?        ""
-			  : !selectedExpediente.isPersisted()? "NUEVO "+ selectedExpediente.getType()
-			  :                                    selectedExpediente.getType()+ " "+ selectedExpediente.formatCode()+ " - "+ selectedExpediente.getName();
+    String oldOrNew = selectedExpediente == null?        ""
+        : !selectedExpediente.isPersisted()? "NUEVO "+ selectedExpediente.getType()
+        :                                    selectedExpediente.getType()+ " "+ selectedExpediente.formatCode()+ " - "+ selectedExpediente.getName();
 
-	  String classOrGroup = selectedExpediente == null?                          ""
-			  : selectedExpediente.getOwnerPath() != null?           ", EN GRUPO "+ selectedExpediente.getOwnerPath()
-			  : selectedExpediente.getClassificationClass() != null? ", EN CLASE "+ selectedExpediente.getClassificationClass().formatCode() : "";
+    String classOrGroup = selectedExpediente == null?                          ""
+        : selectedExpediente.getOwnerPath() != null?           ", EN GRUPO "+ selectedExpediente.getOwnerPath()
+        : selectedExpediente.getClassificationClass() != null? ", EN CLASE "+ selectedExpediente.getClassificationClass().formatCode() : "";
 
-	  return oldOrNew + classOrGroup;
+    return oldOrNew + classOrGroup;
 
   }//getTitle
 
