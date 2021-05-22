@@ -60,7 +60,10 @@ public class SchemaValuesToVaadinExporter implements Exporter
 
       int i= 0;
       for ( HasValue<?,?> field: fields)
-         setValue( field, vals[i++]);
+      {  String value = vals[i++];
+         if ( !Constant.NULL_VALUE.equals(value))
+            setValue( field, value);
+      }
       
    }//exportValues
 
@@ -78,10 +81,13 @@ public class SchemaValuesToVaadinExporter implements Exporter
          ((TextField)field).setValue(value);
       else if (field instanceof DateTimePicker)
       {
-         LocalDateTime dateTime = (TextUtil.isEmpty(value) || value.trim().toLowerCase().equals("now"))? 
-                                  LocalDateTime.now(): 
-                                  LocalDateTime.parse(value);
-         ((DateTimePicker)field).setValue(dateTime);
+         String      stringDate = value.trim().toLowerCase();
+         LocalDateTime dateTime = (TextUtil.isEmpty(value) || stringDate.equals("now"))
+                                ? LocalDateTime.now() 
+                                : stringDate.equals("endOfTimes")
+                                ? Constant.END_OF_TIMES
+                                : LocalDateTime.parse(value);
+        ((DateTimePicker)field).setValue(dateTime);
       }
       else if( field instanceof Checkbox)
       {

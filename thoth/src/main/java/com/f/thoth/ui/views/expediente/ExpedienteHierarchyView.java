@@ -141,8 +141,6 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     content.add(new H3("Seleccione el expediente de interes"));
     content.add(configureExpedienteSelector());
     content.add(configureButtons());
-    updateSelector();
-    closeAll();
 
     add(content, rightSection);
   }//afterNavigation
@@ -157,7 +155,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     this.classCode     =  clsPresent? selectedClass.formatCode() : "---";
     this.className     =  clsPresent? selectedClass.getName()    : "";
     this.branchExpedienteEditor  = new BranchExpedienteEditor(branchExpedienteService, schemaService, schemaValuesService, selectedClass);
-    this.branchExpedienteEditor.addListener(BranchExpedienteEditor.CloseEvent.class, e->selectInGrid(e.getExpediente()));
+    this.branchExpedienteEditor.addListener(BranchExpedienteEditor.CloseEvent.class, e-> selectInGrid(e.getExpediente()));
   }//setParameter
 
 
@@ -290,31 +288,20 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 
   private Registration setupSingleSelectListener( Grid<BaseExpediente> sGrid, TreeGrid<BaseExpediente> tGrid)
   {
-    Registration registration = sGrid.asSingleSelect().addValueChangeListener(e ->
-    {
-      tGrid.deselectAll();
-      BaseExpediente value = e.getValue();
-      if (value != null)
-      {
-        backtrackParents(tGrid::expand, value);
-        tGrid.select(value);
-        updateGrid(value);
-        currentExpediente = value;
-        //TODO: llamar el método que [procesa] la selección
-      }
-    });
+    Registration registration = sGrid.asSingleSelect().addValueChangeListener(e ->updateGrid(e.getValue()));
     return registration;
   }//setupSingleSelectListener (in selection grid)
 
+
   private void updateGrid( BaseExpediente selectedExpediente)
   {
-      if (selectedExpediente != null)
-      {
-        backtrackParents(treeGrid::expand, selectedExpediente);
-        treeGrid.select(selectedExpediente);
-        currentExpediente = selectedExpediente;
-        //llamar el método que [procesa] la selección
-      }
+     treeGrid.deselectAll();
+     if (selectedExpediente != null)
+     {
+       backtrackParents(treeGrid::expand, selectedExpediente);
+       currentExpediente = selectedExpediente;
+       treeGrid.select(selectedExpediente);
+     }
   }//updateGrid
 
   private void backtrackParents(Consumer<Collection<BaseExpediente>> fn, final BaseExpediente value)
@@ -433,18 +420,12 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   }//closeAll
 
 
-  private void updateSelector()
-  {
-    refresh();
-  }//updateSelector
-
 
   private void selectInGrid(BaseExpediente base)
   {
-	treeGrid.deselectAll();
     if (base != null)
-    {   backtrackParents(treeGrid::expand, base);
-        treeGrid.select(base);
+    {  dataProvider.refreshAll(); 
+       backtrackParents(treeGrid::expand, base);
     }
   }//selectInGrid
 

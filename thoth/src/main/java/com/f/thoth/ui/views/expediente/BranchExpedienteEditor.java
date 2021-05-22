@@ -66,6 +66,7 @@ public class BranchExpedienteEditor extends VerticalLayout
   private BaseExpedienteForm configureEditor()
   {
     baseExpedienteForm = new BaseExpedienteForm(schemaService);
+    registerListeners();
     return baseExpedienteForm;
   }//configureEditor
 
@@ -97,7 +98,7 @@ public class BranchExpedienteEditor extends VerticalLayout
   {
     this.parentBranch  = parentBranch;
     this.currentBranch = createBranch();
-    registerListeners();
+   // registerListeners();
     editBranchExpediente(currentBranch);
   }//addBranchExpediente
 
@@ -137,7 +138,7 @@ public class BranchExpedienteEditor extends VerticalLayout
     { if ( branch.isPersisted())
       {  branch = branchExpedienteService.load(branch.getId());
       }
-      registerListeners();
+    //  registerListeners();
       setVisible(true);
       baseExpedienteForm.setVisible(true);
       baseExpedienteForm.addClassName("selected-item-form");
@@ -186,7 +187,7 @@ public class BranchExpedienteEditor extends VerticalLayout
     baseExpedienteForm.setExpediente(null);
     baseExpedienteForm.setVisible(false);
     baseExpedienteForm.removeClassName("selected-item-form");
-    removeListeners();
+  //  removeListeners();
     fireEvent(new CloseEvent(this, currentBranch));
   }//closeEditor
 

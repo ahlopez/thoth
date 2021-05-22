@@ -1,5 +1,6 @@
 package com.f.thoth.ui.utils;
 
+import java.time.LocalDateTime;
 import java.util.Locale;
 
 import org.springframework.data.domain.Sort;
@@ -14,6 +15,7 @@ public class Constant
    public static final Integer DEFAULT_CATEGORY = MIN_CATEGORY;
    public static final Integer ADMIN_CATEGORY   = MAX_CATEGORY - 1;
    public static final String  VALUE_SEPARATOR = ";";
+   public static final LocalDateTime  END_OF_TIMES = LocalDateTime.parse("5000-12-31T11:59:59");
    public static final String  NULL_VALUE = "*";
 
    public static final String PAGE_ROOT = "";

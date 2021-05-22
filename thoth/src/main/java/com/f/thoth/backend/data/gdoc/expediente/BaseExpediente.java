@@ -309,6 +309,9 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
   public String            getPath()                                  { return path;}
   public void              setPath ( String path)                     { this.path = path;}
+
+  public String            getLocation()                              { return location;}
+  public void              setLocation ( String location)             { this.location = location;}
   /*
    public ExpedienteIndex   getExpedienteIndex(){ return expedienteIndex;}
    public void              setExpedienteIndex(ExpedienteIndex expedienteIndex){ this.expedienteIndex = expedienteIndex;}

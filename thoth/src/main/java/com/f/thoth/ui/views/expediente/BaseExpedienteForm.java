@@ -66,12 +66,6 @@ public class BaseExpedienteForm extends FormLayout
     title.getElement().setAttribute("color",            "blue");
     title.getElement().setAttribute("font-weight",      "bold");
 
-    /*
-          Campos que falta considerar, si es que se necesitan
-     protected String            ownerPath;                   // Branch Expediente to which this Branch/Leaf/Volume belongs
-     protected String            location;                    // Signatura topográfica
-   */
-
     TextField  name    = new TextField("Asunto");
     name.setRequired(true);
     name.setRequiredIndicatorVisible(true);
@@ -91,6 +85,12 @@ public class BaseExpedienteForm extends FormLayout
     classCode.getElement().setAttribute("colspan", "1");
     classCode.setEnabled(false);
 
+    TextField  location    = new TextField("Localización");
+    location.setRequired(false);
+    location.setRequiredIndicatorVisible(false);
+    location.getElement().setAttribute("colspan", "1");
+    location.setEnabled(false);
+    
     open = new ComboBox<>();
     open.setItems(new String[] {"ABIERTO", "CERRADO"});
     open.setWidth("20%");
@@ -153,20 +153,19 @@ public class BaseExpedienteForm extends FormLayout
         title                ,
         name                 ,
         expedienteCode       ,
-        schema               ,
-        open                 ,
+        classCode            ,
+        location             ,
         createdBy            ,
         dateOpened           ,
         dateClosed           ,
-        classCode            ,
         keywords             ,
+        schema               ,
+        open                 ,
         buttons
        );
 
     binder.forField(name)          .bind("name");
-  //  binder.forField(expedienteCode).bind("expedienteCode");
-  //  binder.forField(classCode)     .bind("classificationClass.classCode");
-
+    binder.forField(location)      .bind("location");
     binder.forField(dateOpened)
           .asRequired()
           .withConverter(DATE_CONVERTER)
@@ -176,7 +175,6 @@ public class BaseExpedienteForm extends FormLayout
              return dateTo == null || (dateFrom != null && dateFrom.equals(dateTo) || dateFrom.isBefore(dateTo));
            },         "Fecha de cierre debe posterior a la de apertura")
           .bind("dateOpened");
-
 
     binder.forField(dateClosed)
           .asRequired()
@@ -293,7 +291,7 @@ public class BaseExpedienteForm extends FormLayout
       boolean valid =binder.isValid();
       if (valid)
       {
-    	whenExpedienteCloses(expediente);
+        whenExpedienteCloses(expediente);
         close();
         fireEvent(new SaveEvent(this, expediente));
       }
