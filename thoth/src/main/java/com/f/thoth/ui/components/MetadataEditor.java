@@ -66,17 +66,18 @@ public class MetadataEditor extends VerticalLayout
 
    private void endEditing()
    {
+      this.schema = null;
+      this.schemaFields = null;
       setVisible(false);
       removeClassName("field-form");
    }//endEditing
 
 
-   private void validateAndSave()
-   {
-      String     values = getValuesFromFields(schemaFields);
-      SchemaValues vals = new SchemaValues(schema, values);
+   public SchemaValues validateAndSave()
+   {       
+      SchemaValues vals = schemaFields == null? null:  new SchemaValues(schema, getValuesFromFields(schemaFields));
       endEditing();
-      fireEvent(new SaveEvent(this, vals));
+      return vals;
    }//validateAndSave
 
 
@@ -144,6 +145,7 @@ public class MetadataEditor extends VerticalLayout
 
       HorizontalLayout buttons = new HorizontalLayout( close, save);
       buttons.setWidthFull();
+      buttons.setVisible(false);
 
       return buttons;
    }//createButtonsLayout

@@ -38,7 +38,8 @@ public class BranchExpedienteEditor extends VerticalLayout
   public BranchExpedienteEditor( BranchExpedienteService branchExpedienteService,
                                  SchemaService schemaService,
                                  SchemaValuesService schemaValuesService,
-                                 Classification classificationClass)
+                                 Classification classificationClass
+                               )
   {
     this.branchExpedienteService = branchExpedienteService;
     this.schemaService           = schemaService;

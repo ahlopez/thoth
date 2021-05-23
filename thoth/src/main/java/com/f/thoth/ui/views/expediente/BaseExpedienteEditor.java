@@ -104,18 +104,15 @@ public class BaseExpedienteEditor extends FormLayout
     schema.addValueChangeListener(e ->
     {
       Schema selectedSchema = e.getValue();
-      if (selectedSchema != null)
+      boolean metaSelected = (selectedSchema != null);
+      metadataEditor.setVisible(metaSelected);
+      if (metaSelected)
       {
         selectedExpediente.setMetadataSchema(selectedSchema);
         selectedExpediente.setMetadata(null);
         metadataEditor.editMetadata(selectedSchema, null);
-        buttons.setVisible(false);
-      }else
-      { buttons.setVisible(true);
       }
-      buttons.setVisible(true);
-      metadataEditor.setVisible(selectedSchema != null);
-    });
+     });
     schema.setItemLabelGenerator(e-> e.getName());
     schema.setWidth("30%");
     schema.setRequired(true);
@@ -160,8 +157,7 @@ public class BaseExpedienteEditor extends FormLayout
         dateClosed           ,
         keywords             ,
         schema               ,
-        open                 ,
-        buttons
+        open                 
        );
 
     binder.forField(name)          .bind("name");
@@ -193,7 +189,7 @@ public class BaseExpedienteEditor extends FormLayout
     metadataEditor = new MetadataEditor();
     metadataEditor.addListener(MetadataEditor.SaveEvent.class, e->validateAndSave(e.getValues()));
     metadataEditor.getElement().setAttribute("colspan", "4");
-    add(metadataEditor);
+    add(metadataEditor, buttons);
 
   }//BaseExpedienteEditor
 
@@ -240,7 +236,7 @@ public class BaseExpedienteEditor extends FormLayout
   {
     String oldOrNew = selectedExpediente == null?        ""
         : !selectedExpediente.isPersisted()? "NUEVO "+ selectedExpediente.getType()
-        :                                    selectedExpediente.getType()+ " "+ selectedExpediente.formatCode()+ " - "+ selectedExpediente.getName();
+        :  selectedExpediente.getType()+ " "+ selectedExpediente.formatCode()+ " - "+ selectedExpediente.getName();
 
     String classOrGroup = selectedExpediente == null?                          ""
         : selectedExpediente.getOwnerPath() != null?           ", EN GRUPO "+ selectedExpediente.getOwnerPath()
@@ -270,7 +266,6 @@ public class BaseExpedienteEditor extends FormLayout
     HorizontalLayout buttons = new HorizontalLayout(close, save);
     buttons.getElement().setAttribute("colspan", "4");
     buttons.setWidthFull();
-
     return buttons;
   }//createButtonsLayout
 
@@ -286,16 +281,16 @@ public class BaseExpedienteEditor extends FormLayout
 
   private void saveBaseExpediente(BaseExpediente expediente)
   {
-    if ( expediente != null)
-    {
-      boolean valid =binder.isValid();
-      if (valid)
-      {
+     if ( expediente != null && binder.isValid())
+     {
         whenExpedienteCloses(expediente);
+        SchemaValues metaValues = metadataEditor.validateAndSave();
+        if (metaValues != null)
+        {   expediente.setMetadata(metaValues);
+        }
         close();
         fireEvent(new SaveEvent(this, expediente));
-      }
-    }
+     }
   }//saveBaseExpediente
 
 
