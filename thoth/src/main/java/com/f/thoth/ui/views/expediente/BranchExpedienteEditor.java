@@ -31,10 +31,7 @@ public class BranchExpedienteEditor extends VerticalLayout
   private Classification              classificationClass;
   private User                        currentUser;
 
-  private BaseExpedienteForm          baseExpedienteForm;
-  private Registration                saveListener;
-  private Registration                deleteListener;
-  private Registration                closeListener;
+  private BaseExpedienteEditor        baseExpedienteEditor;
   private Notifier notifier     = new Notifier();
 
 
@@ -57,48 +54,21 @@ public class BranchExpedienteEditor extends VerticalLayout
   }//BranchExpedienteEditor
 
 
-  public void resetEditor()
-  {
-    this.currentBranch           = null;
-  }//resetEditor
 
-
-  private BaseExpedienteForm configureEditor()
+  private BaseExpedienteEditor configureEditor()
   {
-    baseExpedienteForm = new BaseExpedienteForm(schemaService);
-    registerListeners();
-    return baseExpedienteForm;
+    baseExpedienteEditor = new BaseExpedienteEditor(schemaService);
+    baseExpedienteEditor.addListener(BaseExpedienteEditor.SaveEvent.class,    this::saveExpediente );
+    baseExpedienteEditor.addListener(BaseExpedienteEditor.CloseEvent.class,   e -> closeEditor());
+    baseExpedienteEditor.addListener(BaseExpedienteEditor.DeleteEvent.class,  this::deleteExpediente);
+    return baseExpedienteEditor;
   }//configureEditor
-
-  private void registerListeners()
-  {
-     saveListener   = baseExpedienteForm.addListener(BaseExpedienteForm.SaveEvent.class,    this::saveExpediente );
-     closeListener  = baseExpedienteForm.addListener(BaseExpedienteForm.CloseEvent.class,   e -> closeEditor());
-     deleteListener = baseExpedienteForm.addListener(BaseExpedienteForm.DeleteEvent.class,  this::deleteExpediente);
-  }//registerListeners
-
-  private void removeListeners()
-  {
-     if( saveListener != null)
-     {  saveListener.remove();
-        saveListener = null;
-     }
-     if( closeListener != null)
-     { closeListener.remove();
-       closeListener = null;
-     }
-     if( deleteListener != null)
-     {  deleteListener.remove();
-        deleteListener = null;
-     }
-  }//removeListeners
 
 
   public void addBranchExpediente(BranchExpediente parentBranch)
   {
     this.parentBranch  = parentBranch;
     this.currentBranch = createBranch();
-   // registerListeners();
     editBranchExpediente(currentBranch);
   }//addBranchExpediente
 
@@ -138,16 +108,15 @@ public class BranchExpedienteEditor extends VerticalLayout
     { if ( branch.isPersisted())
       {  branch = branchExpedienteService.load(branch.getId());
       }
-    //  registerListeners();
       setVisible(true);
-      baseExpedienteForm.setVisible(true);
-      baseExpedienteForm.addClassName("selected-item-form");
-      baseExpedienteForm.setExpediente(branch.getExpediente());
+      baseExpedienteEditor.setVisible(true);
+      baseExpedienteEditor.addClassName("selected-item-form");
+      baseExpedienteEditor.editExpediente(branch.getExpediente());
     }
   }//editBranchExpediente
 
 
-  private void saveExpediente(BaseExpedienteForm.SaveEvent event)
+  private void saveExpediente(BaseExpedienteEditor.SaveEvent event)
   {
      BaseExpediente expediente = event.getBaseExpediente();
      if ( expediente != null)
@@ -156,7 +125,8 @@ public class BranchExpedienteEditor extends VerticalLayout
         boolean isNew = !expediente.isPersisted();
         int  duration = isNew? 6000 : 3000;
         if (currentBranch != null)
-        {  branchExpedienteService.save(currentUser, currentBranch);
+        {  currentBranch.setExpediente(expediente);
+           branchExpedienteService.save(currentUser, currentBranch);
            String businessCode = expediente.formatCode();
            String msg          = isNew? "Grupo de expedientes creado con código "+ businessCode: "Grupo de expedientes "+ businessCode+ " actualizado";
            notifier.show(msg, "notifier-accept", duration, Notification.Position.BOTTOM_CENTER);
@@ -166,7 +136,7 @@ public class BranchExpedienteEditor extends VerticalLayout
   }//saveExpediente
 
 
-  private void deleteExpediente(BaseExpedienteForm.DeleteEvent event)
+  private void deleteExpediente(BaseExpedienteEditor.DeleteEvent event)
   {
     BaseExpediente expediente = event.getBaseExpediente();
     if (expediente.isOfType(Nature.GRUPO) && expediente.isPersisted())
@@ -184,10 +154,8 @@ public class BranchExpedienteEditor extends VerticalLayout
 
   public void closeEditor()
   {
-    baseExpedienteForm.setExpediente(null);
-    baseExpedienteForm.setVisible(false);
-    baseExpedienteForm.removeClassName("selected-item-form");
-  //  removeListeners();
+    baseExpedienteEditor.setVisible(false);
+    baseExpedienteEditor.removeClassName("selected-item-form");
     fireEvent(new CloseEvent(this, currentBranch));
   }//closeEditor
 

@@ -30,7 +30,7 @@ import com.vaadin.flow.shared.Registration;
 /*
   Editor de la informacion basica de todo expediente/volumen
 */
-public class BaseExpedienteForm extends FormLayout
+public class BaseExpedienteEditor extends FormLayout
 {
   private static final Converter<LocalDateTime, LocalDateTime> DATE_CONVERTER   = new LocalDateTimeToLocalDateTime();
 
@@ -51,7 +51,7 @@ public class BaseExpedienteForm extends FormLayout
   BaseExpediente             selectedExpediente = null;
   Binder<BaseExpediente>     binder             = new BeanValidationBinder<>(BaseExpediente.class);
 
-  public BaseExpedienteForm(SchemaService schemaService)
+  public BaseExpedienteEditor(SchemaService schemaService)
   {
     setWidthFull();
     setResponsiveSteps(
@@ -90,7 +90,7 @@ public class BaseExpedienteForm extends FormLayout
     location.setRequiredIndicatorVisible(false);
     location.getElement().setAttribute("colspan", "1");
     location.setEnabled(false);
-    
+
     open = new ComboBox<>();
     open.setItems(new String[] {"ABIERTO", "CERRADO"});
     open.setWidth("20%");
@@ -108,7 +108,7 @@ public class BaseExpedienteForm extends FormLayout
       {
         selectedExpediente.setMetadataSchema(selectedSchema);
         selectedExpediente.setMetadata(null);
-        metadataEditor.setSchema(selectedSchema, null);
+        metadataEditor.editMetadata(selectedSchema, null);
         buttons.setVisible(false);
       }else
       { buttons.setVisible(true);
@@ -195,21 +195,21 @@ public class BaseExpedienteForm extends FormLayout
     metadataEditor.getElement().setAttribute("colspan", "4");
     add(metadataEditor);
 
-  }//BaseExpedienteForm
+  }//BaseExpedienteEditor
 
 
-  public void setExpediente(BaseExpediente expediente)
+  public void editExpediente(BaseExpediente expediente)
   {
     if ( expediente != null)
     {
       this.selectedExpediente = expediente;
       binder.setBean(selectedExpediente);
       setStatus( selectedExpediente);
-      metadataEditor.setSchema( selectedExpediente.getMetadataSchema(), selectedExpediente.getMetadata());
+      metadataEditor.editMetadata( selectedExpediente.getMetadataSchema(), selectedExpediente.getMetadata());
       metadataEditor.setVisible(selectedExpediente == null || selectedExpediente.getMetadataSchema() != null);
     }
 
-  }//setExpediente
+  }//editExpediente
 
 
   private void setStatus (BaseExpediente expediente)
@@ -315,11 +315,11 @@ public class BaseExpedienteForm extends FormLayout
   private void close() {  metadataEditor.setVisible(false);}
 
   // --------------------- Events -----------------------
-  public static abstract class BaseExpedienteFormEvent extends ComponentEvent<BaseExpedienteForm>
+  public static abstract class BaseExpedienteFormEvent extends ComponentEvent<BaseExpedienteEditor>
   {
     private BaseExpediente baseExpediente;
 
-    protected BaseExpedienteFormEvent(BaseExpedienteForm source, BaseExpediente baseExpediente)
+    protected BaseExpedienteFormEvent(BaseExpedienteEditor source, BaseExpediente baseExpediente)
     {
       super(source, false);
       this.baseExpediente = baseExpediente;
@@ -333,7 +333,7 @@ public class BaseExpedienteForm extends FormLayout
 
   public static class SaveEvent extends BaseExpedienteFormEvent
   {
-    SaveEvent(BaseExpedienteForm source, BaseExpediente baseExpediente)
+    SaveEvent(BaseExpedienteEditor source, BaseExpediente baseExpediente)
     {
       super(source, baseExpediente);
     }
@@ -341,7 +341,7 @@ public class BaseExpedienteForm extends FormLayout
 
   public static class DeleteEvent extends BaseExpedienteFormEvent
   {
-    DeleteEvent(BaseExpedienteForm source, BaseExpediente baseExpediente)
+    DeleteEvent(BaseExpedienteEditor source, BaseExpediente baseExpediente)
     {
       super(source, baseExpediente);
     }
@@ -349,7 +349,7 @@ public class BaseExpedienteForm extends FormLayout
 
   public static class CloseEvent extends BaseExpedienteFormEvent
   {
-    CloseEvent(BaseExpedienteForm source)
+    CloseEvent(BaseExpedienteEditor source)
     {
       super(source, null);
     }
@@ -360,4 +360,4 @@ public class BaseExpedienteForm extends FormLayout
     return getEventBus().addListener(eventType, listener);
   }//addListener
 
-}//BaseExpedienteForm
+}//BaseExpedienteEditor

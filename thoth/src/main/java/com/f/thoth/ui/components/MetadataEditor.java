@@ -42,26 +42,25 @@ public class MetadataEditor extends VerticalLayout
    }//MetadataEditor
 
 
-   public void setSchema( Schema schema, SchemaValues values)
+   public void editMetadata( Schema schema, SchemaValues values)
    {
-      this.schema       = schema;
-      this.schemaFields =  schema == null?  new FormLayout() : (Component)schema.export(schemaExporter); 
       removeAll();
       add(getEditor( schema, values));
       add(createButtonsLayout());
-   }//setSchema
+   }//editMetadata
 
 
 
    public Component getEditor( Schema schema, SchemaValues values)
    {
-      Component editor =  values != null && !SchemaValues.EMPTY.equals(values) 
-                       ? (Component)values.export(valuesExporter)
-                       :  schema == null
-                       ?  new FormLayout() 
-                       : (Component)schema.export(schemaExporter);
+      this.schema      =  schema;
+      this.schemaFields=  values != null && !SchemaValues.EMPTY.equals(values) 
+                                 ? (Component)values.export(valuesExporter)
+                                 :  schema == null
+                                 ?  new FormLayout() 
+                                 : (Component)schema.export(schemaExporter);
 
-      return editor;
+      return schemaFields;
    }//getEditor
 
 
