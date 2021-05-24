@@ -107,9 +107,9 @@ public class VolumeService implements FilterableCrudService<Volume>, PermissionS
    //  ----- implements HierarchicalService ------
    @Override public List<Volume>      findAll()                     { return volumeRepository.findAll(ThothSession.getCurrentTenant());}
    @Override public Optional<Volume>  findById(Long id)             { return volumeRepository.findById( id);}
-   @Override public List<Volume>      findByParent ( Volume owner)  { return volumeRepository.findByParent(owner.getPath());}
-   @Override public int               countByParent( Volume owner)  { return volumeRepository.countByParent (owner.getPath());}
-   @Override public boolean           hasChildren  ( Volume volume) { return volumeRepository.countByChildren(volume.getPath()) > 0;}
+   @Override public List<Volume>      findByParent ( Volume owner)  { return volumeRepository.findByParent(owner.getId());}
+   @Override public int               countByParent( Volume owner)  { return volumeRepository.countByParent (owner.getId());}
+   @Override public boolean           hasChildren  ( Volume volume) { return volumeRepository.countByChildren(volume.getId()) > 0;}
 
    @Override public List<Volume> findByNameLikeIgnoreCase (Tenant tenant, String name)
              { return volumeRepository.findByNameLikeIgnoreCase (tenant, name);}

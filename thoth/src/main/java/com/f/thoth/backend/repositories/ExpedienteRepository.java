@@ -51,20 +51,20 @@ public interface ExpedienteRepository extends JpaRepository<Expediente, Long>
    @Query("SELECT e FROM Expediente e "+
           "JOIN LeafExpediente leaf "+
           "JOIN BaseExpediente base "+
-          "WHERE ((base.ownerPath IS null AND :owner IS null) OR base.ownerPath = :owner) AND e.expediente.id = leaf.id AND leaf.expediente.id = base.id")
-   List<Expediente> findByParent( @Param("owner") String parentPath);
+          "WHERE ((base.ownerId IS null AND :owner IS null) OR base.ownerId = :owner) AND e.expediente.id = leaf.id AND leaf.expediente.id = base.id")
+   List<Expediente> findByParent( @Param("owner") Long parentId);
 
    @Query("SELECT count(*) FROM Expediente e "+
           "JOIN LeafExpediente leaf "+
           "JOIN BaseExpediente base "+
-          "WHERE ((base.ownerPath IS null AND :owner IS null) OR base.ownerPath = :owner) AND e.expediente.id = leaf.id AND leaf.expediente.id = base.id")
-   int countByParent( @Param("owner") String parentPath);
+          "WHERE ((base.ownerId IS null AND :owner IS null) OR base.ownerId = :owner) AND e.expediente.id = leaf.id AND leaf.expediente.id = base.id")
+   int countByParent( @Param("owner") Long parentId);
 
    @Query("SELECT count(*) FROM Expediente e "+
           "JOIN LeafExpediente leaf "+
           "JOIN BaseExpediente base "+
-          "WHERE ((base.ownerPath IS null AND :group is null) or base.ownerPath = :group) AND e.expediente.id = leaf.id AND leaf.expediente.id = base.id")
-   int countByChildren( @Param("group") String groupPath);
+          "WHERE ((base.ownerId IS null AND :group is null) or base.ownerId = :group) AND e.expediente.id = leaf.id AND leaf.expediente.id = base.id")
+   int countByChildren( @Param("group") Long groupId);
 
    @Query("SELECT e FROM Expediente e "+
           "JOIN LeafExpediente leaf "+

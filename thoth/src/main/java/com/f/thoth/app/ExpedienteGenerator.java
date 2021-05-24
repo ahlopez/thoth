@@ -25,7 +25,6 @@ import com.f.thoth.backend.data.gdoc.expediente.Volume;
 import com.f.thoth.backend.data.gdoc.expediente.VolumeInstance;
 import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
-import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.gdoc.numerator.Numerator;
 import com.f.thoth.backend.data.gdoc.numerator.Sequence;
 import com.f.thoth.backend.data.security.ObjectToProtect;
@@ -146,29 +145,29 @@ public class ExpedienteGenerator implements HasLogger
    }//registerExpedientes
 
 
-   private BaseExpediente creeExpediente( Tenant tenant, User user, Classification classificationClass, String ownerPath)
+   private BaseExpediente creeExpediente( Tenant tenant, User user, Classification classificationClass, Long ownerId)
    {
       int branchProbability =  random.nextInt(100);
       if ( branchProbability < 20)
       {
-         BranchExpediente branch = creeBranchExpediente(tenant, user, classificationClass, ownerPath);
+         BranchExpediente branch = creeBranchExpediente(tenant, user, classificationClass, ownerId);
          return branch.getExpediente();
       }
-      LeafExpediente leaf = creeLeafExpediente  (tenant, user, classificationClass, ownerPath);
+      LeafExpediente leaf = creeLeafExpediente  (tenant, user, classificationClass, ownerId);
       return leaf.getExpediente();
 
    }//creeExpediente
 
 
-   private BranchExpediente creeBranchExpediente(Tenant tenant, User user, Classification classificationClass, String ownerPath)
+   private BranchExpediente creeBranchExpediente(Tenant tenant, User user, Classification classificationClass, Long ownerId)
    {
-      BaseExpediente   base   = createBase( classificationClass, user, ownerPath);
+      BaseExpediente   base   = createBase( classificationClass, user, ownerId);
       BranchExpediente branch = new BranchExpediente();
       branch.setExpediente(base);
       branchExpedienteRepository.saveAndFlush(branch);
       int nChildren = random.nextInt(4)+1;
       for( int i=0; i< nChildren; i++)
-      {  creeExpediente( tenant, user, classificationClass, base.getPath());
+      {  creeExpediente( tenant, user, classificationClass, base.getId());
       }
       nBranches++;
       nExpedientes++;
@@ -178,9 +177,9 @@ public class ExpedienteGenerator implements HasLogger
 
 
 
-   private LeafExpediente  creeLeafExpediente(Tenant tenant, User user, Classification classificationClass, String ownerPath)
+   private LeafExpediente  creeLeafExpediente(Tenant tenant, User user, Classification classificationClass, Long ownerId)
    {
-      BaseExpediente   base   = createBase( classificationClass, user, ownerPath);
+      BaseExpediente   base   = createBase( classificationClass, user, ownerId);
       LeafExpediente   leaf   = new LeafExpediente();
       leaf.setExpediente(base);
       Set<DocumentType> admissibleTypes = generateAdmissibleTypes();
@@ -200,9 +199,9 @@ public class ExpedienteGenerator implements HasLogger
 
 
 
-   private BaseExpediente createBase(Classification classificationClass, User user, String parentPath)
+   private BaseExpediente createBase(Classification classificationClass, User user, Long parentId)
    {
-	  LocalDateTime  now      =   LocalDateTime.now();
+	   LocalDateTime  now      =   LocalDateTime.now();
       BaseExpediente base     =   new BaseExpediente();
       base.setExpedienteCode      (buildExpedienteCode(base, classificationClass));
       base.setPath                (buildExpedientePath(base, base.getExpedienteCode()));
@@ -212,10 +211,10 @@ public class ExpedienteGenerator implements HasLogger
       base.setCreatedBy           (user);
       base.setClassificationClass (classificationClass);
       base.setMetadataSchema      (availableSchemas.get(random.nextInt(availableSchemas.size()))  );
-      base.setMetadata            (SchemaValues.EMPTY);
+   //   base.setMetadata            (SchemaValues.EMPTY);
       base.setDateOpened          (now);
       base.setDateClosed          (now.plusYears(200L));
-      base.setOwnerPath           (parentPath);
+      base.setOwnerId             (parentId);
       base.setOpen                (true);
       base.setKeywords            (generateKeywords());
       base.setMac                 (generateMac());

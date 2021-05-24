@@ -80,10 +80,10 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 
   public void              setObjectToProtect(ObjectToProtect objectToProtect) { expediente.setObjectToProtect(objectToProtect);}
 
-  public String            getOwnerPath()                            { return expediente.getOwnerPath();}
-  public void              setOwnerPath(String ownerPath)            { expediente.setOwnerPath(ownerPath);}
+  public Long              getOwnerId()                              { return expediente.getOwnerId();}
+  public void              setOwnerId(Long ownerId)                  { expediente.setOwnerId(ownerId);}
 
-  public Classification    getClassificationClass()                                    { return expediente.getClassificationClass();}
+  public Classification    getClassificationClass()                  { return expediente.getClassificationClass();}
   public void              setClassificationClass( Classification classificationClass) { expediente.setClassificationClass(classificationClass);}
 
   public User              getCreatedBy()                             { return expediente.getCreatedBy();}
@@ -120,7 +120,7 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
 
   @Override public String            getCode()           { return expediente.getCode();}
 
-  @Override public String            getOwner()          { return expediente.getOwnerPath();}
+  @Override public String            getOwner()          { return expediente.getOwner();}
 
   @Override public String            formatCode()        { return expediente.formatCode();}
 

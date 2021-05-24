@@ -71,6 +71,19 @@
      margin: 10px;
 }
 
+.main-view .right-section .field-form {
+     border: 1px ridge lightgray;
+     background-color: ivory;
+     padding:2px;
+     margin: 2px;
+}
+
+.main-view .right-section .field-form .hilighted-field {
+     color: blue;
+     background-color: snow;
+     font-weight: bold;
+}
+
 
 /* Hierarchical selector */
 .selector-tree {

@@ -54,7 +54,7 @@ import com.f.thoth.backend.data.security.UserGroup;
           @NamedAttributeNode("name"),
           @NamedAttributeNode("path"),
           @NamedAttributeNode("classificationClass"),
-          @NamedAttributeNode("ownerPath"),
+          @NamedAttributeNode("ownerId"),
           @NamedAttributeNode("open"),
           @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF)
       },
@@ -77,7 +77,7 @@ import com.f.thoth.backend.data.security.UserGroup;
           @NamedAttributeNode("name"),
           @NamedAttributeNode("classificationClass"),
           @NamedAttributeNode("createdBy"),
-          @NamedAttributeNode("ownerPath"),
+          @NamedAttributeNode("ownerId"),
           @NamedAttributeNode("path"),
           @NamedAttributeNode("dateOpened"),
           @NamedAttributeNode("dateClosed"),
@@ -146,7 +146,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
   @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
   protected Schema            metadataSchema;              // Metadata Schema
 
-  @OneToOne(cascade= CascadeType.MERGE, fetch = FetchType.EAGER, orphanRemoval = true)
+  @OneToOne(cascade= CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
   protected SchemaValues      metadata;                    // Metadata values of the associated expediente
 
   @NotNull(message = "{evidentia.dateopened.required}")
@@ -155,7 +155,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
   @NotNull(message = "{evidentia.dateclosed.required}")
   protected LocalDateTime     dateClosed;                  // Date expediente was closed
 
-  protected String            ownerPath;                   // Branch Expediente to which this Branch/Leaf/Volume belongs
+  protected Long              ownerId;                     // Id of Branch Expediente to which this Branch/Leaf/Volume belongs
 
   /*
    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -188,7 +188,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
     this.metadata             = null;
     this.dateOpened           = LocalDateTime.MAX;
     this.dateClosed           = LocalDateTime.MAX;
-    this.ownerPath            = null;
+    this.ownerId              = null;
     //  this.expedienteIndex      = null;
     this.open                 = false;
     this.keywords             = null;
@@ -198,7 +198,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
 
   public BaseExpediente( String expedienteCode, Nature type, String path, String name, User createdBy, Classification classificationClass,
-                         Schema metadataSchema, SchemaValues metadata, LocalDateTime dateOpened, LocalDateTime dateClosed, String ownerPath,
+                         Schema metadataSchema, SchemaValues metadata, LocalDateTime dateOpened, LocalDateTime dateClosed, Long ownerId,
                          Boolean open,String keywords, String mac)
   {
     if ( TextUtil.isEmpty(expedienteCode))
@@ -236,7 +236,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
     this.metadata            = metadata;
     this.dateOpened          = dateOpened;
     this.dateClosed          = dateClosed;
-    this.ownerPath           = ownerPath;
+    this.ownerId             = ownerId;
     this.open                = (open == null? false : open);
     this.keywords            = keywords;
     // this.expedienteIndex     = null;
@@ -263,7 +263,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
       expedienteCode = expedienteSequence.next();
 
       this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ "/"+ NodeType.EXPEDIENTE.getCode()+ "/"+
-              (ownerPath == null ? "/": ownerPath)+ (expedienteCode == null? "[expedienteCode]" : expedienteCode);
+              (ownerId == null ? "/": ownerId)+ (expedienteCode == null? "[expedienteCode]" : expedienteCode);
       this.code = this.path;
     }
   }//buildCode
@@ -283,8 +283,9 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
   public void              setObjectToProtect(ObjectToProtect objectToProtect)  { this.objectToProtect = objectToProtect;}
 
-  public String            getOwnerPath()                             { return ownerPath;}
-  public void              setOwnerPath(String ownerPath)             { this.ownerPath = ownerPath;}
+  public Long              getOwnerId()                               { return ownerId;}
+  public void              setOwnerId(Long ownerId)                   { this.ownerId = ownerId;}
+  public String            getOwner()                                 { return ownerId == null? "" : ownerId.toString();}
 
   public Classification    getClassificationClass()                                    { return classificationClass;}
   public void              setClassificationClass( Classification classificationClass) { this.classificationClass = classificationClass;}
@@ -357,7 +358,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
      .append( " dateOpened["+ TextUtil.formatDateTime(dateOpened)+ "]")
      .append( " dateClosed["+ TextUtil.formatDateTime(dateClosed)+ "]\n")
      .append( " objectToProtect["+ (objectToProtect == null? "---" : objectToProtect.toString())+ "]\n")
-     .append( " expediente owner["+ (ownerPath == null? "/": ownerPath)+ "]")
+     .append( " expediente ownerId["+ (owner == null? "/": owner)+ "]")
     //       .append( " n index-entries["+ expedienteIndex.size()+ "]")
      .append( " path["+ path+ "]")
      .append( " mac=["+ mac+ "]")
@@ -465,7 +466,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
     expedienteIndex.setMetadata(metadata);
     expedienteIndex.setDateOpened(dateOpened);
     expedienteIndex.setDateClosed(dateClosed);
-    expedienteIndex.setOwnerPath(ownerPath);
+    expedienteIndex.setOwner(ownerId);
     expedienteIndex.setExpedienteCode(expedienteCode);
     //       expedienteIndex.setEntries( new TreeSet<>());
     expedienteIndex.setOpen(open);

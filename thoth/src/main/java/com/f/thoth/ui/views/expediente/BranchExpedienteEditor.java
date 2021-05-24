@@ -12,7 +12,6 @@ import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.service.BranchExpedienteService;
 import com.f.thoth.backend.service.SchemaService;
-import com.f.thoth.backend.service.SchemaValuesService;
 import com.f.thoth.ui.components.Notifier;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
@@ -24,7 +23,6 @@ public class BranchExpedienteEditor extends VerticalLayout
 {
   private BranchExpedienteService     branchExpedienteService;
   private SchemaService               schemaService;
-  private SchemaValuesService         schemaValuesService;
 
   private BranchExpediente            currentBranch;            // Branch that is presented on right panel
   private BranchExpediente            parentBranch;             // Branch that is parent of currentBranch in expediente hierarchy
@@ -37,13 +35,11 @@ public class BranchExpedienteEditor extends VerticalLayout
 
   public BranchExpedienteEditor( BranchExpedienteService branchExpedienteService,
                                  SchemaService schemaService,
-                                 SchemaValuesService schemaValuesService,
                                  Classification classificationClass
                                )
   {
     this.branchExpedienteService = branchExpedienteService;
     this.schemaService           = schemaService;
-    this.schemaValuesService     = schemaValuesService;
     this.currentUser             = ThothSession.getCurrentUser();
     this.classificationClass     = classificationClass;
     this.currentBranch           = null;
@@ -89,12 +85,12 @@ public class BranchExpedienteEditor extends VerticalLayout
     newBranch.setMetadata            (SchemaValues.EMPTY);
     newBranch.setDateOpened          (now);
     newBranch.setDateClosed          (now.plusYears(1000L));
-    newBranch.setOwnerPath           (null);
+    newBranch.setOwnerId             (null);
     newBranch.setOpen                (true);
     newBranch.setKeywords            ("keyword1, keyword2, keyword3");
     newBranch.setMac                 ("[mac]");
     if (parentBranch != null)
-    {  currentBranch.setOwnerPath(parentBranch.getPath());
+    {  currentBranch.setOwnerId(parentBranch.getId());
     }
     return newBranch;
 
@@ -106,13 +102,11 @@ public class BranchExpedienteEditor extends VerticalLayout
     if (branch == null)
     {  closeEditor();
     } else
-    { if ( branch.isPersisted())
-      {  branch = branchExpedienteService.load(branch.getId());
-      }
+    { 
+      String parentCode = parentBranch == null? "" : parentBranch.formatCode();
       setVisible(true);
       baseExpedienteEditor.setVisible(true);
-      baseExpedienteEditor.addClassName("selected-item-form");
-      baseExpedienteEditor.editExpediente(branch.getExpediente());
+      baseExpedienteEditor.editExpediente(branch.getExpediente(), parentCode);
     }
   }//editBranchExpediente
 
@@ -122,7 +116,14 @@ public class BranchExpedienteEditor extends VerticalLayout
      BaseExpediente expediente = event.getBaseExpediente();
      if ( expediente != null)
      {
-        schemaValuesService.save(currentUser, expediente.getMetadata());
+        /*
+        SchemaValues metadata = expediente.getMetadata();
+        if ( !metadata.isPersisted())
+        {
+           schemaValuesService.save(currentUser, expediente.getMetadata());
+           expediente.setMetadata(metadata);
+        }   
+        */  
         boolean isNew = !expediente.isPersisted();
         int  duration = isNew? 6000 : 3000;
         if (currentBranch != null)
@@ -156,7 +157,7 @@ public class BranchExpedienteEditor extends VerticalLayout
   public void closeEditor()
   {
     baseExpedienteEditor.setVisible(false);
-    baseExpedienteEditor.removeClassName("selected-item-form");
+//    removeClassName("selected-item-form");
     fireEvent(new CloseEvent(this, currentBranch));
   }//closeEditor
 

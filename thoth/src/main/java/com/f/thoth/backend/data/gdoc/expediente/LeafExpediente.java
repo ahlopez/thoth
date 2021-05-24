@@ -74,7 +74,7 @@ public class LeafExpediente extends AbstractEntity implements  NeedsProtection, 
 
    public String            getPath()            {  return expediente.getPath();}
 
-   public String            getOwner()           {  return expediente.getOwnerPath();}
+   public String            getOwner()           {  return expediente.getOwner();}
 
    // --------------- Object methods ---------------------
 

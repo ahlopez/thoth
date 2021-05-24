@@ -105,8 +105,8 @@ public class LeafExpedienteService implements FilterableCrudService<LeafExpedien
    //  ----- implements HierarchicalService ------
    @Override public List<LeafExpediente>     findAll()                    {return leafExpedienteRepository.findAll(ThothSession.getCurrentTenant());}
    @Override public Optional<LeafExpediente> findById(Long id)            {return leafExpedienteRepository.findById( id);}
-   @Override public List<LeafExpediente>     findByParent( LeafExpediente owner){return owner == null? new ArrayList<>(): leafExpedienteRepository.findByParent(owner.getPath());}
-   @Override public int        countByParent ( LeafExpediente owner)      {return owner == null? 0: leafExpedienteRepository.countByParent (owner.getPath());}
+   @Override public List<LeafExpediente>     findByParent( LeafExpediente owner){return owner == null? new ArrayList<>(): leafExpedienteRepository.findByParent(owner.getId());}
+   @Override public int        countByParent ( LeafExpediente owner)      {return owner == null? 0: leafExpedienteRepository.countByParent (owner.getId());}
    @Override public boolean    hasChildren   ( LeafExpediente expediente) {return expediente == null? false: leafExpedienteRepository.countByChildren(expediente.getPath())> 0;}
 
    @Override public List<LeafExpediente> findByNameLikeIgnoreCase (Tenant tenant, String name)

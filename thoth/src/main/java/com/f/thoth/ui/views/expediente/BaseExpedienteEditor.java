@@ -40,6 +40,7 @@ public class BaseExpedienteEditor extends FormLayout
 
   private ReadOnlyHasValue<String> theTitle;
   private H3                 title;
+  private TextField          expedienteCode;
   private TextField          classCode;
   private ComboBox<String>   open;
   private DateTimePicker     dateOpened;
@@ -47,6 +48,7 @@ public class BaseExpedienteEditor extends FormLayout
   private ComboBox<Schema>   schema;
 
   private MetadataEditor     metadataEditor;
+  private String             parentCode;
 
   BaseExpediente             selectedExpediente = null;
   Binder<BaseExpediente>     binder             = new BeanValidationBinder<>(BaseExpediente.class);
@@ -58,13 +60,14 @@ public class BaseExpedienteEditor extends FormLayout
                       new ResponsiveStep("30em", 1),
                       new ResponsiveStep("30em", 2),
                       new ResponsiveStep("30em", 3),
-                      new ResponsiveStep("30em", 4));
+                      new ResponsiveStep("30em", 4)
+                      );
 
     title = new H3("(((( TITULO ))))");
     title.getElement().setAttribute("colspan", "4");
-    title.getElement().setAttribute("background-color", "snow");
-    title.getElement().setAttribute("color",            "blue");
-    title.getElement().setAttribute("font-weight",      "bold");
+    title.getElement().getStyle().set("background", "ivory");
+    title.getElement().getStyle().set("color",      "blue");
+    title.getElement().getStyle().set("font-weight",      "bold");
 
     TextField  name    = new TextField("Asunto");
     name.setRequired(true);
@@ -72,10 +75,14 @@ public class BaseExpedienteEditor extends FormLayout
     name.setErrorMessage("El Asunto es obligatorio y no puede estar en blanco");
     name.getElement().setAttribute("colspan", "4");
 
-    TextField  expedienteCode    = new TextField("Código");
+    expedienteCode    = new TextField("Código");
     expedienteCode.setRequired(false);
     expedienteCode.setRequiredIndicatorVisible(false);
     expedienteCode.getElement().setAttribute("colspan", "1");
+   // expedienteCode.addClassName("hilighted-field");
+    expedienteCode.getElement().getStyle().set("color",       "blue");
+    //   expedienteCode.getElement().getStyle().set("background",  "snow");
+    //   expedienteCode.getElement().getStyle().set("font-weight", "bold");
     expedienteCode.setEnabled(false);
 
     classCode= new TextField("Clase");
@@ -83,6 +90,9 @@ public class BaseExpedienteEditor extends FormLayout
     classCode.setRequiredIndicatorVisible(true);
     classCode.setErrorMessage("Código de la clase a que pertenece es obligatorio");
     classCode.getElement().setAttribute("colspan", "1");
+    classCode.getElement().getStyle().set("color",       "blue");
+    classCode.getElement().getStyle().set("background",  "snow");
+    classCode.getElement().getStyle().set("font-weight", "bold");
     classCode.setEnabled(false);
 
     TextField  location    = new TextField("Localización");
@@ -157,7 +167,7 @@ public class BaseExpedienteEditor extends FormLayout
         dateClosed           ,
         keywords             ,
         schema               ,
-        open                 
+        open
        );
 
     binder.forField(name)          .bind("name");
@@ -194,21 +204,23 @@ public class BaseExpedienteEditor extends FormLayout
   }//BaseExpedienteEditor
 
 
-  public void editExpediente(BaseExpediente expediente)
+  public void editExpediente(BaseExpediente expediente, String parentCode)
   {
     if ( expediente != null)
     {
       this.selectedExpediente = expediente;
+      this.parentCode         = parentCode;
       binder.setBean(selectedExpediente);
-      setStatus( selectedExpediente);
+      initValues( selectedExpediente);
       metadataEditor.editMetadata( selectedExpediente.getMetadataSchema(), selectedExpediente.getMetadata());
       metadataEditor.setVisible(selectedExpediente == null || selectedExpediente.getMetadataSchema() != null);
+      addClassName  ("field-form");
     }
 
   }//editExpediente
 
 
-  private void setStatus (BaseExpediente expediente)
+  private void initValues (BaseExpediente expediente)
   {
     LocalDateTime now       = LocalDateTime.now();
     LocalDateTime endOfTimes= now.plusYears(1000L);
@@ -227,9 +239,11 @@ public class BaseExpedienteEditor extends FormLayout
     {
       dateOpened.setValue(now);
       dateClosed.setValue(endOfTimes);
+    }else
+    { expedienteCode.setValue(expediente.getExpedienteCode());
     }
 
-  }//setStatus
+  }//initValues
 
 
   private String  getTitle()
@@ -238,8 +252,10 @@ public class BaseExpedienteEditor extends FormLayout
         : !selectedExpediente.isPersisted()? "NUEVO "+ selectedExpediente.getType()
         :  selectedExpediente.getType()+ " "+ selectedExpediente.formatCode()+ " - "+ selectedExpediente.getName();
 
-    String classOrGroup = selectedExpediente == null?                          ""
-        : selectedExpediente.getOwnerPath() != null?           ", EN GRUPO "+ selectedExpediente.getOwnerPath()
+    String classOrGroup = selectedExpediente == null
+        ?  ""
+        : selectedExpediente.getOwner() != null
+        ? ", EN GRUPO "+ parentCode
         : selectedExpediente.getClassificationClass() != null? ", EN CLASE "+ selectedExpediente.getClassificationClass().formatCode() : "";
 
     return oldOrNew + classOrGroup;
@@ -307,7 +323,10 @@ public class BaseExpedienteEditor extends FormLayout
     }
   }//whenExpedienteCloses
 
-  private void close() {  metadataEditor.setVisible(false);}
+  private void close()
+  {  metadataEditor.setVisible(false);
+     removeClassName("field-form");
+  }
 
   // --------------------- Events -----------------------
   public static abstract class BaseExpedienteFormEvent extends ComponentEvent<BaseExpedienteEditor>

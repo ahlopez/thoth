@@ -68,9 +68,11 @@ public class BranchExpedienteService implements FilterableCrudService<BranchExpe
 
    public Page<BranchExpediente> find(Pageable pageable)
        { return branchExpedienteRepository.findBy(ThothSession.getCurrentTenant(), pageable);}
-   
+/*   
    public BranchExpediente  findByCode(String code) { return branchExpedienteRepository.findByCode(code);}
-
+   
+   public Optional<BranchExpediente>  findParent(String parentPath) { return branchExpedienteRepository.findParent(ThothSession.getCurrentTenant(),parentPath);}
+*/
    @Override public JpaRepository<BranchExpediente, Long> getRepository()
        { return branchExpedienteRepository; }
 
@@ -105,9 +107,9 @@ public class BranchExpedienteService implements FilterableCrudService<BranchExpe
    //  ----- implements HierarchicalService ------
    @Override public List<BranchExpediente>     findAll()                            {return branchExpedienteRepository.findAll(ThothSession.getCurrentTenant()); }
    @Override public Optional<BranchExpediente> findById(Long id)                    {return branchExpedienteRepository.findById( id);}
-   @Override public List<BranchExpediente>     findByParent( BranchExpediente owner){return branchExpedienteRepository.findByParent(owner.getOwner()); }
-   @Override public int        countByParent ( BranchExpediente owner)              {return branchExpedienteRepository.countByParent (owner.getOwner()); }
-   @Override public boolean    hasChildren   ( BranchExpediente expediente)         {return branchExpedienteRepository.countByChildren(expediente.getPath())> 0;}
+   @Override public List<BranchExpediente>     findByParent( BranchExpediente owner){return branchExpedienteRepository.findByParent(owner.getOwnerId()); }
+   @Override public int        countByParent ( BranchExpediente owner)              {return branchExpedienteRepository.countByParent (owner.getOwnerId()); }
+   @Override public boolean    hasChildren   ( BranchExpediente expediente)         {return branchExpedienteRepository.countByChildren(expediente.getId())> 0;}
 
    @Override public List<BranchExpediente> findByNameLikeIgnoreCase (Tenant tenant, String name)
                           { return branchExpedienteRepository.findByNameLikeIgnoreCase (tenant, name); }

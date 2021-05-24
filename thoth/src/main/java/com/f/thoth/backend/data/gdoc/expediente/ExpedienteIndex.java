@@ -45,7 +45,7 @@ import com.f.thoth.backend.data.security.UserGroup;
       @NamedAttributeNode("code"),
       @NamedAttributeNode("name"),
       @NamedAttributeNode("type"),
-      @NamedAttributeNode("ownerPath"),
+      @NamedAttributeNode("owner"),
       @NamedAttributeNode("expedienteCode"),
       @NamedAttributeNode("dateOpened"),
       @NamedAttributeNode("dateClosed"),
@@ -69,7 +69,7 @@ import com.f.thoth.backend.data.security.UserGroup;
       @NamedAttributeNode("code"),
       @NamedAttributeNode("name"),
       @NamedAttributeNode("type"),
-      @NamedAttributeNode("ownerPath"),
+      @NamedAttributeNode("owner"),
       @NamedAttributeNode("expedienteCode"),
       @NamedAttributeNode("open"),
       @NamedAttributeNode("createdBy"),
@@ -119,7 +119,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
    protected User               createdBy;                  // User that created this expediente
 
-   @NotNull(message = "evidentia.metadata.required")
+ //  @NotNull(message = "evidentia.metadata.required")
    @OneToOne(cascade= CascadeType.MERGE, fetch = FetchType.LAZY, orphanRemoval = true)
    protected SchemaValues       metadata;                   // Metadata values of the associated expediente
 
@@ -129,7 +129,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
    @NotNull(message = "{evidentia.dateclosed.required}")
    protected LocalDateTime      dateClosed;                 // Date expediente was closed
 
-   protected String             ownerPath;                  // Path of BranchExpediente to which this SUBEXPEDIENTE/VOLUMEN belongs
+   protected Long               owner;                      // Id of BranchExpediente to which this SUBEXPEDIENTE/VOLUMEN belongs
 
    @NotNull(message = "{evidentia.expedientecode.required}")
    protected String             expedienteCode;             // Expediente code
@@ -159,15 +159,15 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
    }//ExpedienteIndex null constructor
    
    
-   public ExpedienteIndex(String code, String ownerPath)
+   public ExpedienteIndex(String code, Long owner)
    {
       super();
-      init(code, ownerPath);
+      init(code, owner);
       buildCode();
    }//ExpedienteIndex constructor
 
 
-   private void init(String code, String ownerPath)
+   private void init(String code, Long owner)
    { 
       LocalDateTime now        = LocalDateTime.now();
       this.code                = code;
@@ -176,7 +176,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
       this.objectToProtect     = new ObjectToProtect();
       this.dateOpened          = now;
       this.dateClosed          = LocalDateTime.MAX;
-      this.ownerPath           = ownerPath == null? "/": ownerPath;
+      this.owner               = owner;
       this.metadata            = SchemaValues.EMPTY;
       this.expedienteCode      = obtainExpedienteCode(code);
       this.path                = "/";
@@ -198,8 +198,8 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
    @Override protected void buildCode()
    {
       this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ "/"+ NodeType.EXPEDIENTE_INDEX.getCode()+ "/"+
-                  (ownerPath == null? "" : ownerPath)+ "/"+ (expedienteCode == null? "[expedienteCode]" : expedienteCode);
-     
+                  (owner == null? "" : owner)+ "/"+ (expedienteCode == null? "[expedienteCode]" : expedienteCode);
+                  //TODO: Cambiar el owner Id por el owner code
       this.code = this.path;
    }//buildCode
    
@@ -215,8 +215,8 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
    // -------------- Getters & Setters ----------------
    public void             setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect;}
    
-   public String           getOwnerPath()                             { return ownerPath;}
-   public void             setOwnerPath(String ownerPath)             { this.ownerPath = ownerPath;}
+   public String           getOwnerPath()                             { return owner.toString();}
+   public void             setOwner(Long owner)                       { this.owner = owner;}
    
    public void             setName( String name)                      { this.name = name;}
    
@@ -295,7 +295,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
        .append( " dateOpened["+ TextUtil.formatDateTime(dateOpened)+ "]")
        .append( " dateClosed["+ TextUtil.formatDateTime(dateClosed)+ "]\n")
        .append( " objectToProtect["+ objectToProtect.toString()+ "]")
-       .append( " ownerPath["+ ownerPath+ "]")
+       .append( " owner["+ owner+ "]")
        .append( " path="+ path)
 //       .append( " nEntries["+ entries.size()+ "]")
        .append( " mac=["+ mac+ "]")
@@ -338,9 +338,9 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
 
 	@Override public String            getCode()           { return code;}
 
-	@Override public String            getOwner()          { return ownerPath;}
+	@Override public String            getOwner()          { return owner.toString();}
 
-	@Override    public String            formatCode()
+	@Override    public String         formatCode()
 	   {
 	      int i = code.lastIndexOf("/");
 	      String id = code.substring(i);

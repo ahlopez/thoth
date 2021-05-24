@@ -107,12 +107,12 @@ public class BaseExpedienteService implements FilterableCrudService<BaseExpedien
 	//  ----- implements HierarchicalService ------
 	@Override public List<BaseExpediente>     findAll()                           {return baseExpedienteRepository.findAll(ThothSession.getCurrentTenant());}
 	@Override public Optional<BaseExpediente> findById(Long id)                   {return baseExpedienteRepository.findById( id);}
-	@Override public List<BaseExpediente>     findByParent( BaseExpediente owner) {return baseExpedienteRepository.findByParent(owner.getPath()); }
-	@Override public int                      countByParent(BaseExpediente owner) {return baseExpedienteRepository.countByParent(owner.getPath());}
-	@Override public boolean                  hasChildren( BaseExpediente expediente){return  baseExpedienteRepository.countByChildren(expediente.getPath()) > 0; }
+	@Override public List<BaseExpediente>     findByParent( BaseExpediente owner) {return baseExpedienteRepository.findByParent(owner.getId()); }
+	@Override public int                      countByParent(BaseExpediente owner) {return baseExpedienteRepository.countByParent(owner.getId());}
+	@Override public boolean                  hasChildren( BaseExpediente expediente){return  baseExpedienteRepository.countByChildren(expediente.getId()) > 0; }
 	public boolean hasChildren( BaseExpediente expediente, Classification clase) 
 	{ 
-		int count = expediente != null?  baseExpedienteRepository.countByChildren(expediente.getPath()) :
+		int count = expediente != null?  baseExpedienteRepository.countByChildren(expediente.getId()) :
 		                                 baseExpedienteRepository.countByClass(clase);
 		return count > 0;
 	}//hasChildren

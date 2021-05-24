@@ -20,11 +20,11 @@ public interface BranchExpedienteRepository extends JpaRepository<BranchExpedien
           "JOIN  BaseExpediente base "+
           "WHERE base.tenant = :tenant AND base.id = branch.expediente.id")
    Page<BranchExpediente> findBy(@Param("tenant") Tenant tenant, Pageable page);
-   
+/*   
    @Query("SELECT branch FROM BranchExpediente branch "+
           "WHERE branch.expediente.code = :code")  
    BranchExpediente findByCode(@Param("code") String code);
-
+*/
    @Query("SELECT branch FROM BranchExpediente branch "+
           "JOIN  BaseExpediente base "+
           "WHERE base.tenant = :tenant AND base.id = branch.expediente.id")
@@ -51,18 +51,18 @@ public interface BranchExpedienteRepository extends JpaRepository<BranchExpedien
 
    @Query("SELECT branch FROM BranchExpediente branch "+
           "JOIN BaseExpediente base "+
-          "WHERE ((base.ownerPath IS null AND :owner IS null) OR base.ownerPath = :owner) AND base.id = branch.expediente.id")
-   List<BranchExpediente> findByParent( @Param("owner") String ownerPath);
+          "WHERE ((base.ownerId IS null AND :owner IS null) OR base.ownerId = :owner) AND base.id = branch.expediente.id")
+   List<BranchExpediente> findByParent( @Param("owner") Long ownerId);
 
    @Query("SELECT count(branch) FROM BranchExpediente branch "+
           "JOIN BaseExpediente base "+
-          "WHERE ((base.ownerPath IS null AND :owner IS null) OR (base.ownerPath = :owner)) AND base.id = branch.expediente.id")
-   int countByParent( @Param("owner") String ownerPath);
+          "WHERE ((base.ownerId IS null AND :owner IS null) OR (base.ownerId = :owner)) AND base.id = branch.expediente.id")
+   int countByParent( @Param("owner") Long ownerId);
 
    @Query("SELECT count(branch) FROM BranchExpediente branch "+
           "JOIN BaseExpediente base "+
-          "WHERE (base.ownerPath IS null AND :group IS null) OR (base.ownerPath = :group AND base.id = branch.expediente.id)")
-   int countByChildren(@Param("group") String group);
+          "WHERE (base.ownerId IS null AND :group IS null) OR (base.ownerId = :group AND base.id = branch.expediente.id)")
+   int countByChildren(@Param("group") Long groupId);
 
    @Query("SELECT branch FROM BranchExpediente branch "+
           "JOIN BaseExpediente base "+

@@ -27,7 +27,6 @@ import com.f.thoth.backend.service.BranchExpedienteService;
 import com.f.thoth.backend.service.ClassificationService;
 import com.f.thoth.backend.service.ExpedienteService;
 import com.f.thoth.backend.service.SchemaService;
-import com.f.thoth.backend.service.SchemaValuesService;
 import com.f.thoth.backend.service.VolumeService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.components.SearchBar;
@@ -73,7 +72,6 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   private ExpedienteService           expedienteService;
   private VolumeService               volumeService;
   private SchemaService               schemaService;
-  private SchemaValuesService         schemaValuesService;
   private BaseExpediente              currentExpediente;
 
   private ClassificationService       classificationService;
@@ -104,7 +102,6 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
                                  BranchExpedienteService branchExpedienteService,
                                  ExpedienteService       expedienteService,
                                  SchemaService           schemaService,
-                                 SchemaValuesService     schemaValuesService,
                                  VolumeService           volumeService
                                 )
   {
@@ -114,7 +111,6 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     this.expedienteService       = expedienteService;
     this.volumeService           = volumeService;
     this.schemaService           = schemaService;
-    this.schemaValuesService     = schemaValuesService;
     this.currentBranch           = null;
     this.currentExpediente       = null;
 
@@ -133,6 +129,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     rightSection.setWidth("35%");
     rightSection.add(new H3("RIGHT SECTION"));
     rightSection.add(branchExpedienteEditor);
+    rightSection.setVisible(false);
 
     content = new VerticalLayout();
     content.addClassName ("selector");
@@ -154,8 +151,11 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     this.selectedClass =  clsPresent? cls.get()                  : null;
     this.classCode     =  clsPresent? selectedClass.formatCode() : "---";
     this.className     =  clsPresent? selectedClass.getName()    : "";
-    this.branchExpedienteEditor  = new BranchExpedienteEditor(branchExpedienteService, schemaService, schemaValuesService, selectedClass);
-    this.branchExpedienteEditor.addListener(BranchExpedienteEditor.CloseEvent.class, e-> selectInGrid(e.getExpediente()));
+    this.branchExpedienteEditor  = new BranchExpedienteEditor(branchExpedienteService, schemaService, selectedClass);
+    this.branchExpedienteEditor.addListener(BranchExpedienteEditor.CloseEvent.class, e-> 
+    {  rightSection.setVisible(false);
+       selectInGrid(e.getExpediente());
+    });
   }//setParameter
 
 
@@ -222,8 +222,8 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
         {  return empty;
         }
         BaseExpediente base = query.getParent();
-        return  base != null? baseExpedienteService.findByParent(base).stream():
-                            baseExpedienteService.findByClass(selectedClass).stream();
+        return  base != null? baseExpedienteService.findByParent(base).stream()
+                            : baseExpedienteService.findByClass(selectedClass).stream();
       }//fetchChildrenFromBackEnd
 
     };// new AbstractBackEndHierarchicalDataProvider<>
@@ -277,6 +277,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
         {
           searchGrid.setVisible(true);
           searchGrid.setItems(items);
+          rightSection.setVisible(false);
         }
       }
     });
@@ -308,9 +309,9 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   {
     final Set<BaseExpediente> path = new TreeSet<>();
     BaseExpediente currentItem = value;
-    while (currentItem != null && currentItem.getOwnerPath() != null)
+    while (currentItem != null && currentItem.getOwnerId() != null)
     {
-      Optional<BaseExpediente> item = baseExpedienteService.findByPath(currentItem.getOwnerPath());
+      Optional<BaseExpediente> item = baseExpedienteService.findById(currentItem.getOwnerId());
       if (item.isPresent())
       {  currentItem = item.get();
          path.add(currentItem);
@@ -328,6 +329,9 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   {
     treeGrid.deselectAll();
     treeGrid.collapse(expandedNodes);
+    currentBranch     = null;
+    currentExpediente = null;
+
     expandedNodes.clear();
     resetSearch();
     addGrupo.setVisible(true);
@@ -341,6 +345,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     searchGrid.setItems(emptyGrid);
     searchGrid.setVisible(false);
     searchBar.clear();
+    rightSection.setVisible(false);
   }//resetSearch
 
 
@@ -357,17 +362,26 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   private Component configureButtons()
   {
     addGrupo.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-    addGrupo.addClickListener(click -> branchExpedienteEditor.addBranchExpediente(parentBranch));
+    addGrupo.addClickListener(click -> 
+    {  rightSection.setVisible(true);
+       branchExpedienteEditor.addBranchExpediente(parentBranch);
+    });
     addGrupo.getElement().getStyle().set("margin-left", "auto");
 
     addExpediente.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     addExpediente.addClickShortcut(Key.ENTER);
-    addExpediente.addClickListener(click -> addLeaf());
+    addExpediente.addClickListener(click ->
+    {  rightSection.setVisible(true);
+       addLeaf();
+    });
     addExpediente.getElement().getStyle().set("margin-left", "auto");
 
     addVolumen.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     addVolumen.addClickShortcut(Key.ENTER);
-    addVolumen.addClickListener(click -> addVolume());
+    addVolumen.addClickListener(click ->
+    {  rightSection.setVisible(true);
+       addVolume();
+    });
     addVolumen.getElement().getStyle().set("margin-left", "auto");
 
     close.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
@@ -389,8 +403,16 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   {
     if( currentExpediente != null && currentExpediente.isOfType(Nature.GRUPO))
     {
-      parentBranch   = branchExpedienteService.findByCode(currentExpediente.getCode());
-      currentBranch  = parentBranch;
+      Optional<BranchExpediente> current = branchExpedienteService.findById(currentExpediente.getId());
+      currentBranch = current.isPresent()? current.get() : null;
+      Long parentId = currentExpediente.getOwnerId();
+      if (parentId != null)
+      { Optional<BranchExpediente> theParent =  branchExpedienteService.findById(parentId);
+        parentBranch =  theParent.isPresent()?  theParent.get() : null;
+      }else
+      { parentBranch = null;
+      }
+      rightSection.setVisible(true);
       branchExpedienteEditor.editBranchExpediente(currentBranch);
       addGrupo.setVisible     (true);
       addExpediente.setVisible(true);
@@ -405,17 +427,9 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   }//selectExpediente
 
 
-  private void closeEditors()
-  {
-    branchExpedienteEditor.closeEditor();
-  }//closeEditors
-
-
   private void closeAll()
   {
-    closeEditors();
-    currentBranch     = null;
-    currentExpediente = null;
+    branchExpedienteEditor.closeEditor();    
     resetSelector();
   }//closeAll
 
