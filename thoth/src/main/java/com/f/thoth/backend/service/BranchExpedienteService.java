@@ -68,9 +68,9 @@ public class BranchExpedienteService implements FilterableCrudService<BranchExpe
 
    public Page<BranchExpediente> find(Pageable pageable)
        { return branchExpedienteRepository.findBy(ThothSession.getCurrentTenant(), pageable);}
-/*   
-   public BranchExpediente  findByCode(String code) { return branchExpedienteRepository.findByCode(code);}
    
+   public BranchExpediente  findByCode(String code) { return branchExpedienteRepository.findByCode(code);}
+/*   
    public Optional<BranchExpediente>  findParent(String parentPath) { return branchExpedienteRepository.findParent(ThothSession.getCurrentTenant(),parentPath);}
 */
    @Override public JpaRepository<BranchExpediente, Long> getRepository()

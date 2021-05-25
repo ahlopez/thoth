@@ -20,11 +20,11 @@ public interface BranchExpedienteRepository extends JpaRepository<BranchExpedien
           "JOIN  BaseExpediente base "+
           "WHERE base.tenant = :tenant AND base.id = branch.expediente.id")
    Page<BranchExpediente> findBy(@Param("tenant") Tenant tenant, Pageable page);
-/*   
+  
    @Query("SELECT branch FROM BranchExpediente branch "+
           "WHERE branch.expediente.code = :code")  
    BranchExpediente findByCode(@Param("code") String code);
-*/
+
    @Query("SELECT branch FROM BranchExpediente branch "+
           "JOIN  BaseExpediente base "+
           "WHERE base.tenant = :tenant AND base.id = branch.expediente.id")

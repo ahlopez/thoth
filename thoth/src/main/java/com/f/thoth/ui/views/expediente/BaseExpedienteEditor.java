@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
+import com.f.thoth.backend.data.gdoc.expediente.Nature;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.service.SchemaService;
@@ -79,10 +80,7 @@ public class BaseExpedienteEditor extends FormLayout
     expedienteCode.setRequired(false);
     expedienteCode.setRequiredIndicatorVisible(false);
     expedienteCode.getElement().setAttribute("colspan", "1");
-   // expedienteCode.addClassName("hilighted-field");
-    expedienteCode.getElement().getStyle().set("color",       "blue");
-    //   expedienteCode.getElement().getStyle().set("background",  "snow");
-    //   expedienteCode.getElement().getStyle().set("font-weight", "bold");
+    expedienteCode.getElement().getStyle().set("color", "blue");
     expedienteCode.setEnabled(false);
 
     classCode= new TextField("Clase");
@@ -90,9 +88,8 @@ public class BaseExpedienteEditor extends FormLayout
     classCode.setRequiredIndicatorVisible(true);
     classCode.setErrorMessage("Código de la clase a que pertenece es obligatorio");
     classCode.getElement().setAttribute("colspan", "1");
-    classCode.getElement().getStyle().set("color",       "blue");
-    classCode.getElement().getStyle().set("background",  "snow");
-    classCode.getElement().getStyle().set("font-weight", "bold");
+    classCode.getElement().getStyle().set("color", "blue");
+    classCode.getElement().getStyle().set("background-color", "ivory");
     classCode.setEnabled(false);
 
     TextField  location    = new TextField("Localización");
@@ -248,18 +245,26 @@ public class BaseExpedienteEditor extends FormLayout
 
   private String  getTitle()
   {
-    String oldOrNew = selectedExpediente == null?        ""
-        : !selectedExpediente.isPersisted()? "NUEVO "+ selectedExpediente.getType()
-        :  selectedExpediente.getType()+ " "+ selectedExpediente.formatCode()+ " - "+ selectedExpediente.getName();
+     if( selectedExpediente != null)
+     {
+        boolean   isNew = !selectedExpediente.isPersisted();
+        String oldOrNew = isNew? "NUEVO " : "";
+        String   prefix = selectedExpediente.isOfType(Nature.GRUPO)
+                        ? selectedExpediente.getOwnerId() == null? "" : "SUB"
+                        :   "";
 
-    String classOrGroup = selectedExpediente == null
-        ?  ""
-        : selectedExpediente.getOwner() != null
-        ? ", EN GRUPO "+ parentCode
-        : selectedExpediente.getClassificationClass() != null? ", EN CLASE "+ selectedExpediente.getClassificationClass().formatCode() : "";
+        String title =  selectedExpediente.getType()+ (isNew? "" : (" "+ selectedExpediente.formatCode()+ " - "+ selectedExpediente.getName()));
 
-    return oldOrNew + classOrGroup;
+        String classOrGroup = selectedExpediente == null
+                            ?  ""
+                            : selectedExpediente.getOwnerId() != null
+                            ? ", DE GRUPO "+ parentCode
+                            : ", EN CLASE "+ parentCode;
 
+        return oldOrNew + prefix+ title+ classOrGroup;
+     }else
+     {  return  "";
+     }
   }//getTitle
 
 

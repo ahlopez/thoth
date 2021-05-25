@@ -1,12 +1,12 @@
 package com.f.thoth.ui.views.expediente;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.BranchExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.Nature;
-import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
@@ -24,13 +24,12 @@ public class BranchExpedienteEditor extends VerticalLayout
   private BranchExpedienteService     branchExpedienteService;
   private SchemaService               schemaService;
 
-  private BranchExpediente            currentBranch;            // Branch that is presented on right panel
-  private BranchExpediente            parentBranch;             // Branch that is parent of currentBranch in expediente hierarchy
+  private BranchExpediente            currentBranch;
   private Classification              classificationClass;
   private User                        currentUser;
 
   private BaseExpedienteEditor        baseExpedienteEditor;
-  private Notifier notifier     = new Notifier();
+  private Notifier notifier           = new Notifier();
 
 
   public BranchExpedienteEditor( BranchExpedienteService branchExpedienteService,
@@ -43,7 +42,6 @@ public class BranchExpedienteEditor extends VerticalLayout
     this.currentUser             = ThothSession.getCurrentUser();
     this.classificationClass     = classificationClass;
     this.currentBranch           = null;
-    this.parentBranch            = null;
 
     add(configureEditor());
     setVisible(false);
@@ -62,19 +60,24 @@ public class BranchExpedienteEditor extends VerticalLayout
   }//configureEditor
 
 
-  public void addBranchExpediente(BranchExpediente parentBranch)
+  public void addBranchExpediente(BaseExpediente parentBase)
   {
-    this.parentBranch  = parentBranch;
-    this.currentBranch = createBranch();
-    editBranchExpediente(currentBranch);
+     BranchExpediente parentBranch  = loadBranch( parentBase);
+     editBranchExpediente(createBranch(parentBranch));
   }//addBranchExpediente
 
 
-
-  private  BranchExpediente   createBranch()
+  private BranchExpediente loadBranch( BaseExpediente base)
   {
-    BranchExpediente newBranch = new BranchExpediente();
-    LocalDateTime         now  = LocalDateTime.now();
+    BranchExpediente branch = base == null? null : branchExpedienteService.findByCode(base.getCode());
+    return branch;
+  }//loadBranch
+
+
+  private  BranchExpediente   createBranch(BranchExpediente parentBranch)
+  {
+    BranchExpediente       newBranch = new BranchExpediente();
+    LocalDateTime               now  = LocalDateTime.now();
     newBranch.setExpedienteCode      (null);
     newBranch.setPath                (null);
     newBranch.setName                (" ");
@@ -82,16 +85,13 @@ public class BranchExpedienteEditor extends VerticalLayout
     newBranch.setCreatedBy           (currentUser);
     newBranch.setClassificationClass (classificationClass);
     newBranch.setMetadataSchema      (null);
-    newBranch.setMetadata            (SchemaValues.EMPTY);
+    newBranch.setMetadata            (null);
     newBranch.setDateOpened          (now);
     newBranch.setDateClosed          (now.plusYears(1000L));
-    newBranch.setOwnerId             (null);
+    newBranch.setOwnerId             ( parentBranch == null? null : parentBranch.getId());
     newBranch.setOpen                (true);
     newBranch.setKeywords            ("keyword1, keyword2, keyword3");
     newBranch.setMac                 ("[mac]");
-    if (parentBranch != null)
-    {  currentBranch.setOwnerId(parentBranch.getId());
-    }
     return newBranch;
 
   }//createBranch
@@ -102,13 +102,33 @@ public class BranchExpedienteEditor extends VerticalLayout
     if (branch == null)
     {  closeEditor();
     } else
-    { 
-      String parentCode = parentBranch == null? "" : parentBranch.formatCode();
-      setVisible(true);
-      baseExpedienteEditor.setVisible(true);
-      baseExpedienteEditor.editExpediente(branch.getExpediente(), parentCode);
+    {
+       currentBranch = branch;
+       setVisible(true);
+       baseExpedienteEditor.setVisible(true);
+       BaseExpediente base = currentBranch.getExpediente();
+       String   parentCode = getParentCode( base);
+       baseExpedienteEditor.editExpediente(base, parentCode);
     }
   }//editBranchExpediente
+
+
+  private String getParentCode( BaseExpediente base)
+  {
+     if (base != null)
+     {
+        Long parentId = base.getOwnerId();
+        if (parentId != null)
+        {
+           Optional<BranchExpediente> parentBranch = branchExpedienteService.findById( parentId);
+           if(parentBranch.isPresent())
+           { return parentBranch.get().formatCode();
+           }
+       }
+       return base.getClassificationClass().formatCode();
+     }
+     return null;
+   }//getParentCode
 
 
   private void saveExpediente(BaseExpedienteEditor.SaveEvent event)
@@ -122,8 +142,8 @@ public class BranchExpedienteEditor extends VerticalLayout
         {
            schemaValuesService.save(currentUser, expediente.getMetadata());
            expediente.setMetadata(metadata);
-        }   
-        */  
+        }
+        */
         boolean isNew = !expediente.isPersisted();
         int  duration = isNew? 6000 : 3000;
         if (currentBranch != null)
@@ -159,6 +179,7 @@ public class BranchExpedienteEditor extends VerticalLayout
     baseExpedienteEditor.setVisible(false);
 //    removeClassName("selected-item-form");
     fireEvent(new CloseEvent(this, currentBranch));
+    currentBranch = null;
   }//closeEditor
 
 

@@ -263,7 +263,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
       expedienteCode = expedienteSequence.next();
 
       this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ "/"+ NodeType.EXPEDIENTE.getCode()+ "/"+
-              (ownerId == null ? "/": ownerId)+ (expedienteCode == null? "[expedienteCode]" : expedienteCode);
+              (ownerId == null ? "": ownerId)+ "/"+ (expedienteCode == null? "[expedienteCode]" : expedienteCode);
       this.code = this.path;
     }
   }//buildCode
