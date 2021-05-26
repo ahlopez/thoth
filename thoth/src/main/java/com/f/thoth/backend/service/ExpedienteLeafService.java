@@ -21,19 +21,19 @@ import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
-import com.f.thoth.backend.repositories.ExpedienteRepository;
+import com.f.thoth.backend.repositories.ExpedienteLeafRepository;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
 
 @Service
-public class ExpedienteService implements FilterableCrudService<Expediente>, PermissionService<Expediente>
+public class ExpedienteLeafService implements FilterableCrudService<Expediente>, PermissionService<Expediente>
 {
-   private final ExpedienteRepository           expedienteRepository;
+   private final ExpedienteLeafRepository           expedienteRepository;
    private final PermissionRepository           permissionRepository;
    private final ObjectToProtectRepository      objectToProtectRepository;
 
    @Autowired
-   public ExpedienteService(ExpedienteRepository       expedienteRepository,
+   public ExpedienteLeafService(ExpedienteLeafRepository       expedienteRepository,
                             PermissionRepository       permissionRepository,
                             ObjectToProtectRepository  objectToProtectRepository)
    {

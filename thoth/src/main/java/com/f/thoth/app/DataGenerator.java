@@ -35,10 +35,10 @@ import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.UserGroup;
 import com.f.thoth.backend.repositories.BaseExpedienteRepository;
-import com.f.thoth.backend.repositories.BranchExpedienteRepository;
+import com.f.thoth.backend.repositories.ExpedienteGroupRepository;
 import com.f.thoth.backend.repositories.ClassificationRepository;
 import com.f.thoth.backend.repositories.ExpedienteIndexRepository;
-import com.f.thoth.backend.repositories.ExpedienteRepository;
+import com.f.thoth.backend.repositories.ExpedienteLeafRepository;
 import com.f.thoth.backend.repositories.FieldRepository;
 import com.f.thoth.backend.repositories.LeafExpedienteRepository;
 import com.f.thoth.backend.repositories.LevelRepository;
@@ -98,9 +98,9 @@ public class DataGenerator implements HasLogger
    private ClassificationRepository      claseRepository;
 //   private BaseExpedienteRepository      baseExpedienteRepository;
    private ExpedienteIndexRepository     expedienteIndexRepository;
-   private BranchExpedienteRepository    branchExpedienteRepository;
+   private ExpedienteGroupRepository    expedienteGroupRepository;
 //   private LeafExpedienteRepository      leafExpedienteRepository;
-   private ExpedienteRepository          expedienteRepository;
+   private ExpedienteLeafRepository          expedienteRepository;
    private VolumeRepository              volumeRepository;
    private VolumeInstanceRepository      volumeInstanceRepository;
    private LevelRepository               levelRepository;
@@ -121,8 +121,8 @@ public class DataGenerator implements HasLogger
          ProductRepository productRepository, PickupLocationRepository pickupLocationRepository,
          TenantRepository tenantRepository, RoleRepository roleRepository, OperationRepository operationRepository,
          ClassificationRepository claseRepository, BaseExpedienteRepository baseExpedienteRepository, ExpedienteIndexRepository expedienteIndexRepository,
-         BranchExpedienteRepository branchExpedienteRepository, LeafExpedienteRepository leafExpedienteRepository,
-         ExpedienteRepository expedienteRepository, VolumeRepository volumeRepository, VolumeInstanceRepository volumeInstanceRepository,
+         ExpedienteGroupRepository expedienteGroupRepository, LeafExpedienteRepository leafExpedienteRepository,
+         ExpedienteLeafRepository expedienteRepository, VolumeRepository volumeRepository, VolumeInstanceRepository volumeInstanceRepository,
          MetadataRepository metadataRepository, FieldRepository fieldRepository, SchemaRepository schemaRepository,
          SchemaValuesRepository schemaValuesRepository, LevelRepository levelRepository, RetentionRepository retentionRepository,
          UserGroupRepository userGroupRepository, SingleUserRepository singleUserRepository, Numerator numerator, PasswordEncoder passwordEncoder)
@@ -138,7 +138,7 @@ public class DataGenerator implements HasLogger
       this.claseRepository               = claseRepository;
 //      this.baseExpedienteRepository      = baseExpedienteRepository;
       this.expedienteIndexRepository     = expedienteIndexRepository;
-      this.branchExpedienteRepository    = branchExpedienteRepository;
+      this.expedienteGroupRepository    = expedienteGroupRepository;
 //      this.leafExpedienteRepository      = leafExpedienteRepository;
       this.expedienteRepository          = expedienteRepository;
       this.volumeRepository              = volumeRepository;
@@ -193,7 +193,7 @@ public class DataGenerator implements HasLogger
 
          Schema.EMPTY.setTenant(tenant1);
          Schema.EMPTY.buildCode();
-         schemaRepository.saveAndFlush(Schema.EMPTY);    
+         schemaRepository.saveAndFlush(Schema.EMPTY);
          SchemaValues.EMPTY.setTenant(tenant1);
          schemaValuesRepository.saveAndFlush(SchemaValues.EMPTY);
 
@@ -247,7 +247,7 @@ public class DataGenerator implements HasLogger
          ExpedienteGenerator  expedienteGenerator =
                new ExpedienteGenerator(
                      claseRepository, jcrSession, expedienteIndexRepository,
-                     branchExpedienteRepository, expedienteRepository,
+                     expedienteGroupRepository, expedienteRepository,
                      volumeRepository, volumeInstanceRepository, schemaRepository
                      );
 

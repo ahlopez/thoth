@@ -14,40 +14,40 @@ import org.springframework.stereotype.Service;
 
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
-import com.f.thoth.backend.data.gdoc.expediente.BranchExpediente;
+import com.f.thoth.backend.data.gdoc.expediente.ExpedienteGroup;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
-import com.f.thoth.backend.repositories.BranchExpedienteRepository;
+import com.f.thoth.backend.repositories.ExpedienteGroupRepository;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
 
 @Service
-public class BranchExpedienteService implements FilterableCrudService<BranchExpediente>, PermissionService<BranchExpediente>
+public class ExpedienteGroupService implements FilterableCrudService<ExpedienteGroup>, PermissionService<ExpedienteGroup>
 {
-   private final BranchExpedienteRepository   branchExpedienteRepository;
+   private final ExpedienteGroupRepository   expedienteGroupRepository;
    private final PermissionRepository         permissionRepository;
    private final ObjectToProtectRepository    objectToProtectRepository;
 
    @Autowired
-   public BranchExpedienteService(BranchExpedienteRepository   branchExpedienteRepository,
+   public ExpedienteGroupService(ExpedienteGroupRepository   expedienteGroupRepository,
                                   PermissionRepository         permissionRepository,
                                   ObjectToProtectRepository    objectToProtectRepository)
    {
-      this.branchExpedienteRepository  = branchExpedienteRepository;
+      this.expedienteGroupRepository  = expedienteGroupRepository;
       this.permissionRepository        = permissionRepository;
       this.objectToProtectRepository   = objectToProtectRepository;
-   }//BranchExpedienteService constructor
+   }//ExpedienteGroupService constructor
 
 
-   @Override public Page<BranchExpediente> findAnyMatching(Optional<String> filter, Pageable pageable)
+   @Override public Page<ExpedienteGroup> findAnyMatching(Optional<String> filter, Pageable pageable)
    {
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return branchExpedienteRepository.findByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter, pageable);
+         return expedienteGroupRepository.findByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter, pageable);
       } else {
          return find(pageable);
       }
@@ -58,40 +58,40 @@ public class BranchExpedienteService implements FilterableCrudService<BranchExpe
    {
       if (filter.isPresent()) {
          String repositoryFilter = "%" + filter.get() + "%";
-         return branchExpedienteRepository.countByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter);
+         return expedienteGroupRepository.countByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter);
       } else {
-         long n = branchExpedienteRepository.countAll(ThothSession.getCurrentTenant());
+         long n = expedienteGroupRepository.countAll(ThothSession.getCurrentTenant());
          return n;
       }
    }//countAnyMatching
 
 
-   public Page<BranchExpediente> find(Pageable pageable)
-       { return branchExpedienteRepository.findBy(ThothSession.getCurrentTenant(), pageable);}
-   
-   public BranchExpediente  findByCode(String code) { return branchExpedienteRepository.findByCode(code);}
-/*   
-   public Optional<BranchExpediente>  findParent(String parentPath) { return branchExpedienteRepository.findParent(ThothSession.getCurrentTenant(),parentPath);}
-*/
-   @Override public JpaRepository<BranchExpediente, Long> getRepository()
-       { return branchExpedienteRepository; }
+   public Page<ExpedienteGroup> find(Pageable pageable)
+       { return expedienteGroupRepository.findBy(ThothSession.getCurrentTenant(), pageable);}
 
-   @Override public BranchExpediente createNew(User currentUser)
+   public ExpedienteGroup  findByCode(String code) { return expedienteGroupRepository.findByCode(code);}
+/*
+   public Optional<ExpedienteGroup>  findParent(String parentPath) { return expedienteGroupRepository.findParent(ThothSession.getCurrentTenant(),parentPath);}
+*/
+   @Override public JpaRepository<ExpedienteGroup, Long> getRepository()
+       { return expedienteGroupRepository; }
+
+   @Override public ExpedienteGroup createNew(User currentUser)
    {
       BaseExpediente   baseExpediente   = new BaseExpediente();
       baseExpediente.setTenant(ThothSession.getCurrentTenant());
       baseExpediente.setCreatedBy(null /*TODO: currentUser*/);
 
-      BranchExpediente branchExpediente = new BranchExpediente();
-      branchExpediente.setExpediente(baseExpediente);
-      return branchExpediente;
+      ExpedienteGroup expedienteGroup = new ExpedienteGroup();
+      expedienteGroup.setExpediente(baseExpediente);
+      return expedienteGroup;
 
    }//createNew
 
-   @Override public BranchExpediente save(User currentUser, BranchExpediente expediente)
+   @Override public ExpedienteGroup save(User currentUser, ExpedienteGroup expediente)
    {
       try {
-    	  /*
+          /*
          ObjectToProtect associatedObject = expediente.getObjectToProtect();
          if ( !associatedObject.isPersisted())
             objectToProtectRepository.saveAndFlush( associatedObject);
@@ -105,30 +105,30 @@ public class BranchExpedienteService implements FilterableCrudService<BranchExpe
 
 
    //  ----- implements HierarchicalService ------
-   @Override public List<BranchExpediente>     findAll()                            {return branchExpedienteRepository.findAll(ThothSession.getCurrentTenant()); }
-   @Override public Optional<BranchExpediente> findById(Long id)                    {return branchExpedienteRepository.findById( id);}
-   @Override public List<BranchExpediente>     findByParent( BranchExpediente owner){return branchExpedienteRepository.findByParent(owner.getOwnerId()); }
-   @Override public int        countByParent ( BranchExpediente owner)              {return branchExpedienteRepository.countByParent (owner.getOwnerId()); }
-   @Override public boolean    hasChildren   ( BranchExpediente expediente)         {return branchExpedienteRepository.countByChildren(expediente.getId())> 0;}
+   @Override public List<ExpedienteGroup>     findAll()                            {return expedienteGroupRepository.findAll(ThothSession.getCurrentTenant()); }
+   @Override public Optional<ExpedienteGroup> findById(Long id)                    {return expedienteGroupRepository.findById( id);}
+   @Override public List<ExpedienteGroup>     findByParent( ExpedienteGroup owner){return expedienteGroupRepository.findByParent(owner.getOwnerId()); }
+   @Override public int        countByParent ( ExpedienteGroup owner)              {return expedienteGroupRepository.countByParent (owner.getOwnerId()); }
+   @Override public boolean    hasChildren   ( ExpedienteGroup expediente)         {return expedienteGroupRepository.countByChildren(expediente.getId())> 0;}
 
-   @Override public List<BranchExpediente> findByNameLikeIgnoreCase (Tenant tenant, String name)
-                          { return branchExpedienteRepository.findByNameLikeIgnoreCase (tenant, name); }
+   @Override public List<ExpedienteGroup> findByNameLikeIgnoreCase (Tenant tenant, String name)
+                          { return expedienteGroupRepository.findByNameLikeIgnoreCase (tenant, name); }
 
    @Override public long  countByNameLikeIgnoreCase(Tenant tenant, String name)
-                          { return branchExpedienteRepository.countByNameLikeIgnoreCase(tenant, name); }
+                          { return expedienteGroupRepository.countByNameLikeIgnoreCase(tenant, name); }
 
    //  --------  Permission handling ---------------------
 
    @Override public List<Permission> findGrants( Role role)
    {
-      List<BranchExpediente> expedientes = branchExpedienteRepository.findExpedientesGranted(role);
+      List<ExpedienteGroup> expedientes = expedienteGroupRepository.findExpedientesGranted(role);
       List<ObjectToProtect>     objects = new ArrayList<>();
       expedientes.forEach( expediente-> objects.add(expediente.getObjectToProtect()));
       return  permissionRepository.findByObjects(objects);
    }//findGrants
 
-   @Override public List<BranchExpediente> findObjectsGranted( Role role)
-             {  return branchExpedienteRepository.findExpedientesGranted(role); }
+   @Override public List<ExpedienteGroup> findObjectsGranted( Role role)
+             {  return expedienteGroupRepository.findExpedientesGranted(role); }
 
    public void grantRevoke( User currentUser, Role role, Set<Permission> newGrants, Set<Permission> newRevokes)
    {
@@ -167,4 +167,4 @@ public class BranchExpedienteService implements FilterableCrudService<BranchExpe
 
    }//revoke
 
-}//BranchExpedienteService
+}//ExpedienteGroupService

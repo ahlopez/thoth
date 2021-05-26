@@ -166,7 +166,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
   @NotNull(message = "{evidentia.open.required}")
   protected Boolean           open;                        // Is the expediente currently open?
 
-  protected String            location;                    // Signatura topográfica
+  protected String            location;                    // Physical archive location (topographic signature)
 
   protected String            keywords;                    // Search keywords
 

@@ -129,7 +129,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
    @NotNull(message = "{evidentia.dateclosed.required}")
    protected LocalDateTime      dateClosed;                 // Date expediente was closed
 
-   protected Long               owner;                      // Id of BranchExpediente to which this SUBEXPEDIENTE/VOLUMEN belongs
+   protected Long               owner;                      // Id of ExpedienteGroup to which this SUBEXPEDIENTE/VOLUMEN belongs
 
    @NotNull(message = "{evidentia.expedientecode.required}")
    protected String             expedienteCode;             // Expediente code
@@ -155,10 +155,10 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
    // ------------- Constructors ------------------
    public ExpedienteIndex()
    {
-	  this( null, null);
+          this( null, null);
    }//ExpedienteIndex null constructor
-   
-   
+
+
    public ExpedienteIndex(String code, Long owner)
    {
       super();
@@ -168,7 +168,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
 
 
    private void init(String code, Long owner)
-   { 
+   {
       LocalDateTime now        = LocalDateTime.now();
       this.code                = code;
       this.name                = "[EXPEDIENTE_INDEX]";
@@ -184,7 +184,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
       this.mac                 = "";
 
    }//init
-   
+
 
    @PrePersist
    @PreUpdate
@@ -193,7 +193,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
       objectToProtect.prepareData();
       buildCode();
    }//prepareData
-   
+
 
    @Override protected void buildCode()
    {
@@ -202,24 +202,24 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
                   //TODO: Cambiar el owner Id por el owner code
       this.code = this.path;
    }//buildCode
-   
-   
+
+
    private String  obtainExpedienteCode( String code)
    {
-	   int i = code == null? -1 : code.lastIndexOf("/");
-	   String expedienteCode = i < 0? code: code.substring(i);
-	   return expedienteCode;
+           int i = code == null? -1 : code.lastIndexOf("/");
+           String expedienteCode = i < 0? code: code.substring(i);
+           return expedienteCode;
    }//obtainExpedienteCode
 
 
    // -------------- Getters & Setters ----------------
    public void             setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect;}
-   
+
    public String           getOwnerPath()                             { return owner.toString();}
    public void             setOwner(Long owner)                       { this.owner = owner;}
-   
+
    public void             setName( String name)                      { this.name = name;}
-   
+
    public NodeType         getType()                                  { return type;}
    public void             setType( NodeType type)                    { this.type = type;}
 
@@ -246,7 +246,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
    public void             setEntries(Set<IndexEntry> entries){ this.entries = entries;}
    public int              size() { return entries.size();}
    */
-   
+
    public Boolean          getOpen()                                  { return open;}
    public Boolean          isOpen()                                   { return open;}
    public void             setOpen( Boolean open)                     { this.open = open; }
@@ -259,7 +259,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
 
    public String           getMac()                                   { return mac;}
    public void             setMac(String mac)                         { this.mac = mac;}
-   
+
 
    // --------------- Object methods ---------------------
 
@@ -275,10 +275,10 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
       return this.id != null && this.id.equals(that.id);
 
    }//equals
-   
+
 
    @Override public int hashCode() { return id == null? 4027: id.hashCode();}
-   
+
 
    @Override
    public String toString()
@@ -330,23 +330,23 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
 
    public UserGroup     getRestrictedTo() {return objectToProtect.getRestrictedTo();}
    public void          setRestrictedTo(UserGroup restrictedTo) {objectToProtect.setRestrictedTo(restrictedTo);}
-   	
 
-	// --------------------------- Implements HierarchicalEntity ---------------------------------------
 
-	@Override public String            getName()           { return name;}
+        // --------------------------- Implements HierarchicalEntity ---------------------------------------
 
-	@Override public String            getCode()           { return code;}
+        @Override public String            getName()           { return name;}
 
-	@Override public String            getOwner()          { return owner.toString();}
+        @Override public String            getCode()           { return code;}
 
-	@Override    public String         formatCode()
-	   {
-	      int i = code.lastIndexOf("/");
-	      String id = code.substring(i);
-	      id = TextUtil.replace(id, "/", "-");
-	      return id;
-	   }//formatCode
+        @Override public String            getOwner()          { return owner.toString();}
+
+        @Override    public String         formatCode()
+           {
+              int i = code.lastIndexOf("/");
+              String id = code.substring(i);
+              id = TextUtil.replace(id, "/", "-");
+              return id;
+           }//formatCode
 
 
    // -----------------  Implements NeedsProtection ----------------

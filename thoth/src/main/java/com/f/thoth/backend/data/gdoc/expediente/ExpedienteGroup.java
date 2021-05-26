@@ -26,23 +26,23 @@ import com.f.thoth.backend.data.security.UserGroup;
  */
 @Entity
 @Table(name = "BRANCH_EXPEDIENTE")
-public class BranchExpediente extends AbstractEntity implements  NeedsProtection, HierarchicalEntity<String>, Comparable<BranchExpediente>, ExpedienteType
+public class ExpedienteGroup extends AbstractEntity implements  NeedsProtection, HierarchicalEntity<String>, Comparable<ExpedienteGroup>, ExpedienteType
 {
   @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
   @NotNull  (message = "{evidentia.expediente.required}")
   protected BaseExpediente       expediente;                 // Expediente that describes this branch
 
   // ------------- Constructors ------------------
-  public BranchExpediente()
+  public ExpedienteGroup()
   {
     super();
     this.expediente = new BaseExpediente();
     setType();
-  }//BranchExpediente null constructor
+  }//ExpedienteGroup null constructor
 
 
 
-  public BranchExpediente( BaseExpediente expediente)// , Set<BaseExpediente> children)
+  public ExpedienteGroup( BaseExpediente expediente)// , Set<BaseExpediente> children)
   {
     super();
 
@@ -52,7 +52,7 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
     this.expediente = expediente;
     setType();
 
-  }//BranchExpediente constructor
+  }//ExpedienteGroup constructor
 
 
 
@@ -164,10 +164,10 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
     if (this == o)
       return true;
 
-    if (!(o instanceof BranchExpediente ))
+    if (!(o instanceof ExpedienteGroup ))
       return false;
 
-    BranchExpediente that = (BranchExpediente) o;
+    ExpedienteGroup that = (ExpedienteGroup) o;
     return this.id != null && this.id.equals(that.id);
 
   }//equals
@@ -177,7 +177,7 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
   @Override public String toString()
   {
     StringBuilder s = new StringBuilder();
-    s.append( "BranchExpediente{")
+    s.append( "ExpedienteGroup{")
      .append( super.toString())
      .append( "expediente["+ expediente.getCode())
      .append("]\n     }\n");
@@ -185,7 +185,7 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
     return s.toString();
   }//toString
 
-  @Override  public int compareTo(BranchExpediente that) { return that == null? 1: expediente.compareTo(that.getExpediente());}
+  @Override  public int compareTo(ExpedienteGroup that) { return that == null? 1: expediente.compareTo(that.getExpediente());}
 
 
   // --------------- Logic ------------------------------
@@ -205,4 +205,4 @@ public class BranchExpediente extends AbstractEntity implements  NeedsProtection
     }
   }//closeExpediente
 
-}//BranchExpediente
+}//ExpedienteGroup

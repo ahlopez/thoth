@@ -29,7 +29,7 @@ import com.vaadin.flow.data.converter.Converter;
 import com.vaadin.flow.shared.Registration;
 
 /*
-  Editor de la informacion basica de todo expediente/volumen
+  Editor de la informacion basica de todo grupo/expediente/volumen
 */
 public class BaseExpedienteEditor extends FormLayout
 {
@@ -66,9 +66,9 @@ public class BaseExpedienteEditor extends FormLayout
 
     title = new H3("(((( TITULO ))))");
     title.getElement().setAttribute("colspan", "4");
-    title.getElement().getStyle().set("background", "ivory");
-    title.getElement().getStyle().set("color",      "blue");
-    title.getElement().getStyle().set("font-weight",      "bold");
+    title.getElement().getStyle().set("background",  "ivory");
+    title.getElement().getStyle().set("color",       "blue");
+    title.getElement().getStyle().set("font-weight", "bold");
 
     TextField  name    = new TextField("Asunto");
     name.setRequired(true);
@@ -89,7 +89,6 @@ public class BaseExpedienteEditor extends FormLayout
     classCode.setErrorMessage("Código de la clase a que pertenece es obligatorio");
     classCode.getElement().setAttribute("colspan", "1");
     classCode.getElement().getStyle().set("color", "blue");
-    classCode.getElement().getStyle().set("background-color", "ivory");
     classCode.setEnabled(false);
 
     TextField  location    = new TextField("Localización");
@@ -151,7 +150,7 @@ public class BaseExpedienteEditor extends FormLayout
     keywords.setRequiredIndicatorVisible(true);
     keywords.getElement().setAttribute("colspan", "4");
 
-    buttons = createButtonsLayout();
+    buttons = configureActions();
 
     add(
         title                ,
@@ -219,14 +218,14 @@ public class BaseExpedienteEditor extends FormLayout
 
   private void initValues (BaseExpediente expediente)
   {
-    LocalDateTime now       = LocalDateTime.now();
-    LocalDateTime endOfTimes= now.plusYears(1000L);
+    LocalDateTime now        = LocalDateTime.now();
+    LocalDateTime endOfTimes = now.plusYears(1000L);
     boolean isNew  = expediente == null || expediente.getId() == null;
     boolean isOpen = isNew || expediente.getOpen();
     classCode.setValue(expediente.getClassificationClass().formatCode());
-    open.setValue( isOpen? "ABIERTO" : "CERRADO");
-    open.setEnabled(isOpen);
-    schema.setValue(expediente.getMetadataSchema());
+    open.setValue    (isOpen? "ABIERTO" : "CERRADO");
+    open.setEnabled  (isOpen);
+    schema.setValue  (expediente.getMetadataSchema());
     schema.setEnabled(isNew);
 
     theTitle = new ReadOnlyHasValue<>( text ->title.setText(text));
@@ -268,7 +267,7 @@ public class BaseExpedienteEditor extends FormLayout
   }//getTitle
 
 
-  private Component createButtonsLayout()
+  private Component configureActions()
   {
     save = new Button("Guardar Grupo");
     save.addClickShortcut (Key.ENTER);
@@ -288,7 +287,7 @@ public class BaseExpedienteEditor extends FormLayout
     buttons.getElement().setAttribute("colspan", "4");
     buttons.setWidthFull();
     return buttons;
-  }//createButtonsLayout
+  }//configureActions
 
 
   private void validateAndSave(SchemaValues metadataValues)
@@ -331,7 +330,7 @@ public class BaseExpedienteEditor extends FormLayout
   private void close()
   {  metadataEditor.setVisible(false);
      removeClassName("field-form");
-  }
+  }//close
 
   // --------------------- Events -----------------------
   public static abstract class BaseExpedienteFormEvent extends ComponentEvent<BaseExpedienteEditor>
@@ -339,44 +338,38 @@ public class BaseExpedienteEditor extends FormLayout
     private BaseExpediente baseExpediente;
 
     protected BaseExpedienteFormEvent(BaseExpedienteEditor source, BaseExpediente baseExpediente)
-    {
-      super(source, false);
-      this.baseExpediente = baseExpediente;
+    {  super(source, false);
+       this.baseExpediente = baseExpediente;
     }//BaseExpedienteFormEvent
 
     public BaseExpediente getBaseExpediente()
-    {
-      return baseExpediente;
+    { return baseExpediente;
     }
   }//BaseExpedienteFormEvent
 
   public static class SaveEvent extends BaseExpedienteFormEvent
   {
     SaveEvent(BaseExpedienteEditor source, BaseExpediente baseExpediente)
-    {
-      super(source, baseExpediente);
+    { super(source, baseExpediente);
     }
   }//SaveEvent
 
   public static class DeleteEvent extends BaseExpedienteFormEvent
   {
     DeleteEvent(BaseExpedienteEditor source, BaseExpediente baseExpediente)
-    {
-      super(source, baseExpediente);
+    { super(source, baseExpediente);
     }
   }//DeleteEvent
 
   public static class CloseEvent extends BaseExpedienteFormEvent
   {
     CloseEvent(BaseExpedienteEditor source)
-    {
-      super(source, null);
+    { super(source, null);
     }
   }//CloseEvent
 
   public <T extends ComponentEvent<?>> Registration addListener(Class<T> eventType, ComponentEventListener<T> listener)
-  {
-    return getEventBus().addListener(eventType, listener);
+  {  return getEventBus().addListener(eventType, listener);
   }//addListener
 
 }//BaseExpedienteEditor

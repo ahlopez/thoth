@@ -1,16 +1,18 @@
 package com.f.thoth.backend.data.gdoc.expediente;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import com.f.thoth.backend.data.entity.AbstractEntity;
+import com.f.thoth.backend.data.gdoc.classification.Classification;
+import com.f.thoth.backend.data.gdoc.metadata.Schema;
+import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
@@ -22,60 +24,86 @@ import com.f.thoth.backend.data.security.UserGroup;
 @Table(name = "EXPEDIENTE")
 public class Expediente  extends AbstractEntity implements  NeedsProtection, Comparable<Expediente>, ExpedienteType
 {
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+      @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
       @NotNull  (message = "{evidentia.expediente.required}")
       protected LeafExpediente       expediente;                              // Leaf expediente associated to the expediente
-
-      @NotNull  (message = "{evidentia.repopath.required}")
-      @NotBlank (message = "{evidentia.repopath.required}")
-      @NotEmpty (message = "{evidentia.repopath.required}")
-      @Size(max = 255)
-      protected String               path;                                    // Node path in document repository
-
-      protected String               location;                                // Physical archive location (topographic signature)
 
       // ------------------ Construction -----------------------
 
       public Expediente()
       {
          this.expediente = new LeafExpediente();
-         this.path       = "";
-         this.location   = "";
       }//Expediente constructor
 
-      public Expediente( LeafExpediente expediente, String path, String location)
+      public Expediente( LeafExpediente expediente)
       {
          if (expediente == null)
-            throw new IllegalArgumentException("Expediente-Hoja que define el expediente no puede ser nulo");
-
-         if ( path == null)
-            throw new IllegalArgumentException("Path del expediente en el repositorio no puede ser nulo");
-
+         {   throw new IllegalArgumentException("Expediente-Hoja que define el expediente no puede ser nulo");
+         }
          this.expediente = expediente;
-         this.path       = path;
-         this.location   = (location   == null? "" : location);
          setType();
 
       }//Expediente constructor
 
       // ---------------------- getters & setters ---------------------
-      public LeafExpediente    getExpediente()              { return expediente;}
+      public LeafExpediente    getExpediente()                         { return expediente;}
       public void              setExpediente(LeafExpediente expediente){ this.expediente = expediente;}
-  	  	
-      @Override public Nature    getType()                    { return expediente == null? null: expediente.getType();}
-      @Override public boolean isOfType( Nature type)         { return expediente != null && expediente.isOfType(type);}
 
-      public String            getPath()                    { return path;}
-      public void              setPath ( String path)       { this.path = path;}
-
-      public String            getLocation()                { return location;}
-      public void              setLocation(String location) { this.location = location;}
-  	
       private void             setType()
       {
-  		if( expediente != null && !isOfType(Nature.EXPEDIENTE))
-  			expediente.setType(Nature.EXPEDIENTE);
-  	  }//setType
+      if( expediente != null && !isOfType(Nature.EXPEDIENTE))
+        expediente.setType(Nature.EXPEDIENTE);
+      }//setType
+
+
+  // ------------------------ Hereda de LeafExpediente -------------------------
+
+  public void              setName ( String name)                     { expediente.setName(name);}
+
+  @Override public Nature  getType()                                  { return expediente == null? null: expediente.getType();}
+  @Override public boolean isOfType( Nature type)                     { return expediente != null && expediente.isOfType(type);}
+  public void              setType ( Nature type)                     { expediente.setType(Nature.EXPEDIENTE);}
+
+  public Boolean           getOpen()                                  { return expediente.getOpen();}
+  public void              setOpen ( Boolean open)                    { expediente.setOpen(open);}
+
+  public void              setObjectToProtect(ObjectToProtect objectToProtect) { expediente.setObjectToProtect(objectToProtect);}
+
+  public Long              getOwnerId()                               { return expediente.getOwnerId();}
+  public void              setOwnerId(Long ownerId)                   { expediente.setOwnerId(ownerId);}
+
+  public Classification    getClassificationClass()                   { return expediente.getClassificationClass();}
+  public void              setClassificationClass( Classification classificationClass) { expediente.setClassificationClass(classificationClass);}
+
+  public User              getCreatedBy()                             { return expediente.getCreatedBy();}
+  public void              setCreatedBy( User createdBy)              { expediente.setCreatedBy(createdBy);}
+
+  public LocalDateTime     getDateOpened()                            { return expediente.getDateOpened();}
+  public void              setDateOpened( LocalDateTime dateOpened)   { expediente.setDateOpened(dateOpened);}
+
+  public LocalDateTime     getDateClosed()                            { return expediente.getDateClosed();}
+  public void              setDateClosed( LocalDateTime dateClosed)   { expediente.setDateClosed(dateClosed);}
+
+  public Schema            getMetadataSchema()                        { return expediente.getMetadataSchema();}
+  public void              setMetadataSchema ( Schema metadataSchema) { expediente.setMetadataSchema(metadataSchema);}
+
+  public SchemaValues      getMetadata()                              { return expediente.getMetadata();}
+  public void              setMetadata ( SchemaValues metadata)       { expediente.setMetadata(metadata);}
+
+  public String            getExpedienteCode()                        { return expediente.getExpedienteCode();}
+  public void              setExpedienteCode ( String expedienteCode) { expediente.setExpedienteCode(expedienteCode);}
+
+  public String            getPath()                                  { return expediente.getPath();}
+  public void              setPath ( String path)                     { expediente.setPath(path);}
+
+  public String            getKeywords()                              { return expediente.getKeywords();}
+  public void              setKeywords( String keywords)              { expediente.setKeywords(keywords);}
+
+  public String            getMac()                                   { return expediente.getMac();}
+  public void              setMac(String mac)                         { expediente.setMac(mac);}
+
+  public String            getLocation()                              { return expediente.getLocation();}
+  public void              setLocation(String location)               { expediente.setLocation(location);}
 
 
       // -----------------  Implements NeedsProtection ----------------
@@ -130,9 +158,7 @@ public class Expediente  extends AbstractEntity implements  NeedsProtection, Com
          StringBuilder s = new StringBuilder();
          s.append( "Expediente{")
           .append( super.toString())
-          .append( " expediente["+ expediente.toString()+ "]")
-          .append( " path["+ path+ "]")
-          .append( " location["  + location+ "]}\n");
+          .append( " expediente["+ expediente.toString()+ "]}");
 
          return s.toString();
       }//toString

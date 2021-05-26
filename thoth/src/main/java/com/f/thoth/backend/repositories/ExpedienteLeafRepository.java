@@ -13,7 +13,7 @@ import com.f.thoth.backend.data.gdoc.expediente.Expediente;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
 
-public interface ExpedienteRepository extends JpaRepository<Expediente, Long>
+public interface ExpedienteLeafRepository extends JpaRepository<Expediente, Long>
 {
    @Query("SELECT e FROM Expediente e "+
           "JOIN LeafExpediente leaf "+
