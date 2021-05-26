@@ -143,7 +143,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
   @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
   protected Classification    classificationClass;         // Classification class to which this expediente belongs (Subserie si TRD)
 
-  @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+  @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
   protected Schema            metadataSchema;              // Metadata Schema
 
   @OneToOne(cascade= CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)

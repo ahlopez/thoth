@@ -12,7 +12,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.Expediente;
 import com.f.thoth.backend.data.gdoc.expediente.LeafExpediente;
@@ -21,6 +20,7 @@ import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.repositories.ExpedienteLeafRepository;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
@@ -66,10 +66,8 @@ public class ExpedienteLeafService implements FilterableCrudService<Expediente>,
    }//countAnyMatching
 
 
-   public Page<Expediente> find(Pageable pageable)
-   {
-      return expedienteRepository.findAll(ThothSession.getCurrentTenant(), pageable);
-   }
+   public Page<Expediente> find(Pageable pageable){ return expedienteRepository.findAll(ThothSession.getCurrentTenant(), pageable); }
+   public Expediente  findByCode(String code) { return expedienteRepository.findByCode(ThothSession.getCurrentTenant(), code);}
 
    @Override public JpaRepository<Expediente, Long> getRepository()
    {

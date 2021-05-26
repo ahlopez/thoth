@@ -19,12 +19,14 @@ import com.f.thoth.backend.data.Role;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
+import com.f.thoth.backend.data.gdoc.expediente.Expediente;
 import com.f.thoth.backend.data.gdoc.expediente.ExpedienteGroup;
 import com.f.thoth.backend.data.gdoc.expediente.Nature;
+import com.f.thoth.backend.data.gdoc.expediente.Volume;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.service.BaseExpedienteService;
-import com.f.thoth.backend.service.ExpedienteGroupService;
 import com.f.thoth.backend.service.ClassificationService;
+import com.f.thoth.backend.service.ExpedienteGroupService;
 import com.f.thoth.backend.service.ExpedienteLeafService;
 import com.f.thoth.backend.service.SchemaService;
 import com.f.thoth.backend.service.VolumeService;
@@ -71,12 +73,15 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   private ExpedienteGroupService      expedienteGroupService;
   private ExpedienteGroupEditor       expedienteGroupEditor;
 
+  private SchemaService               schemaService;
   private BaseExpedienteService       baseExpedienteService;
   private BaseExpediente              selectedBase;
 
-  private ExpedienteLeafService           expedienteService;
+  private ExpedienteLeafService       expedienteService;
+  private ExpedienteLeafEditor        expedienteLeafEditor;
+  
   private VolumeService               volumeService;
-  private SchemaService               schemaService;
+  private VolumeEditor                volumeEditor;
 
   private VerticalLayout              content;
   private VerticalLayout              rightSection;
@@ -98,7 +103,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   public ExpedienteHierarchyView(ClassificationService   classificationService,
                                  BaseExpedienteService   baseExpedienteService,
                                  ExpedienteGroupService  expedienteGroupService,
-                                 ExpedienteLeafService       expedienteService,
+                                 ExpedienteLeafService   expedienteService,
                                  SchemaService           schemaService,
                                  VolumeService           volumeService
                                 )
@@ -170,12 +175,22 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 
   private void setupExpedienteEditor()
   {
-  }
+     this.expedienteLeafEditor  = new ExpedienteLeafEditor(expedienteGroupService, expedienteService, baseExpedienteService, schemaService, selectedClass);
+     this.expedienteLeafEditor.addListener(ExpedienteLeafEditor.CloseEvent.class, e->
+     {  rightSection.setVisible(false);
+        selectInGrid(e.getExpediente());
+     });
+  }//setupExpedienteEditor
 
 
   private void setupVolumeEditor()
   {
-  }
+     this.volumeEditor  = new VolumeEditor(expedienteGroupService, volumeService, baseExpedienteService, schemaService, selectedClass);
+     this.volumeEditor.addListener(VolumeEditor.CloseEvent.class, e->
+     {  rightSection.setVisible(false);
+        selectInGrid(e.getExpediente());
+     });
+  }//setupVolumeEditor
 
   // ---------------------  Base Expediente Selector ---------------------------
   private Component configureExpedienteSelector()
@@ -489,14 +504,16 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     {  return;
     }
     if( selectedBase.isOfType(Nature.GRUPO))
-    {
-      ExpedienteGroup selectedBranch = expedienteGroupService.findByCode(selectedBase.getCode());
+    { ExpedienteGroup selectedBranch = expedienteGroupService.findByCode(selectedBase.getCode());
       expedienteGroupEditor.editExpedienteGroup(selectedBranch);
+      
     } else if( selectedBase.isOfType(Nature.EXPEDIENTE))
-    {
+    {  Expediente selectedExpediente = expedienteService.findByCode(selectedBase.getCode());
+       expedienteLeafEditor.editExpediente(selectedExpediente);
+       
     } else if( selectedBase.isOfType(Nature.VOLUMEN))
-    {
-    }
+    { Volume selectedVolume= volumeService.findByCode(selectedBase.getCode());
+      volumeEditor.editVolume(selectedVolume);    }
 
   }//selectExpediente
 

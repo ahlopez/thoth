@@ -1,5 +1,6 @@
 package com.f.thoth.backend.data.gdoc.expediente;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -12,6 +13,9 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import com.f.thoth.backend.data.entity.AbstractEntity;
+import com.f.thoth.backend.data.gdoc.classification.Classification;
+import com.f.thoth.backend.data.gdoc.metadata.Schema;
+import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
@@ -57,9 +61,6 @@ public class Volume extends AbstractEntity implements  NeedsProtection, Comparab
    // ---------------------- getters & setters ---------------------
    public LeafExpediente            getExpediente()      { return expediente;}
    public void                      setExpediente(LeafExpediente expediente){ this.expediente = expediente;} 	
-	
-   @Override public Nature            getType()            { setType(); return expediente.getType();}
-   @Override public boolean         isOfType( Nature type) { return expediente != null && expediente.isOfType(type);}
 
    public Integer                   getCurrentInstance() { return currentInstance;}
    public void                      setCurrentInstance ( Integer currentInstance) { this.currentInstance = currentInstance;}
@@ -67,12 +68,54 @@ public class Volume extends AbstractEntity implements  NeedsProtection, Comparab
    public Set<VolumeInstance>       getInstances()       {  return instances;}
    public void                      setInstances(Set<VolumeInstance> instances) { this.instances = instances;}
  	
-   private void                     setType()
-   {
-		if( expediente != null && !isOfType(Nature.VOLUMEN))
-			expediente.setType(Nature.VOLUMEN);
-   }//setType
+   // ------------------------ Hereda de LeafExpediente -------------------------
 
+   public void              setName ( String name)                     { expediente.setName(name);}
+
+   @Override public Nature  getType()                                  { return expediente == null? null: expediente.getType();}
+   @Override public boolean isOfType( Nature type)                     { return expediente != null && expediente.isOfType(type);}
+   public void              setType ()                                 { expediente.setType(Nature.EXPEDIENTE);}
+
+   public Boolean           getOpen()                                  { return expediente.getOpen();}
+   public void              setOpen ( Boolean open)                    { expediente.setOpen(open);}
+
+   public void              setObjectToProtect(ObjectToProtect objectToProtect) { expediente.setObjectToProtect(objectToProtect);}
+
+   public Long              getOwnerId()                               { return expediente.getOwnerId();}
+   public void              setOwnerId(Long ownerId)                   { expediente.setOwnerId(ownerId);}
+
+   public Classification    getClassificationClass()                   { return expediente.getClassificationClass();}
+   public void              setClassificationClass( Classification classificationClass) { expediente.setClassificationClass(classificationClass);}
+
+   public User              getCreatedBy()                             { return expediente.getCreatedBy();}
+   public void              setCreatedBy( User createdBy)              { expediente.setCreatedBy(createdBy);}
+
+   public LocalDateTime     getDateOpened()                            { return expediente.getDateOpened();}
+   public void              setDateOpened( LocalDateTime dateOpened)   { expediente.setDateOpened(dateOpened);}
+
+   public LocalDateTime     getDateClosed()                            { return expediente.getDateClosed();}
+   public void              setDateClosed( LocalDateTime dateClosed)   { expediente.setDateClosed(dateClosed);}
+
+   public Schema            getMetadataSchema()                        { return expediente.getMetadataSchema();}
+   public void              setMetadataSchema ( Schema metadataSchema) { expediente.setMetadataSchema(metadataSchema);}
+
+   public SchemaValues      getMetadata()                              { return expediente.getMetadata();}
+   public void              setMetadata ( SchemaValues metadata)       { expediente.setMetadata(metadata);}
+
+   public String            getExpedienteCode()                        { return expediente.getExpedienteCode();}
+   public void              setExpedienteCode ( String expedienteCode) { expediente.setExpedienteCode(expedienteCode);}
+
+   public String            getPath()                                  { return expediente.getPath();}
+   public void              setPath ( String path)                     { expediente.setPath(path);}
+
+   public String            getKeywords()                              { return expediente.getKeywords();}
+   public void              setKeywords( String keywords)              { expediente.setKeywords(keywords);}
+
+   public String            getMac()                                   { return expediente.getMac();}
+   public void              setMac(String mac)                         { expediente.setMac(mac);}
+
+   public String            getLocation()                              { return expediente.getLocation();}
+   public void              setLocation(String location)               { expediente.setLocation(location);}
 
    // -----------------  Implements NeedsProtection ----------------
 
@@ -144,8 +187,6 @@ public class Volume extends AbstractEntity implements  NeedsProtection, Comparab
 
    // ----------------------- Logic --------------------------
    public void  addInstance( VolumeInstance instance) { instances.add(instance); }
-
-   public String getPath() { return expediente.getPath();}
 
 
 }//Volume

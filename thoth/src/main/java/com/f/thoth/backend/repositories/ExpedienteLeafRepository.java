@@ -22,6 +22,12 @@ public interface ExpedienteLeafRepository extends JpaRepository<Expediente, Long
    Page<Expediente> findAll( @Param("tenant") Tenant tenant, Pageable page);
 
    @Query("SELECT e FROM Expediente e "+
+          "JOIN LeafExpediente leaf ON e.expediente.id = leaf.id "+
+          "JOIN BaseExpediente base ON leaf.expediente.id = base.id "+
+          "WHERE (base.tenant = :tenant AND base.code = :code)")
+   Expediente findByCode( @Param("tenant") Tenant tenant, @Param("code") String code);
+
+   @Query("SELECT e FROM Expediente e "+
           "JOIN LeafExpediente leaf "+
           "JOIN BaseExpediente base "+
           "WHERE base.tenant = :tenant AND e.expediente.id = leaf.id AND leaf.expediente.id = base.id")
@@ -53,7 +59,7 @@ public interface ExpedienteLeafRepository extends JpaRepository<Expediente, Long
           "JOIN BaseExpediente base "+
           "WHERE ((base.ownerId IS null AND :owner IS null) OR base.ownerId = :owner) AND e.expediente.id = leaf.id AND leaf.expediente.id = base.id")
    List<Expediente> findByParent( @Param("owner") Long parentId);
-
+   
    @Query("SELECT count(*) FROM Expediente e "+
           "JOIN LeafExpediente leaf "+
           "JOIN BaseExpediente base "+

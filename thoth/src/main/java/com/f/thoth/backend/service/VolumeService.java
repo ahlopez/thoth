@@ -70,6 +70,7 @@ public class VolumeService implements FilterableCrudService<Volume>, PermissionS
 
 
    public Page<Volume> find(Pageable pageable) { return volumeRepository.findAll(ThothSession.getCurrentTenant(), pageable); }
+   public Volume  findByCode(String code)      { return volumeRepository.findByCode(ThothSession.getCurrentTenant(), code);}
 
    @Override public JpaRepository<Volume, Long> getRepository() { return volumeRepository; }
 
