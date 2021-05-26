@@ -253,9 +253,9 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
   }//prepareData
 
 
-  @Override protected void buildCode()
+  @Override public void buildCode()
   {
-    if (expedienteCode == null)
+    if (code == null)
     {
       String seqKey = Numerator.sequenceName( classificationClass.getTenant(),  null , classificationClass.getRootCode()+ "-"+ LocalDate.now().getYear(), "E");
       Numerator numerador = Numerator.getInstance();
@@ -373,22 +373,24 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
   @Override  public int compareTo(BaseExpediente that)
   {
-    return this.equals(that)?  0 :
-      that == null?       1 :
-        this.code.compareTo(that.code);
+    return this.equals(that)
+           ?  0 
+           :  that == null
+           ?  1 
+           :  this.code.compareTo(that.code);
   }// compareTo
 
 
   // ------------------ code & path -------------------------
   public String            formatCode()
   {
-  String formattedCode = "";
-  if (code != null)
-  {
-       int i = TextUtil.indexOf(code, "/", 3);
-       formattedCode = TextUtil.replace(code.substring(i+1), "/", "-");
-  }
-    return formattedCode;
+     String formattedCode = "";
+     if (code != null)
+     {
+        int i = TextUtil.indexOf(code, "/", 4);
+        formattedCode = TextUtil.replace(code.substring(i), "/", "-");
+     }
+     return formattedCode;
   }//formatCode
 
   // -----------------  Implements NeedsProtection ----------------

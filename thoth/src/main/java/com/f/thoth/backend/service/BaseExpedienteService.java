@@ -107,15 +107,12 @@ public class BaseExpedienteService implements FilterableCrudService<BaseExpedien
 	//  ----- implements HierarchicalService ------
 	@Override public List<BaseExpediente>     findAll()                           {return baseExpedienteRepository.findAll(ThothSession.getCurrentTenant());}
 	@Override public Optional<BaseExpediente> findById(Long id)                   {return baseExpedienteRepository.findById( id);}
+
 	@Override public List<BaseExpediente>     findByParent( BaseExpediente owner) {return baseExpedienteRepository.findByParent(owner.getId()); }
-	@Override public int                      countByParent(BaseExpediente owner) {return baseExpedienteRepository.countByParent(owner.getId());}
-	@Override public boolean                  hasChildren( BaseExpediente expediente){return  baseExpedienteRepository.countByChildren(expediente.getId()) > 0; }
-	public boolean hasChildren( BaseExpediente expediente, Classification clase) 
-	{ 
-		int count = expediente != null?  baseExpedienteRepository.countByChildren(expediente.getId()) :
-		                                 baseExpedienteRepository.countByClass(clase);
-		return count > 0;
-	}//hasChildren
+	@Override public int                      countByParent(BaseExpediente owner) {return baseExpedienteRepository.countByParent(owner.getId()); }
+   @Override public boolean               hasChildren( BaseExpediente expediente){return baseExpedienteRepository.countByChildren(expediente.getId()) > 0; }
+   public boolean                         hasChildren( Classification clase)     {return baseExpedienteRepository.countByClass(clase) > 0; }
+	public boolean   hasChildren( BaseExpediente expediente, Classification clase){return expediente != null?  hasChildren(expediente) : hasChildren(clase);}
 
 	@Override public List<BaseExpediente> findByNameLikeIgnoreCase (Tenant tenant, String name)
 	{ return baseExpedienteRepository.findByNameLikeIgnoreCase (tenant, name);}
@@ -123,8 +120,9 @@ public class BaseExpedienteService implements FilterableCrudService<BaseExpedien
 	@Override public long  countByNameLikeIgnoreCase(Tenant tenant, String name)
 	{ return baseExpedienteRepository.countByNameLikeIgnoreCase(tenant, name);}
 
-	public List<BaseExpediente>   findByClass (Classification clase)         {return baseExpedienteRepository.findByClass(clase);}
-	public int                    countByClass(Classification clase)         {return baseExpedienteRepository.countByClass(clase);}
+	public List<BaseExpediente>   findByClass (Classification clase){ return baseExpedienteRepository.findByClass(clase);}
+
+	public int                    countByClass(Classification clase){ return baseExpedienteRepository.countByClass(clase); }
 
 	public List<BaseExpediente>   findByNameLikeIgnoreCase (Tenant tenant, String name, Classification clase)
 	{ return baseExpedienteRepository.findByNameLikeIgnoreCase (tenant, name, clase);}

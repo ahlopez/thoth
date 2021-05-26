@@ -161,7 +161,7 @@ public class ExpedienteGenerator implements HasLogger
 
    private BranchExpediente creeBranchExpediente(Tenant tenant, User user, Classification classificationClass, Long ownerId)
    {
-      BaseExpediente   base   = createBase( classificationClass, user, ownerId);
+      BaseExpediente   base   = createBase( classificationClass, user, ownerId);      base.buildCode();
       BranchExpediente branch = new BranchExpediente();
       branch.setExpediente(base);
       branchExpedienteRepository.saveAndFlush(branch);
@@ -204,8 +204,6 @@ public class ExpedienteGenerator implements HasLogger
 	   LocalDateTime  now      =   LocalDateTime.now();
       BaseExpediente base     =   new BaseExpediente();
       base.setExpedienteCode      (buildExpedienteCode(base, classificationClass));
-      base.setPath                (buildExpedientePath(base, base.getExpedienteCode()));
-      base.setCode                (base.getPath());
       base.setName                (generateName());
       base.setObjectToProtect     (new ObjectToProtect());
       base.setCreatedBy           (user);
@@ -218,6 +216,7 @@ public class ExpedienteGenerator implements HasLogger
       base.setOpen                (true);
       base.setKeywords            (generateKeywords());
       base.setMac                 (generateMac());
+      base.buildCode();
 
       ExpedienteIndex idx = base.createIndex();
       expedienteIndexRepository.saveAndFlush(idx);
@@ -287,14 +286,6 @@ public class ExpedienteGenerator implements HasLogger
       nInstances++;
       return instance;
    }//createVolumeInstance
-
-
-
-   private String buildExpedientePath(BaseExpediente padre, String expedienteCode)
-   {
-      String path = padre.getPath() + expedienteCode;
-      return path;
-   }//buildExpedientePath
 
 
 

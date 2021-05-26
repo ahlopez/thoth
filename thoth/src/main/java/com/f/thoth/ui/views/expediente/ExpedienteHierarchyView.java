@@ -160,7 +160,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 
   private void setupBranchEditor()
   {
-    this.branchExpedienteEditor  = new BranchExpedienteEditor(branchExpedienteService, schemaService, selectedClass);
+    this.branchExpedienteEditor  = new BranchExpedienteEditor(branchExpedienteService, baseExpedienteService, schemaService, selectedClass);
     this.branchExpedienteEditor.addListener(BranchExpedienteEditor.CloseEvent.class, e->
     {  rightSection.setVisible(false);
        selectInGrid(e.getExpediente());
@@ -253,7 +253,11 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   private void setupTreeListeners(TreeGrid<BaseExpediente> tGrid)
   {
     tGrid.addItemClickListener      ( e-> tGrid.select  (e.getItem()));
-    tGrid.addItemDoubleClickListener( e-> tGrid.deselect(e.getItem()));
+    tGrid.addItemDoubleClickListener( e-> 
+    {  tGrid.deselect(e.getItem());
+       selectedBase = null;
+       updateActions();
+    });
     tGrid.addExpandListener         ( e-> expandedNodes.addAll(e.getItems()));
     tGrid.addSelectionListener      ( e->
     {
@@ -387,6 +391,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 
   private void updateActions()
   {
+    rightSection.setVisible(selectedBase != null);
     classActions.setVisible( selectedBase == null);
     groupActions.setVisible( selectedBase != null && selectedBase.isOfType(Nature.GRUPO));
   }//updateActions
@@ -487,7 +492,6 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     if( selectedBase != null && selectedBase.isOfType(Nature.GRUPO))
     {
       BranchExpediente selectedBranch = branchExpedienteService.findByCode(selectedBase.getCode());
-      rightSection.setVisible(true);
       branchExpedienteEditor.editBranchExpediente(selectedBranch);
     }
 

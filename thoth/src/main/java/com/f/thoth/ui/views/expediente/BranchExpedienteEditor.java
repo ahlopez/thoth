@@ -10,6 +10,7 @@ import com.f.thoth.backend.data.gdoc.expediente.Nature;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
+import com.f.thoth.backend.service.BaseExpedienteService;
 import com.f.thoth.backend.service.BranchExpedienteService;
 import com.f.thoth.backend.service.SchemaService;
 import com.f.thoth.ui.components.Notifier;
@@ -22,6 +23,7 @@ import com.vaadin.flow.shared.Registration;
 public class BranchExpedienteEditor extends VerticalLayout
 {
   private BranchExpedienteService     branchExpedienteService;
+  private BaseExpedienteService       baseExpedienteService;
   private SchemaService               schemaService;
 
   private BranchExpediente            currentBranch;
@@ -33,11 +35,13 @@ public class BranchExpedienteEditor extends VerticalLayout
 
 
   public BranchExpedienteEditor( BranchExpedienteService branchExpedienteService,
-                                 SchemaService schemaService,
-                                 Classification classificationClass
+                                 BaseExpedienteService   baseExpedienteService,
+                                 SchemaService           schemaService,
+                                 Classification          classificationClass
                                )
   {
     this.branchExpedienteService = branchExpedienteService;
+    this.baseExpedienteService   = baseExpedienteService;
     this.schemaService           = schemaService;
     this.currentUser             = ThothSession.getCurrentUser();
     this.classificationClass     = classificationClass;
@@ -88,7 +92,7 @@ public class BranchExpedienteEditor extends VerticalLayout
     newBranch.setMetadata            (null);
     newBranch.setDateOpened          (now);
     newBranch.setDateClosed          (now.plusYears(1000L));
-    newBranch.setOwnerId             ( parentBranch == null? null : parentBranch.getId());
+    newBranch.setOwnerId             ( parentBranch == null? null : parentBranch.getExpediente().getId());
     newBranch.setOpen                (true);
     newBranch.setKeywords            ("keyword1, keyword2, keyword3");
     newBranch.setMac                 ("[mac]");
@@ -120,9 +124,9 @@ public class BranchExpedienteEditor extends VerticalLayout
         Long parentId = base.getOwnerId();
         if (parentId != null)
         {
-           Optional<BranchExpediente> parentBranch = branchExpedienteService.findById( parentId);
-           if(parentBranch.isPresent())
-           { return parentBranch.get().formatCode();
+           Optional<BaseExpediente> parent = baseExpedienteService.findById( parentId);
+           if(parent.isPresent())
+           { return parent.get().formatCode();
            }
        }
        return base.getClassificationClass().formatCode();
