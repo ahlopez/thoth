@@ -91,11 +91,6 @@ public class ExpedienteGroupService implements FilterableCrudService<ExpedienteG
    @Override public ExpedienteGroup save(User currentUser, ExpedienteGroup expediente)
    {
       try {
-          /*
-         ObjectToProtect associatedObject = expediente.getObjectToProtect();
-         if ( !associatedObject.isPersisted())
-            objectToProtectRepository.saveAndFlush( associatedObject);
-          */
          return FilterableCrudService.super.save(currentUser, expediente);
       } catch (DataIntegrityViolationException e) {
          throw new UserFriendlyDataException("Ya hay un expediente con esa identificación. Por favor escoja un identificador único para el expediente");

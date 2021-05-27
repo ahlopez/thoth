@@ -20,12 +20,14 @@ public interface VolumeRepository extends JpaRepository<Volume, Long>
           "JOIN BaseExpediente base "+
           "WHERE base.tenant = :tenant AND v.expediente.id = leaf.id AND leaf.expediente.id = base.id")
    Page<Volume> findAll( @Param("tenant") Tenant tenant, Pageable page);
+   
 
    @Query("SELECT v FROM Volume v "+
-          "JOIN LeafExpediente leaf "+
-          "JOIN BaseExpediente base "+
-          "WHERE base.tenant = :tenant AND v.expediente.id = leaf.id AND leaf.expediente.id = base.id AND base.code = :code")
+          "JOIN LeafExpediente leaf ON v.expediente.id = leaf.id "+
+          "JOIN BaseExpediente base ON leaf.expediente.id = base.id "+
+          "WHERE (base.tenant = :tenant AND base.code = :code)")
    Volume findByCode( @Param("tenant") Tenant tenant, @Param("code") String code);
+
 
    @Query("SELECT v FROM Volume v "+
           "JOIN LeafExpediente leaf "+

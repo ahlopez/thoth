@@ -131,6 +131,8 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     rightSection.setWidth("35%");
     rightSection.add(new H3("RIGHT SECTION"));
     rightSection.add(expedienteGroupEditor);
+    rightSection.add(expedienteLeafEditor);
+    rightSection.add(volumeEditor);
     rightSection.setVisible(false);
 
     content = new VerticalLayout();
@@ -268,12 +270,17 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 
   private void setupTreeListeners(TreeGrid<BaseExpediente> tGrid)
   {
-    tGrid.addItemClickListener      ( e-> tGrid.select  (e.getItem()));
     tGrid.addItemDoubleClickListener( e->
-    {  tGrid.deselect(e.getItem());
-       selectedBase = null;
-       updateActions();
+    {  BaseExpediente b = e.getItem();
+       if ( b != null  && b.equals(selectedBase))
+       {  tGrid.deselect(e.getItem());
+          selectedBase = null;
+          updateActions();
+      }else
+      { tGrid.select(b);
+      }
     });
+    tGrid.addItemClickListener      ( e-> tGrid.select  (e.getItem()));
     tGrid.addExpandListener         ( e-> expandedNodes.addAll(e.getItems()));
     tGrid.addSelectionListener      ( e->
     {
@@ -387,6 +394,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     selectedBase = null;
     resetSearch();
     dataProvider.refreshAll();
+    selectEditor();
   }//refresh
 
 
@@ -402,10 +410,20 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 
   private void updateActions()
   {
-    rightSection.setVisible(selectedBase != null);
+    rightSection.setVisible( selectedBase != null);
     classActions.setVisible( selectedBase == null);
     groupActions.setVisible( selectedBase != null && selectedBase.isOfType(Nature.GRUPO));
+    selectEditor();
   }//updateActions
+  
+  
+  private void selectEditor()
+  {
+     Nature type = selectedBase == null? null : selectedBase.getType();
+     expedienteGroupEditor.setVisible(Nature.GRUPO.equals(type));
+     expedienteLeafEditor.setVisible (Nature.EXPEDIENTE.equals(type));
+     volumeEditor.setVisible         (Nature.VOLUMEN.equals(type));
+  }//selectEditor
 
 
   private Component configureClassActions  (HorizontalLayout classActions)
@@ -500,20 +518,24 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   private void selectExpediente(BaseExpediente selectedBase)
   {
     updateActions();
-    if ( selectedBase == null )
-    {  return;
+    if ( selectedBase != null )
+    {  
+       switch (selectedBase.getType())
+       {
+       case GRUPO:
+         ExpedienteGroup selectedBranch = expedienteGroupService.findByCode(selectedBase.getCode());
+         expedienteGroupEditor.editExpedienteGroup(selectedBranch);
+         break;
+       case EXPEDIENTE:
+         Expediente selectedExpediente = expedienteService.findByCode(selectedBase.getCode());
+         expedienteLeafEditor.editExpediente(selectedExpediente);
+         break;
+       case VOLUMEN:
+         Volume selectedVolume= volumeService.findByCode(selectedBase.getCode());
+         volumeEditor.editVolume(selectedVolume);  
+       default:
+       }
     }
-    if( selectedBase.isOfType(Nature.GRUPO))
-    { ExpedienteGroup selectedBranch = expedienteGroupService.findByCode(selectedBase.getCode());
-      expedienteGroupEditor.editExpedienteGroup(selectedBranch);
-      
-    } else if( selectedBase.isOfType(Nature.EXPEDIENTE))
-    {  Expediente selectedExpediente = expedienteService.findByCode(selectedBase.getCode());
-       expedienteLeafEditor.editExpediente(selectedExpediente);
-       
-    } else if( selectedBase.isOfType(Nature.VOLUMEN))
-    { Volume selectedVolume= volumeService.findByCode(selectedBase.getCode());
-      volumeEditor.editVolume(selectedVolume);    }
 
   }//selectExpediente
 
@@ -521,6 +543,8 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   private void closeAll()
   {
     expedienteGroupEditor.closeEditor();
+    expedienteLeafEditor.closeEditor();
+    volumeEditor.closeEditor();
     resetSelector();
   }//closeAll
 

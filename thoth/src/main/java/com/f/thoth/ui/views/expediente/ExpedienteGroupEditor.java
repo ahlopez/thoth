@@ -173,6 +173,7 @@ public class ExpedienteGroupEditor extends VerticalLayout
   public void closeEditor()
   {
     baseExpedienteEditor.setVisible(false);
+    setVisible(false);
     fireEvent(new CloseEvent(this, currentGroup));
     currentGroup = null;
   }//closeEditor

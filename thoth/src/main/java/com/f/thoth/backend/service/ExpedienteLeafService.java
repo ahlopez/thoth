@@ -28,14 +28,14 @@ import com.f.thoth.backend.repositories.PermissionRepository;
 @Service
 public class ExpedienteLeafService implements FilterableCrudService<Expediente>, PermissionService<Expediente>
 {
-   private final ExpedienteLeafRepository           expedienteRepository;
+   private final ExpedienteLeafRepository       expedienteRepository;
    private final PermissionRepository           permissionRepository;
    private final ObjectToProtectRepository      objectToProtectRepository;
 
    @Autowired
-   public ExpedienteLeafService(ExpedienteLeafRepository       expedienteRepository,
-                            PermissionRepository       permissionRepository,
-                            ObjectToProtectRepository  objectToProtectRepository)
+   public ExpedienteLeafService(ExpedienteLeafRepository   expedienteRepository,
+                                PermissionRepository       permissionRepository,
+                                ObjectToProtectRepository  objectToProtectRepository)
    {
       this.expedienteRepository        = expedienteRepository;
       this.permissionRepository        = permissionRepository;
@@ -89,16 +89,13 @@ public class ExpedienteLeafService implements FilterableCrudService<Expediente>,
       return expediente;
    }//createNew
 
-   @Override public Expediente save(User currentUser, Expediente Expediente)
+   @Override public Expediente save(User currentUser, Expediente expediente)
    {
-      try {
-         ObjectToProtect associatedObject = Expediente.getObjectToProtect();
-         if ( !associatedObject.isPersisted())
-            objectToProtectRepository.saveAndFlush( associatedObject);
-
-         return FilterableCrudService.super.save(currentUser, Expediente);
+      try 
+      {
+         return FilterableCrudService.super.save(currentUser, expediente);
       } catch (DataIntegrityViolationException e) {
-         throw new UserFriendlyDataException("Ya hay un expediente con esa identificaciÃ³n. Por favor escoja un identificador Ãºnico para el expediente");
+         throw new UserFriendlyDataException("Ya hay un expediente con esa identificación. Por favor escoja un identificador único para el expediente");
       }
 
    }//save

@@ -99,7 +99,7 @@ public class ExpedienteLeafEditor extends VerticalLayout
      newExpediente.setDateClosed          (now.plusYears(1000L));
      newExpediente.setOwnerId             ( parentGroup == null? null : parentGroup.getExpediente().getId());
      newExpediente.setOpen                (true);
-     newExpediente.setKeywords            ("keyword1, keyword2, keyword3");
+     newExpediente.setKeywords            ("keyword4, keyword5, keyword6");
      newExpediente.setMac                 ("[mac]");
      return newExpediente;
 

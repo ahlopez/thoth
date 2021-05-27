@@ -269,7 +269,7 @@ public class BaseExpedienteEditor extends FormLayout
 
   private Component configureActions()
   {
-    save = new Button("Guardar Grupo");
+    save = new Button("Guardar");
     save.addClickShortcut (Key.ENTER);
     save.addThemeVariants  (ButtonVariant.LUMO_PRIMARY);
     save.getElement().getStyle().set("margin-left", "auto");

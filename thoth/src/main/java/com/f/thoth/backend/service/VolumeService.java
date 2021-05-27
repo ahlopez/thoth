@@ -92,10 +92,6 @@ public class VolumeService implements FilterableCrudService<Volume>, PermissionS
    {
       try
       {
-         ObjectToProtect associatedObject = Volume.getObjectToProtect();
-         if ( !associatedObject.isPersisted())
-            objectToProtectRepository.saveAndFlush( associatedObject);
-
          return FilterableCrudService.super.save(currentUser, Volume);
       } catch (DataIntegrityViolationException e)
       {
