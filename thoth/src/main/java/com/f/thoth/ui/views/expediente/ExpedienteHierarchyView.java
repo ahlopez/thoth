@@ -535,7 +535,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
          volumeEditor.editVolume(selectedVolume);  
        default:
        }
-    }
+    }// if selectedBase != null
 
   }//selectExpediente
 

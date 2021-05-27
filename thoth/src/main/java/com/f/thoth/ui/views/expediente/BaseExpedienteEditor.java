@@ -81,7 +81,7 @@ public class BaseExpedienteEditor extends FormLayout
     expedienteCode.setRequiredIndicatorVisible(false);
     expedienteCode.getElement().setAttribute("colspan", "1");
     expedienteCode.getElement().getStyle().set("color", "blue");
-    expedienteCode.setEnabled(false);
+    expedienteCode.setReadOnly(true);
 
     classCode= new TextField("Clase");
     classCode.setRequired(true);
@@ -89,7 +89,7 @@ public class BaseExpedienteEditor extends FormLayout
     classCode.setErrorMessage("Código de la clase a que pertenece es obligatorio");
     classCode.getElement().setAttribute("colspan", "1");
     classCode.getElement().getStyle().set("color", "blue");
-    classCode.setEnabled(false);
+    classCode.setReadOnly(true);
 
     TextField  location    = new TextField("Localización");
     location.setRequired(false);
