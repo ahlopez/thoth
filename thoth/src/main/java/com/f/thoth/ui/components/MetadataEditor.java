@@ -1,6 +1,5 @@
 package com.f.thoth.ui.components;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,17 +15,15 @@ import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.combobox.ComboBox;
-import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.shared.Registration;
 
 public class MetadataEditor extends VerticalLayout
 {
    private Schema                schema         = null;
+   private SchemaValues          schemaValues   = null;
    private Component             schemaFields   = null;
    private Schema.Exporter       schemaExporter = new SchemaToVaadinExporter();
    private SchemaValues.Exporter valuesExporter = new SchemaValuesToVaadinExporter();
@@ -53,8 +50,9 @@ public class MetadataEditor extends VerticalLayout
 
    public Component getEditor( Schema schema, SchemaValues values)
    {
-      this.schema      =  schema;
-      this.schemaFields=  values != null && !SchemaValues.EMPTY.equals(values) 
+      this.schema       = schema;
+      this.schemaValues = values;
+      this.schemaFields = values != null && !SchemaValues.EMPTY.equals(values) 
                                  ? (Component)values.export(valuesExporter)
                                  :  schema == null
                                  ?  new FormLayout() 
@@ -66,7 +64,7 @@ public class MetadataEditor extends VerticalLayout
 
    private void endEditing()
    {
-      this.schema = null;
+      this.schema       = null;
       this.schemaFields = null;
       setVisible(false);
       removeClassName("field-form");
@@ -74,10 +72,15 @@ public class MetadataEditor extends VerticalLayout
 
 
    public SchemaValues validateAndSave()
-   {       
-      SchemaValues vals = schemaFields == null? null:  new SchemaValues(schema, getValuesFromFields(schemaFields));
+   {  
+      String sVals =  schemaFields == null? null : getValuesFromFields(schemaFields);
+      if (schemaValues == null)
+      {  schemaValues = new SchemaValues(schema, sVals );
+      }else
+      {  schemaValues.setValues(sVals);
+      }
       endEditing();
-      return vals;
+      return schemaValues;
    }//validateAndSave
 
 
@@ -100,12 +103,10 @@ public class MetadataEditor extends VerticalLayout
          if (i++ > 0)
          {  values.append(Constant.VALUE_SEPARATOR);
          }
-          
-        /*
+         
          Object  val = ((HasValue<?,?>)field).getValue();
          values.append( val == null? Constant.NULL_VALUE: val.toString());
-         */
-      
+         /*
          String valor=""; 
          if( field instanceof DateTimePicker)
          {  LocalDateTime val = ((DateTimePicker)field).getValue(); 
@@ -116,10 +117,9 @@ public class MetadataEditor extends VerticalLayout
          }else if (field instanceof ComboBox)
          {  @SuppressWarnings("unchecked") String val = ((ComboBox<String>)field).getValue();
             valor = val == null?  Constant.NULL_VALUE : val;       
-         }
-          
+         } 
          values.append(valor);
-       
+         */
       }
 
       return values == null? null: values.toString();

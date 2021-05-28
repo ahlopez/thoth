@@ -162,7 +162,7 @@ public class VolumeEditor extends VerticalLayout
    private void deleteVolume(BaseExpedienteEditor.DeleteEvent event)
    {
      BaseExpediente volumen = event.getBaseExpediente();
-     if (volumen.isOfType(Nature.VOLUMEN) && volumen.isPersisted())
+     if (volumen != null && volumen.isOfType(Nature.VOLUMEN) && volumen.isPersisted())
      {
        if (!volumeService.hasChildren(currentVolume))
        {  volumeService.delete(currentUser, currentVolume);

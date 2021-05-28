@@ -115,8 +115,7 @@ public class BaseExpedienteEditor extends FormLayout
       if (metaSelected)
       {
         selectedExpediente.setMetadataSchema(selectedSchema);
-        selectedExpediente.setMetadata(null);
-        metadataEditor.editMetadata(selectedSchema, null);
+        metadataEditor.editMetadata(selectedSchema, selectedExpediente.getMetadata());
       }
      });
     schema.setItemLabelGenerator(e-> e.getName());

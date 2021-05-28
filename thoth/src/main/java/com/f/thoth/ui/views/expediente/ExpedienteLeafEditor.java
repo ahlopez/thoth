@@ -168,7 +168,7 @@ public class ExpedienteLeafEditor extends VerticalLayout
        {  expedienteLeafService.delete(currentUser, currentExpediente);
           notifier.show("Expediente "+ expediente.formatCode()+ " eliminado",    "notifier-accept",  3000,  Notification.Position.BOTTOM_CENTER);
        }else
-       {  notifier.error("Expediente no puede ser eliminado pues tiene documentos");
+       {  notifier.error("Expediente no puede ser eliminado pues contiene documentos");
        }
      }
      closeEditor();
