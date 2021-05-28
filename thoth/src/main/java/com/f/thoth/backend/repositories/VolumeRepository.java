@@ -16,41 +16,30 @@ import com.f.thoth.backend.data.security.Tenant;
 public interface VolumeRepository extends JpaRepository<Volume, Long>
 {
    @Query("SELECT v FROM Volume v "+
-          "JOIN LeafExpediente leaf "+
           "JOIN BaseExpediente base "+
-          "WHERE base.tenant = :tenant AND v.expediente.id = leaf.id AND leaf.expediente.id = base.id")
+          "WHERE base.tenant = :tenant")
    Page<Volume> findAll( @Param("tenant") Tenant tenant, Pageable page);
-   
-
-   @Query("SELECT v FROM Volume v "+
-          "JOIN LeafExpediente leaf ON v.expediente.id = leaf.id "+
-          "JOIN BaseExpediente base ON leaf.expediente.id = base.id "+
-          "WHERE (base.tenant = :tenant AND base.code = :code)")
-   Volume findByCode( @Param("tenant") Tenant tenant, @Param("code") String code);
 
 
    @Query("SELECT v FROM Volume v "+
-          "JOIN LeafExpediente leaf "+
-          "JOIN BaseExpediente base "+
-          "WHERE base.tenant = :tenant AND v.expediente.id = leaf.id AND leaf.expediente.id = base.id")
+          "WHERE v.expediente.code = :code")
+   Volume findByCode( @Param("code") String code);
+
+
+   @Query("SELECT v FROM Volume v "+
+          "WHERE v.expediente.tenant = :tenant")
    List<Volume> findAll( @Param("tenant") Tenant tenant);
 
    @Query("SELECT COUNT(v) FROM Volume v "+
-          "JOIN LeafExpediente leaf "+
-          "JOIN BaseExpediente base "+
-          "WHERE base.tenant = :tenant AND v.expediente.id = leaf.id AND leaf.expediente.id = base.id")
+          "WHERE v.expediente.tenant = :tenant")
    long countAll( @Param("tenant") Tenant tenant);
 
    @Query("SELECT v FROM Volume v "+
-          "JOIN LeafExpediente leaf "+
-          "JOIN BaseExpediente base "+
-          "WHERE base.tenant = :tenant AND lower(base.name) LIKE lower(concat('%', :name,'%')) AND v.expediente.id = leaf.id AND leaf.expediente.id = base.id")
+          "WHERE v.expediente.tenant = :tenant AND lower(v.expediente.name) LIKE lower(concat('%', :name,'%'))")
    Page<Volume> findByNameLikeIgnoreCase( @Param("tenant") Tenant tenant, @Param("name") String name, Pageable page);
 
    @Query("SELECT count(v) FROM Volume v "+
-          "JOIN LeafExpediente leaf "+
-          "JOIN BaseExpediente base "+
-          "WHERE base.tenant = :tenant AND lower(base.name) LIKE lower(concat('%', :name,'%')) AND v.expediente.id = leaf.id AND leaf.expediente.id = base.id")
+          "WHERE v.expediente.tenant = :tenant AND lower(v.expediente.name) LIKE lower(concat('%', :name,'%'))")
    Page<Volume> countByNameLikeIgnoreCase( @Param("tenant") Tenant tenant, @Param("name") String name, Pageable page);
 
 
@@ -58,41 +47,30 @@ public interface VolumeRepository extends JpaRepository<Volume, Long>
    Optional<Volume> findById(Long id);
 
    @Query("SELECT v FROM Volume v "+
-          "JOIN LeafExpediente leaf "+
-          "JOIN BaseExpediente base "+
-          "WHERE ((base.ownerId IS null AND :owner IS null) OR base.ownerId = :owner) AND v.expediente.id = leaf.id AND leaf.expediente.id = base.id")
+          "WHERE ((v.expediente.ownerId IS null AND :owner IS null) OR v.expediente.ownerId = :owner)")
    List<Volume> findByParent( @Param("owner") Long parentId);
 
    @Query("SELECT COUNT(v) FROM Volume v "+
-          "JOIN LeafExpediente leaf "+
-          "JOIN BaseExpediente base "+
-          "WHERE ((base.ownerId IS null AND :owner IS null) OR base.ownerId = :owner) AND v.expediente.id = leaf.id AND leaf.expediente.id = base.id")
+          "WHERE ((v.expediente.ownerId IS null AND :owner IS null) OR v.expediente.ownerId = :owner)")
    int countByParent( @Param("owner") Long parentId);
 
    @Query("SELECT COUNT(v) FROM Volume v "+
-          "JOIN LeafExpediente leaf "+
-          "JOIN BaseExpediente base "+
-          "WHERE ((base.ownerId IS null AND :group is null) or base.ownerId = :group) AND v.expediente.id = leaf.id AND leaf.expediente.id = base.id")
+          "WHERE ((v.expediente.ownerId IS null AND :group is null) or v.expediente.ownerId = :group)")
    int countByChildren( @Param("group") Long groupId);
 
    @Query("SELECT v FROM Volume v "+
-          "JOIN LeafExpediente leaf "+
-          "JOIN BaseExpediente base "+
-          "WHERE base.tenant = :tenant AND lower(base.name) LIKE lower(concat('%', :name,'%')) AND v.expediente.id = leaf.id AND leaf.expediente.id = base.id")
+          "WHERE v.expediente.tenant = :tenant AND lower(v.expediente.name) LIKE lower(concat('%', :name,'%'))")
    List<Volume> findByNameLikeIgnoreCase( @Param("tenant") Tenant tenant, @Param("name") String name);
 
    @Query("SELECT count(v) FROM Volume v "+
-          "JOIN LeafExpediente leaf "+
-          "JOIN BaseExpediente base "+
-          "WHERE base.tenant = :tenant AND lower(base.name) LIKE lower(concat('%', :name,'%')) AND v.expediente.id = leaf.id AND leaf.expediente.id = base.id")
+          "WHERE v.expediente.tenant = :tenant AND lower(v.expediente.name) LIKE lower(concat('%', :name,'%'))")
    long countByNameLikeIgnoreCase( @Param("tenant") Tenant tenant, @Param("name") String name);
 
    //   ----------- ACL handling ----------------
    @Query("SELECT DISTINCT v FROM Volume v "+
-          "JOIN LeafExpediente leaf "+
           "JOIN BaseExpediente base "+
           "JOIN Permission p  "+
-          "WHERE base.objectToProtect = p.objectToProtect AND p.role = :role AND v.expediente.id = leaf.id AND leaf.expediente.id = base.id")
+          "WHERE base.objectToProtect = p.objectToProtect AND p.role = :role")
    List<Volume> findExpedientesGranted( @Param("role") Role role);
 
 }//VolumeRepository

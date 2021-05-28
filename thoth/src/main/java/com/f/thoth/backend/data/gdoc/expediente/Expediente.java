@@ -2,14 +2,9 @@ package com.f.thoth.backend.data.gdoc.expediente;
 
 import java.time.LocalDateTime;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
 
-import com.f.thoth.backend.data.entity.AbstractEntity;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
@@ -22,43 +17,42 @@ import com.f.thoth.backend.data.security.UserGroup;
 
 @Entity
 @Table(name = "EXPEDIENTE")
-public class Expediente  extends AbstractEntity implements  NeedsProtection, Comparable<Expediente>, ExpedienteType
+public class Expediente  extends LeafExpediente implements  NeedsProtection, Comparable<Expediente>, ExpedienteType
 {
-      @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-      @NotNull  (message = "{evidentia.expediente.required}")
-      protected LeafExpediente       expediente;                              // Leaf expediente associated to the expediente
-
       // ------------------ Construction -----------------------
-
       public Expediente()
       {
-         this.expediente = new LeafExpediente();
-      }//Expediente constructor
-
-      public Expediente( LeafExpediente expediente)
-      {
-         if (expediente == null)
-         {   throw new IllegalArgumentException("Expediente-Hoja que define el expediente no puede ser nulo");
-         }
-         this.expediente = expediente;
+         super();
          setType();
+      }//Expediente constructor
+      
+      
+      public Expediente (BaseExpediente base)
+      {
+         super();
+         setType();
+         if (base == null)
+            throw new IllegalArgumentException("Expediente básico no puede ser nulo");
 
+         this.expediente = base;
       }//Expediente constructor
 
       // ---------------------- getters & setters ---------------------
-      public LeafExpediente    getExpediente()                         { return expediente;}
-      public void              setExpediente(LeafExpediente expediente){ this.expediente = expediente;}
-
       private void             setType()
       {
-      if( expediente != null && !isOfType(Nature.EXPEDIENTE))
-        expediente.setType(Nature.EXPEDIENTE);
+         if( expediente != null && !isOfType(Nature.EXPEDIENTE))
+         {  expediente.setType(Nature.EXPEDIENTE);       
+         }
       }//setType
 
 
   // ------------------------ Hereda de LeafExpediente -------------------------
+  public BaseExpediente    getExpediente()                            { return expediente;}
+  public void              setExpediente(BaseExpediente expediente)   { this.expediente = expediente;}   
 
   public void              setName ( String name)                     { expediente.setName(name);}
+  
+  public String            getCode()                                  { return expediente.getCode();}
 
   @Override public Nature  getType()                                  { return expediente == null? null: expediente.getType();}
   @Override public boolean isOfType( Nature type)                     { return expediente != null && expediente.isOfType(type);}
@@ -158,7 +152,7 @@ public class Expediente  extends AbstractEntity implements  NeedsProtection, Com
          StringBuilder s = new StringBuilder();
          s.append( "Expediente{")
           .append( super.toString())
-          .append( " expediente["+ expediente.toString()+ "]}");
+          .append( "]}");
 
          return s.toString();
       }//toString
@@ -169,7 +163,7 @@ public class Expediente  extends AbstractEntity implements  NeedsProtection, Com
          if (other == null)
             return 1;
 
-         LeafExpediente that = other.getExpediente();
+         BaseExpediente that = other.getExpediente();
          return expediente.compareTo(that);
       }//compareTo
 

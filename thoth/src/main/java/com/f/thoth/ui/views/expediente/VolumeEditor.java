@@ -115,7 +115,7 @@ public class VolumeEditor extends VerticalLayout
         currentVolume = volume;
         setVisible(true);
         baseExpedienteEditor.setVisible(true);
-        BaseExpediente base = currentVolume.getExpediente().getExpediente();
+        BaseExpediente base = currentVolume.getExpediente();
         String   parentCode = getParentCode( base);
         baseExpedienteEditor.editExpediente(base, parentCode);
      }
@@ -148,7 +148,7 @@ public class VolumeEditor extends VerticalLayout
          boolean isNew = !expediente.isPersisted();
          int  duration = isNew? 6000 : 3000;
          if (currentVolume != null)
-         {  currentVolume.getExpediente().setExpediente(expediente);
+         {  currentVolume.setExpediente(expediente);
             volumeService.save(currentUser, currentVolume);
             String businessCode = expediente.formatCode();
             String msg          = isNew? "Volumen creado con código "+ businessCode: "Volumen "+ businessCode+ " actualizado";
@@ -194,7 +194,7 @@ public class VolumeEditor extends VerticalLayout
      }//VolumeEditorEvent
 
      public Volume           getVolume()      { return volume;  }
-     public BaseExpediente   getExpediente()  { return volume == null? null: volume.getExpediente().getExpediente();}
+     public BaseExpediente   getExpediente()  { return volume == null? null: volume.getExpediente();}
 
    }//VolumeEditorEvent
 

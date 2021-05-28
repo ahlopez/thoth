@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.Expediente;
-import com.f.thoth.backend.data.gdoc.expediente.LeafExpediente;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
@@ -67,7 +66,7 @@ public class ExpedienteLeafService implements FilterableCrudService<Expediente>,
 
 
    public Page<Expediente> find(Pageable pageable){ return expedienteRepository.findAll(ThothSession.getCurrentTenant(), pageable); }
-   public Expediente  findByCode(String code) { return expedienteRepository.findByCode(ThothSession.getCurrentTenant(), code);}
+   public Expediente  findByCode(String code) { return  expedienteRepository.findByCode(code);}
 
    @Override public JpaRepository<Expediente, Long> getRepository()
    {
@@ -81,12 +80,9 @@ public class ExpedienteLeafService implements FilterableCrudService<Expediente>,
      baseExpediente.setTenant(ThothSession.getCurrentTenant());
      baseExpediente.setCreatedBy(null/*TODO: currentUser*/);
 
-     LeafExpediente leafExpediente = new LeafExpediente();
-     leafExpediente.setExpediente(baseExpediente);
-
-      Expediente expediente = new Expediente();
-      expediente.setExpediente(leafExpediente);
-      return expediente;
+     Expediente expediente = new Expediente();
+     expediente.setExpediente(baseExpediente);
+     return expediente;
    }//createNew
 
    @Override public Expediente save(User currentUser, Expediente expediente)

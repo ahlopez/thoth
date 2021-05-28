@@ -7,12 +7,10 @@ import java.util.TreeSet;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import com.f.thoth.backend.data.entity.AbstractEntity;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
@@ -25,11 +23,8 @@ import com.f.thoth.backend.data.security.UserGroup;
 
 @Entity
 @Table(name = "VOLUME")
-public class Volume extends AbstractEntity implements  NeedsProtection, Comparable<Volume>, ExpedienteType
+public class Volume extends LeafExpediente implements  NeedsProtection, Comparable<Volume>, ExpedienteType
 {
-   @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-   @NotNull  (message = "{evidentia.expediente.required}")
-   protected LeafExpediente       expediente;                              // Leaf expediente associated to the volume
 
    @NotNull  (message = "{evidentia.expediente.required}")
    protected Integer              currentInstance;                         // Current instace of this volume
@@ -40,33 +35,34 @@ public class Volume extends AbstractEntity implements  NeedsProtection, Comparab
 
    public Volume()
    {
-      this.expediente      = new LeafExpediente();
+      super();
+      setType();
       this.currentInstance = 0;
       this.instances       = new TreeSet<>();
    }//Volume constructor
 
 
-   public Volume( LeafExpediente expediente, Integer currentInstance, Set<VolumeInstance>  instances)
+   public Volume( BaseExpediente base, Integer currentInstance, Set<VolumeInstance>  instances)
    {
-      if (expediente == null)
+      if (base == null)
          throw new IllegalArgumentException("Expediente-Hoja que define el volumen no puede ser nulo");
 
-      this.expediente      = expediente;
+      this.expediente      = base;
+      setType();
       this.currentInstance = (currentInstance == null? 0: currentInstance);
       this.instances       = (instances       == null? new TreeSet<>(): instances);
-      setType();
    }//Volume constructor
 
 
    // ---------------------- getters & setters ---------------------
-   public LeafExpediente            getExpediente()      { return expediente;}
-   public void                      setExpediente(LeafExpediente expediente){ this.expediente = expediente;} 	
+   public BaseExpediente            getExpediente()                               { return expediente;}
+   public void                      setExpediente(BaseExpediente expediente)      { this.expediente = expediente;} 	
 
-   public Integer                   getCurrentInstance() { return currentInstance;}
+   public Integer                   getCurrentInstance()                          { return currentInstance;}
    public void                      setCurrentInstance ( Integer currentInstance) { this.currentInstance = currentInstance;}
 
-   public Set<VolumeInstance>       getInstances()       {  return instances;}
-   public void                      setInstances(Set<VolumeInstance> instances) { this.instances = instances;}
+   public Set<VolumeInstance>       getInstances()                                {  return instances;}
+   public void                      setInstances(Set<VolumeInstance> instances)   { this.instances = instances;}
  	
    // ------------------------ Hereda de LeafExpediente -------------------------
 
@@ -74,7 +70,7 @@ public class Volume extends AbstractEntity implements  NeedsProtection, Comparab
 
    @Override public Nature  getType()                                  { return expediente == null? null: expediente.getType();}
    @Override public boolean isOfType( Nature type)                     { return expediente != null && expediente.isOfType(type);}
-   public void              setType ()                                 { expediente.setType(Nature.EXPEDIENTE);}
+   public void              setType ()                                 { expediente.setType(Nature.VOLUMEN);}
 
    public Boolean           getOpen()                                  { return expediente.getOpen();}
    public void              setOpen ( Boolean open)                    { expediente.setOpen(open);}
@@ -181,7 +177,7 @@ public class Volume extends AbstractEntity implements  NeedsProtection, Comparab
       if (other == null)
          return 1;
 
-      LeafExpediente that = other.getExpediente();
+      BaseExpediente that = other.getExpediente();
       return this.expediente.compareTo(that);
    }//compareTo
 

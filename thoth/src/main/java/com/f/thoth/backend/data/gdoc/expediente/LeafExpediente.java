@@ -5,11 +5,10 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import com.f.thoth.backend.data.entity.AbstractEntity;
@@ -27,11 +26,9 @@ import com.f.thoth.backend.data.security.UserGroup;
 /**
  * Representa un nodo terminal de la jerarquia de expedientes (expediente/sub-expediente/volumen)
  */
-@Entity
-@Table(name = "LEAF_EXPEDIENTE")
-public class LeafExpediente extends AbstractEntity implements  NeedsProtection, Comparable<LeafExpediente>, ExpedienteType
+@MappedSuperclass
+public class LeafExpediente extends AbstractEntity implements  NeedsProtection, ExpedienteType
 {
-
    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
    @NotNull  (message = "{evidentia.expediente.required}")
    protected BaseExpediente    expediente;                 // Expediente that describes this leaf
@@ -58,7 +55,7 @@ public class LeafExpediente extends AbstractEntity implements  NeedsProtection, 
       if ( expediente == null )
          throw new IllegalArgumentException("Expediente asociado a la rama no puede ser nulo");
 
-          expediente.setType(Nature.HOJA);
+      this.expediente       = expediente;
       this.admissibleTypes  = (admissibleTypes  == null? new TreeSet<>(): admissibleTypes);
 
    }//LeafExpediente constructor
@@ -75,6 +72,8 @@ public class LeafExpediente extends AbstractEntity implements  NeedsProtection, 
   // ------------------------ Hereda de BaseExpediente -------------------------
 
   public void              setName ( String name)                    { expediente.setName(name);}
+  
+  public String            getCode()                                 { return expediente.getCode();}
 
   @Override public Nature  getType()                                 { return expediente == null? null: expediente.getType();}
   @Override public boolean isOfType( Nature type)                    { return expediente != null && expediente.isOfType(type);}
@@ -155,16 +154,6 @@ public class LeafExpediente extends AbstractEntity implements  NeedsProtection, 
 
       return s.toString();
    }//toString
-
-
-   @Override  public int compareTo(LeafExpediente other)
-   {
-     if ( other == null)
-        return 1;
-
-     BaseExpediente that = other.getExpediente();
-     return this.expediente.compareTo(that);
-   }// compareTo
 
 
    // -----------------  Implements NeedsProtection ----------------

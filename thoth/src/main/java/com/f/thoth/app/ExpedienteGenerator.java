@@ -3,7 +3,6 @@ package com.f.thoth.app;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Random;
@@ -17,22 +16,19 @@ import org.springframework.core.io.Resource;
 
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
-import com.f.thoth.backend.data.gdoc.expediente.ExpedienteGroup;
 import com.f.thoth.backend.data.gdoc.expediente.Expediente;
+import com.f.thoth.backend.data.gdoc.expediente.ExpedienteGroup;
 import com.f.thoth.backend.data.gdoc.expediente.ExpedienteIndex;
-import com.f.thoth.backend.data.gdoc.expediente.LeafExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.Volume;
 import com.f.thoth.backend.data.gdoc.expediente.VolumeInstance;
 import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
-import com.f.thoth.backend.data.gdoc.numerator.Numerator;
-import com.f.thoth.backend.data.gdoc.numerator.Sequence;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
-import com.f.thoth.backend.repositories.ExpedienteGroupRepository;
 import com.f.thoth.backend.repositories.ClassificationRepository;
+import com.f.thoth.backend.repositories.ExpedienteGroupRepository;
 import com.f.thoth.backend.repositories.ExpedienteIndexRepository;
 import com.f.thoth.backend.repositories.ExpedienteLeafRepository;
 import com.f.thoth.backend.repositories.SchemaRepository;
@@ -89,7 +85,7 @@ public class ExpedienteGenerator implements HasLogger
    {
       this.claseRepository            = claseRepository;
       this.expedienteIndexRepository  = expedienteIndexRepository;
-      this.expedienteGroupRepository = expedienteGroupRepository;
+      this.expedienteGroupRepository  = expedienteGroupRepository;
       this.expedienteRepository       = expedienteRepository;
       this.volumeRepository           = volumeRepository;
       this.volumeInstanceRepository   = volumeInstanceRepository;
@@ -145,16 +141,13 @@ public class ExpedienteGenerator implements HasLogger
    }//registerExpedientes
 
 
-   private BaseExpediente creeExpediente( Tenant tenant, User user, Classification classificationClass, Long ownerId)
+   private void creeExpediente( Tenant tenant, User user, Classification classificationClass, Long ownerId)
    {
       int branchProbability =  random.nextInt(100);
       if ( branchProbability < 20)
-      {
-         ExpedienteGroup branch = creeExpedienteGroup(tenant, user, classificationClass, ownerId);
-         return branch.getExpediente();
-      }
-      LeafExpediente leaf = creeLeafExpediente  (tenant, user, classificationClass, ownerId);
-      return leaf.getExpediente();
+      {  creeExpedienteGroup(tenant, user, classificationClass, ownerId);
+      }else
+         creeExpedienteLeaf  (tenant, user, classificationClass, ownerId);
 
    }//creeExpediente
 
@@ -177,33 +170,28 @@ public class ExpedienteGenerator implements HasLogger
 
 
 
-   private LeafExpediente  creeLeafExpediente(Tenant tenant, User user, Classification classificationClass, Long ownerId)
+   private void  creeExpedienteLeaf(Tenant tenant, User user, Classification classificationClass, Long ownerId)
    {
       BaseExpediente   base   = createBase( classificationClass, user, ownerId);
-      LeafExpediente   leaf   = new LeafExpediente();
-      leaf.setExpediente(base);
       Set<DocumentType> admissibleTypes = generateAdmissibleTypes();
-      leaf.setAdmissibleTypes(admissibleTypes);
 
       int  volProbability = random.nextInt(100);
       if ( volProbability < 15)
-      {  createVolume(leaf);
+      {  createVolume(base, admissibleTypes);
       } else
-      {  createExpediente(leaf);
+      {  createExpediente(base, admissibleTypes);
       }
       nLeaves++;
       nExpedientes++;
-      return leaf;
 
-   }//creeLeafExpediente
+   }//creeExpedienteLeaf
 
 
 
    private BaseExpediente createBase(Classification classificationClass, User user, Long parentId)
    {
-     LocalDateTime  now      =   LocalDateTime.now();
+      LocalDateTime  now      =   LocalDateTime.now();
       BaseExpediente base     =   new BaseExpediente();
-      base.setExpedienteCode      (buildExpedienteCode(base, classificationClass));
       base.setName                (generateName());
       base.setObjectToProtect     (new ObjectToProtect());
       base.setCreatedBy           (user);
@@ -229,11 +217,12 @@ public class ExpedienteGenerator implements HasLogger
 
 
 
-   private void createExpediente(LeafExpediente leaf)
+   private void createExpediente(BaseExpediente base, Set<DocumentType> admissibleTypes)
    {
       Expediente expediente = new Expediente();
-      expediente.setExpediente( leaf);
-      expediente.setPath(leaf.getExpediente().getPath());
+      expediente.setExpediente( base);
+      expediente.setAdmissibleTypes(admissibleTypes);
+      expediente.setPath(base.getPath());
       expediente.setLocation( "[LOCATION]");
       expedienteRepository.saveAndFlush(expediente);
       nLeavesFinal++;
@@ -242,9 +231,9 @@ public class ExpedienteGenerator implements HasLogger
 
 
 
-   private void createVolume(LeafExpediente leaf)
+   private void createVolume(BaseExpediente base, Set<DocumentType> admissibleTypes)
    {
-      Volume volume = createVolumeHeader(leaf);
+      Volume volume = createVolumeHeader(base, admissibleTypes);
       VolumeInstance currentInstance = null;
       int nInstances = random.nextInt(3)+1;
       volume.setCurrentInstance(nInstances);
@@ -253,7 +242,7 @@ public class ExpedienteGenerator implements HasLogger
       LocalDateTime dateClosed =  dateOpened.plusDays(365L);
       for (int instance=1; instance <= nInstances; instance++)
       {
-       currentInstance = createVolumeInstance(volume, instance, dateOpened, dateClosed);
+         currentInstance = createVolumeInstance(volume, instance, dateOpened, dateClosed);
          dateOpened = dateClosed.plusDays(1L);
          dateClosed = dateOpened.plusDays(365L);
       }
@@ -266,10 +255,12 @@ public class ExpedienteGenerator implements HasLogger
 
 
 
-   private Volume createVolumeHeader(LeafExpediente leaf)
+   private Volume createVolumeHeader(BaseExpediente base, Set<DocumentType> admissibleTypes)
    {
       Volume volume = new Volume();
-      volume.setExpediente(leaf);
+      volume.setExpediente(base);
+      volume.setType();
+      volume.setAdmissibleTypes(admissibleTypes);
       volume.setCurrentInstance(0);
       return volume;
    }//createVolumeHeader
@@ -286,18 +277,6 @@ public class ExpedienteGenerator implements HasLogger
       nInstances++;
       return instance;
    }//createVolumeInstance
-
-
-
-   private String buildExpedienteCode(BaseExpediente padre, Classification classificationClass)
-   {
-      String seqKey = Numerator.sequenceName( classificationClass.getTenant(),  null , classificationClass.getRootCode()+ "-"+ LocalDate.now().getYear(), "E");
-      Numerator numerador = Numerator.getInstance();
-      Sequence expedienteSequence = numerador.obtenga(seqKey);
-      String expedienteCode = expedienteSequence.next();
-      return expedienteCode;
-   }//buildExpedienteCode
-
 
 
    private String generateName()

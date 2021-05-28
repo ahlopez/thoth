@@ -79,7 +79,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 
   private ExpedienteLeafService       expedienteService;
   private ExpedienteLeafEditor        expedienteLeafEditor;
-  
+
   private VolumeService               volumeService;
   private VolumeEditor                volumeEditor;
 
@@ -415,14 +415,19 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     groupActions.setVisible( selectedBase != null && selectedBase.isOfType(Nature.GRUPO));
     selectEditor();
   }//updateActions
-  
-  
+
+
   private void selectEditor()
   {
-     Nature type = selectedBase == null? null : selectedBase.getType();
+  //   Nature type = selectedBase == null? null : selectedBase.getType();
+     expedienteGroupEditor.setVisible(false);
+     expedienteLeafEditor.setVisible(false);
+     volumeEditor.setVisible(false);
+     /*
      expedienteGroupEditor.setVisible(Nature.GRUPO.equals(type));
      expedienteLeafEditor.setVisible (Nature.EXPEDIENTE.equals(type));
      volumeEditor.setVisible         (Nature.VOLUMEN.equals(type));
+     */
   }//selectEditor
 
 
@@ -436,7 +441,8 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     addGrupo.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     addGrupo.addClickShortcut(Key.ENTER);
     addGrupo.addClickListener(click ->
-    {  rightSection.setVisible(true);
+    {  selectEditor();
+       rightSection.setVisible(true);
        expedienteGroupEditor.addExpedienteGroup(selectedBase);
     });
     addGrupo.getElement().getStyle().set("margin-left", "auto");
@@ -444,16 +450,18 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     addExpediente.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     addExpediente.addClickShortcut(Key.ENTER);
     addExpediente.addClickListener(click ->
-    {  rightSection.setVisible(true);
-       addLeaf();
+    {  selectEditor();
+       rightSection.setVisible(true);
+       expedienteLeafEditor.addExpediente(selectedBase);
     });
     addExpediente.getElement().getStyle().set("margin-left", "auto");
 
     addVolumen.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     addVolumen.addClickShortcut(Key.ENTER);
     addVolumen.addClickListener(click ->
-    {  rightSection.setVisible(true);
-       addVolume();
+    {  selectEditor();
+       rightSection.setVisible(true);
+       volumeEditor.addVolume(selectedBase);
     });
     addVolumen.getElement().getStyle().set("margin-left", "auto");
 
@@ -479,7 +487,8 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     addSubgrupo.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     addSubgrupo.addClickShortcut(Key.ENTER);
     addSubgrupo.addClickListener(click ->
-    {  rightSection.setVisible(true);
+    {  selectEditor();
+       rightSection.setVisible(true);
        expedienteGroupEditor.addExpedienteGroup(selectedBase);
     });
     addSubgrupo.getElement().getStyle().set("margin-left", "auto");
@@ -487,16 +496,20 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     addExpediente.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     addExpediente.addClickShortcut(Key.ENTER);
     addExpediente.addClickListener(click ->
-    {  rightSection.setVisible(true);
-       addLeaf();
+    {  
+       rightSection.setVisible(true);
+       selectEditor();
+       expedienteLeafEditor.addExpediente(selectedBase);
     });
     addExpediente.getElement().getStyle().set("margin-left", "auto");
 
     addVolumen.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     addVolumen.addClickShortcut(Key.ENTER);
     addVolumen.addClickListener(click ->
-    {  rightSection.setVisible(true);
-       addVolume();
+    {  
+       rightSection.setVisible(true);
+       selectEditor();
+       volumeEditor.addVolume(selectedBase);
     });
     addVolumen.getElement().getStyle().set("margin-left", "auto");
 
@@ -511,15 +524,11 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   }//configureGroupActions
 
 
-  private void addLeaf() {}
-  private void addVolume() {}
-
-
   private void selectExpediente(BaseExpediente selectedBase)
   {
     updateActions();
     if ( selectedBase != null )
-    {  
+    {
        switch (selectedBase.getType())
        {
        case GRUPO:
@@ -532,7 +541,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
          break;
        case VOLUMEN:
          Volume selectedVolume= volumeService.findByCode(selectedBase.getCode());
-         volumeEditor.editVolume(selectedVolume);  
+         volumeEditor.editVolume(selectedVolume);
        default:
        }
     }// if selectedBase != null

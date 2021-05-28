@@ -42,7 +42,7 @@ public class ExpedienteLeafEditor extends VerticalLayout
                                  BaseExpedienteService   baseExpedienteService,
                                  SchemaService           schemaService,
                                  Classification          classificationClass
-                                )
+                              )
    {
      this.expedienteGroupService  = expedienteGroupService;
      this.expedienteLeafService   = expedienteLeafService;
@@ -115,7 +115,7 @@ public class ExpedienteLeafEditor extends VerticalLayout
         currentExpediente = expediente;
         setVisible(true);
         baseExpedienteEditor.setVisible(true);
-        BaseExpediente base = currentExpediente.getExpediente().getExpediente();
+        BaseExpediente base = currentExpediente.getExpediente();
         String   parentCode = getParentCode( base);
         baseExpedienteEditor.editExpediente(base, parentCode);
      }
@@ -148,7 +148,7 @@ public class ExpedienteLeafEditor extends VerticalLayout
          boolean isNew = !expediente.isPersisted();
          int  duration = isNew? 6000 : 3000;
          if (currentExpediente != null)
-         {  currentExpediente.getExpediente().setExpediente(expediente);
+         {  currentExpediente.setExpediente(expediente);
             expedienteLeafService.save(currentUser, currentExpediente);
             String businessCode = expediente.formatCode();
             String msg          = isNew? "Expediente creado con código "+ businessCode: "Expediente "+ businessCode+ " actualizado";
@@ -194,7 +194,7 @@ public class ExpedienteLeafEditor extends VerticalLayout
      }//ExpedienteLeafEditorEvent
 
      public Expediente       getExpedienteLeaf()  { return expediente;  }
-     public BaseExpediente   getExpediente()      { return expediente == null? null: expediente.getExpediente().getExpediente();}
+     public BaseExpediente   getExpediente()      { return expediente == null? null: expediente.getExpediente();}
 
    }//ExpedienteLeafEditorEvent
 

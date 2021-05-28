@@ -40,7 +40,6 @@ import com.f.thoth.backend.repositories.ClassificationRepository;
 import com.f.thoth.backend.repositories.ExpedienteIndexRepository;
 import com.f.thoth.backend.repositories.ExpedienteLeafRepository;
 import com.f.thoth.backend.repositories.FieldRepository;
-import com.f.thoth.backend.repositories.LeafExpedienteRepository;
 import com.f.thoth.backend.repositories.LevelRepository;
 import com.f.thoth.backend.repositories.MetadataRepository;
 import com.f.thoth.backend.repositories.OperationRepository;
@@ -121,8 +120,7 @@ public class DataGenerator implements HasLogger
          ProductRepository productRepository, PickupLocationRepository pickupLocationRepository,
          TenantRepository tenantRepository, RoleRepository roleRepository, OperationRepository operationRepository,
          ClassificationRepository claseRepository, BaseExpedienteRepository baseExpedienteRepository, ExpedienteIndexRepository expedienteIndexRepository,
-         ExpedienteGroupRepository expedienteGroupRepository, LeafExpedienteRepository leafExpedienteRepository,
-         ExpedienteLeafRepository expedienteRepository, VolumeRepository volumeRepository, VolumeInstanceRepository volumeInstanceRepository,
+         ExpedienteGroupRepository expedienteGroupRepository, ExpedienteLeafRepository expedienteRepository, VolumeRepository volumeRepository, VolumeInstanceRepository volumeInstanceRepository,
          MetadataRepository metadataRepository, FieldRepository fieldRepository, SchemaRepository schemaRepository,
          SchemaValuesRepository schemaValuesRepository, LevelRepository levelRepository, RetentionRepository retentionRepository,
          UserGroupRepository userGroupRepository, SingleUserRepository singleUserRepository, Numerator numerator, PasswordEncoder passwordEncoder)
@@ -138,8 +136,7 @@ public class DataGenerator implements HasLogger
       this.claseRepository               = claseRepository;
 //      this.baseExpedienteRepository      = baseExpedienteRepository;
       this.expedienteIndexRepository     = expedienteIndexRepository;
-      this.expedienteGroupRepository    = expedienteGroupRepository;
-//      this.leafExpedienteRepository      = leafExpedienteRepository;
+      this.expedienteGroupRepository     = expedienteGroupRepository;
       this.expedienteRepository          = expedienteRepository;
       this.volumeRepository              = volumeRepository;
       this.volumeInstanceRepository      = volumeInstanceRepository;

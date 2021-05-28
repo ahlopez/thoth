@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -13,8 +14,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
-import com.f.thoth.backend.data.gdoc.expediente.LeafExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.Volume;
+import com.f.thoth.backend.data.gdoc.expediente.VolumeInstance;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
@@ -70,7 +71,7 @@ public class VolumeService implements FilterableCrudService<Volume>, PermissionS
 
 
    public Page<Volume> find(Pageable pageable) { return volumeRepository.findAll(ThothSession.getCurrentTenant(), pageable); }
-   public Volume  findByCode(String code)      { return volumeRepository.findByCode(ThothSession.getCurrentTenant(), code);}
+   public Volume  findByCode(String code)      { return volumeRepository.findByCode(code);}
 
    @Override public JpaRepository<Volume, Long> getRepository() { return volumeRepository; }
 
@@ -80,12 +81,8 @@ public class VolumeService implements FilterableCrudService<Volume>, PermissionS
       baseExpediente.setTenant(ThothSession.getCurrentTenant());
       baseExpediente.setCreatedBy(null/*TODO: currentUser*/);
 
-      LeafExpediente leafExpediente = new LeafExpediente();
-      leafExpediente.setExpediente(baseExpediente);
-
-      Volume expediente = new Volume();
-      expediente.setExpediente(leafExpediente);
-      return expediente;
+      Volume volume = new Volume(baseExpediente, 0, new TreeSet<VolumeInstance>());
+      return volume;
    }//createNew
 
    @Override public Volume save(User currentUser, Volume Volume)
