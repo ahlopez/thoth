@@ -36,7 +36,6 @@ import com.f.thoth.backend.repositories.BaseExpedienteRepository;
 import com.f.thoth.backend.repositories.ExpedienteGroupRepository;
 import com.f.thoth.backend.repositories.ClassificationRepository;
 import com.f.thoth.backend.repositories.ExpedienteLeafRepository;
-import com.f.thoth.backend.repositories.LeafExpedienteRepository;
 import com.f.thoth.backend.repositories.LevelRepository;
 import com.f.thoth.backend.repositories.OperationRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
@@ -51,7 +50,6 @@ import com.f.thoth.backend.service.BaseExpedienteService;
 import com.f.thoth.backend.service.ExpedienteGroupService;
 import com.f.thoth.backend.service.ClassificationService;
 import com.f.thoth.backend.service.ExpedienteLeafService;
-import com.f.thoth.backend.service.LeafExpedienteService;
 import com.f.thoth.backend.service.LevelService;
 import com.f.thoth.backend.service.OperationService;
 import com.f.thoth.backend.service.RetentionService;
@@ -78,7 +76,6 @@ import com.f.thoth.ui.MainView;
             SchemaService.class,
             ClassificationService.class,
             BaseExpedienteService.class,
-            LeafExpedienteService.class,
             ExpedienteLeafService.class,
             ExpedienteGroupService.class,
             VolumeService.class,
@@ -120,7 +117,6 @@ import com.f.thoth.ui.MainView;
             ClassificationRepository.class,
             BaseExpedienteRepository.class,
             ExpedienteGroupRepository.class,
-            LeafExpedienteRepository.class,
             ExpedienteLeafRepository.class,
             VolumeRepository.class,
             SequenceRepository.class,

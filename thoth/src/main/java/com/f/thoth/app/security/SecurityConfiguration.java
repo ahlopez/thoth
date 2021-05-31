@@ -44,7 +44,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
    private PasswordEncoder passwordEncoder;
 
    @Autowired
-   public SecurityConfiguration(UserDetailsService userDetailsService) {
+   public SecurityConfiguration(UserDetailsService userDetailsService) 
+   {
       this.userDetailsService = userDetailsService;
    }
 
@@ -52,7 +53,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
     * The password encoder to use when encrypting passwords.
     */
    @Bean
-   public PasswordEncoder passwordEncoder() {
+   public PasswordEncoder passwordEncoder() 
+   {
       return new BCryptPasswordEncoder();
    }
 
@@ -63,16 +65,17 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
       final String username = SecurityUtils.getUsername();
       com.f.thoth.backend.data.security.User user = (username != null) ? userRepository.findByEmailIgnoreCase(ThothSession.getTenant(),  username) :  null;
       return () -> user;
-   }
+   }//currentUser
 
    /**
     * Registers our UserDetailsService and the password encoder to be used on login attempts.
     */
    @Override
-   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+   protected void configure(AuthenticationManagerBuilder auth) throws Exception 
+   {
       super.configure(auth);
       auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
-   }
+   }//configure
 
    /**
     * Require login to access internal pages and configure login form.

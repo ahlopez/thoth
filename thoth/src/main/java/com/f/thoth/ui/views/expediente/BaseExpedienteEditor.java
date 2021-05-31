@@ -234,6 +234,7 @@ public class BaseExpedienteEditor extends FormLayout
     {
       dateOpened.setValue(now);
       dateClosed.setValue(endOfTimes);
+      expedienteCode.setValue("");
     }else
     { expedienteCode.setValue(expediente.getExpedienteCode());
     }

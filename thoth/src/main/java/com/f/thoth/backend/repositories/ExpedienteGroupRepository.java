@@ -1,4 +1,4 @@
-﻿package com.f.thoth.backend.repositories;
+package com.f.thoth.backend.repositories;
 
 import java.util.List;
 import java.util.Optional;

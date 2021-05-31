@@ -394,6 +394,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     selectedBase = null;
     resetSearch();
     dataProvider.refreshAll();
+    updateActions();
     selectEditor();
   }//refresh
 
@@ -419,15 +420,11 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
 
   private void selectEditor()
   {
-  //   Nature type = selectedBase == null? null : selectedBase.getType();
-     expedienteGroupEditor.setVisible(false);
-     expedienteLeafEditor.setVisible(false);
-     volumeEditor.setVisible(false);
-     /*
+     Nature type = selectedBase == null? null : selectedBase.getType();
      expedienteGroupEditor.setVisible(Nature.GRUPO.equals(type));
      expedienteLeafEditor.setVisible (Nature.EXPEDIENTE.equals(type));
      volumeEditor.setVisible         (Nature.VOLUMEN.equals(type));
-     */
+      
   }//selectEditor
 
 
@@ -487,8 +484,8 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     addSubgrupo.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     addSubgrupo.addClickShortcut(Key.ENTER);
     addSubgrupo.addClickListener(click ->
-    {  selectEditor();
-       rightSection.setVisible(true);
+    {  rightSection.setVisible(true);
+       expedienteGroupEditor.setVisible(false);
        expedienteGroupEditor.addExpedienteGroup(selectedBase);
     });
     addSubgrupo.getElement().getStyle().set("margin-left", "auto");
@@ -496,9 +493,8 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     addExpediente.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     addExpediente.addClickShortcut(Key.ENTER);
     addExpediente.addClickListener(click ->
-    {  
-       rightSection.setVisible(true);
-       selectEditor();
+    {  rightSection.setVisible(true);
+       expedienteGroupEditor.setVisible(false);
        expedienteLeafEditor.addExpediente(selectedBase);
     });
     addExpediente.getElement().getStyle().set("margin-left", "auto");
@@ -506,9 +502,8 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     addVolumen.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
     addVolumen.addClickShortcut(Key.ENTER);
     addVolumen.addClickListener(click ->
-    {  
-       rightSection.setVisible(true);
-       selectEditor();
+    {  rightSection.setVisible(true);
+       expedienteGroupEditor.setVisible(false);
        volumeEditor.addVolume(selectedBase);
     });
     addVolumen.getElement().getStyle().set("margin-left", "auto");

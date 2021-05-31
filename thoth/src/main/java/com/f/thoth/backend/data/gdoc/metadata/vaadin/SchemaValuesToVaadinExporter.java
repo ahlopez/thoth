@@ -54,7 +54,9 @@ public class SchemaValuesToVaadinExporter implements Exporter
             fields.add( (HasValue<?,?>)fld);            
       });
       
-      String[] vals = valores.split(Constant.VALUE_SEPARATOR);
+      String[] vals = valores == null || valores.length()== 0
+                    ? new String[0]
+                    : valores.split(Constant.VALUE_SEPARATOR);
       if (vals.length != fields.size())
          throw new IllegalStateException("Valores a exportar["+ vals.length+ "] diferentes a campos a recibirlos["+ fields.size()+ "]");
 
