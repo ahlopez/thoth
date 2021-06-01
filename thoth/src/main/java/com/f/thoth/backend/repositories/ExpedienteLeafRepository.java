@@ -63,10 +63,10 @@ public interface ExpedienteLeafRepository extends JpaRepository<Expediente, Long
    long countByNameLikeIgnoreCase(@Param("tenant") Tenant tenant, @Param("name") String name);
 
    //   ----------- ACL handling ----------------
+
    @Query("SELECT DISTINCT e FROM Expediente e "+
-          "JOIN BaseExpediente base "+
-          "JOIN Permission p "+
-          "WHERE base.objectToProtect = p.objectToProtect AND p.role = :role")
+          "JOIN   Permission p ON e.expediente.objectToProtect = p.objectToProtect "+
+          "WHERE  p.role = :role")
    List<Expediente> findExpedientesGranted( @Param("role") Role role);
 
 }//ExpedienteRepository

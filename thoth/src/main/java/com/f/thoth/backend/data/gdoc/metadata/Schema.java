@@ -78,7 +78,8 @@ public class Schema extends BaseEntity implements Comparable<Schema>
 
    @Override public void buildCode()
    {  if (this.code == null)
-	     this.code = (tenant == null? "[Tenant]": tenant.getCode())+ "[SCM]"+ (name == null? "[Name]": name);
+      {  this.code = (tenant == null? "[Tenant]": tenant.getCode())+ "[SCM]"+ (name == null? "[Name]": name);
+      }
    }//buildCode
 
    // -------------- Getters & Setters ----------------

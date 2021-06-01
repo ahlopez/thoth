@@ -46,13 +46,14 @@ public class Expediente  extends LeafExpediente implements  NeedsProtection, Com
       }//setType
 
 
-  // ------------------------ Hereda de LeafExpediente -------------------------
+  // ------------------------ Hereda de BaseExpediente -------------------------
   public BaseExpediente    getExpediente()                            { return expediente;}
   public void              setExpediente(BaseExpediente expediente)   { this.expediente = expediente;}   
 
   public void              setName ( String name)                     { expediente.setName(name);}
   
   public String            getCode()                                  { return expediente.getCode();}
+  public String            formatCode()                               { return expediente.formatCode();}
 
   @Override public Nature  getType()                                  { return expediente == null? null: expediente.getType();}
   @Override public boolean isOfType( Nature type)                     { return expediente != null && expediente.isOfType(type);}

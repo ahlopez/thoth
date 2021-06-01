@@ -10,17 +10,12 @@ import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.service.SchemaService;
 import com.f.thoth.ui.components.MetadataEditor;
 import com.f.thoth.ui.utils.converters.LocalDateTimeToLocalDateTime;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
@@ -34,10 +29,6 @@ import com.vaadin.flow.shared.Registration;
 public class BaseExpedienteEditor extends FormLayout
 {
   private static final Converter<LocalDateTime, LocalDateTime> DATE_CONVERTER   = new LocalDateTimeToLocalDateTime();
-
-  private Button             save;
-  private Button             close;
-  private Component          buttons;
 
   private ReadOnlyHasValue<String> theTitle;
   private H3                 title;
@@ -149,8 +140,6 @@ public class BaseExpedienteEditor extends FormLayout
     keywords.setRequiredIndicatorVisible(true);
     keywords.getElement().setAttribute("colspan", "4");
 
-    buttons = configureActions();
-
     add(
         title                ,
         name                 ,
@@ -190,11 +179,12 @@ public class BaseExpedienteEditor extends FormLayout
 
     binder.forField(keywords) .bind("keywords");
     binder.forField(createdBy).bind("createdBy.email");
+    binder.addStatusChangeListener(evt -> fireEvent( new ValidationEvent(this, selectedExpediente, binder.isValid())));
 
     metadataEditor = new MetadataEditor();
-    metadataEditor.addListener(MetadataEditor.SaveEvent.class, e->validateAndSave(e.getValues()));
+    metadataEditor.addListener(MetadataEditor.SaveEvent.class, e-> saveMetadata());
     metadataEditor.getElement().setAttribute("colspan", "4");
-    add(metadataEditor, buttons);
+    add(metadataEditor);
 
   }//BaseExpedienteEditor
 
@@ -209,7 +199,7 @@ public class BaseExpedienteEditor extends FormLayout
       initValues( selectedExpediente);
       metadataEditor.editMetadata( selectedExpediente.getMetadataSchema(), selectedExpediente.getMetadata());
       metadataEditor.setVisible(selectedExpediente == null || selectedExpediente.getMetadataSchema() != null);
-      addClassName  ("field-form");
+//      addClassName  ("field-form");
     }
 
   }//editExpediente
@@ -267,50 +257,30 @@ public class BaseExpedienteEditor extends FormLayout
   }//getTitle
 
 
-  private Component configureActions()
+  private boolean saveMetadata()
   {
-    save = new Button("Guardar");
-    save.addClickShortcut (Key.ENTER);
-    save.addThemeVariants  (ButtonVariant.LUMO_PRIMARY);
-    save.getElement().getStyle().set("margin-left", "auto");
-    save.setWidth("20%");
-    save.addClickListener  (click -> saveBaseExpediente(binder.getBean()));
-    binder.addStatusChangeListener(evt -> save.setEnabled(binder.isValid()));
-
-    close= new Button("Cancelar");
-    close.addThemeVariants (ButtonVariant.LUMO_TERTIARY);
-    close.addClickShortcut(Key.ESCAPE);
-    close. setWidth("20%");
-    close.addClickListener (click -> { close(); fireEvent(new CloseEvent(this));});
-
-    HorizontalLayout buttons = new HorizontalLayout(close, save);
-    buttons.getElement().setAttribute("colspan", "4");
-    buttons.setWidthFull();
-    return buttons;
-  }//configureActions
-
-
-  private void validateAndSave(SchemaValues metadataValues)
-  {
-    if (selectedExpediente != null)
-    {   selectedExpediente.setMetadata(metadataValues);
-    }
-    saveBaseExpediente(selectedExpediente);
-  }//validateAndSave
-
-
-  private void saveBaseExpediente(BaseExpediente expediente)
-  {
-     if ( expediente != null && binder.isValid())
-     {
-        whenExpedienteCloses(expediente);
-        SchemaValues metaValues = metadataEditor.validateAndSave();
-        if (metaValues != null)
-        {   expediente.setMetadata(metaValues);
-        }
-        close();
-        fireEvent(new SaveEvent(this, expediente));
+     boolean savedMeta = false;
+     if (selectedExpediente != null)
+     {  
+         SchemaValues metaValues = metadataEditor.validateAndSave();
+         if (metaValues != null)
+         {   selectedExpediente.setMetadata(metaValues);
+             savedMeta = true;
+         }
      }
+     return savedMeta;
+  }//saveMetadata
+  
+
+  public boolean saveBaseExpediente()
+  {
+     boolean savedExpediente = false;
+     if ( selectedExpediente != null && binder.isValid() && saveMetadata())
+     {  whenExpedienteCloses(selectedExpediente);
+        close();
+        savedExpediente = true;
+     }
+     return savedExpediente;
   }//saveBaseExpediente
 
 
@@ -327,46 +297,38 @@ public class BaseExpedienteEditor extends FormLayout
     }
   }//whenExpedienteCloses
 
-  private void close()
+  public void close()
   {  metadataEditor.setVisible(false);
-     removeClassName("field-form");
+//     removeClassName("field-form");
   }//close
 
   // --------------------- Events -----------------------
-  public static abstract class BaseExpedienteFormEvent extends ComponentEvent<BaseExpedienteEditor>
+  public static abstract class BaseExpedienteEditorEvent extends ComponentEvent<BaseExpedienteEditor>
   {
     private BaseExpediente baseExpediente;
 
-    protected BaseExpedienteFormEvent(BaseExpedienteEditor source, BaseExpediente baseExpediente)
+    protected BaseExpedienteEditorEvent(BaseExpedienteEditor source, BaseExpediente baseExpediente)
     {  super(source, false);
        this.baseExpediente = baseExpediente;
-    }//BaseExpedienteFormEvent
+    }//BaseExpedienteEditorEvent
 
     public BaseExpediente getBaseExpediente()
     { return baseExpediente;
     }
-  }//BaseExpedienteFormEvent
-
-  public static class SaveEvent extends BaseExpedienteFormEvent
+  }//BaseExpedienteEditorEvent
+  
+  public static class ValidationEvent extends BaseExpedienteEditorEvent
   {
-    SaveEvent(BaseExpedienteEditor source, BaseExpediente baseExpediente)
-    { super(source, baseExpediente);
-    }
-  }//SaveEvent
-
-  public static class DeleteEvent extends BaseExpedienteFormEvent
-  {
-    DeleteEvent(BaseExpedienteEditor source, BaseExpediente baseExpediente)
-    { super(source, baseExpediente);
-    }
-  }//DeleteEvent
-
-  public static class CloseEvent extends BaseExpedienteFormEvent
-  {
-    CloseEvent(BaseExpedienteEditor source)
-    { super(source, null);
-    }
-  }//CloseEvent
+     boolean baseOK =  false;
+     ValidationEvent(BaseExpedienteEditor source, BaseExpediente baseExpediente, boolean baseOK)
+     { super(source, baseExpediente);
+       this.baseOK = baseOK;
+     }
+ 
+     public boolean getValidationResult()
+     {  return baseOK;       
+     }
+  }//ValidationEvent
 
   public <T extends ComponentEvent<?>> Registration addListener(Class<T> eventType, ComponentEventListener<T> listener)
   {  return getEventBus().addListener(eventType, listener);

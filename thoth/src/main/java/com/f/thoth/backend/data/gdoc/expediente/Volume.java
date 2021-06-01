@@ -67,6 +67,9 @@ public class Volume extends LeafExpediente implements  NeedsProtection, Comparab
    // ------------------------ Hereda de LeafExpediente -------------------------
 
    public void              setName ( String name)                     { expediente.setName(name);}
+   
+   public String            getCode()                                  { return expediente.getCode();}
+   public String            formatCode()                               { return expediente.formatCode();}
 
    @Override public Nature  getType()                                  { return expediente == null? null: expediente.getType();}
    @Override public boolean isOfType( Nature type)                     { return expediente != null && expediente.isOfType(type);}

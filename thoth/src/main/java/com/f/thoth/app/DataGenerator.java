@@ -24,6 +24,7 @@ import com.f.thoth.backend.data.Role;
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.gdoc.classification.Level;
 import com.f.thoth.backend.data.gdoc.classification.Retention;
+import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.gdoc.metadata.Field;
 import com.f.thoth.backend.data.gdoc.metadata.Metadata;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
@@ -35,8 +36,9 @@ import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.UserGroup;
 import com.f.thoth.backend.repositories.BaseExpedienteRepository;
-import com.f.thoth.backend.repositories.ExpedienteGroupRepository;
 import com.f.thoth.backend.repositories.ClassificationRepository;
+import com.f.thoth.backend.repositories.DocumentTypeRepository;
+import com.f.thoth.backend.repositories.ExpedienteGroupRepository;
 import com.f.thoth.backend.repositories.ExpedienteIndexRepository;
 import com.f.thoth.backend.repositories.ExpedienteLeafRepository;
 import com.f.thoth.backend.repositories.FieldRepository;
@@ -107,6 +109,7 @@ public class DataGenerator implements HasLogger
    private SchemaValuesRepository        schemaValuesRepository;
    private MetadataRepository            metadataRepository;
    private FieldRepository               fieldRepository;
+   private DocumentTypeRepository        documentTypeRepository;
    private RetentionRepository           retentionRepository;
    private SingleUserRepository          singleUserRepository;
    private UserGroupRepository           userGroupRepository;
@@ -121,7 +124,7 @@ public class DataGenerator implements HasLogger
          TenantRepository tenantRepository, RoleRepository roleRepository, OperationRepository operationRepository,
          ClassificationRepository claseRepository, BaseExpedienteRepository baseExpedienteRepository, ExpedienteIndexRepository expedienteIndexRepository,
          ExpedienteGroupRepository expedienteGroupRepository, ExpedienteLeafRepository expedienteRepository, VolumeRepository volumeRepository, VolumeInstanceRepository volumeInstanceRepository,
-         MetadataRepository metadataRepository, FieldRepository fieldRepository, SchemaRepository schemaRepository,
+         MetadataRepository metadataRepository, FieldRepository fieldRepository, SchemaRepository schemaRepository, DocumentTypeRepository documentTypeRepository,
          SchemaValuesRepository schemaValuesRepository, LevelRepository levelRepository, RetentionRepository retentionRepository,
          UserGroupRepository userGroupRepository, SingleUserRepository singleUserRepository, Numerator numerator, PasswordEncoder passwordEncoder)
    {
@@ -134,7 +137,6 @@ public class DataGenerator implements HasLogger
       this.roleRepository                = roleRepository;
       this.operationRepository           = operationRepository;
       this.claseRepository               = claseRepository;
-//      this.baseExpedienteRepository      = baseExpedienteRepository;
       this.expedienteIndexRepository     = expedienteIndexRepository;
       this.expedienteGroupRepository     = expedienteGroupRepository;
       this.expedienteRepository          = expedienteRepository;
@@ -145,6 +147,7 @@ public class DataGenerator implements HasLogger
       this.schemaValuesRepository        = schemaValuesRepository;
       this.fieldRepository               = fieldRepository;
       this.metadataRepository            = metadataRepository;
+      this.documentTypeRepository        = documentTypeRepository;
       this.numerator                     = numerator;
       this.passwordEncoder               = passwordEncoder;
       this.retentionRepository           = retentionRepository;
@@ -348,26 +351,41 @@ public class DataGenerator implements HasLogger
 
    private Level[] createMetadata()
    {
-      Metadata nameMeta  = createMeta("String", Type.STRING, "length > 0");
-      Field    nameField = createField("Nombre", nameMeta, true, false, true, 1, 2);
-      Field    bossField = createField("Jefe",   nameMeta, true, false, true, 2, 2);
+      Metadata nameMeta =        createMeta ("String", Type.STRING, "length > 0");
+      Field    nameField       = createField("Nombre",         nameMeta, true, false, true, 1, 2);
+      Field    bossField       = createField("Jefe",           nameMeta, true, false, true, 2, 2);
+      Field    commitmentField = createField("Obligacion",     nameMeta, true, false, true, 1, 2);
+      Field    dispatchField   = createField("Despacho",       nameMeta, true, true,  true, 2, 1);
+      Field    idField         = createField("Identificacion", nameMeta, true, false, true, 1, 1);
+      Field    authorField     = createField("Autor",          nameMeta, true, false, true, 2, 1);
+      Field    conceptField    = createField("Concepto",       nameMeta, false,false, true, 2, 1);
+      Field    remiteField     = createField("Remitente",      nameMeta, true, false, true, 3, 2);
 
-      Metadata dateMeta  = createMeta("Fecha", Type.DATETIME, "not null");
-      Field    fromField = createField("Desde", dateMeta, true, false, true, 3, 2);
-      Field    toField   = createField("Hasta", dateMeta, true, false, true, 4, 2);
+      Metadata dateMeta  = createMeta ("Fecha", Type.DATETIME, "not null");
+      Field    fromField = createField("Desde",      dateMeta, true, false, true, 3, 2);
+      Field    toField   = createField("Hasta",      dateMeta, true, false, true, 4, 2);
+      Field    dateField = createField("Fecha",      dateMeta, true, true,  true, 3, 1);
+      Field    dueDate   = createField("APagarEn",   dateMeta, true, true,  true, 2, 1);
+      Field    paidDate  = createField("PagadoEn",   dateMeta, true, false, true, 3, 1);
 
-      Metadata enumMeta   = createMeta("Color",    Type.ENUM, "Verde;Rojo;Azul;Magenta;Cyan");
+      Metadata enumMeta   = createMeta ("Color",    Type.ENUM, "Verde;Rojo;Azul;Magenta;Cyan");
       Field    colorField = createField("Colores",   enumMeta, true, false, true, 5, 1);
 
-      Metadata claseMeta     = createMeta("Security", Type.ENUM, "Restringido;Confidencial;Interno;Público");
+      Metadata claseMeta     = createMeta ("Security", Type.ENUM, "Restringido;Confidencial;Interno;Público");
       Field    securityField = createField("Seguridad", claseMeta, true, false, true, 5, 1);
 
-      Metadata intMeta   = createMeta("Entero", Type.INTEGER, " >0; < 100");
+      Metadata intMeta   = createMeta ("Entero", Type.INTEGER, " >0; < 100");
       Field    cantField = createField("Cantidad", intMeta, true, false, true, 5, 1);
       Field    edadField = createField("Edad",     intMeta, true, true,  true, 6, 1);
 
-      Metadata decMeta   = createMeta("Decimal", Type.DECIMAL," >= 0.0");
+      Metadata decMeta   = createMeta ("Decimal", Type.DECIMAL," >= 0.0");
       Field    ratioField= createField("Razon", decMeta, true, false, true, 7, 1);
+      Field    valueField= createField("Valor", decMeta, true, false, true, 4, 1);
+      
+      Schema   docSchema =  createSchema("Documento");
+      docSchema.addField(idField);
+      docSchema.addField(authorField);
+      schemaRepository.saveAndFlush(docSchema);
 
       Schema  sedeSchema = createSchema("Sede");
       sedeSchema.addField(fromField);
@@ -375,6 +393,37 @@ public class DataGenerator implements HasLogger
       sedeSchema.addField(colorField);
       sedeSchema.addField(securityField);
       schemaRepository.saveAndFlush(sedeSchema);
+      
+      Schema  commitmentSchema = createSchema("Obligacion");
+      commitmentSchema.addField(idField);
+      commitmentSchema.addField(conceptField);
+      commitmentSchema.addField(remiteField);
+      commitmentSchema.addField(valueField);
+      schemaRepository.saveAndFlush(commitmentSchema);
+      
+      Schema invoiceSchema= createSchema("Factura");
+      invoiceSchema.addField(commitmentField);
+      invoiceSchema.addField(dueDate);
+      invoiceSchema.addField(valueField);
+      schemaRepository.saveAndFlush(invoiceSchema);
+      
+      Schema paymentSchema= createSchema("Pago");
+      paymentSchema.addField(idField);
+      paymentSchema.addField(valueField);
+      paymentSchema.addField(paidDate);
+      schemaRepository.saveAndFlush(paymentSchema);
+      
+      Schema dispatchSchema=  createSchema("Remision");
+      dispatchSchema.addField(idField);
+      dispatchSchema.addField(commitmentField);
+      dispatchSchema.addField(dateField);
+      schemaRepository.saveAndFlush(dispatchSchema);
+      
+      Schema receiptSchema=  createSchema("Recibo");
+      receiptSchema.addField(idField);
+      receiptSchema.addField(dispatchField);
+      receiptSchema.addField(dateField);
+      schemaRepository.saveAndFlush(receiptSchema);
 
       Schema   officeSchema = createSchema("Office");
       officeSchema.addField(bossField);
@@ -398,6 +447,17 @@ public class DataGenerator implements HasLogger
       otherSchema.addField(edadField);
       otherSchema.addField(ratioField);
       schemaRepository.saveAndFlush(otherSchema);
+      
+      Schema   shortSchema = createSchema("SHORT");
+      shortSchema.addField(colorField);
+      schemaRepository.saveAndFlush(shortSchema);
+            
+      DocumentType document   = createDocType( "Document",   docSchema,        null,     true);
+      createDocType( "Obligacion", commitmentSchema, document, true);
+      createDocType( "Factura",    invoiceSchema,    document, true);
+      createDocType( "Pago",       paymentSchema,    document, true);
+      createDocType( "Remision",   dispatchSchema,   document, true);
+      createDocType( "Recibo",     receiptSchema,    document, true);
 
       Level level0 = new Level("Sede",     0, sedeSchema);
       Level level1 = new Level("Oficina",  1, officeSchema);
@@ -430,6 +490,17 @@ public class DataGenerator implements HasLogger
       schemaRepository.saveAndFlush(schema);
       return schema;
    }//createSchema
+   
+   
+   private DocumentType createDocType(String name, Schema schema, DocumentType parent, boolean requiresContent)
+   {
+      DocumentType docType = new DocumentType( name, schema, parent, requiresContent);
+      documentTypeRepository.save(docType);
+      return docType;      
+   }//createDocType
+   
+   
+   
 
    private UserGroup createUserGroup(Tenant tenant, String name, Integer category, UserGroup owner, LocalDate dateFrom, LocalDate dateTo, boolean locked)
    {

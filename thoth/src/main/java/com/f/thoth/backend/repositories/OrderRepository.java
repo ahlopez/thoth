@@ -54,7 +54,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
    long countByState(OrderState state);
 
-   @Query("SELECT month(dueDate) as month, count(*) as deliveries FROM OrderInfo o where o.state=?1 and year(dueDate)=?2 group by month(dueDate)")
+   @Query("SELECT month(dueDate) as month, count(*) as deliveries "+
+          "FROM OrderInfo o "+
+          "WHERE o.state=?1 AND year(dueDate)=?2 GROUP BY month(dueDate)")
    List<Object[]> countPerMonth(OrderState orderState, int year);
 
    @Query("SELECT year(o.dueDate) as y, month(o.dueDate) as m, sum(oi.quantity*p.price) as deliveries FROM OrderInfo o JOIN o.items oi JOIN oi.product p where o.state=?1 and year(o.dueDate)<=?2 AND year(o.dueDate)>=(?2-3) group by year(o.dueDate), month(o.dueDate) order by y desc, month(o.dueDate)")

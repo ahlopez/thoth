@@ -27,6 +27,7 @@
 
     <!-- Dependencies -->
     <vaadin.version>14.4.3</vaadin.version>
+    <vaadin.multiselectcombo.version>3.0.2</vaadin.multiselectcombo.version>
     <!--  <vaadin.crudui.version>4.3.2</vaadin.crudui.version> -->
 
     <!--jackrabbit.oak.version>1.36</jackrabbit.oak.version-->
@@ -91,7 +92,7 @@
         <enabled>false</enabled>
       </snapshots>
     </repository>
-
+    
     <repository>
       <id>vaadin-prereleases</id>
       <url>https://maven.vaadin.com/vaadin-prereleases</url>
@@ -193,6 +194,12 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-spring</artifactId>
+    </dependency>
+    
+    <dependency>
+       <groupId>org.vaadin.gatanaso</groupId>
+       <artifactId>multiselect-combo-box-flow</artifactId>
+       <version>${vaadin.multiselectcombo.version}</version> 
     </dependency>
 
     <dependency>

@@ -33,7 +33,7 @@ public class LeafExpediente extends AbstractEntity implements  NeedsProtection, 
    @NotNull  (message = "{evidentia.expediente.required}")
    protected BaseExpediente    expediente;                 // Expediente that describes this leaf
 
-   @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
+   @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
    @NotNull  (message = "{evidentia.types.required}")
    protected Set<DocumentType> admissibleTypes;            // Admisible document types that can be included in the expediente
 

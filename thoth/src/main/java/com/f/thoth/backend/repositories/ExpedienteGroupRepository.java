@@ -17,8 +17,7 @@ import com.f.thoth.backend.data.security.Tenant;
 public interface ExpedienteGroupRepository extends JpaRepository<ExpedienteGroup, Long>
 {
    @Query("SELECT branch FROM ExpedienteGroup branch "+
-          "JOIN  BaseExpediente base "+
-          "WHERE base.tenant = :tenant AND base.id = branch.expediente.id")
+          "WHERE branch.expediente.tenant = :tenant")
    Page<ExpedienteGroup> findBy(@Param("tenant") Tenant tenant, Pageable page);
 
    @Query("SELECT branch FROM ExpedienteGroup branch "+
@@ -26,23 +25,19 @@ public interface ExpedienteGroupRepository extends JpaRepository<ExpedienteGroup
    ExpedienteGroup findByCode(@Param("code") String code);
 
    @Query("SELECT branch FROM ExpedienteGroup branch "+
-          "JOIN  BaseExpediente base "+
-          "WHERE base.tenant = :tenant AND base.id = branch.expediente.id")
+          "WHERE branch.expediente.tenant = :tenant")
    List<ExpedienteGroup> findAll(@Param("tenant") Tenant tenant);
 
    @Query("SELECT count(branch) FROM ExpedienteGroup branch "+
-          "JOIN  BaseExpediente base "+
-          "WHERE base.tenant = :tenant AND base.id = branch.expediente.id")
+          "WHERE branch.expediente.tenant = :tenant")
    long countAll(@Param("tenant") Tenant tenant);
 
    @Query("SELECT count(branch) FROM ExpedienteGroup branch "+
-          "JOIN  BaseExpediente base "+
-          "WHERE base.tenant = :tenant AND base.name like :name AND base.id = branch.expediente.id")
+          "WHERE branch.expediente.tenant = :tenant AND lower(branch.expediente.name) LIKE lower(concat('%', :name,'%'))")
    Page<ExpedienteGroup> findByNameLikeIgnoreCase(@Param("tenant") Tenant tenant, @Param("name") String name, Pageable page);
 
    @Query("SELECT count(branch) FROM ExpedienteGroup branch "+
-          "JOIN  BaseExpediente base "+
-          "WHERE base.id = branch.expediente.id AND base.tenant = :tenant AND lower(base.name) LIKE lower(concat('%', :name,'%'))")
+          "WHERE branch.expediente.tenant = :tenant AND lower(branch.expediente.name) LIKE lower(concat('%', :name,'%'))")
    Page<ExpedienteGroup> countByNameLikeIgnoreCase(@Param("tenant") Tenant tenant, @Param("name") String name, Pageable page);
 
 
@@ -50,36 +45,30 @@ public interface ExpedienteGroupRepository extends JpaRepository<ExpedienteGroup
    Optional<ExpedienteGroup> findById(Long id);
 
    @Query("SELECT branch FROM ExpedienteGroup branch "+
-          "JOIN BaseExpediente base "+
-          "WHERE ((base.ownerId IS null AND :owner IS null) OR base.ownerId = :owner) AND base.id = branch.expediente.id")
+          "WHERE (branch.expediente.ownerId IS null AND :owner IS null) OR branch.expediente.ownerId = :owner")
    List<ExpedienteGroup> findByParent( @Param("owner") Long ownerId);
 
    @Query("SELECT count(branch) FROM ExpedienteGroup branch "+
-          "JOIN BaseExpediente base "+
-          "WHERE ((base.ownerId IS null AND :owner IS null) OR (base.ownerId = :owner)) AND base.id = branch.expediente.id")
+          "WHERE (branch.expediente.ownerId IS NULL AND :owner IS NULL) OR branch.expediente.ownerId = :owner")
    int countByParent( @Param("owner") Long ownerId);
 
    @Query("SELECT count(branch) FROM ExpedienteGroup branch "+
-          "JOIN BaseExpediente base "+
-          "WHERE (base.ownerId IS null AND :group IS null) OR (base.ownerId = :group AND base.id = branch.expediente.id)")
+          "WHERE (branch.expediente.ownerId IS NULL AND :group IS NULL) OR branch.expediente.ownerId = :group")
    int countByChildren(@Param("group") Long groupId);
 
    @Query("SELECT branch FROM ExpedienteGroup branch "+
-          "JOIN BaseExpediente base "+
-          "WHERE base.tenant = :tenant AND lower(base.name) LIKE lower(concat('%', :name,'%')) AND base.id = branch.expediente.id")
+          "WHERE branch.expediente.tenant = :tenant AND lower(branch.expediente.name) LIKE lower(concat('%', :name,'%'))")
    List<ExpedienteGroup> findByNameLikeIgnoreCase(@Param("tenant") Tenant tenant, @Param("name") String name);
 
    @Query("SELECT count(branch) FROM ExpedienteGroup branch "+
-          "JOIN BaseExpediente base "+
-          "WHERE base.tenant = :tenant AND lower(base.name) LIKE lower(concat('%', :name,'%')) AND base.id = branch.expediente.id")
+          "WHERE branch.expediente.tenant = :tenant AND lower(branch.expediente.name) LIKE lower(concat('%', :name,'%'))")
    long countByNameLikeIgnoreCase(@Param("tenant") Tenant tenant, @Param("name") String name);
 
 
    //   ----------- ACL handling ----------------
    @Query("SELECT DISTINCT branch FROM ExpedienteGroup branch "+
-          "JOIN BaseExpediente base "+
-          "JOIN Permission p "+
-          "WHERE base.objectToProtect = p.objectToProtect AND p.role = :role AND base.id = branch.expediente.id")
+          "JOIN   Permission p ON branch.expediente.objectToProtect = p.objectToProtect "+
+          "WHERE  p.role = :role")
    List<ExpedienteGroup> findExpedientesGranted( @Param("role") Role role);
 
 }//ExpedienteGroupRepository

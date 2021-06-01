@@ -1,24 +1,36 @@
 package com.f.thoth.ui.views.expediente;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+
+import org.vaadin.gatanaso.MultiselectComboBox;
 
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.ExpedienteGroup;
 import com.f.thoth.backend.data.gdoc.expediente.Nature;
 import com.f.thoth.backend.data.gdoc.expediente.Volume;
+import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.service.BaseExpedienteService;
+import com.f.thoth.backend.service.DocumentTypeService;
 import com.f.thoth.backend.service.ExpedienteGroupService;
 import com.f.thoth.backend.service.SchemaService;
 import com.f.thoth.backend.service.VolumeService;
 import com.f.thoth.ui.components.Notifier;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.shared.Registration;
 
@@ -28,6 +40,9 @@ public class VolumeEditor extends VerticalLayout
    private VolumeService               volumeService;
    private BaseExpedienteService       baseExpedienteService;
    private SchemaService               schemaService;
+   private DocumentTypeService         documentTypeService;
+
+   private MultiselectComboBox<DocumentType> docTypes;
 
    private Volume                      currentVolume;
    private Classification              classificationClass;
@@ -36,11 +51,17 @@ public class VolumeEditor extends VerticalLayout
    private BaseExpedienteEditor        baseExpedienteEditor;
    private Notifier notifier           = new Notifier();
 
+   private Button             save;
+   private Button             delete;
+   private Button             close;
+   private Component          buttons;
+
 
    public VolumeEditor( ExpedienteGroupService  expedienteGroupService,
                         VolumeService           volumeService,
                         BaseExpedienteService   baseExpedienteService,
                         SchemaService           schemaService,
+                        DocumentTypeService     documentTypeService,
                         Classification          classificationClass
                       )
    {
@@ -48,11 +69,18 @@ public class VolumeEditor extends VerticalLayout
      this.volumeService           = volumeService;
      this.baseExpedienteService   = baseExpedienteService;
      this.schemaService           = schemaService;
+     this.documentTypeService     = documentTypeService;
      this.currentUser             = ThothSession.getCurrentUser();
      this.classificationClass     = classificationClass;
      this.currentVolume           = null;
 
+     buttons = configureActions();
+
      add(configureEditor());
+     add(configureDocTypes());
+     add(buttons);
+
+     addClassName("field-form");
      setVisible(false);
 
    }//VolumeEditor
@@ -62,11 +90,58 @@ public class VolumeEditor extends VerticalLayout
    private BaseExpedienteEditor configureEditor()
    {
      baseExpedienteEditor = new BaseExpedienteEditor(schemaService);
-     baseExpedienteEditor.addListener(BaseExpedienteEditor.SaveEvent.class,    this::saveVolume );
-     baseExpedienteEditor.addListener(BaseExpedienteEditor.CloseEvent.class,   e -> closeEditor());
-     baseExpedienteEditor.addListener(BaseExpedienteEditor.DeleteEvent.class,  this::deleteVolume);
+     baseExpedienteEditor.addListener(BaseExpedienteEditor.ValidationEvent.class, e -> save.setEnabled(e.getValidationResult()));
      return baseExpedienteEditor;
    }//configureEditor
+
+
+   private Component configureActions()
+   {
+     save = new Button("Guardar");
+     save.addClickShortcut (Key.ENTER);
+     save.addThemeVariants  (ButtonVariant.LUMO_PRIMARY);
+     save.getElement().getStyle().set("margin-left", "auto");
+     save.setWidth("20%");
+     save.addClickListener  (click -> saveVolume(currentVolume));
+
+     delete = new Button("Eliminar");
+     delete.addClickShortcut (Key.DELETE);
+     delete.addThemeVariants  (ButtonVariant.LUMO_CONTRAST);
+     delete.getElement().getStyle().set("margin-left", "auto");
+     delete.setWidth("20%");
+     delete.addClickListener  (click -> deleteVolume(currentVolume));
+
+
+     close= new Button("Cancelar");
+     close.addThemeVariants (ButtonVariant.LUMO_TERTIARY);
+     close.addClickShortcut(Key.ESCAPE);
+     close. setWidth("20%");
+     close.addClickListener (click ->
+     { baseExpedienteEditor.close();
+       closeEditor();
+     });
+
+     HorizontalLayout buttons = new HorizontalLayout(close, delete, save);
+     buttons.getElement().setAttribute("colspan", "4");
+     buttons.setWidthFull();
+     return buttons;
+   }//configureActions
+
+
+   private Component  configureDocTypes()
+   {
+      docTypes = new MultiselectComboBox<>("Tipos documentales");
+      List<DocumentType> allTypes = documentTypeService.findAll();   // Recibirlo como parámetro
+      docTypes.setItems(allTypes);
+   //   docTypes.addValueChangeListener(e -> currentVolume.setAdmissibleTypes(e.getValue()));
+      docTypes.setItemLabelGenerator(e-> e.getName());
+      docTypes.setWidth("30%");
+      docTypes.setRequired(false);
+      docTypes.setRequiredIndicatorVisible(true);
+      docTypes.getElement().setAttribute("colspan", "1");
+      return docTypes;
+
+   }//configureDocTypes
 
 
    public void addVolume(BaseExpediente parentBase)
@@ -97,10 +172,12 @@ public class VolumeEditor extends VerticalLayout
      newVolume.setMetadata            (null);
      newVolume.setDateOpened          (now);
      newVolume.setDateClosed          (now.plusYears(1000L));
-     newVolume.setOwnerId             ( parentGroup == null? null : parentGroup.getExpediente().getId());
+     newVolume.setOwnerId             ( parentGroup == null? null : parentGroup.getOwnerId());
      newVolume.setOpen                (true);
      newVolume.setKeywords            ("keyword1, keyword2, keyword3");
      newVolume.setMac                 ("[mac]");
+     newVolume.setCurrentInstance     (0);
+     newVolume.setInstances           (new TreeSet<>());
      return newVolume;
 
    }//createVolume
@@ -113,13 +190,24 @@ public class VolumeEditor extends VerticalLayout
      } else
      {
         currentVolume = volume;
-        setVisible(true);
-        baseExpedienteEditor.setVisible(true);
+        docTypes.deselectAll();
+        Set<DocumentType> admissibleTypes = currentVolume.getAdmissibleTypes();
+        docTypes.setValue(admissibleTypes == null? new TreeSet<>() : admissibleTypes);
+        setVisibility(true);
         BaseExpediente base = currentVolume.getExpediente();
         String   parentCode = getParentCode( base);
         baseExpedienteEditor.editExpediente(base, parentCode);
      }
    }//editVolume
+   
+   
+   private void setVisibility( boolean visibility)
+   {
+      baseExpedienteEditor.setVisible(visibility);
+      docTypes            .setVisible(visibility);
+      buttons             .setVisible(visibility);
+      setVisible(visibility);
+   }//setVisibility
 
 
    private String getParentCode( BaseExpediente base)
@@ -140,44 +228,42 @@ public class VolumeEditor extends VerticalLayout
     }//getParentCode
 
 
-   private void saveVolume(BaseExpedienteEditor.SaveEvent event)
+   private void saveVolume(Volume volume)
    {
-      BaseExpediente expediente = event.getBaseExpediente();
-      if ( expediente != null)
+      if ( volume != null && baseExpedienteEditor.saveBaseExpediente())
       {
-         boolean isNew = !expediente.isPersisted();
+         boolean isNew = !volume.isPersisted();
          int  duration = isNew? 6000 : 3000;
-         if (currentVolume != null)
-         {  currentVolume.setExpediente(expediente);
-            volumeService.save(currentUser, currentVolume);
-            String businessCode = expediente.formatCode();
-            String msg          = isNew? "Volumen creado con código "+ businessCode: "Volumen "+ businessCode+ " actualizado";
-            notifier.show(msg, "notifier-accept", duration, Notification.Position.BOTTOM_CENTER);
-         }
-         closeEditor();
+         volume.setAdmissibleTypes(docTypes.getValue());
+         volumeService.save(currentUser, volume);
+         String businessCode = volume.formatCode();
+         String msg          = isNew? "Volumen creado con código "+ businessCode: "Volumen "+ businessCode+ " actualizado";
+         notifier.show(msg, "notifier-accept", duration, Notification.Position.BOTTOM_CENTER);
       }
+      closeEditor();
+
    }//saveVolume
 
 
-   private void deleteVolume(BaseExpedienteEditor.DeleteEvent event)
+   private void deleteVolume(Volume volume)
    {
-     BaseExpediente volumen = event.getBaseExpediente();
-     if (volumen != null && volumen.isOfType(Nature.VOLUMEN) && volumen.isPersisted())
+     if (volume != null && volume.isOfType(Nature.VOLUMEN) && volume.isPersisted())
      {
        if (!volumeService.hasChildren(currentVolume))
        {  volumeService.delete(currentUser, currentVolume);
-          notifier.show("Volumen "+ volumen.formatCode()+ " eliminado",    "notifier-accept",  3000,  Notification.Position.BOTTOM_CENTER);
+          notifier.show("Volumen "+ volume.formatCode()+ " eliminado",    "notifier-accept",  3000,  Notification.Position.BOTTOM_CENTER);
        }else
        {  notifier.error("Volumen no puede ser eliminado pues contiene documentos");
        }
      }
      closeEditor();
+
    }//deleteVolume
 
 
    public void closeEditor()
    {
-     baseExpedienteEditor.setVisible(false);
+     setVisibility(false);
      fireEvent(new CloseEvent(this, currentVolume));
      currentVolume = null;
    }//closeEditor

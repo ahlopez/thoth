@@ -23,7 +23,6 @@ import javax.validation.constraints.Size;
 
 import com.f.thoth.backend.data.entity.AbstractEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
-import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 
 
 /**
@@ -54,7 +53,6 @@ import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
                @NamedAttributeNode("roles"),
                @NamedAttributeNode("singleUsers"),
                @NamedAttributeNode("userGroups"),
-               @NamedAttributeNode("docTypes")
                */
          }) })
 @Entity
@@ -115,13 +113,6 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
    @BatchSize(size = 50)
    @Valid
    private Set<UserGroup>  userGroups;
-
-   @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-   @OrderColumn
-   @JoinColumn(name="doctype_id")
-   @BatchSize(size = 50)
-   @Valid
-   private Set<DocType>  docTypes;
    */
 
    @Transient
@@ -132,10 +123,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 
    @Transient
    private Set<UserGroup>        userGroups;
-
-   @Transient
-   private Set<DocumentType>     docTypes;
-
+  
 
    // ------------- Constructors ----------------------
 
@@ -187,7 +175,6 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
       roles        = new TreeSet<>();
       singleUsers  = new TreeSet<>();
       userGroups   = new TreeSet<>();
-      docTypes     = new TreeSet<>();
    }//allocate
 
    // -------------- Getters & Setters ----------------
@@ -240,9 +227,6 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
    public Set<UserGroup>     getUserGroups() { return userGroups;}
    public void               setUserGroups( Set<UserGroup> userGroups){ this.userGroups = userGroups;}
 
-   public Set<DocumentType>  getDocTypes() { return docTypes;}
-   public void               setDocTypes( Set<DocumentType> docTypes){ this.docTypes = docTypes;}
-
    // --------------- Object methods ------------------
 
    @Override
@@ -268,7 +252,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
       return "Tenant{ id["+ id+ "] version["+ version+ "] name["+ name+ "] "+
              "code["+  code+ "] workspace["+ workspace+ "] "+
              "roles["+  roles.size()+ "] singleUsers["+ singleUsers.size()+ "] "+
-             "userGroups["+ userGroups.size()+ "] docTypes["+ docTypes.size()+ "]}";
+             "userGroups["+ userGroups.size()+ "]}";
    }//toString
 
    @Override
@@ -285,10 +269,6 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 
 
    // --------------- Logic ---------------------
-
-   public boolean contains( DocumentType type) { return docTypes.contains(type);}
-
-   public void addType( DocumentType type) { docTypes.add(type);}
 
    public void addRole( Role role) { roles.add(role);}
 
@@ -313,17 +293,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
       }
       return null;
    }//getUserGroupById
-
-   public DocumentType getTypeById( String code)
-   {
-      for (DocumentType dt: docTypes)
-      {
-         if( dt.getCode().equals(code))
-            return dt;
-      }
-      return null;
-   }//getTypeById
-   
+ 
 
 
 }//Tenant

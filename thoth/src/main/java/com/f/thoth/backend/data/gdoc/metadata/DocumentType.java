@@ -40,15 +40,15 @@ import com.f.thoth.backend.data.security.UserGroup;
                @NamedAttributeNode("owner"),
                @NamedAttributeNode("schema"),
                @NamedAttributeNode("requiresContent"),
-            @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF)
+               @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF)
          },
          subgraphs = @NamedSubgraph(name = ObjectToProtect.BRIEF,
-               attributeNodes = {
-                 @NamedAttributeNode("category"),
-                 @NamedAttributeNode("userOwner"),
-                 @NamedAttributeNode("roleOwner"),
-                 @NamedAttributeNode("restrictedTo")
-               })
+         attributeNodes = {
+               @NamedAttributeNode("category"),
+               @NamedAttributeNode("userOwner"),
+               @NamedAttributeNode("roleOwner"),
+               @NamedAttributeNode("restrictedTo")
+         })
          ),
    @NamedEntityGraph(
          name = DocumentType.FULL,
@@ -60,17 +60,17 @@ import com.f.thoth.backend.data.security.UserGroup;
                @NamedAttributeNode("schema"),
                @NamedAttributeNode("requiresContent"),
                @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)
-            },
-            subgraphs = @NamedSubgraph(name = ObjectToProtect.FULL,
-                  attributeNodes = {
-                    @NamedAttributeNode("category"),
-                    @NamedAttributeNode("userOwner"),
-                    @NamedAttributeNode("roleOwner"),
-                    @NamedAttributeNode("restrictedTo"),
-                    @NamedAttributeNode("acl")
-                  })
-            )
+         },
+         subgraphs = @NamedSubgraph(name = ObjectToProtect.FULL,
+         attributeNodes = {
+               @NamedAttributeNode("category"),
+               @NamedAttributeNode("userOwner"),
+               @NamedAttributeNode("roleOwner"),
+               @NamedAttributeNode("restrictedTo"),
+               @NamedAttributeNode("acl")
          })
+         )
+})
 @Entity
 @Table(name = "DOCUMENT_TYPE", indexes = { @Index(columnList = "code") })
 public class DocumentType extends BaseEntity implements NeedsProtection, HierarchicalEntity<DocumentType>, Comparable<DocumentType>
@@ -114,7 +114,6 @@ public class DocumentType extends BaseEntity implements NeedsProtection, Hierarc
       super();
       name = "[name]";
       init();
-      buildCode();
    }// DocType constructor
 
    public DocumentType( String name, Schema schema, DocumentType owner, boolean requiresContent)
@@ -126,14 +125,14 @@ public class DocumentType extends BaseEntity implements NeedsProtection, Hierarc
       if(schema == null)
          throw new IllegalArgumentException( "El esquema de metadatos del tipo documental no puede ser nulo");
 
-      if( !this.tenant.contains( owner))
+      if( owner != null && !owner.isPersisted())
          throw new IllegalArgumentException( "El tipo padre debe definirse antes que el tipo hijo");
 
       this.name     = name;
       this.owner    = owner;
       this.schema   = schema;
       this.requiresContent = requiresContent;
-      buildCode();
+      this.objectToProtect = new ObjectToProtect();
 
    }//DocType
 
@@ -157,9 +156,12 @@ public class DocumentType extends BaseEntity implements NeedsProtection, Hierarc
 
    @Override protected void buildCode()
    {
-      this.code = (tenant == null? "[tenant]": tenant.getCode())+"[DTP]"+
-                  (owner == null? ":": owner.getOwnerCode())+ ">"+
-                  (name == null? "[name]" : name);
+      if ( this.code == null)
+      {
+         this.code = (tenant == null? "[tenant]": tenant.getCode())+"[DTP]"+
+               (owner == null? ":": owner.getOwnerCode())+ ">"+
+               (name == null? "[name]" : name);
+      }
    }//buildCode
 
 
@@ -184,10 +186,10 @@ public class DocumentType extends BaseEntity implements NeedsProtection, Hierarc
 
    @Override public String      formatCode()
    {
-       int i = TextUtil.indexOf(code, "/", 3);
-       String id = code.substring(i);
-       id = TextUtil.replace(id, "/", "-");
-       return id;
+      int i = TextUtil.indexOf(code, "/", 3);
+      String id = code.substring(i);
+      id = TextUtil.replace(id, "/", "-");
+      return id;
    }//formatCode
 
    private String getOwnerCode(){ return (owner == null ? "" : owner.getOwnerCode())+ ":"+ name; }
@@ -247,8 +249,8 @@ public class DocumentType extends BaseEntity implements NeedsProtection, Hierarc
    @Override  public int compareTo(DocumentType that)
    {
       return this.equals(that)?  0 :
-             that == null?       1 :
-             this.getCode().compareTo(that.getCode());
+         that == null?       1 :
+            this.getCode().compareTo(that.getCode());
 
    }// compareTo
 

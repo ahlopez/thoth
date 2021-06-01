@@ -18,9 +18,9 @@ public interface ObjectToProtectRepository extends JpaRepository<ObjectToProtect
 {
    @EntityGraph(value = ObjectToProtect.FULL, type = EntityGraphType.LOAD)
    Optional<ObjectToProtect> findById(Long id);
-   
+
    @EntityGraph(value = ObjectToProtect.FULL, type = EntityGraphType.LOAD)
-   @Query("SELECT o FROM ObjectToProtect o where o = ?1")
+   @Query("SELECT o FROM ObjectToProtect o WHERE o = ?1")
    Optional<ObjectToProtect> findByObject(ObjectToProtect object);
 
    @EntityGraph(value = ObjectToProtect.BRIEF, type = EntityGraphType.LOAD)
@@ -33,8 +33,10 @@ public interface ObjectToProtectRepository extends JpaRepository<ObjectToProtect
 
    @Query("SELECT count(o) FROM ObjectToProtect o")
    long countAll();
- 
-   @Query("SELECT o FROM ObjectToProtect o JOIN o.acl p WHERE o = p.objectToProtect AND p.role= ?1")
+
+   @Query("SELECT o FROM ObjectToProtect o "+
+          "JOIN   o.acl p ON  o = p.objectToProtect "+
+          "WHERE  p.role= ?1")
    List<ObjectToProtect>findObjectsGranted( Role role);
 
 }//ObjectToProtectRepository

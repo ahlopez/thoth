@@ -16,8 +16,7 @@ import com.f.thoth.backend.data.security.Tenant;
 public interface VolumeRepository extends JpaRepository<Volume, Long>
 {
    @Query("SELECT v FROM Volume v "+
-          "JOIN BaseExpediente base "+
-          "WHERE base.tenant = :tenant")
+          "WHERE v.expediente.tenant = :tenant")
    Page<Volume> findAll( @Param("tenant") Tenant tenant, Pageable page);
 
 
@@ -68,9 +67,8 @@ public interface VolumeRepository extends JpaRepository<Volume, Long>
 
    //   ----------- ACL handling ----------------
    @Query("SELECT DISTINCT v FROM Volume v "+
-          "JOIN BaseExpediente base "+
-          "JOIN Permission p  "+
-          "WHERE base.objectToProtect = p.objectToProtect AND p.role = :role")
+          "JOIN   Permission p ON v.expediente.objectToProtect = p.objectToProtect "+
+          "WHERE  p.role = :role")
    List<Volume> findExpedientesGranted( @Param("role") Role role);
 
 }//VolumeRepository

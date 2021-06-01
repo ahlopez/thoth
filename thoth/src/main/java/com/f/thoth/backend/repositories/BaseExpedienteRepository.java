@@ -112,8 +112,8 @@ public interface BaseExpedienteRepository extends JpaRepository<BaseExpediente, 
 
    //   ----------- ACL handling ----------------
    @Query("SELECT DISTINCT base FROM BaseExpediente base "+
-          "JOIN Permission p "+
-          "WHERE base.objectToProtect = p.objectToProtect AND p.role = :role")
+          "JOIN   Permission p ON base.objectToProtect = p.objectToProtect "+
+          "WHERE  p.role = :role")
    List<BaseExpediente> findExpedientesGranted( @Param("role") Role role);
 
 }//BaseExpedienteRepository

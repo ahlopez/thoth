@@ -6,7 +6,6 @@ import java.util.Optional;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.ExpedienteGroup;
-import com.f.thoth.backend.data.gdoc.expediente.Nature;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
@@ -14,9 +13,14 @@ import com.f.thoth.backend.service.BaseExpedienteService;
 import com.f.thoth.backend.service.ExpedienteGroupService;
 import com.f.thoth.backend.service.SchemaService;
 import com.f.thoth.ui.components.Notifier;
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
+import com.vaadin.flow.component.Key;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.shared.Registration;
 
@@ -33,6 +37,11 @@ public class ExpedienteGroupEditor extends VerticalLayout
   private BaseExpedienteEditor        baseExpedienteEditor;
   private Notifier notifier           = new Notifier();
 
+  private Button             save;
+  private Button             delete;
+  private Button             close;
+  private Component          buttons;
+
 
   public ExpedienteGroupEditor( ExpedienteGroupService  expedienteGroupService,
                                 BaseExpedienteService   baseExpedienteService,
@@ -47,7 +56,12 @@ public class ExpedienteGroupEditor extends VerticalLayout
     this.classificationClass     = classificationClass;
     this.currentGroup            = null;
 
+
     add(configureEditor());
+    buttons = configureActions();
+    add(buttons);
+
+    addClassName("field-form");
     setVisible(false);
 
   }//ExpedienteGroupEditor
@@ -57,11 +71,41 @@ public class ExpedienteGroupEditor extends VerticalLayout
   private BaseExpedienteEditor configureEditor()
   {
     baseExpedienteEditor = new BaseExpedienteEditor(schemaService);
-    baseExpedienteEditor.addListener(BaseExpedienteEditor.SaveEvent.class,    this::saveExpediente );
-    baseExpedienteEditor.addListener(BaseExpedienteEditor.CloseEvent.class,   e -> closeEditor());
-    baseExpedienteEditor.addListener(BaseExpedienteEditor.DeleteEvent.class,  this::deleteExpediente);
+    baseExpedienteEditor.addListener(BaseExpedienteEditor.ValidationEvent.class, e -> save.setEnabled(e.getValidationResult()));
     return baseExpedienteEditor;
   }//configureEditor
+
+
+  private Component configureActions()
+  {
+    save = new Button("Guardar");
+    save.addClickShortcut (Key.ENTER);
+    save.addThemeVariants  (ButtonVariant.LUMO_PRIMARY);
+    save.getElement().getStyle().set("margin-left", "auto");
+    save.setWidth("20%");
+    save.addClickListener  (click -> saveGroup(currentGroup));
+
+    delete = new Button("Eliminar");
+    delete.addClickShortcut (Key.DELETE);
+    delete.addThemeVariants  (ButtonVariant.LUMO_CONTRAST);
+    delete.getElement().getStyle().set("margin-left", "auto");
+    delete.setWidth("20%");
+    delete.addClickListener  (click -> deleteGroup(currentGroup));
+
+    close= new Button("Cancelar");
+    close.addThemeVariants (ButtonVariant.LUMO_TERTIARY);
+    close.addClickShortcut(Key.ESCAPE);
+    close. setWidth("20%");
+    close.addClickListener (click ->
+    { baseExpedienteEditor.close();
+      closeEditor();
+    });
+
+    HorizontalLayout buttons = new HorizontalLayout(close, delete, save);
+    buttons.getElement().setAttribute("colspan", "4");
+    buttons.setWidthFull();
+    return buttons;
+  }//configureActions
 
 
   public void addExpedienteGroup(BaseExpediente parentBase)
@@ -92,13 +136,23 @@ public class ExpedienteGroupEditor extends VerticalLayout
     newGroup.setMetadata            (null);
     newGroup.setDateOpened          (now);
     newGroup.setDateClosed          (now.plusYears(1000L));
-    newGroup.setOwnerId             ( parentGroup == null? null : parentGroup.getExpediente().getId());
+    newGroup.setOwnerId             ( parentGroup == null? null : parentGroup.getOwnerId());
     newGroup.setOpen                (true);
     newGroup.setKeywords            ("keyword1, keyword2, keyword3");
     newGroup.setMac                 ("[mac]");
+
     return newGroup;
 
   }//createGroup
+ 
+  
+  private void setVisibility( boolean visibility)
+  {
+     baseExpedienteEditor.setVisible(visibility);
+     buttons             .setVisible(visibility);
+     setVisible(visibility);
+  }//setVisibility
+
 
 
   public void editExpedienteGroup(ExpedienteGroup group)
@@ -108,7 +162,7 @@ public class ExpedienteGroupEditor extends VerticalLayout
     } else
     {
        currentGroup = group;
-       setVisible(true);
+       setVisibility(true);
        baseExpedienteEditor.setVisible(true);
        BaseExpediente base = currentGroup.getExpediente();
        String   parentCode = getParentCode( base);
@@ -135,45 +189,40 @@ public class ExpedienteGroupEditor extends VerticalLayout
    }//getParentCode
 
 
-  private void saveExpediente(BaseExpedienteEditor.SaveEvent event)
+  private void saveGroup(ExpedienteGroup group)
   {
-     BaseExpediente expediente = event.getBaseExpediente();
-     if ( expediente != null)
+     if ( group != null && baseExpedienteEditor.saveBaseExpediente())
      {
-        boolean isNew = !expediente.isPersisted();
+        boolean isNew = !group.isPersisted();
         int  duration = isNew? 6000 : 3000;
-        if (currentGroup != null)
-        {  currentGroup.setExpediente(expediente);
-           expedienteGroupService.save(currentUser, currentGroup);
-           String businessCode = expediente.formatCode();
-           String msg          = isNew? "Grupo de expedientes creado con código "+ businessCode: "Grupo de expedientes "+ businessCode+ " actualizado";
-           notifier.show(msg, "notifier-accept", duration, Notification.Position.BOTTOM_CENTER);
-        }
-        closeEditor();
+        expedienteGroupService.save(currentUser, group);
+        String msg          = "Grupo de expedientes "+ group.formatCode()+ (isNew? " creado" : " actualizado");
+        notifier.show(msg, "notifier-accept", duration, Notification.Position.BOTTOM_CENTER);
      }
-  }//saveExpediente
+     closeEditor();
+
+  }//saveGroup
 
 
-  private void deleteExpediente(BaseExpedienteEditor.DeleteEvent event)
+  private void deleteGroup(ExpedienteGroup group)
   {
-    BaseExpediente expediente = event.getBaseExpediente();
-    if (expediente.isOfType(Nature.GRUPO) && expediente.isPersisted())
+    if (group != null && group.isPersisted())
     {
-      if (!expedienteGroupService.hasChildren(currentGroup))
-      {  expedienteGroupService.delete(currentUser, currentGroup);
-         notifier.show("Grupo de expedientes "+ expediente.formatCode()+ " eliminado",    "notifier-accept",  3000,  Notification.Position.BOTTOM_CENTER);
+      if (!expedienteGroupService.hasChildren(group))
+      {  expedienteGroupService.delete(currentUser, group);
+         notifier.show("Grupo de expedientes "+ group.formatCode()+ " eliminado",    "notifier-accept",  3000,  Notification.Position.BOTTOM_CENTER);
       }else
-      {  notifier.error("Grupo de expedientes no puede ser eliminado pues tiene expedientes hijos");
+      {  notifier.error("Grupo de expedientes no puede ser eliminado pues contiene subgrupos");
       }
     }
     closeEditor();
-  }//deleteExpediente
+
+  }//deleteGroup
 
 
   public void closeEditor()
   {
-    baseExpedienteEditor.setVisible(false);
-    setVisible(false);
+    setVisibility(false);
     fireEvent(new CloseEvent(this, currentGroup));
     currentGroup = null;
   }//closeEditor
