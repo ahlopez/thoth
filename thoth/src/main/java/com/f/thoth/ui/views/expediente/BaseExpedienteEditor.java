@@ -182,7 +182,6 @@ public class BaseExpedienteEditor extends FormLayout
     binder.addStatusChangeListener(evt -> fireEvent( new ValidationEvent(this, selectedExpediente, binder.isValid())));
 
     metadataEditor = new MetadataEditor();
-    metadataEditor.addListener(MetadataEditor.SaveEvent.class, e-> saveMetadata());
     metadataEditor.getElement().setAttribute("colspan", "4");
     add(metadataEditor);
 

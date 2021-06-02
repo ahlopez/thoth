@@ -97,10 +97,8 @@ public class DataGenerator implements HasLogger
 //   private PickupLocationRepository      pickupLocationRepository;
    private PasswordEncoder               passwordEncoder;
    private ClassificationRepository      claseRepository;
-//   private BaseExpedienteRepository      baseExpedienteRepository;
    private ExpedienteIndexRepository     expedienteIndexRepository;
    private ExpedienteGroupRepository    expedienteGroupRepository;
-//   private LeafExpedienteRepository      leafExpedienteRepository;
    private ExpedienteLeafRepository          expedienteRepository;
    private VolumeRepository              volumeRepository;
    private VolumeInstanceRepository      volumeInstanceRepository;
@@ -364,9 +362,9 @@ public class DataGenerator implements HasLogger
       Metadata dateMeta  = createMeta ("Fecha", Type.DATETIME, "not null");
       Field    fromField = createField("Desde",      dateMeta, true, false, true, 3, 2);
       Field    toField   = createField("Hasta",      dateMeta, true, false, true, 4, 2);
-      Field    dateField = createField("Fecha",      dateMeta, true, true,  true, 3, 1);
-      Field    dueDate   = createField("APagarEn",   dateMeta, true, true,  true, 2, 1);
-      Field    paidDate  = createField("PagadoEn",   dateMeta, true, false, true, 3, 1);
+      Field    dateField = createField("Fecha",      dateMeta, true, true,  true, 3, 2);
+      Field    dueDate   = createField("APagarEn",   dateMeta, true, true,  true, 2, 2);
+      Field    paidDate  = createField("PagadoEn",   dateMeta, true, false, true, 3, 2);
 
       Metadata enumMeta   = createMeta ("Color",    Type.ENUM, "Verde;Rojo;Azul;Magenta;Cyan");
       Field    colorField = createField("Colores",   enumMeta, true, false, true, 5, 1);

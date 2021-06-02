@@ -13,6 +13,7 @@ import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.ExpedienteGroup;
 import com.f.thoth.backend.data.gdoc.expediente.Nature;
 import com.f.thoth.backend.data.gdoc.expediente.Volume;
+import com.f.thoth.backend.data.gdoc.expediente.VolumeInstance;
 import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.ThothSession;
@@ -21,6 +22,7 @@ import com.f.thoth.backend.service.BaseExpedienteService;
 import com.f.thoth.backend.service.DocumentTypeService;
 import com.f.thoth.backend.service.ExpedienteGroupService;
 import com.f.thoth.backend.service.SchemaService;
+import com.f.thoth.backend.service.VolumeInstanceService;
 import com.f.thoth.backend.service.VolumeService;
 import com.f.thoth.ui.components.Notifier;
 import com.vaadin.flow.component.Component;
@@ -32,17 +34,21 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.shared.Registration;
 
 public class VolumeEditor extends VerticalLayout
 {
    private ExpedienteGroupService      expedienteGroupService;
    private VolumeService               volumeService;
+   private VolumeInstanceService       volumeInstanceService;
    private BaseExpedienteService       baseExpedienteService;
    private SchemaService               schemaService;
    private DocumentTypeService         documentTypeService;
 
+   private HorizontalLayout            volumeFields;
    private MultiselectComboBox<DocumentType> docTypes;
+   private TextField                   currentInstance;
 
    private Volume                      currentVolume;
    private Classification              classificationClass;
@@ -59,6 +65,7 @@ public class VolumeEditor extends VerticalLayout
 
    public VolumeEditor( ExpedienteGroupService  expedienteGroupService,
                         VolumeService           volumeService,
+                        VolumeInstanceService   volumeInstanceService,
                         BaseExpedienteService   baseExpedienteService,
                         SchemaService           schemaService,
                         DocumentTypeService     documentTypeService,
@@ -67,6 +74,7 @@ public class VolumeEditor extends VerticalLayout
    {
      this.expedienteGroupService  = expedienteGroupService;
      this.volumeService           = volumeService;
+     this.volumeInstanceService   = volumeInstanceService;
      this.baseExpedienteService   = baseExpedienteService;
      this.schemaService           = schemaService;
      this.documentTypeService     = documentTypeService;
@@ -77,14 +85,13 @@ public class VolumeEditor extends VerticalLayout
      buttons = configureActions();
 
      add(configureEditor());
-     add(configureDocTypes());
+     add(configureVolumeFields());
      add(buttons);
 
      addClassName("field-form");
      setVisible(false);
 
    }//VolumeEditor
-
 
 
    private BaseExpedienteEditor configureEditor()
@@ -128,20 +135,32 @@ public class VolumeEditor extends VerticalLayout
    }//configureActions
 
 
-   private Component  configureDocTypes()
+   private Component  configureVolumeFields()
    {
+      volumeFields = new HorizontalLayout();
+      volumeFields.setWidthFull();
       docTypes = new MultiselectComboBox<>("Tipos documentales");
       List<DocumentType> allTypes = documentTypeService.findAll();   // Recibirlo como parámetro
       docTypes.setItems(allTypes);
-   //   docTypes.addValueChangeListener(e -> currentVolume.setAdmissibleTypes(e.getValue()));
       docTypes.setItemLabelGenerator(e-> e.getName());
       docTypes.setWidth("30%");
       docTypes.setRequired(false);
       docTypes.setRequiredIndicatorVisible(true);
       docTypes.getElement().setAttribute("colspan", "1");
-      return docTypes;
+      
+      currentInstance= new TextField("Instancia actual");
+      currentInstance.setRequired(true);
+      currentInstance.setRequiredIndicatorVisible(true);
+      currentInstance.setErrorMessage("Código de la instancia actual debe ser mayor o igual a 0");
+      currentInstance.getElement().setAttribute("colspan", "1");
+      currentInstance.getElement().getStyle().set("color", "blue");
+      currentInstance.setReadOnly(true);
+      
+      volumeFields.add( docTypes, currentInstance);
+      
+      return volumeFields;
 
-   }//configureDocTypes
+   }//configureVolumeFields
 
 
    public void addVolume(BaseExpediente parentBase)
@@ -177,7 +196,6 @@ public class VolumeEditor extends VerticalLayout
      newVolume.setKeywords            ("keyword1, keyword2, keyword3");
      newVolume.setMac                 ("[mac]");
      newVolume.setCurrentInstance     (0);
-     newVolume.setInstances           (new TreeSet<>());
      return newVolume;
 
    }//createVolume
@@ -193,6 +211,7 @@ public class VolumeEditor extends VerticalLayout
         docTypes.deselectAll();
         Set<DocumentType> admissibleTypes = currentVolume.getAdmissibleTypes();
         docTypes.setValue(admissibleTypes == null? new TreeSet<>() : admissibleTypes);
+        currentInstance.setValue(volume.getCurrentInstance().toString());
         setVisibility(true);
         BaseExpediente base = currentVolume.getExpediente();
         String   parentCode = getParentCode( base);
@@ -204,7 +223,7 @@ public class VolumeEditor extends VerticalLayout
    private void setVisibility( boolean visibility)
    {
       baseExpedienteEditor.setVisible(visibility);
-      docTypes            .setVisible(visibility);
+      volumeFields        .setVisible(visibility);
       buttons             .setVisible(visibility);
       setVisible(visibility);
    }//setVisibility
@@ -253,14 +272,55 @@ public class VolumeEditor extends VerticalLayout
        {  volumeService.delete(currentUser, currentVolume);
           notifier.show("Volumen "+ volume.formatCode()+ " eliminado",    "notifier-accept",  3000,  Notification.Position.BOTTOM_CENTER);
        }else
-       {  notifier.error("Volumen no puede ser eliminado pues contiene documentos");
+       {  notifier.show("Volumen no puede ser eliminado pues contiene documentos", "notifier-error", 6000, Notification.Position.BOTTOM_CENTER);
        }
      }
      closeEditor();
 
    }//deleteVolume
+   
+   
+   public void openNewInstance(BaseExpediente baseVolume)
+   {
+      Volume     volume = volumeService.findByCode(baseVolume.getCode());
+      LocalDateTime now = LocalDateTime.now();
+      closeCurrentInstance (volume, now);
+      currentVolume = createNewInstance(volume, now);
+      notifier.show("Nueva instancia "+ volume.getCurrentInstance()+ " creada en Volumen "+ volume.formatCode(), 
+                    "notifier-accept",  3000,  Notification.Position.BOTTOM_CENTER);
+      editVolume(currentVolume);
 
-
+   }//openNewInstance
+   
+   
+   private void closeCurrentInstance(Volume volume, LocalDateTime closingDate)
+   {
+      if ( volume != null)
+      {  VolumeInstance instance = volumeInstanceService.findByInstanceCode(volume, volume.getCurrentInstance());
+         if (instance != null)
+         { instance.setDateClosed(closingDate);
+           volumeInstanceService.save(currentUser, instance);
+         }
+      }     
+   }//closeCurrentInstance
+   
+   
+   private Volume createNewInstance(Volume volume, LocalDateTime openingDate)
+   {
+      if ( volume != null)
+      {
+         Integer    currentInstance = volume.getCurrentInstance() + 1;
+         VolumeInstance newInstance = new VolumeInstance(volume, currentInstance, "", openingDate, openingDate.plusYears(1L));
+         volumeInstanceService.save(currentUser, newInstance);
+         volume.setCurrentInstance(currentInstance);
+         volumeService.save(currentUser, volume);
+         volume = volumeService.findById(volume.getId()).get();
+      }
+      return volume;
+     
+   }//createNewInstance
+     
+   
    public void closeEditor()
    {
      setVisibility(false);

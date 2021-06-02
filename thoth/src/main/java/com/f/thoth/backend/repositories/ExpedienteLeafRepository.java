@@ -52,7 +52,7 @@ public interface ExpedienteLeafRepository extends JpaRepository<Expediente, Long
 
    @Query("SELECT count(*) FROM Expediente e "+
           "WHERE ((e.expediente.ownerId IS null AND :group is null) or e.expediente.ownerId = :group)")
-   int countByChildren( @Param("group") Long groupId);
+   int countByChildren( @Param("group") Long groupId);  //TODO:  Implantar el hasChildren y countByChildren usando el DocumentRepository
 
    @Query("SELECT e FROM Expediente e "+
           "WHERE e.expediente.tenant = :tenant AND LOWER(e.expediente.name) LIKE lower(concat('%', :name,'%'))")

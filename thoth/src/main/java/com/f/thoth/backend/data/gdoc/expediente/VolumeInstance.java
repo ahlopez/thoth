@@ -167,5 +167,14 @@ public class VolumeInstance extends AbstractEntity implements  Comparable<Volume
             ((now.equals(dateOpened) || now.equals(dateClosed)) ||
                   (now.isAfter(dateOpened) && now.isBefore(dateClosed))) ;
    }//isOpen
+   
+   
+   public void closeInstance()
+   {
+      if (isOpen())
+      {  dateClosed = LocalDateTime.now();
+      }
+   }//closeInstance
+  
 
-}//Volume
+}//VolumeInstance

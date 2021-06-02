@@ -2,12 +2,8 @@ package com.f.thoth.backend.data.gdoc.expediente;
 
 import java.time.LocalDateTime;
 import java.util.Set;
-import java.util.TreeSet;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
@@ -29,17 +25,12 @@ public class Volume extends LeafExpediente implements  NeedsProtection, Comparab
    @NotNull  (message = "{evidentia.expediente.required}")
    protected Integer              currentInstance;                         // Current instace of this volume
 
-   @OneToMany(cascade = CascadeType.MERGE, fetch = FetchType.LAZY)
-   @NotNull  (message = "{evidentia.volume_instances.required}")
-   protected Set<VolumeInstance>  instances;                               // Set of volume instances
-
    public Volume()
    {
       super();
       setType();
       this.currentInstance = 0;
-      this.instances       = new TreeSet<>();
-   }//Volume constructor
+  }//Volume constructor
 
 
    public Volume( BaseExpediente base, Integer currentInstance, Set<VolumeInstance>  instances)
@@ -50,7 +41,6 @@ public class Volume extends LeafExpediente implements  NeedsProtection, Comparab
       this.expediente      = base;
       setType();
       this.currentInstance = (currentInstance == null? 0: currentInstance);
-      this.instances       = (instances       == null? new TreeSet<>(): instances);
    }//Volume constructor
 
 
@@ -60,9 +50,6 @@ public class Volume extends LeafExpediente implements  NeedsProtection, Comparab
 
    public Integer                   getCurrentInstance()                          { return currentInstance;}
    public void                      setCurrentInstance ( Integer currentInstance) { this.currentInstance = currentInstance;}
-
-   public Set<VolumeInstance>       getInstances()                                {  return instances;}
-   public void                      setInstances(Set<VolumeInstance> instances)   { this.instances = instances;}
  	
    // ------------------------ Hereda de LeafExpediente -------------------------
 
@@ -185,7 +172,6 @@ public class Volume extends LeafExpediente implements  NeedsProtection, Comparab
    }//compareTo
 
    // ----------------------- Logic --------------------------
-   public void  addInstance( VolumeInstance instance) { instances.add(instance); }
 
 
 }//Volume

@@ -56,6 +56,11 @@ public interface VolumeRepository extends JpaRepository<Volume, Long>
    @Query("SELECT COUNT(v) FROM Volume v "+
           "WHERE ((v.expediente.ownerId IS null AND :group is null) or v.expediente.ownerId = :group)")
    int countByChildren( @Param("group") Long groupId);
+   
+   @Query("SELECT COUNT(v) FROM Volume v "+
+          "WHERE ((v.id IS null AND :volume is null) or v.id = :volume)")
+   int hasChildren( @Param("volume") Long volumeId); //TODO:  Implantar el hasChildren y countByChildren usando el DocumentRepository
+
 
    @Query("SELECT v FROM Volume v "+
           "WHERE v.expediente.tenant = :tenant AND lower(v.expediente.name) LIKE lower(concat('%', :name,'%'))")
