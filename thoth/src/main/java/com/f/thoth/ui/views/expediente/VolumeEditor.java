@@ -139,7 +139,7 @@ public class VolumeEditor extends VerticalLayout
    {
       volumeFields = new HorizontalLayout();
       volumeFields.setWidthFull();
-      docTypes = new MultiselectComboBox<>("Tipos documentales");
+      docTypes = new MultiselectComboBox<>("Tipos documentales admisibles");
       List<DocumentType> allTypes = documentTypeService.findAll();   // Recibirlo como parámetro
       docTypes.setItems(allTypes);
       docTypes.setItemLabelGenerator(e-> e.getName());

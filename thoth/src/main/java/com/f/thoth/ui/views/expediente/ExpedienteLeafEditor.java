@@ -96,7 +96,7 @@ public class ExpedienteLeafEditor extends VerticalLayout
 
    private MultiselectComboBox<DocumentType>  configureDocTypes()
    {
-      MultiselectComboBox<DocumentType> docTypes = new MultiselectComboBox<>("Tipos documentales permitidos");
+      MultiselectComboBox<DocumentType> docTypes = new MultiselectComboBox<>("Tipos documentales admisibles");
       List<DocumentType> allTypes = documentTypeService.findAll();
       docTypes.setItems(allTypes);
      // docTypes.addValueChangeListener(e -> currentExpediente.setAdmissibleTypes(e.getValue()));

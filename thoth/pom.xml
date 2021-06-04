@@ -30,12 +30,15 @@
     <vaadin.multiselectcombo.version>3.0.2</vaadin.multiselectcombo.version>
     <!--  <vaadin.crudui.version>4.3.2</vaadin.crudui.version> -->
 
-    <!--jackrabbit.oak.version>1.36</jackrabbit.oak.version-->
+    <!--... jackrabbit -->
     <jackrabbit.oak.version>1.36</jackrabbit.oak.version>
     <jcr.version>2.0</jcr.version>
+    
+    <!--... mongo -->
     <mongodb.driver.version>3.12.7</mongodb.driver.version>
     <mongodb.driver.core.version>4.0.5</mongodb.driver.core.version>
 
+    <!--... spring -->
     <spring.data.provider.version>2.1.0</spring.data.provider.version>
     <spring.data.mongodb.version>3.1.1</spring.data.mongodb.version>
 
