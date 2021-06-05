@@ -19,7 +19,6 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.shared.Registration;
@@ -110,19 +109,12 @@ public class ExpedienteGroupEditor extends VerticalLayout
 
   public void addExpedienteGroup(BaseExpediente parentBase)
   {
-     ExpedienteGroup parentGroup  = loadGroup( parentBase);
-     editExpedienteGroup(createGroup(parentGroup));
+     ExpedienteGroup newGroup  = createGroup(parentBase);
+     editExpedienteGroup(newGroup);
   }//addExpedienteGroup
 
 
-  private ExpedienteGroup loadGroup( BaseExpediente base)
-  {
-    ExpedienteGroup group = base == null? null : expedienteGroupService.findByCode(base.getCode());
-    return group;
-  }//loadGroup
-
-
-  private  ExpedienteGroup   createGroup(ExpedienteGroup parentGroup)
+  private  ExpedienteGroup   createGroup(BaseExpediente parentBase)
   {
     ExpedienteGroup        newGroup = new ExpedienteGroup();
     LocalDateTime              now  = LocalDateTime.now();
@@ -136,7 +128,7 @@ public class ExpedienteGroupEditor extends VerticalLayout
     newGroup.setMetadata            (null);
     newGroup.setDateOpened          (now);
     newGroup.setDateClosed          (now.plusYears(1000L));
-    newGroup.setOwnerId             ( parentGroup == null? null : parentGroup.getOwnerId());
+    newGroup.setOwnerId             ( parentBase == null? null : parentBase.getId());
     newGroup.setOpen                (true);
     newGroup.setKeywords            ("keyword1, keyword2, keyword3");
     newGroup.setMac                 ("[mac]");
@@ -194,10 +186,8 @@ public class ExpedienteGroupEditor extends VerticalLayout
      if ( group != null && baseExpedienteEditor.saveBaseExpediente())
      {
         boolean isNew = !group.isPersisted();
-        int  duration = isNew? 6000 : 3000;
         expedienteGroupService.save(currentUser, group);
-        String msg          = "Grupo de expedientes "+ group.formatCode()+ (isNew? " creado" : " actualizado");
-        notifier.show(msg, "notifier-accept", duration, Notification.Position.BOTTOM_CENTER);
+        notifier.accept("Grupo de expedientes "+ group.formatCode()+ (isNew? " creado" : " actualizado"));
      }
      closeEditor();
 
@@ -210,7 +200,7 @@ public class ExpedienteGroupEditor extends VerticalLayout
     {
       if (!expedienteGroupService.hasChildren(group))
       {  expedienteGroupService.delete(currentUser, group);
-         notifier.show("Grupo de expedientes "+ group.formatCode()+ " eliminado",    "notifier-accept",  3000,  Notification.Position.BOTTOM_CENTER);
+         notifier.accept("Grupo de expedientes "+ group.formatCode()+ " eliminado");
       }else
       {  notifier.error("Grupo de expedientes no puede ser eliminado pues contiene subgrupos");
       }

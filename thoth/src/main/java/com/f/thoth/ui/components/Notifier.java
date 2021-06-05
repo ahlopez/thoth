@@ -26,7 +26,7 @@ public class Notifier
    
    public void error( String text)
    {
-      show(text, "notifier-error", -1, Notification.Position.BOTTOM_CENTER);
+      show(text, "notifier-error", 6000, Notification.Position.BOTTOM_CENTER);
    }//error
    
    public void accept( String text)

@@ -11,7 +11,6 @@ import org.vaadin.gatanaso.MultiselectComboBox;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.Expediente;
-import com.f.thoth.backend.data.gdoc.expediente.ExpedienteGroup;
 import com.f.thoth.backend.data.gdoc.expediente.Nature;
 import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.security.ObjectToProtect;
@@ -19,7 +18,6 @@ import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.service.BaseExpedienteService;
 import com.f.thoth.backend.service.DocumentTypeService;
-import com.f.thoth.backend.service.ExpedienteGroupService;
 import com.f.thoth.backend.service.ExpedienteLeafService;
 import com.f.thoth.backend.service.SchemaService;
 import com.f.thoth.ui.components.Notifier;
@@ -29,14 +27,12 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.shared.Registration;
 
 public class ExpedienteLeafEditor extends VerticalLayout
 {
-   private ExpedienteGroupService      expedienteGroupService;
    private ExpedienteLeafService       expedienteLeafService;
    private BaseExpedienteService       baseExpedienteService;
    private SchemaService               schemaService;
@@ -57,15 +53,13 @@ public class ExpedienteLeafEditor extends VerticalLayout
    private Component                   buttons;
 
 
-   public ExpedienteLeafEditor(  ExpedienteGroupService  expedienteGroupService,
-                                 ExpedienteLeafService   expedienteLeafService,
+   public ExpedienteLeafEditor(  ExpedienteLeafService   expedienteLeafService,
                                  BaseExpedienteService   baseExpedienteService,
                                  SchemaService           schemaService,
                                  DocumentTypeService     documentTypeService,
                                  Classification          classificationClass
                               )
    {
-     this.expedienteGroupService  = expedienteGroupService;
      this.expedienteLeafService   = expedienteLeafService;
      this.baseExpedienteService   = baseExpedienteService;
      this.schemaService           = schemaService;
@@ -145,19 +139,12 @@ public class ExpedienteLeafEditor extends VerticalLayout
 
    public void addExpediente(BaseExpediente parentBase)
    {
-      ExpedienteGroup parentGroup  = loadGroup( parentBase);
-      editExpediente(createExpediente(parentGroup));
+      Expediente newExpediente  = createExpediente(parentBase);
+      editExpediente(newExpediente);
    }//addExpediente
 
 
-   private ExpedienteGroup loadGroup( BaseExpediente base)
-   {
-     ExpedienteGroup group = base == null? null : expedienteGroupService.findByCode(base.getCode());
-     return group;
-   }//loadGroup
-
-
-   private  Expediente   createExpediente(ExpedienteGroup parentGroup)
+   private  Expediente   createExpediente(BaseExpediente parentBase)
    {
      Expediente        newExpediente = new Expediente();
      LocalDateTime              now  = LocalDateTime.now();
@@ -171,7 +158,7 @@ public class ExpedienteLeafEditor extends VerticalLayout
      newExpediente.setMetadata            (null);
      newExpediente.setDateOpened          (now);
      newExpediente.setDateClosed          (now.plusYears(1000L));
-     newExpediente.setOwnerId             ( parentGroup == null? null : parentGroup.getOwnerId());
+     newExpediente.setOwnerId             ( parentBase == null? null : parentBase.getId());
      newExpediente.setOpen                (true);
      newExpediente.setKeywords            ("keyword4, keyword5, keyword6");
      newExpediente.setMac                 ("[mac]");
@@ -231,16 +218,19 @@ public class ExpedienteLeafEditor extends VerticalLayout
       if ( expediente != null && baseExpedienteEditor.saveBaseExpediente())
       {
          boolean isNew = !expediente.isPersisted();
-         int  duration = isNew? 6000 : 3000;
+         expediente.getAdmissibleTypes().clear();         
+         expediente = expedienteLeafService.save(currentUser, expediente);
          expediente.setAdmissibleTypes(docTypes.getValue());
          expedienteLeafService.save(currentUser, expediente);
          String businessCode = expediente.formatCode();
-         String msg          = isNew? "Expediente creado con código "+ businessCode: "Expediente "+ businessCode+ " actualizado";
-         notifier.show(msg, "notifier-accept", duration, Notification.Position.BOTTOM_CENTER);
+         notifier.accept( isNew? "Expediente creado con código "+ businessCode: "Expediente "+ businessCode+ " actualizado");
       }
       closeEditor();
 
    }//saveExpediente
+   
+   
+   
 
 
    private void deleteExpediente(Expediente expediente)
@@ -249,7 +239,7 @@ public class ExpedienteLeafEditor extends VerticalLayout
      {
        if (!expedienteLeafService.hasChildren(currentExpediente))
        {  expedienteLeafService.delete(currentUser, currentExpediente);
-          notifier.show("Expediente "+ expediente.formatCode()+ " eliminado",    "notifier-accept",  3000,  Notification.Position.BOTTOM_CENTER);
+          notifier.accept("Expediente "+ expediente.formatCode()+ " eliminado");
        }else
        {  notifier.error("Expediente no puede ser eliminado pues contiene documentos");
        }

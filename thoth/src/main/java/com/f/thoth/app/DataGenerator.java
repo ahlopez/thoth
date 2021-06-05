@@ -98,8 +98,8 @@ public class DataGenerator implements HasLogger
    private PasswordEncoder               passwordEncoder;
    private ClassificationRepository      claseRepository;
    private ExpedienteIndexRepository     expedienteIndexRepository;
-   private ExpedienteGroupRepository    expedienteGroupRepository;
-   private ExpedienteLeafRepository          expedienteRepository;
+   private ExpedienteGroupRepository     expedienteGroupRepository;
+   private ExpedienteLeafRepository      expedienteRepository;
    private VolumeRepository              volumeRepository;
    private VolumeInstanceRepository      volumeInstanceRepository;
    private LevelRepository               levelRepository;
@@ -126,11 +126,11 @@ public class DataGenerator implements HasLogger
          SchemaValuesRepository schemaValuesRepository, LevelRepository levelRepository, RetentionRepository retentionRepository,
          UserGroupRepository userGroupRepository, SingleUserRepository singleUserRepository, Numerator numerator, PasswordEncoder passwordEncoder)
    {
-      this.tenantService                 = tenantService;
 //      this.orderRepository               = orderRepository;
-      this.userRepository                = userRepository;
 //      this.productRepository             = productRepository;
 //      this.pickupLocationRepository      = pickupLocationRepository;
+      this.tenantService                 = tenantService;
+      this.userRepository                = userRepository;
       this.tenantRepository              = tenantRepository;
       this.roleRepository                = roleRepository;
       this.operationRepository           = operationRepository;
@@ -161,8 +161,7 @@ public class DataGenerator implements HasLogger
       try
       {
          if (userRepository.count() != 0L)
-         {
-            getLogger().info("Using existing database");
+         {  getLogger().info("Using existing database");
             return;
          }
 
@@ -299,7 +298,82 @@ public class DataGenerator implements HasLogger
 
    private Repository initJCRRepo()throws UnknownHostException
    {
-      // Repository repo = initRepo("mongodb://localhost", 27017, "oak");
+      /*
+         Ver ejemplo completo en   C:\ahl\estudio\dzone\ecm\oak-mongodb-demo-master
+
+         2021/06/04 : From the JackRabbit Oak Repository Construction page at https://jackrabbit.apache.org/oak/docs/construct.html
+         DB db = new MongoClient("127.0.0.1", 27017).getDB("test2");
+         DocumentNodeStore ns = new DocumentMK.Builder().
+         setMongoDB(db).getNodeStore();
+         Repository repo = new Jcr(new Oak(ns)).createRepository();
+
+         2021/06/04: Adaptation of the following article and Oak documentation
+         Repository repo = initRepo("mongodb://localhost", 27017, "oak");
+
+         2021/06/04: From the Dzone article "Creating a Content Repository Using Jackrabbit Oak and MongoDB, Bishnu Mishra  Apr. 07, 18"
+         String uri = "mongodb://" + host + ":" + port;
+         DocumentNodeStore ns = new DocumentMK.Builder().setMongoDB(uri, "oak_demo", 16).getNodeStore();
+         Repository repo = new Jcr(new Oak(ns)).createRepository();
+
+         2021/06/04: From the Dzone article ibid,   Creating File Nodes
+         Node fileNodeParent = session.getNode("pathToParentNode"); // /node1/node2/
+         Node fileNode = fileNodeParent.addNode("theFile", "nt:file");
+         Node content = fileNode.addNode("jcr:content", "nt:resource");
+         InputStream is = getFileInputStream();//Get the file data as stream.
+         Binary binary = session.getValueFactory().createBinary(is);
+         content.setProperty("jcr:data", binary);
+         session.save();
+         // To enable versioning use VersionManager
+         VersionManager vm = session.getWorkspace().getVersionManager();
+         vm.checkin(fileNode.getPath());
+
+         2021/06/04: From the Dzone article ibid,   Retrieving File From Repository
+         Node fileNodeParent = session.getNode("pathToParentNode"); // /node1/node2/
+         Node fileContent = fileNodeParent.getNode("theFile").getNode("jcr:content");
+         Binary bin = fileContent.getProperty("jcr:data").getBinary();
+         InputStream stream = bin.getStream();
+         byte[] bytes = IOUtils.toByteArray(stream);
+         bin.dispose();
+         stream.close();
+
+         2021/06/04: From the Dzone article ibid,   Retrieving Version of a Content
+         VersionManager vm = session.getWorkspace().getVersionManager();
+         javax.jcr.version.VersionHistory versionHistory = vm.getVersionHistory("filePath");
+         Version currentVersion = vm.getBaseVersion(filePath);// This is the current version of the file
+         VersionIterator itr = versionHistory.getAllVersions();// gets all the versions of that content
+
+         We can iterate over the VersionIterator to get specific versions and its properties.
+         Similarly, we can restore a specific version of a content.
+
+         //Restoring a specific version
+         VersionManager vm = session.getWorkspace().getVersionManager();
+         Version version = (Version) session.getNodeByIdentifier("versionId");
+         vm.restore(version, false);// boolean flag governs what happens in case of an identifier collision.
+
+         2021/06/04:  To access the repository (example) - See https://jackrabbit.apache.org/oak/docs/construct.html
+         Session session = repo.login( new SimpleCredentials("admin", "admin".toCharArray()));
+         Node root = session.getRootNode();
+         if (root.hasNode("hello"))
+         {
+             Node hello = root.getNode("hello");
+             long count = hello.getProperty("count").getLong();
+             hello.setProperty("count", count + 1);
+             System.out.println("found the hello node, count = " + count);
+         } else
+         {
+             System.out.println("creating the hello node");
+             root.addNode("hello").setProperty("count", 1);
+         }
+         session.save();
+
+         2021/06/04:  To logout and close the store - See https://jackrabbit.apache.org/oak/docs/construct.html
+         session.logout();
+         // depending on NodeStore implementation either:
+         // close FileStore
+         fs.close();
+         // or close DocumentNodeStore
+         ns.dispose();
+      */
       // Gets an in-memory repo
       repo = new Jcr(new Oak()).createRepository();
       getLogger().info("... Got an in-memory repo");
@@ -340,9 +414,11 @@ public class DataGenerator implements HasLogger
       {
          Node node         = jcrSession.getRootNode();
          Node jcrWorkspace = node.addNode(workspacePath.substring(1));
+         jcrWorkspace.setProperty("name", name);
          getLogger().info("    >>> Tenant["+ tenant.getName()+ "] workspace["+ name+ "], path["+ jcrWorkspace.getPath()+ "]");
          if ( !workspacePath.equals( jcrWorkspace.getPath()))
-            throw new RepositoryException("Workspace path["+ workspacePath+ "] diferente del path en repositorio["+ jcrWorkspace.getPath()+ "]");
+         { throw new RepositoryException("Workspace path["+ workspacePath+ "] diferente del path en repositorio["+ jcrWorkspace.getPath()+ "]");
+         }
       }
    }//initWorkspace
 
@@ -379,7 +455,7 @@ public class DataGenerator implements HasLogger
       Metadata decMeta   = createMeta ("Decimal", Type.DECIMAL," >= 0.0");
       Field    ratioField= createField("Razon", decMeta, true, false, true, 7, 1);
       Field    valueField= createField("Valor", decMeta, true, false, true, 4, 1);
-      
+
       Schema   docSchema =  createSchema("Documento");
       docSchema.addField(idField);
       docSchema.addField(authorField);
@@ -391,32 +467,32 @@ public class DataGenerator implements HasLogger
       sedeSchema.addField(colorField);
       sedeSchema.addField(securityField);
       schemaRepository.saveAndFlush(sedeSchema);
-      
+
       Schema  commitmentSchema = createSchema("Obligacion");
       commitmentSchema.addField(idField);
       commitmentSchema.addField(conceptField);
       commitmentSchema.addField(remiteField);
       commitmentSchema.addField(valueField);
       schemaRepository.saveAndFlush(commitmentSchema);
-      
+
       Schema invoiceSchema= createSchema("Factura");
       invoiceSchema.addField(commitmentField);
       invoiceSchema.addField(dueDate);
       invoiceSchema.addField(valueField);
       schemaRepository.saveAndFlush(invoiceSchema);
-      
+
       Schema paymentSchema= createSchema("Pago");
       paymentSchema.addField(idField);
       paymentSchema.addField(valueField);
       paymentSchema.addField(paidDate);
       schemaRepository.saveAndFlush(paymentSchema);
-      
+
       Schema dispatchSchema=  createSchema("Remision");
       dispatchSchema.addField(idField);
       dispatchSchema.addField(commitmentField);
       dispatchSchema.addField(dateField);
       schemaRepository.saveAndFlush(dispatchSchema);
-      
+
       Schema receiptSchema=  createSchema("Recibo");
       receiptSchema.addField(idField);
       receiptSchema.addField(dispatchField);
@@ -445,11 +521,11 @@ public class DataGenerator implements HasLogger
       otherSchema.addField(edadField);
       otherSchema.addField(ratioField);
       schemaRepository.saveAndFlush(otherSchema);
-      
+
       Schema   shortSchema = createSchema("SHORT");
       shortSchema.addField(colorField);
       schemaRepository.saveAndFlush(shortSchema);
-            
+
       DocumentType document   = createDocType( "Document",   docSchema,        null,     true);
       createDocType( "Obligacion", commitmentSchema, document, true);
       createDocType( "Factura",    invoiceSchema,    document, true);
@@ -488,17 +564,17 @@ public class DataGenerator implements HasLogger
       schemaRepository.saveAndFlush(schema);
       return schema;
    }//createSchema
-   
-   
+
+
    private DocumentType createDocType(String name, Schema schema, DocumentType parent, boolean requiresContent)
    {
       DocumentType docType = new DocumentType( name, schema, parent, requiresContent);
       documentTypeRepository.save(docType);
-      return docType;      
+      return docType;
    }//createDocType
-   
-   
-   
+
+
+
 
    private UserGroup createUserGroup(Tenant tenant, String name, Integer category, UserGroup owner, LocalDate dateFrom, LocalDate dateTo, boolean locked)
    {

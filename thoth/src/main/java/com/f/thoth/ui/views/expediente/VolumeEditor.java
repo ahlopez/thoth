@@ -10,7 +10,6 @@ import org.vaadin.gatanaso.MultiselectComboBox;
 
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
-import com.f.thoth.backend.data.gdoc.expediente.ExpedienteGroup;
 import com.f.thoth.backend.data.gdoc.expediente.Nature;
 import com.f.thoth.backend.data.gdoc.expediente.Volume;
 import com.f.thoth.backend.data.gdoc.expediente.VolumeInstance;
@@ -20,7 +19,6 @@ import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.service.BaseExpedienteService;
 import com.f.thoth.backend.service.DocumentTypeService;
-import com.f.thoth.backend.service.ExpedienteGroupService;
 import com.f.thoth.backend.service.SchemaService;
 import com.f.thoth.backend.service.VolumeInstanceService;
 import com.f.thoth.backend.service.VolumeService;
@@ -39,7 +37,6 @@ import com.vaadin.flow.shared.Registration;
 
 public class VolumeEditor extends VerticalLayout
 {
-   private ExpedienteGroupService      expedienteGroupService;
    private VolumeService               volumeService;
    private VolumeInstanceService       volumeInstanceService;
    private BaseExpedienteService       baseExpedienteService;
@@ -63,8 +60,7 @@ public class VolumeEditor extends VerticalLayout
    private Component          buttons;
 
 
-   public VolumeEditor( ExpedienteGroupService  expedienteGroupService,
-                        VolumeService           volumeService,
+   public VolumeEditor( VolumeService           volumeService,
                         VolumeInstanceService   volumeInstanceService,
                         BaseExpedienteService   baseExpedienteService,
                         SchemaService           schemaService,
@@ -72,7 +68,6 @@ public class VolumeEditor extends VerticalLayout
                         Classification          classificationClass
                       )
    {
-     this.expedienteGroupService  = expedienteGroupService;
      this.volumeService           = volumeService;
      this.volumeInstanceService   = volumeInstanceService;
      this.baseExpedienteService   = baseExpedienteService;
@@ -165,19 +160,12 @@ public class VolumeEditor extends VerticalLayout
 
    public void addVolume(BaseExpediente parentBase)
    {
-      ExpedienteGroup parentGroup  = loadGroup( parentBase);
-      editVolume(createVolume(parentGroup));
+      Volume newVolume  = createVolume(parentBase);
+      editVolume(newVolume);
    }//addVolume
 
 
-   private ExpedienteGroup loadGroup( BaseExpediente base)
-   {
-     ExpedienteGroup group = base == null? null : expedienteGroupService.findByCode(base.getCode());
-     return group;
-   }//loadGroup
-
-
-   private  Volume   createVolume(ExpedienteGroup parentGroup)
+   private  Volume   createVolume(BaseExpediente parentBase)
    {
      Volume                newVolume = new Volume();
      LocalDateTime              now  = LocalDateTime.now();
@@ -191,7 +179,7 @@ public class VolumeEditor extends VerticalLayout
      newVolume.setMetadata            (null);
      newVolume.setDateOpened          (now);
      newVolume.setDateClosed          (now.plusYears(1000L));
-     newVolume.setOwnerId             ( parentGroup == null? null : parentGroup.getOwnerId());
+     newVolume.setOwnerId             ( parentBase == null? null : parentBase.getId());
      newVolume.setOpen                (true);
      newVolume.setKeywords            ("keyword1, keyword2, keyword3");
      newVolume.setMac                 ("[mac]");
@@ -252,12 +240,12 @@ public class VolumeEditor extends VerticalLayout
       if ( volume != null && baseExpedienteEditor.saveBaseExpediente())
       {
          boolean isNew = !volume.isPersisted();
-         int  duration = isNew? 6000 : 3000;
+         volume.getAdmissibleTypes().clear();         
+         volume = volumeService.save(currentUser, volume);
          volume.setAdmissibleTypes(docTypes.getValue());
          volumeService.save(currentUser, volume);
          String businessCode = volume.formatCode();
-         String msg          = isNew? "Volumen creado con código "+ businessCode: "Volumen "+ businessCode+ " actualizado";
-         notifier.show(msg, "notifier-accept", duration, Notification.Position.BOTTOM_CENTER);
+         notifier.accept( isNew? "Volumen creado con código "+ businessCode: "Volumen "+ businessCode+ " actualizado");
       }
       closeEditor();
 
@@ -270,9 +258,9 @@ public class VolumeEditor extends VerticalLayout
      {
        if (!volumeService.hasChildren(currentVolume))
        {  volumeService.delete(currentUser, currentVolume);
-          notifier.show("Volumen "+ volume.formatCode()+ " eliminado",    "notifier-accept",  3000,  Notification.Position.BOTTOM_CENTER);
+          notifier.accept("Volumen "+ volume.formatCode()+ " eliminado");
        }else
-       {  notifier.show("Volumen no puede ser eliminado pues contiene documentos", "notifier-error", 6000, Notification.Position.BOTTOM_CENTER);
+       {  notifier.error("Volumen no puede ser eliminado pues contiene documentos");
        }
      }
      closeEditor();

@@ -386,9 +386,8 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
   {
      String formattedCode = "";
      if (code != null)
-     {
-        int i = TextUtil.indexOf(code, "/", 4);
-        formattedCode = TextUtil.replace(code.substring(i), "/", "-");
+     {  int i = code.lastIndexOf("/");
+        formattedCode = code.substring(i+1);
      }
      return formattedCode;
   }//formatCode
