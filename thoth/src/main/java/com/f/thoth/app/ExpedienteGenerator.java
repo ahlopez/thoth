@@ -28,6 +28,7 @@ import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.repositories.ClassificationRepository;
+import com.f.thoth.backend.repositories.DocumentTypeRepository;
 import com.f.thoth.backend.repositories.ExpedienteGroupRepository;
 import com.f.thoth.backend.repositories.ExpedienteIndexRepository;
 import com.f.thoth.backend.repositories.ExpedienteLeafRepository;
@@ -39,8 +40,8 @@ public class ExpedienteGenerator implements HasLogger
 {
    private ClassificationRepository   claseRepository;
    private ExpedienteIndexRepository  expedienteIndexRepository;
-   private ExpedienteGroupRepository expedienteGroupRepository;
-   private ExpedienteLeafRepository       expedienteRepository;
+   private ExpedienteGroupRepository  expedienteGroupRepository;
+   private ExpedienteLeafRepository   expedienteRepository;
    private VolumeRepository           volumeRepository;
    private VolumeInstanceRepository   volumeInstanceRepository;
    private Session                    jcrSession;
@@ -54,6 +55,7 @@ public class ExpedienteGenerator implements HasLogger
    private int                        nVolumes;
    private int                        nInstances;
    private List<Schema>               availableSchemas;
+   private List<DocumentType>         availableTypes;
 
    private static String KEYWORD_NAMES[] = {
          "belleza",      "escepticismo", "nostalgia",    "justicia",     "esperanza",    "tentación",   "nación",       "espiritualidad",
@@ -79,7 +81,7 @@ public class ExpedienteGenerator implements HasLogger
 
    public ExpedienteGenerator(
          ClassificationRepository claseRepository, Session jcrSession, ExpedienteIndexRepository expedienteIndexRepository,
-         ExpedienteGroupRepository expedienteGroupRepository, ExpedienteLeafRepository expedienteRepository,
+         ExpedienteGroupRepository expedienteGroupRepository, ExpedienteLeafRepository expedienteRepository, DocumentTypeRepository documentTypeRepository,
          VolumeRepository volumeRepository, VolumeInstanceRepository volumeInstanceRepository, SchemaRepository schemaRepository
          )
    {
@@ -90,6 +92,8 @@ public class ExpedienteGenerator implements HasLogger
       this.volumeRepository           = volumeRepository;
       this.volumeInstanceRepository   = volumeInstanceRepository;
       this.availableSchemas           = schemaRepository.findAll(ThothSession.getCurrentTenant());
+      this.availableTypes             = documentTypeRepository.findAll();
+
       this.jcrSession                 = jcrSession;
       this.user                       = ThothSession.getUser();
 
@@ -332,13 +336,11 @@ public class ExpedienteGenerator implements HasLogger
    private Set<DocumentType> generateAdmissibleTypes()
    {
       Set<DocumentType> admissibleTypes = new TreeSet<>();
-      // Cargar la lista de tipos documentales
-      // N = ramdom(1, 10)
-      // for (int i = 0; i < N; i++)
-      // {
-      //    admissibleTypes.add(  select a doc type at random);
-      // }
-      //
+      int sizeAvailable = availableTypes.size();
+      int N =random.nextInt(4);
+      for (int i = 0; i < N; i++)
+      {  admissibleTypes.add( availableTypes.get(random.nextInt(sizeAvailable)));
+      }
       return admissibleTypes;
    }//generateAdmissibleTypes
 

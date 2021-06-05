@@ -244,7 +244,7 @@ public class DataGenerator implements HasLogger
          ExpedienteGenerator  expedienteGenerator =
                new ExpedienteGenerator(
                      claseRepository, jcrSession, expedienteIndexRepository,
-                     expedienteGroupRepository, expedienteRepository,
+                     expedienteGroupRepository, expedienteRepository, documentTypeRepository,
                      volumeRepository, volumeInstanceRepository, schemaRepository
                      );
 
