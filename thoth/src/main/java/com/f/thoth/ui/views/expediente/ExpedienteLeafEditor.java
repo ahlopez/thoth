@@ -218,8 +218,6 @@ public class ExpedienteLeafEditor extends VerticalLayout
       if ( expediente != null && baseExpedienteEditor.saveBaseExpediente())
       {
          boolean isNew = !expediente.isPersisted();
-         expediente.getAdmissibleTypes().clear();         
-         expediente = expedienteLeafService.save(currentUser, expediente);
          expediente.setAdmissibleTypes(docTypes.getValue());
          expedienteLeafService.save(currentUser, expediente);
          String businessCode = expediente.formatCode();

@@ -68,5 +68,7 @@ public interface ExpedienteLeafRepository extends JpaRepository<Expediente, Long
           "JOIN   Permission p ON e.expediente.objectToProtect = p.objectToProtect "+
           "WHERE  p.role = :role")
    List<Expediente> findExpedientesGranted( @Param("role") Role role);
+   
+   //  ------------ Admissible Types ---------------
 
 }//ExpedienteRepository

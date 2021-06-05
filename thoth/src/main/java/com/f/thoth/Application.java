@@ -14,11 +14,11 @@ import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.classification.Level;
 import com.f.thoth.backend.data.gdoc.classification.Retention;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
-import com.f.thoth.backend.data.gdoc.expediente.ExpedienteGroup;
 import com.f.thoth.backend.data.gdoc.expediente.Expediente;
+import com.f.thoth.backend.data.gdoc.expediente.ExpedienteGroup;
 import com.f.thoth.backend.data.gdoc.expediente.ExpedienteIndex;
 import com.f.thoth.backend.data.gdoc.expediente.IndexEntry;
-import com.f.thoth.backend.data.gdoc.expediente.LeafExpediente;
+//import com.f.thoth.backend.data.gdoc.expediente.LeafExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.Volume;
 import com.f.thoth.backend.data.gdoc.expediente.VolumeInstance;
 import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
@@ -33,8 +33,8 @@ import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.repositories.BaseExpedienteRepository;
-import com.f.thoth.backend.repositories.ExpedienteGroupRepository;
 import com.f.thoth.backend.repositories.ClassificationRepository;
+import com.f.thoth.backend.repositories.ExpedienteGroupRepository;
 import com.f.thoth.backend.repositories.ExpedienteLeafRepository;
 import com.f.thoth.backend.repositories.LevelRepository;
 import com.f.thoth.backend.repositories.OperationRepository;
@@ -47,8 +47,8 @@ import com.f.thoth.backend.repositories.TenantRepository;
 import com.f.thoth.backend.repositories.UserRepository;
 import com.f.thoth.backend.repositories.VolumeRepository;
 import com.f.thoth.backend.service.BaseExpedienteService;
-import com.f.thoth.backend.service.ExpedienteGroupService;
 import com.f.thoth.backend.service.ClassificationService;
+import com.f.thoth.backend.service.ExpedienteGroupService;
 import com.f.thoth.backend.service.ExpedienteLeafService;
 import com.f.thoth.backend.service.LevelService;
 import com.f.thoth.backend.service.OperationService;
@@ -89,7 +89,7 @@ import com.f.thoth.ui.MainView;
             Permission.class,
             Sequence.class,
             BaseExpediente.class,
-            LeafExpediente.class,
+      //      LeafExpediente.class,
             ExpedienteGroup.class,
             Expediente.class,
             Volume.class,
@@ -137,7 +137,7 @@ import com.f.thoth.ui.MainView;
            Permission.class,
            BaseExpediente.class,
            ExpedienteGroup.class,
-           LeafExpediente.class,
+     //     LeafExpediente.class,
            Expediente.class,
            Volume.class,
            VolumeInstance.class,

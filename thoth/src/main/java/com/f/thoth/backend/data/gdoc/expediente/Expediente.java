@@ -1,11 +1,22 @@
 package com.f.thoth.backend.data.gdoc.expediente;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Index;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
+import com.f.thoth.backend.data.entity.AbstractEntity;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
+import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.security.NeedsProtection;
@@ -17,8 +28,19 @@ import com.f.thoth.backend.data.security.UserGroup;
 
 @Entity
 @Table(name = "EXPEDIENTE")
-public class Expediente  extends LeafExpediente implements  NeedsProtection, Comparable<Expediente>, ExpedienteType
+public class Expediente  extends AbstractEntity implements  NeedsProtection, Comparable<Expediente>, ExpedienteType
 {
+   @OneToOne (cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+   @NotNull  (message = "{evidentia.expediente.required}")
+   protected BaseExpediente    expediente;                 // Base Expediente that describes this leaf expediente
+
+  // @OneToMany (cascade={CascadeType.REFRESH, CascadeType.MERGE}, fetch = FetchType.EAGER)
+   @ManyToMany (fetch= FetchType.EAGER)
+   @JoinTable (name="leaf_docType",  indexes= @Index(name= "expediente_docType", columnList= "expediente_id", unique= false) )
+   @JoinColumn(name="admissibleTypes_id")
+   @NotNull   (message = "{evidentia.types.required}")
+   protected Set<DocumentType> admissibleTypes;            // Admisible document types that can be included in the expediente
+   
       // ------------------ Construction -----------------------
       public Expediente()
       {
@@ -44,6 +66,11 @@ public class Expediente  extends LeafExpediente implements  NeedsProtection, Com
          {  expediente.setType(Nature.EXPEDIENTE);       
          }
       }//setType
+     
+
+      public Set<DocumentType> getAdmissibleTypes()   { return admissibleTypes;}
+      public void              setAdmissibleTypes(Set<DocumentType> admissibleTypes) { this.admissibleTypes = admissibleTypes;}
+      public void              clearTypes() { this.admissibleTypes.clear();}
 
 
   // ------------------------ Hereda de BaseExpediente -------------------------

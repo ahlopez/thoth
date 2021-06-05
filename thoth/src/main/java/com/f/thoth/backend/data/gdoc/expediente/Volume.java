@@ -2,12 +2,21 @@ package com.f.thoth.backend.data.gdoc.expediente;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.TreeSet;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Index;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import com.f.thoth.backend.data.entity.AbstractEntity;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
+import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.security.NeedsProtection;
@@ -19,16 +28,27 @@ import com.f.thoth.backend.data.security.UserGroup;
 
 @Entity
 @Table(name = "VOLUME")
-public class Volume extends LeafExpediente implements  NeedsProtection, Comparable<Volume>, ExpedienteType
+public class Volume extends AbstractEntity implements  NeedsProtection, Comparable<Volume>, ExpedienteType
 {
-
+   @OneToOne (cascade = CascadeType.ALL, fetch = FetchType.EAGER)
    @NotNull  (message = "{evidentia.expediente.required}")
-   protected Integer              currentInstance;                         // Current instace of this volume
+   protected BaseExpediente       expediente;                      // Expediente that describes this volume
+
+  // @OneToMany (cascade={CascadeType.REFRESH, CascadeType.MERGE}, fetch = FetchType.EAGER)
+   @ManyToMany (fetch= FetchType.EAGER)
+   @JoinTable (name="volume_docType",  indexes= @Index(name= "vol_docType", columnList= "volume_id", unique= false) )
+   @NotNull   (message = "{evidentia.types.required}")
+   protected Set<DocumentType>    admissibleTypes;                 // Admisible document types that can be included in the volume
+
+   @NotNull  (message = "{evidentia.volumeinstance.required}")
+   protected Integer              currentInstance;                 // Current instace of this volume
 
    public Volume()
    {
       super();
+      expediente = new BaseExpediente();
       setType();
+      this.admissibleTypes = new TreeSet<>();
       this.currentInstance = 0;
   }//Volume constructor
 
@@ -40,6 +60,7 @@ public class Volume extends LeafExpediente implements  NeedsProtection, Comparab
 
       this.expediente      = base;
       setType();
+      this.admissibleTypes = new TreeSet<>();
       this.currentInstance = (currentInstance == null? 0: currentInstance);
    }//Volume constructor
 
@@ -47,6 +68,10 @@ public class Volume extends LeafExpediente implements  NeedsProtection, Comparab
    // ---------------------- getters & setters ---------------------
    public BaseExpediente            getExpediente()                               { return expediente;}
    public void                      setExpediente(BaseExpediente expediente)      { this.expediente = expediente;} 	
+
+   public Set<DocumentType>         getAdmissibleTypes()   { return admissibleTypes;}
+   public void                      setAdmissibleTypes(Set<DocumentType> admissibleTypes) { this.admissibleTypes = admissibleTypes;}
+   public void                      clearTypes() { this.admissibleTypes.clear();}
 
    public Integer                   getCurrentInstance()                          { return currentInstance;}
    public void                      setCurrentInstance ( Integer currentInstance) { this.currentInstance = currentInstance;}

@@ -240,8 +240,6 @@ public class VolumeEditor extends VerticalLayout
       if ( volume != null && baseExpedienteEditor.saveBaseExpediente())
       {
          boolean isNew = !volume.isPersisted();
-         volume.getAdmissibleTypes().clear();         
-         volume = volumeService.save(currentUser, volume);
          volume.setAdmissibleTypes(docTypes.getValue());
          volumeService.save(currentUser, volume);
          String businessCode = volume.formatCode();

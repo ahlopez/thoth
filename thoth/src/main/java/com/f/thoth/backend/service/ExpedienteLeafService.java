@@ -76,6 +76,7 @@ public class ExpedienteLeafService implements FilterableCrudService<Expediente>,
 
    @Override public Expediente createNew(User currentUser)
    {
+     //TODO: Decidir si el nuevo expediente debe ser persistido 
      BaseExpediente baseExpediente = new BaseExpediente();
      baseExpediente.setTenant(ThothSession.getCurrentTenant());
      baseExpediente.setCreatedBy(null/*TODO: currentUser*/);
@@ -84,6 +85,7 @@ public class ExpedienteLeafService implements FilterableCrudService<Expediente>,
      expediente.setExpediente(baseExpediente);
      return expediente;
    }//createNew
+   
 
    @Override public Expediente save(User currentUser, Expediente expediente)
    {
@@ -95,11 +97,11 @@ public class ExpedienteLeafService implements FilterableCrudService<Expediente>,
       }
 
    }//save
-
-
+   
+   
    //  ----- implements HierarchicalService ------
    @Override public List<Expediente> findAll() { return expedienteRepository.findAll(ThothSession.getCurrentTenant()); }
-   @Override public Optional<Expediente> findById(Long id)                  { return expedienteRepository.findById( id);}
+   @Override public Optional<Expediente> findById   ( Long id)              { return expedienteRepository.findById( id);}
    @Override public List<Expediente>  findByParent  ( Expediente owner)     { return expedienteRepository.findByParent(owner.getId()); }
    @Override public int               countByParent ( Expediente owner)     { return expedienteRepository.countByParent (owner.getId()); }
    @Override public boolean           hasChildren   ( Expediente expediente){ return expedienteRepository.countByChildren(expediente.getId()) > 0; }
