@@ -19,7 +19,6 @@ import com.f.thoth.backend.data.Role;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
-import com.f.thoth.backend.data.gdoc.expediente.Expediente;
 import com.f.thoth.backend.data.gdoc.expediente.ExpedienteGroup;
 import com.f.thoth.backend.data.gdoc.expediente.Nature;
 import com.f.thoth.backend.data.gdoc.expediente.Volume;
@@ -28,7 +27,6 @@ import com.f.thoth.backend.service.BaseExpedienteService;
 import com.f.thoth.backend.service.ClassificationService;
 import com.f.thoth.backend.service.DocumentTypeService;
 import com.f.thoth.backend.service.ExpedienteGroupService;
-import com.f.thoth.backend.service.ExpedienteLeafService;
 import com.f.thoth.backend.service.SchemaService;
 import com.f.thoth.backend.service.VolumeInstanceService;
 import com.f.thoth.backend.service.VolumeService;
@@ -80,9 +78,6 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   private BaseExpedienteService       baseExpedienteService;
   private BaseExpediente              selectedBase;
 
-  private ExpedienteLeafService       expedienteService;
-  private ExpedienteLeafEditor        expedienteLeafEditor;
-
   private VolumeService               volumeService;
   private VolumeInstanceService       volumeInstanceService;
 
@@ -110,7 +105,6 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   public ExpedienteHierarchyView(ClassificationService   classificationService,
                                  BaseExpedienteService   baseExpedienteService,
                                  ExpedienteGroupService  expedienteGroupService,
-                                 ExpedienteLeafService   expedienteService,
                                  SchemaService           schemaService,
                                  DocumentTypeService     documentTypeService,
                                  VolumeService           volumeService,
@@ -120,7 +114,6 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     this.classificationService   = classificationService;
     this.baseExpedienteService   = baseExpedienteService;
     this.expedienteGroupService  = expedienteGroupService;
-    this.expedienteService       = expedienteService;
     this.volumeService           = volumeService;
     this.volumeInstanceService   = volumeInstanceService;
     this.schemaService           = schemaService;
@@ -142,7 +135,6 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     rightSection.setWidth("35%");
     rightSection.add(new H3("RIGHT SECTION"));
     rightSection.add(expedienteGroupEditor);
-    rightSection.add(expedienteLeafEditor);
     rightSection.add(volumeEditor);
     rightSection.setVisible(false);
 
@@ -171,32 +163,20 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     this.classCode               =  clsPresent? selectedClass.formatCode() : "---";
     this.className               =  clsPresent? selectedClass.getName()    : "";
     setupGroupEditor();
-    setupExpedienteEditor();
     setupVolumeEditor();
+
   }//setParameter
 
 
   private void setupGroupEditor()
   {
     this.expedienteGroupEditor  = new ExpedienteGroupEditor(
-          expedienteGroupService, 
-          baseExpedienteService, 
-          schemaService, 
+          expedienteGroupService,
+          baseExpedienteService,
+          schemaService,
           selectedClass);
     this.expedienteGroupEditor.addListener(ExpedienteGroupEditor.CloseEvent.class, e-> selectInGrid(e.getExpediente()));
   }//setupGroupEditor
-
-
-  private void setupExpedienteEditor()
-  {
-     this.expedienteLeafEditor  = new ExpedienteLeafEditor(
-           expedienteService,
-           baseExpedienteService,
-           schemaService,
-           documentTypeService,
-           selectedClass);
-     this.expedienteLeafEditor.addListener(ExpedienteLeafEditor.CloseEvent.class, e-> selectInGrid(e.getExpediente()));
-  }//setupExpedienteEditor
 
 
   private void setupVolumeEditor()
@@ -432,17 +412,16 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     classActions     .setVisible(selectedBase == null);
     groupActions     .setVisible(selectedBase != null && selectedBase.isOfType(Nature.GRUPO));
     volumeActions    .setVisible(selectedBase != null && selectedBase.isOfType(Nature.VOLUMEN));
-    expedienteActions.setVisible(selectedBase != null && selectedBase.isOfType(Nature.EXPEDIENTE));    
+    expedienteActions.setVisible(selectedBase != null && selectedBase.isOfType(Nature.EXPEDIENTE));
     selectEditor();
   }//selectActions
 
 
   private void selectEditor()
-  {  
-     rightSection         .setVisible(selectedBase != null);
+  {
+     rightSection         .setVisible(true);
      expedienteGroupEditor.setVisible(selectedBase != null && selectedBase.isOfType(Nature.GRUPO));
-     volumeEditor         .setVisible(selectedBase != null && selectedBase.isOfType(Nature.VOLUMEN));
-     expedienteLeafEditor .setVisible(selectedBase != null && selectedBase.isOfType(Nature.EXPEDIENTE));
+     volumeEditor         .setVisible(selectedBase != null && (selectedBase.isOfType(Nature.VOLUMEN) || selectedBase.isOfType(Nature.EXPEDIENTE)));
   }//selectEditor
 
 
@@ -465,7 +444,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     addExpediente.addClickShortcut(Key.F3);
     addExpediente.addClickListener(click ->
     {  selectEditor();
-       expedienteLeafEditor.addExpediente(selectedBase);
+    volumeEditor.addExpediente(selectedBase);
     });
     addExpediente.getElement().getStyle().set("margin-left", "auto");
 
@@ -510,7 +489,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
     addExpediente.addClickListener(click ->
     {  rightSection.setVisible(true);
        expedienteGroupEditor.setVisible(false);
-       expedienteLeafEditor.addExpediente(selectedBase);
+       volumeEditor.addExpediente(selectedBase);
     });
     addExpediente.getElement().getStyle().set("margin-left", "auto");
 
@@ -580,6 +559,7 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   private void selectExpediente(BaseExpediente selectedBase)
   {
     selectActions();
+    rightSection.setVisible(true);
     if ( selectedBase != null )
     {
        switch (selectedBase.getType())
@@ -589,9 +569,6 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
          expedienteGroupEditor.editExpedienteGroup(selectedBranch);
          break;
        case EXPEDIENTE:
-         Expediente selectedExpediente = expedienteService.findByCode(selectedBase.getCode());
-         expedienteLeafEditor.editExpediente(selectedExpediente);
-         break;
        case VOLUMEN:
          Volume selectedVolume= volumeService.findByCode(selectedBase.getCode());
          volumeEditor.editVolume(selectedVolume);
@@ -605,7 +582,6 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
   private void closeAll()
   {
     expedienteGroupEditor.closeEditor();
-    expedienteLeafEditor.closeEditor();
     volumeEditor.closeEditor();
     resetSelector();
   }//closeAll

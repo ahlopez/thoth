@@ -40,7 +40,6 @@ import com.f.thoth.backend.repositories.ClassificationRepository;
 import com.f.thoth.backend.repositories.DocumentTypeRepository;
 import com.f.thoth.backend.repositories.ExpedienteGroupRepository;
 import com.f.thoth.backend.repositories.ExpedienteIndexRepository;
-import com.f.thoth.backend.repositories.ExpedienteLeafRepository;
 import com.f.thoth.backend.repositories.FieldRepository;
 import com.f.thoth.backend.repositories.LevelRepository;
 import com.f.thoth.backend.repositories.MetadataRepository;
@@ -99,7 +98,6 @@ public class DataGenerator implements HasLogger
    private ClassificationRepository      claseRepository;
    private ExpedienteIndexRepository     expedienteIndexRepository;
    private ExpedienteGroupRepository     expedienteGroupRepository;
-   private ExpedienteLeafRepository      expedienteRepository;
    private VolumeRepository              volumeRepository;
    private VolumeInstanceRepository      volumeInstanceRepository;
    private LevelRepository               levelRepository;
@@ -121,7 +119,7 @@ public class DataGenerator implements HasLogger
          ProductRepository productRepository, PickupLocationRepository pickupLocationRepository,
          TenantRepository tenantRepository, RoleRepository roleRepository, OperationRepository operationRepository,
          ClassificationRepository claseRepository, BaseExpedienteRepository baseExpedienteRepository, ExpedienteIndexRepository expedienteIndexRepository,
-         ExpedienteGroupRepository expedienteGroupRepository, ExpedienteLeafRepository expedienteRepository, VolumeRepository volumeRepository, VolumeInstanceRepository volumeInstanceRepository,
+         ExpedienteGroupRepository expedienteGroupRepository, VolumeRepository volumeRepository, VolumeInstanceRepository volumeInstanceRepository,
          MetadataRepository metadataRepository, FieldRepository fieldRepository, SchemaRepository schemaRepository, DocumentTypeRepository documentTypeRepository,
          SchemaValuesRepository schemaValuesRepository, LevelRepository levelRepository, RetentionRepository retentionRepository,
          UserGroupRepository userGroupRepository, SingleUserRepository singleUserRepository, Numerator numerator, PasswordEncoder passwordEncoder)
@@ -137,7 +135,6 @@ public class DataGenerator implements HasLogger
       this.claseRepository               = claseRepository;
       this.expedienteIndexRepository     = expedienteIndexRepository;
       this.expedienteGroupRepository     = expedienteGroupRepository;
-      this.expedienteRepository          = expedienteRepository;
       this.volumeRepository              = volumeRepository;
       this.volumeInstanceRepository      = volumeInstanceRepository;
       this.levelRepository               = levelRepository;
@@ -244,7 +241,7 @@ public class DataGenerator implements HasLogger
          ExpedienteGenerator  expedienteGenerator =
                new ExpedienteGenerator(
                      claseRepository, jcrSession, expedienteIndexRepository,
-                     expedienteGroupRepository, expedienteRepository, documentTypeRepository,
+                     expedienteGroupRepository, documentTypeRepository,
                      volumeRepository, volumeInstanceRepository, schemaRepository
                      );
 

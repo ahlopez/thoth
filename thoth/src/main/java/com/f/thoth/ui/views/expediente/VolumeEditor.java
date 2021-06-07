@@ -29,7 +29,6 @@ import com.vaadin.flow.component.ComponentEventListener;
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
-import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
@@ -135,14 +134,14 @@ public class VolumeEditor extends VerticalLayout
       volumeFields = new HorizontalLayout();
       volumeFields.setWidthFull();
       docTypes = new MultiselectComboBox<>("Tipos documentales admisibles");
-      List<DocumentType> allTypes = documentTypeService.findAll();   // Recibirlo como parámetro
+      List<DocumentType> allTypes = documentTypeService.findAll();
       docTypes.setItems(allTypes);
       docTypes.setItemLabelGenerator(e-> e.getName());
       docTypes.setWidth("30%");
       docTypes.setRequired(false);
       docTypes.setRequiredIndicatorVisible(true);
       docTypes.getElement().setAttribute("colspan", "1");
-      
+
       currentInstance= new TextField("Instancia actual");
       currentInstance.setRequired(true);
       currentInstance.setRequiredIndicatorVisible(true);
@@ -150,9 +149,9 @@ public class VolumeEditor extends VerticalLayout
       currentInstance.getElement().setAttribute("colspan", "1");
       currentInstance.getElement().getStyle().set("color", "blue");
       currentInstance.setReadOnly(true);
-      
+
       volumeFields.add( docTypes, currentInstance);
-      
+
       return volumeFields;
 
    }//configureVolumeFields
@@ -160,15 +159,23 @@ public class VolumeEditor extends VerticalLayout
 
    public void addVolume(BaseExpediente parentBase)
    {
-      Volume newVolume  = createVolume(parentBase);
+      Volume newVolume  = createVolume(parentBase, Nature.VOLUMEN);
       editVolume(newVolume);
    }//addVolume
 
 
-   private  Volume   createVolume(BaseExpediente parentBase)
+   public void addExpediente(BaseExpediente parentBase)
+   {
+      Volume newExpediente = createVolume(parentBase, Nature.EXPEDIENTE);
+      editVolume(newExpediente);
+   }//addExpediente
+
+
+   private  Volume   createVolume(BaseExpediente parentBase, Nature type)
    {
      Volume                newVolume = new Volume();
      LocalDateTime              now  = LocalDateTime.now();
+     newVolume.setType                (type);
      newVolume.setExpedienteCode      (null);
      newVolume.setPath                (null);
      newVolume.setName                (" ");
@@ -200,14 +207,15 @@ public class VolumeEditor extends VerticalLayout
         Set<DocumentType> admissibleTypes = currentVolume.getAdmissibleTypes();
         docTypes.setValue(admissibleTypes == null? new TreeSet<>() : admissibleTypes);
         currentInstance.setValue(volume.getCurrentInstance().toString());
+        currentInstance.setVisible(volume.isOfType(Nature.VOLUMEN));
         setVisibility(true);
         BaseExpediente base = currentVolume.getExpediente();
         String   parentCode = getParentCode( base);
         baseExpedienteEditor.editExpediente(base, parentCode);
      }
    }//editVolume
-   
-   
+
+
    private void setVisibility( boolean visibility)
    {
       baseExpedienteEditor.setVisible(visibility);
@@ -243,7 +251,8 @@ public class VolumeEditor extends VerticalLayout
          volume.setAdmissibleTypes(docTypes.getValue());
          volumeService.save(currentUser, volume);
          String businessCode = volume.formatCode();
-         notifier.accept( isNew? "Volumen creado con código "+ businessCode: "Volumen "+ businessCode+ " actualizado");
+         String volType = volume.getType().toString();
+         notifier.accept( isNew? volType+ " creado con código "+ businessCode: volType+ " "+ businessCode+ " actualizado");
       }
       closeEditor();
 
@@ -252,33 +261,33 @@ public class VolumeEditor extends VerticalLayout
 
    private void deleteVolume(Volume volume)
    {
-     if (volume != null && volume.isOfType(Nature.VOLUMEN) && volume.isPersisted())
+     if (volume != null  && volume.isPersisted() && (volume.isOfType(Nature.VOLUMEN) || volume.isOfType(Nature.EXPEDIENTE)))
      {
+       String type = volume.getType().toString();
        if (!volumeService.hasChildren(currentVolume))
        {  volumeService.delete(currentUser, currentVolume);
-          notifier.accept("Volumen "+ volume.formatCode()+ " eliminado");
+          notifier.accept(type+ " "+ volume.formatCode()+ " eliminado");
        }else
-       {  notifier.error("Volumen no puede ser eliminado pues contiene documentos");
+       {  notifier.error(type+ " no puede ser eliminado pues contiene documentos");
        }
      }
      closeEditor();
 
    }//deleteVolume
-   
-   
+
+
    public void openNewInstance(BaseExpediente baseVolume)
    {
       Volume     volume = volumeService.findByCode(baseVolume.getCode());
       LocalDateTime now = LocalDateTime.now();
       closeCurrentInstance (volume, now);
       currentVolume = createNewInstance(volume, now);
-      notifier.show("Nueva instancia "+ volume.getCurrentInstance()+ " creada en Volumen "+ volume.formatCode(), 
-                    "notifier-accept",  3000,  Notification.Position.BOTTOM_CENTER);
+      notifier.accept("Nueva instancia "+ volume.getCurrentInstance()+ " creada en Volumen "+ volume.formatCode());
       editVolume(currentVolume);
 
    }//openNewInstance
-   
-   
+
+
    private void closeCurrentInstance(Volume volume, LocalDateTime closingDate)
    {
       if ( volume != null)
@@ -287,10 +296,10 @@ public class VolumeEditor extends VerticalLayout
          { instance.setDateClosed(closingDate);
            volumeInstanceService.save(currentUser, instance);
          }
-      }     
+      }
    }//closeCurrentInstance
-   
-   
+
+
    private Volume createNewInstance(Volume volume, LocalDateTime openingDate)
    {
       if ( volume != null)
@@ -303,10 +312,10 @@ public class VolumeEditor extends VerticalLayout
          volume = volumeService.findById(volume.getId()).get();
       }
       return volume;
-     
+
    }//createNewInstance
-     
-   
+
+
    public void closeEditor()
    {
      setVisibility(false);
@@ -324,6 +333,7 @@ public class VolumeEditor extends VerticalLayout
      {  super(source, false);
         this.volume = volume;
      }//VolumeEditorEvent
+
 
      public Volume           getVolume()      { return volume;  }
      public BaseExpediente   getExpediente()  { return volume == null? null: volume.getExpediente();}

@@ -16,9 +16,9 @@ import org.springframework.core.io.Resource;
 
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
-import com.f.thoth.backend.data.gdoc.expediente.Expediente;
 import com.f.thoth.backend.data.gdoc.expediente.ExpedienteGroup;
 import com.f.thoth.backend.data.gdoc.expediente.ExpedienteIndex;
+import com.f.thoth.backend.data.gdoc.expediente.Nature;
 import com.f.thoth.backend.data.gdoc.expediente.Volume;
 import com.f.thoth.backend.data.gdoc.expediente.VolumeInstance;
 import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
@@ -31,7 +31,6 @@ import com.f.thoth.backend.repositories.ClassificationRepository;
 import com.f.thoth.backend.repositories.DocumentTypeRepository;
 import com.f.thoth.backend.repositories.ExpedienteGroupRepository;
 import com.f.thoth.backend.repositories.ExpedienteIndexRepository;
-import com.f.thoth.backend.repositories.ExpedienteLeafRepository;
 import com.f.thoth.backend.repositories.SchemaRepository;
 import com.f.thoth.backend.repositories.VolumeInstanceRepository;
 import com.f.thoth.backend.repositories.VolumeRepository;
@@ -41,7 +40,6 @@ public class ExpedienteGenerator implements HasLogger
    private ClassificationRepository   claseRepository;
    private ExpedienteIndexRepository  expedienteIndexRepository;
    private ExpedienteGroupRepository  expedienteGroupRepository;
-   private ExpedienteLeafRepository   expedienteRepository;
    private VolumeRepository           volumeRepository;
    private VolumeInstanceRepository   volumeInstanceRepository;
    private Session                    jcrSession;
@@ -81,14 +79,13 @@ public class ExpedienteGenerator implements HasLogger
 
    public ExpedienteGenerator(
          ClassificationRepository claseRepository, Session jcrSession, ExpedienteIndexRepository expedienteIndexRepository,
-         ExpedienteGroupRepository expedienteGroupRepository, ExpedienteLeafRepository expedienteRepository, DocumentTypeRepository documentTypeRepository,
+         ExpedienteGroupRepository expedienteGroupRepository, DocumentTypeRepository documentTypeRepository,
          VolumeRepository volumeRepository, VolumeInstanceRepository volumeInstanceRepository, SchemaRepository schemaRepository
          )
    {
       this.claseRepository            = claseRepository;
       this.expedienteIndexRepository  = expedienteIndexRepository;
       this.expedienteGroupRepository  = expedienteGroupRepository;
-      this.expedienteRepository       = expedienteRepository;
       this.volumeRepository           = volumeRepository;
       this.volumeInstanceRepository   = volumeInstanceRepository;
       this.availableSchemas           = schemaRepository.findAll(ThothSession.getCurrentTenant());
@@ -223,12 +220,15 @@ public class ExpedienteGenerator implements HasLogger
 
    private void createExpediente(BaseExpediente base, Set<DocumentType> admissibleTypes)
    {
-      Expediente expediente = new Expediente();
-      expediente.setExpediente( base);
-      expediente.setAdmissibleTypes(admissibleTypes);
-      expediente.setPath(base.getPath());
-      expediente.setLocation( "[LOCATION]");
-      expedienteRepository.saveAndFlush(expediente);
+      base.setType(Nature.EXPEDIENTE);
+      Volume volume = new Volume( base, Nature.EXPEDIENTE, 1, admissibleTypes);
+      volume.setPath( base.getPath()+ "/"+ volume.getCurrentInstance());
+      LocalDateTime dateOpened =  LocalDateTime.now().minusDays(365L*4);
+      LocalDateTime dateClosed =  dateOpened.plusYears(1000L);
+      VolumeInstance expedienteInstance =    new VolumeInstance(volume, volume.getCurrentInstance(), "[LOCATION]", dateOpened, dateClosed);
+      expedienteInstance.setOpen(true);
+      volumeRepository.save(volume);
+      volumeInstanceRepository.saveAndFlush(expedienteInstance);
       nLeavesFinal++;
 
    }//createExpediente
@@ -237,7 +237,8 @@ public class ExpedienteGenerator implements HasLogger
 
    private void createVolume(BaseExpediente base, Set<DocumentType> admissibleTypes)
    {
-      Volume volume = createVolumeHeader(base, admissibleTypes);
+      base.setType(Nature.VOLUMEN);
+      Volume volume = createVolumeHeader(base, admissibleTypes);      
       VolumeInstance currentInstance = null;
       int nInstances = random.nextInt(3)+1;
       volume.setCurrentInstance(nInstances);
@@ -263,14 +264,11 @@ public class ExpedienteGenerator implements HasLogger
    {
       Volume volume = new Volume();
       volume.setExpediente(base);
-      volume.setType();
+      volume.setType(base.getType());
       volume.setAdmissibleTypes(admissibleTypes);
       volume.setCurrentInstance(0);
       return volume;
    }//createVolumeHeader
-
-
-
 
 
    private VolumeInstance createVolumeInstance( Volume vol, int instanceNumber, LocalDateTime dateOpened, LocalDateTime dateClosed)

@@ -34,33 +34,35 @@ public class Volume extends AbstractEntity implements  NeedsProtection, Comparab
    @NotNull  (message = "{evidentia.expediente.required}")
    protected BaseExpediente       expediente;                      // Expediente that describes this volume
 
-  // @OneToMany (cascade={CascadeType.REFRESH, CascadeType.MERGE}, fetch = FetchType.EAGER)
    @ManyToMany (fetch= FetchType.EAGER)
    @JoinTable (name="volume_docType",  indexes= @Index(name= "vol_docType", columnList= "volume_id", unique= false) )
    @NotNull   (message = "{evidentia.types.required}")
    protected Set<DocumentType>    admissibleTypes;                 // Admisible document types that can be included in the volume
 
    @NotNull  (message = "{evidentia.volumeinstance.required}")
-   protected Integer              currentInstance;                 // Current instace of this volume
+   protected Integer              currentInstance;                 // Current instance of this volume. For EXPEDIENTE it is always zero (0)
 
    public Volume()
    {
       super();
       expediente = new BaseExpediente();
-      setType();
+      setType(Nature.VOLUMEN);
       this.admissibleTypes = new TreeSet<>();
       this.currentInstance = 0;
   }//Volume constructor
 
 
-   public Volume( BaseExpediente base, Integer currentInstance, Set<VolumeInstance>  instances)
+   public Volume( BaseExpediente base, Nature type, Integer currentInstance, Set<DocumentType>  admissibleTypes)
    {
       if (base == null)
-         throw new IllegalArgumentException("Expediente-Hoja que define el volumen no puede ser nulo");
-
+      {   throw new IllegalArgumentException("Expediente-Hoja que define el volumen no puede ser nulo");
+      }
+      if ( type == null)
+      {   throw new IllegalArgumentException("Tipo que define si es EXPEDIENTE o VOLUMEN no puede ser nulo");        
+      }
       this.expediente      = base;
-      setType();
-      this.admissibleTypes = new TreeSet<>();
+      setType(type);
+      this.admissibleTypes = admissibleTypes  == null? new TreeSet<>(): admissibleTypes;
       this.currentInstance = (currentInstance == null? 0: currentInstance);
    }//Volume constructor
 
@@ -72,7 +74,7 @@ public class Volume extends AbstractEntity implements  NeedsProtection, Comparab
    public Set<DocumentType>         getAdmissibleTypes()   { return admissibleTypes;}
    public void                      setAdmissibleTypes(Set<DocumentType> admissibleTypes) { this.admissibleTypes = admissibleTypes;}
    public void                      clearTypes() { this.admissibleTypes.clear();}
-
+   
    public Integer                   getCurrentInstance()                          { return currentInstance;}
    public void                      setCurrentInstance ( Integer currentInstance) { this.currentInstance = currentInstance;}
  	
@@ -84,8 +86,8 @@ public class Volume extends AbstractEntity implements  NeedsProtection, Comparab
    public String            formatCode()                               { return expediente.formatCode();}
 
    @Override public Nature  getType()                                  { return expediente == null? null: expediente.getType();}
+   @Override public void    setType( Nature type)                      { this.expediente.setType(type);}
    @Override public boolean isOfType( Nature type)                     { return expediente != null && expediente.isOfType(type);}
-   public void              setType ()                                 { expediente.setType(Nature.VOLUMEN);}
 
    public Boolean           getOpen()                                  { return expediente.getOpen();}
    public void              setOpen ( Boolean open)                    { expediente.setOpen(open);}

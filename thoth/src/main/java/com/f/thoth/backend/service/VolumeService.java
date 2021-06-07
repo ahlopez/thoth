@@ -14,8 +14,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
+import com.f.thoth.backend.data.gdoc.expediente.Nature;
 import com.f.thoth.backend.data.gdoc.expediente.Volume;
-import com.f.thoth.backend.data.gdoc.expediente.VolumeInstance;
+import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
@@ -78,10 +79,11 @@ public class VolumeService implements FilterableCrudService<Volume>, PermissionS
    @Override public Volume createNew(User currentUser)
    {
       BaseExpediente baseExpediente = new BaseExpediente();
+      baseExpediente.setType(Nature.VOLUMEN);
       baseExpediente.setTenant(ThothSession.getCurrentTenant());
       baseExpediente.setCreatedBy(null/*TODO: currentUser*/);
 
-      Volume volume = new Volume(baseExpediente, 0, new TreeSet<VolumeInstance>());
+      Volume volume = new Volume(baseExpediente, Nature.VOLUMEN, 0, new TreeSet<DocumentType>());
       return volume;
    }//createNew
 
