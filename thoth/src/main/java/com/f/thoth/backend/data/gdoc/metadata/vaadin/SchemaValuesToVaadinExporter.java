@@ -4,10 +4,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.f.thoth.Parm;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues.Exporter;
-import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -56,14 +56,14 @@ public class SchemaValuesToVaadinExporter implements Exporter
       
       String[] vals = valores == null || valores.length()== 0
                     ? new String[0]
-                    : valores.split(Constant.VALUE_SEPARATOR);
+                    : valores.split(Parm.VALUE_SEPARATOR);
       if (vals.length != fields.size())
          throw new IllegalStateException("Valores a exportar["+ vals.length+ "] diferentes a campos a recibirlos["+ fields.size()+ "]");
 
       int i= 0;
       for ( HasValue<?,?> field: fields)
       {  String value = vals[i++];
-         if ( !Constant.NULL_VALUE.equals(value))
+         if ( !Parm.NULL_VALUE.equals(value))
             setValue( field, value);
       }
       
@@ -87,7 +87,7 @@ public class SchemaValuesToVaadinExporter implements Exporter
          LocalDateTime dateTime = (TextUtil.isEmpty(value) || stringDate.equals("now"))
                                 ? LocalDateTime.now() 
                                 : stringDate.equals("endOfTimes")
-                                ? Constant.END_OF_TIMES
+                                ? Parm.END_OF_TIMES
                                 : LocalDateTime.parse(value);
         ((DateTimePicker)field).setValue(dateTime);
       }

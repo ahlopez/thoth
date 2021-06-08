@@ -1,6 +1,6 @@
 package com.f.thoth.ui.views.login;
 
-import static com.f.thoth.ui.utils.Constant.TENANT;
+import static com.f.thoth.Parm.TENANT;
 
 import org.springframework.beans.factory.annotation.Autowired;
 

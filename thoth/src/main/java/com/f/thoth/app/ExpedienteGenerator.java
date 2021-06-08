@@ -9,8 +9,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.jcr.Session;
-
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
@@ -42,7 +40,6 @@ public class ExpedienteGenerator implements HasLogger
    private ExpedienteGroupRepository  expedienteGroupRepository;
    private VolumeRepository           volumeRepository;
    private VolumeInstanceRepository   volumeInstanceRepository;
-   private Session                    jcrSession;
    private User                       user;
    private final Random               random = new Random(1L);
    private BufferedReader             expedienteNamesReader;
@@ -78,7 +75,7 @@ public class ExpedienteGenerator implements HasLogger
 
 
    public ExpedienteGenerator(
-         ClassificationRepository claseRepository, Session jcrSession, ExpedienteIndexRepository expedienteIndexRepository,
+         ClassificationRepository claseRepository, ExpedienteIndexRepository expedienteIndexRepository,
          ExpedienteGroupRepository expedienteGroupRepository, DocumentTypeRepository documentTypeRepository,
          VolumeRepository volumeRepository, VolumeInstanceRepository volumeInstanceRepository, SchemaRepository schemaRepository
          )
@@ -91,7 +88,6 @@ public class ExpedienteGenerator implements HasLogger
       this.availableSchemas           = schemaRepository.findAll(ThothSession.getCurrentTenant());
       this.availableTypes             = documentTypeRepository.findAll();
 
-      this.jcrSession                 = jcrSession;
       this.user                       = ThothSession.getUser();
 
       nExpedientes = 0;

@@ -1,6 +1,6 @@
 package com.f.thoth.backend.data.security;
 
-import static com.f.thoth.ui.utils.Constant.TENANT;
+import static com.f.thoth.Parm.TENANT;
 
 import java.util.Optional;
 

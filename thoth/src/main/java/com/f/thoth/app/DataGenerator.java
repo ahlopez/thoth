@@ -7,19 +7,12 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.annotation.PostConstruct;
-import javax.jcr.Node;
-import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
-import javax.jcr.Session;
-import javax.jcr.SimpleCredentials;
 
-import org.apache.jackrabbit.oak.Oak;
-import org.apache.jackrabbit.oak.jcr.Jcr;
-import org.apache.jackrabbit.oak.plugins.document.DocumentNodeStore;
-import org.apache.jackrabbit.oak.plugins.document.mongo.MongoDocumentNodeStoreBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.f.thoth.Parm;
 import com.f.thoth.backend.data.Role;
 import com.f.thoth.backend.data.entity.User;
 import com.f.thoth.backend.data.gdoc.classification.Level;
@@ -35,6 +28,7 @@ import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.UserGroup;
+import com.f.thoth.backend.jcr.Repo;
 import com.f.thoth.backend.repositories.BaseExpedienteRepository;
 import com.f.thoth.backend.repositories.ClassificationRepository;
 import com.f.thoth.backend.repositories.DocumentTypeRepository;
@@ -58,7 +52,6 @@ import com.f.thoth.backend.repositories.UserRepository;
 import com.f.thoth.backend.repositories.VolumeInstanceRepository;
 import com.f.thoth.backend.repositories.VolumeRepository;
 import com.f.thoth.backend.service.TenantService;
-import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.spring.annotation.SpringComponent;
 
 @SpringComponent
@@ -89,11 +82,11 @@ public class DataGenerator implements HasLogger
    private TenantService                 tenantService;
    private TenantRepository              tenantRepository;
    private RoleRepository                roleRepository;
-//   private OrderRepository               orderRepository;
    private UserRepository                userRepository;
+//   private OrderRepository               orderRepository;
 //   private ProductRepository             productRepository;
-   private OperationRepository           operationRepository;
 //   private PickupLocationRepository      pickupLocationRepository;
+   private OperationRepository           operationRepository;
    private PasswordEncoder               passwordEncoder;
    private ClassificationRepository      claseRepository;
    private ExpedienteIndexRepository     expedienteIndexRepository;
@@ -110,8 +103,6 @@ public class DataGenerator implements HasLogger
    private SingleUserRepository          singleUserRepository;
    private UserGroupRepository           userGroupRepository;
    private Numerator                     numerator;
-   private Repository                    repo;
-   private Session                       jcrSession;
    private Level[]                       levels;
 
    @Autowired
@@ -164,13 +155,6 @@ public class DataGenerator implements HasLogger
 
          getLogger().info("Generating demo data");
 
-         // ----------- Inicialice el repositorio documental ----------------------
-         getLogger().info("Initializing jcr repository");
-         repo = initJCRRepo();
-
-         getLogger().info("... acquiring a repo session");
-         jcrSession = loginToRepo(repo, "admin", "admin");
-
          // ------------ Cree los tenants y sus roles ----------------------------
          getLogger().info("... generating tenants");
          createTenants(tenantService);
@@ -208,18 +192,20 @@ public class DataGenerator implements HasLogger
          OperationGenerator  opGenerator = new OperationGenerator(operationRepository);
          opGenerator.registerOperations(tenant1);
 
-         // -----------------  Inicialice el árbol de clasificacion documental -----------------------------
-         getLogger().info("... generating classification classes" );
-         ClassificationGenerator classificationGenerator =
-             new ClassificationGenerator(claseRepository, levelRepository, schemaRepository, numerator, levels, jcrSession);
-         classificationGenerator.registerClasses(tenant1);
-
 
          // ------------------ Genere un conjunto de usuarios y grupos de usuarios -------------------------------
          getLogger().info("... generating users");
          createAdmin(userRepository, singleUserRepository, passwordEncoder);
          User baker   = createBaker(userRepository, passwordEncoder);
          User barista = createBarista(userRepository, passwordEncoder);
+
+
+         // -----------------  Inicialice el árbol de clasificacion documental -----------------------------
+         getLogger().info("... generating classification classes" );
+         ClassificationGenerator classificationGenerator =
+             new ClassificationGenerator(claseRepository, levelRepository, schemaRepository, numerator, levels);
+         classificationGenerator.registerClasses(tenant1);
+
 
          // A set of products without constrains that can be deleted
          createDeletableUsers(userRepository, passwordEncoder);
@@ -228,19 +214,19 @@ public class DataGenerator implements HasLogger
          LocalDate now = LocalDate.now();
          LocalDate yearStart =  now.minusDays(now.getDayOfYear());
          LocalDate yearEnd   =  yearStart.plusMonths(12);
-         UserGroup g0100 = createUserGroup(tenant1, "Grupo 0100", Constant.DEFAULT_CATEGORY, null,  yearStart, yearEnd, false);
-         UserGroup g0110 = createUserGroup(tenant1, "Grupo 0101", Constant.DEFAULT_CATEGORY, g0100, yearStart, yearEnd, false);
-         UserGroup g0120 = createUserGroup(tenant1, "Grupo 0102", Constant.DEFAULT_CATEGORY, g0100, yearStart, yearEnd, false);
-         UserGroup g0130 = createUserGroup(tenant1, "Grupo 0103", Constant.DEFAULT_CATEGORY, g0100, yearStart, yearEnd, false);
-         UserGroup g0200 = createUserGroup(tenant1, "Grupo 0200", Constant.DEFAULT_CATEGORY, null,  yearStart, yearEnd, false);
-         UserGroup g0210 = createUserGroup(tenant1, "Grupo 0201", Constant.DEFAULT_CATEGORY, g0200, yearStart, yearEnd, false);
+         UserGroup g0100 = createUserGroup(tenant1, "Grupo 0100", Parm.DEFAULT_CATEGORY, null,  yearStart, yearEnd, false);
+         UserGroup g0110 = createUserGroup(tenant1, "Grupo 0101", Parm.DEFAULT_CATEGORY, g0100, yearStart, yearEnd, false);
+         UserGroup g0120 = createUserGroup(tenant1, "Grupo 0102", Parm.DEFAULT_CATEGORY, g0100, yearStart, yearEnd, false);
+         UserGroup g0130 = createUserGroup(tenant1, "Grupo 0103", Parm.DEFAULT_CATEGORY, g0100, yearStart, yearEnd, false);
+         UserGroup g0200 = createUserGroup(tenant1, "Grupo 0200", Parm.DEFAULT_CATEGORY, null,  yearStart, yearEnd, false);
+         UserGroup g0210 = createUserGroup(tenant1, "Grupo 0201", Parm.DEFAULT_CATEGORY, g0200, yearStart, yearEnd, false);
 
 
          // -----------------  Generando expedientes y documentos de prueba
          getLogger().info("... generating expedientes and documents");
          ExpedienteGenerator  expedienteGenerator =
                new ExpedienteGenerator(
-                     claseRepository, jcrSession, expedienteIndexRepository,
+                     claseRepository, expedienteIndexRepository,
                      expedienteGroupRepository, documentTypeRepository,
                      volumeRepository, volumeInstanceRepository, schemaRepository
                      );
@@ -271,7 +257,8 @@ public class DataGenerator implements HasLogger
    }//loadData
 
 
-   private void createTenants (TenantService tenantService) throws RepositoryException
+   private void createTenants (TenantService tenantService)
+         throws RepositoryException, UnknownHostException
    {
       session = new ThothSession(tenantService);
       tenant1 = createTenant(tenantRepository, "FCN", "FCN");
@@ -291,133 +278,6 @@ public class DataGenerator implements HasLogger
          adminRole = role;
       }
    }//createRoles
-
-
-   private Repository initJCRRepo()throws UnknownHostException
-   {
-      /*
-         Ver ejemplo completo en   C:\ahl\estudio\dzone\ecm\oak-mongodb-demo-master
-
-         2021/06/04 : From the JackRabbit Oak Repository Construction page at https://jackrabbit.apache.org/oak/docs/construct.html
-         DB db = new MongoClient("127.0.0.1", 27017).getDB("test2");
-         DocumentNodeStore ns = new DocumentMK.Builder().
-         setMongoDB(db).getNodeStore();
-         Repository repo = new Jcr(new Oak(ns)).createRepository();
-
-         2021/06/04: Adaptation of the following article and Oak documentation
-         Repository repo = initRepo("mongodb://localhost", 27017, "oak");
-
-         2021/06/04: From the Dzone article "Creating a Content Repository Using Jackrabbit Oak and MongoDB, Bishnu Mishra  Apr. 07, 18"
-         String uri = "mongodb://" + host + ":" + port;
-         DocumentNodeStore ns = new DocumentMK.Builder().setMongoDB(uri, "oak_demo", 16).getNodeStore();
-         Repository repo = new Jcr(new Oak(ns)).createRepository();
-
-         2021/06/04: From the Dzone article ibid,   Creating File Nodes
-         Node fileNodeParent = session.getNode("pathToParentNode"); // /node1/node2/
-         Node fileNode = fileNodeParent.addNode("theFile", "nt:file");
-         Node content = fileNode.addNode("jcr:content", "nt:resource");
-         InputStream is = getFileInputStream();//Get the file data as stream.
-         Binary binary = session.getValueFactory().createBinary(is);
-         content.setProperty("jcr:data", binary);
-         session.save();
-         // To enable versioning use VersionManager
-         VersionManager vm = session.getWorkspace().getVersionManager();
-         vm.checkin(fileNode.getPath());
-
-         2021/06/04: From the Dzone article ibid,   Retrieving File From Repository
-         Node fileNodeParent = session.getNode("pathToParentNode"); // /node1/node2/
-         Node fileContent = fileNodeParent.getNode("theFile").getNode("jcr:content");
-         Binary bin = fileContent.getProperty("jcr:data").getBinary();
-         InputStream stream = bin.getStream();
-         byte[] bytes = IOUtils.toByteArray(stream);
-         bin.dispose();
-         stream.close();
-
-         2021/06/04: From the Dzone article ibid,   Retrieving Version of a Content
-         VersionManager vm = session.getWorkspace().getVersionManager();
-         javax.jcr.version.VersionHistory versionHistory = vm.getVersionHistory("filePath");
-         Version currentVersion = vm.getBaseVersion(filePath);// This is the current version of the file
-         VersionIterator itr = versionHistory.getAllVersions();// gets all the versions of that content
-
-         We can iterate over the VersionIterator to get specific versions and its properties.
-         Similarly, we can restore a specific version of a content.
-
-         //Restoring a specific version
-         VersionManager vm = session.getWorkspace().getVersionManager();
-         Version version = (Version) session.getNodeByIdentifier("versionId");
-         vm.restore(version, false);// boolean flag governs what happens in case of an identifier collision.
-
-         2021/06/04:  To access the repository (example) - See https://jackrabbit.apache.org/oak/docs/construct.html
-         Session session = repo.login( new SimpleCredentials("admin", "admin".toCharArray()));
-         Node root = session.getRootNode();
-         if (root.hasNode("hello"))
-         {
-             Node hello = root.getNode("hello");
-             long count = hello.getProperty("count").getLong();
-             hello.setProperty("count", count + 1);
-             System.out.println("found the hello node, count = " + count);
-         } else
-         {
-             System.out.println("creating the hello node");
-             root.addNode("hello").setProperty("count", 1);
-         }
-         session.save();
-
-         2021/06/04:  To logout and close the store - See https://jackrabbit.apache.org/oak/docs/construct.html
-         session.logout();
-         // depending on NodeStore implementation either:
-         // close FileStore
-         fs.close();
-         // or close DocumentNodeStore
-         ns.dispose();
-      */
-      // Gets an in-memory repo
-      repo = new Jcr(new Oak()).createRepository();
-      getLogger().info("... Got an in-memory repo");
-      return repo;
-
-   }//initJCRRepo
-
-   @SuppressWarnings({"unused"})
-   private Repository initRepo (String host, final int port, String dbName) throws UnknownHostException
-   {
-      String uri = "mongodb://" + host + ":" + port;
-      DocumentNodeStore store = new MongoDocumentNodeStoreBuilder().setMongoDB(uri, dbName, 0).build();
-      Repository repo = new Jcr(new Oak(store)).createRepository();
-      getLogger().info("... Got repo at "+ uri+ "/"+ dbName);
-      return repo;
-
-   }//initRepo
-
-
-   private Session loginToRepo(Repository jcrRepo, String userCode, String passwordHash) throws RepositoryException
-   {
-
-      if (jcrRepo != null)
-      {
-         Session session = jcrRepo.login(new SimpleCredentials(userCode, passwordHash.toCharArray()));
-         getLogger().info("... acquired session to jcr(JackRabbit) repo, user["+ userCode+ "], pwd["+ passwordHash+ "]");
-         return session;
-      } else
-         throw new NullPointerException("Repositorio no inicializado");
-
-      //   jcr spec:    return  Repository.login(Credentials credentials, workspaceName);
-   }//loginToRepo
-
-
-   private void initWorkspace(String workspacePath, String name, Tenant tenant) throws RepositoryException
-   {
-      if ( !jcrSession.nodeExists(workspacePath))
-      {
-         Node node         = jcrSession.getRootNode();
-         Node jcrWorkspace = node.addNode(workspacePath.substring(1));
-         jcrWorkspace.setProperty("name", name);
-         getLogger().info("    >>> Tenant["+ tenant.getName()+ "] workspace["+ name+ "], path["+ jcrWorkspace.getPath()+ "]");
-         if ( !workspacePath.equals( jcrWorkspace.getPath()))
-         { throw new RepositoryException("Workspace path["+ workspacePath+ "] diferente del path en repositorio["+ jcrWorkspace.getPath()+ "]");
-         }
-      }
-   }//initWorkspace
 
 
    private Level[] createMetadata()
@@ -590,7 +450,8 @@ public class DataGenerator implements HasLogger
 
 
 
-   private Tenant createTenant(TenantRepository tenantRepository, String name, String code) throws RepositoryException
+   private Tenant createTenant(TenantRepository tenantRepository, String name, String code)
+         throws RepositoryException, UnknownHostException
    {
       Tenant tenant = new Tenant(name, code);
       tenant.setLocked(false);
@@ -599,7 +460,7 @@ public class DataGenerator implements HasLogger
       tenant.setFromDate( now.minusMonths(random.nextInt(36)));
       tenant.setToDate(now.plusYears(random.nextInt(10)));
       tenantRepository.save(tenant);
-      initWorkspace(tenant.getWorkspace(), name, tenant);
+      Repo.getInstance().initWorkspace(tenant.getWorkspace(), name, code);
 
 
       return tenant;
@@ -615,6 +476,7 @@ public class DataGenerator implements HasLogger
 
       return role;
    }//createRole
+
 /*
    private void fillCustomer(Customer customer)
    {

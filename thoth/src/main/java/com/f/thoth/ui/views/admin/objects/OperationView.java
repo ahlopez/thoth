@@ -8,12 +8,13 @@ import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
+import com.f.thoth.Parm;
 import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.security.Operation;
 import com.f.thoth.backend.data.security.Role;
-import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.service.OperationService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.components.HierarchicalSelector;
@@ -40,7 +41,7 @@ import com.vaadin.flow.router.Route;
 public class OperationView extends AbstractEvidentiaCrudView<Operation>
 {
    private static final Converter<String, String>  STRING_CONVERTER  = new StringToString("");
-   private static final Converter<String, Integer> CATEGORY_CONVERTER= new StringToIntegerConverter( Constant.DEFAULT_CATEGORY, "Número inválido");
+   private static final Converter<String, Integer> CATEGORY_CONVERTER= new StringToIntegerConverter( Parm.DEFAULT_CATEGORY, "Número inválido");
 
    private static HierarchicalSelector<Operation, HasValue.ValueChangeEvent<Operation>> parentObject;
 
@@ -74,7 +75,7 @@ public class OperationView extends AbstractEvidentiaCrudView<Operation>
 
       TextField category = new TextField("Categoría");
       category.setRequired(true);
-      category.setValue(Constant.DEFAULT_CATEGORY.toString());
+      category.setValue(Parm.DEFAULT_CATEGORY.toString());
       category.setRequiredIndicatorVisible(true);
       category.getElement().setAttribute("colspan", "1");
 
@@ -118,8 +119,8 @@ public class OperationView extends AbstractEvidentiaCrudView<Operation>
       binder.forField(category)
             .withValidator(text -> text.length() == 1, "Categorías solo tienen un dígito") //Validación del texto
             .withConverter(CATEGORY_CONVERTER)
-            .withValidator(cat -> cat >= Constant.MIN_CATEGORY && cat <= Constant.MAX_CATEGORY,
-                           "La categoría debe estar entre "+ Constant.MIN_CATEGORY+ " y "+ Constant.MAX_CATEGORY) // Validación del número
+            .withValidator(cat -> cat >= Parm.MIN_CATEGORY && cat <= Parm.MAX_CATEGORY,
+                           "La categoría debe estar entre "+ Parm.MIN_CATEGORY+ " y "+ Parm.MAX_CATEGORY) // Validación del número
             .bind("category");
 
       binder.bind(userOwner, "userOwner");

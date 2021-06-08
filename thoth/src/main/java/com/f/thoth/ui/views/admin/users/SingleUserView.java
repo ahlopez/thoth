@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
+import com.f.thoth.Parm;
 import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.security.Role;
@@ -23,7 +24,6 @@ import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.components.HierarchicalSelector;
 import com.f.thoth.ui.crud.AbstractEvidentiaCrudView;
 import com.f.thoth.ui.crud.CrudEntityPresenter;
-import com.f.thoth.ui.utils.Constant;
 import com.f.thoth.ui.utils.converters.LocalDateToLocalDate;
 import com.f.thoth.ui.utils.converters.StringToString;
 import com.vaadin.flow.component.Component;
@@ -57,7 +57,7 @@ public class SingleUserView extends AbstractEvidentiaCrudView<User>
    private static final Converter<LocalDate, LocalDate> DATE_CONVERTER   = new LocalDateToLocalDate();
    private static final Converter<String, String>       STRING_CONVERTER = new StringToString("");
    private static final Converter<String, Integer>    CATEGORY_CONVERTER =
-                    new StringToIntegerConverter( Constant.DEFAULT_CATEGORY, "Categoría inválida");
+                    new StringToIntegerConverter( Parm.DEFAULT_CATEGORY, "Categoría inválida");
 
    private static User        singleUser = null;
    private static Set<UserGroup>    userGroups = new TreeSet<>();
@@ -138,7 +138,7 @@ public class SingleUserView extends AbstractEvidentiaCrudView<User>
 
       TextField category = new TextField("Categoría");
       category.setRequired(true);
-      category.setValue(Constant.DEFAULT_CATEGORY.toString());
+      category.setValue(Parm.DEFAULT_CATEGORY.toString());
       category.setRequiredIndicatorVisible(true);
       category.getElement().setAttribute("colspan", "1");
 
@@ -185,8 +185,8 @@ public class SingleUserView extends AbstractEvidentiaCrudView<User>
       binder.forField(category)
             .withValidator(text -> text.length() == 1, "Categorías solo tienen un dígito") //Validación del texto
             .withConverter(CATEGORY_CONVERTER)
-            .withValidator(cat -> cat >= Constant.MIN_CATEGORY && cat <= Constant.MAX_CATEGORY,
-                  "La categoría debe estar entre "+ Constant.MIN_CATEGORY+ " y "+ Constant.MAX_CATEGORY) // Validación del número
+            .withValidator(cat -> cat >= Parm.MIN_CATEGORY && cat <= Parm.MAX_CATEGORY,
+                  "La categoría debe estar entre "+ Parm.MIN_CATEGORY+ " y "+ Parm.MAX_CATEGORY) // Validación del número
             .bind("category");
 
       binder.forField(fromDate)

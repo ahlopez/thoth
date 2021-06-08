@@ -10,10 +10,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
+import com.f.thoth.Parm;
 import com.f.thoth.backend.data.entity.AbstractEntity;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.ThothSession;
-import com.f.thoth.ui.utils.Constant;
 
 @Entity
 @Table(name = "FIELD_VALUES")
@@ -94,7 +94,7 @@ public class SchemaValues extends AbstractEntity implements SchemaValuesImporter
       if (valores == null)
          valores = value;
       else
-          valores = valores+ Constant.VALUE_SEPARATOR+ value;
+          valores = valores+ Parm.VALUE_SEPARATOR+ value;
    }//addValue
 
    // ------------------------   Builders ----------------------------
@@ -167,7 +167,7 @@ public class SchemaValues extends AbstractEntity implements SchemaValuesImporter
       if ( valores == null )
          return new ArrayList<String>().iterator();
       
-      String vals[] = valores.split(Constant.VALUE_SEPARATOR);
+      String vals[] = valores.split(Parm.VALUE_SEPARATOR);
       return Arrays.asList(vals).iterator();
    }//iterator
 

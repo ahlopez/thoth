@@ -20,8 +20,8 @@ import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.BatchSize;
 
+import com.f.thoth.Parm;
 import com.f.thoth.backend.data.entity.BaseEntity;
-import com.f.thoth.ui.utils.Constant;
 
 /**
  *  Representa un usuario sencillo o compuesto del sistema
@@ -69,11 +69,11 @@ public abstract class Usuario extends BaseEntity implements NeedsProtection, Com
       name            = "[name]";
       locked          = false;
       fromDate        = yearStart();
-      userCategory    = Constant.DEFAULT_CATEGORY;
+      userCategory    = Parm.DEFAULT_CATEGORY;
       toDate          = yearStart().plusYears(1);
       roles           = new TreeSet<>();
       objectToProtect = new ObjectToProtect();
-      objectToProtect.setCategory(Constant.ADMIN_CATEGORY);
+      objectToProtect.setCategory(Parm.ADMIN_CATEGORY);
    }//Usuario
 
    public void prepareData()

@@ -1,13 +1,14 @@
 package com.f.thoth.app;
 
+import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.TreeSet;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
-import javax.jcr.Session;
 
+import com.f.thoth.Parm;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.classification.Level;
@@ -17,6 +18,8 @@ import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.gdoc.numerator.Numerator;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Tenant;
+import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.jcr.Repo;
 import com.f.thoth.backend.repositories.ClassificationRepository;
 import com.f.thoth.backend.repositories.LevelRepository;
 import com.f.thoth.backend.repositories.SchemaRepository;
@@ -32,31 +35,30 @@ public class ClassificationGenerator implements HasLogger
    private SchemaRepository          schemaRepository;
    private Numerator                 numerator;
    private Level[]                   level;
-   private Session                   session;
    private int                       nClasses=0;
    private int                       nSequences=0;
    private Set<String>               seqNumbers;
+   private String                    currentUser;
 
    public ClassificationGenerator( ClassificationRepository claseRepository,
                                  LevelRepository levelRepository,
                                  SchemaRepository schemaRepository,
                                  Numerator        numerator,
-                                 Level[] level,
-                                 Session session
-                               )
+                                 Level[] level
+                                  )
    {
       this.claseRepository    = claseRepository;
       this.levelRepository    = levelRepository;
       this.schemaRepository   = schemaRepository;
       this.numerator          = numerator;
       this.level              = level;
-      this.session            = session;
       this.seqNumbers         = new TreeSet<>();
+      this.currentUser        = ThothSession.getCurrentUser().getEmail();
 
    }//ClassificationGenerator constructor
 
    @SuppressWarnings("unused")
-   public void registerClasses( Tenant tenant) throws RepositoryException
+   public void registerClasses( Tenant tenant) throws RepositoryException, UnknownHostException
    {
       getLogger().info("... Register classification classes");
       String classificationRootPath = initJcrClassification(tenant, NodeType.CLASSIFICATION.getCode()); 
@@ -424,12 +426,15 @@ public class ClassificationGenerator implements HasLogger
    }//printSequenceStats
 
 
-   private String initJcrClassification(Tenant tenant, String classificationCode) throws RepositoryException
+   private String initJcrClassification(Tenant tenant, String classificationCode) 
+         throws RepositoryException, UnknownHostException
    {
-      String workSpacePath     =  tenant.getWorkspace();
-      Node   workspace         =  session.getNode(workSpacePath);
-      Node   classificatioRoot =  workspace.addNode(classificationCode);
-      return classificatioRoot.getPath();
+      String classificationRootPath = tenant.getWorkspace()+ Parm.PATH_SEPARATOR+ classificationCode;
+      Node      classificationRoot  = Repo.getInstance().addNode(classificationRootPath, "CLASSIFICATION_ROOT", currentUser);
+      if (!classificationRootPath.equals(classificationRoot.getPath()))
+      {   throw new IllegalStateException("No pudo crear raíz del esquema de clasificación en JCR");
+      }
+      return classificationRootPath;
 
    }//initJcrClassification
 
@@ -482,7 +487,9 @@ public class ClassificationGenerator implements HasLogger
          Classification parent = classificationClass.getOwner();
          String parentPath     = parent ==  null? classificationRootPath: parent.getPath();
          String childCode      = classificationClass.getClassCode();
-         addChild( parentPath, childCode);
+         String childName      = classificationClass.getName();
+         String childLevel     = ""+ classificationClass.getLevel().getOrden();
+         addChild( parentPath, childCode, childName, childLevel);
       } catch(Exception e)
       {
          throw new IllegalStateException("*** No pudo guardar estructura de clasificación en el repositorio. Razón\n"+ e.getLocalizedMessage());
@@ -507,19 +514,14 @@ public class ClassificationGenerator implements HasLogger
    }//createSequence
 
 
-   private Node addChild(String parentPath, String childNode) throws RepositoryException
+   private Node addChild(String parentPath, String childNode, String childName, String childLevel) 
+         throws RepositoryException, UnknownHostException
    {
-      Node child = null;
-      if ( ! session.nodeExists(parentPath))
-         throw new RepositoryException("Parent Node["+ parentPath+ "] no existe");
-
-      Node parentNode = session.getNode(parentPath);
-      if (!parentNode.hasNode(childNode))
-      {
-         child = parentNode.addNode(childNode);
-         child.setProperty("jcr:nodeType", NodeType.CLASSIFICATION.name());
-      }
-
+      String childPath = parentPath+ Parm.PATH_SEPARATOR+ childNode;
+      Node child = Repo.getInstance().addNode(childPath, childName, currentUser);
+      child.setProperty("jcr:nodeType", NodeType.CLASSIFICATION.name());
+      child.setProperty("jcr:code",     childNode);
+      child.setProperty("jcr:level",    childLevel);
       return child;
    }//addChild
 

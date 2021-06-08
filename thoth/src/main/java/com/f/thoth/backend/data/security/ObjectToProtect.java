@@ -24,7 +24,7 @@ import javax.validation.constraints.NotNull;
 
 import org.hibernate.annotations.BatchSize;
 
-import com.f.thoth.ui.utils.Constant;
+import com.f.thoth.Parm;
 
 
 /**
@@ -91,7 +91,7 @@ public class ObjectToProtect
    private void init()
    {
       id           = null;
-      category     = Constant.DEFAULT_CATEGORY;
+      category     = Parm.DEFAULT_CATEGORY;
       userOwner    = null;
       roleOwner    = null;
       restrictedTo = null;
@@ -104,7 +104,7 @@ public class ObjectToProtect
    public void prepareData()
    {
       if( category == null)
-         category = Constant.DEFAULT_CATEGORY;
+         category = Parm.DEFAULT_CATEGORY;
 
    }//prepareData
 
