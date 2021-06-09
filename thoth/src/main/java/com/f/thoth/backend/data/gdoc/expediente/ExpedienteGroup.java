@@ -63,7 +63,7 @@ public class ExpedienteGroup extends AbstractEntity implements  NeedsProtection,
 
   private void                setType()
   {
-    if( expediente != null && !isOfType(Nature.GRUPO))
+    if( expediente != null)
       expediente.setType(Nature.GRUPO);
   }
 

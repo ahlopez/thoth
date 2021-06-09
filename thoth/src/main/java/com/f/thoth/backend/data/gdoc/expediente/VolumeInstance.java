@@ -23,11 +23,11 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 public class VolumeInstance extends AbstractEntity implements  Comparable<VolumeInstance>
 {
    @NotNull  (message = "{evidentia.volume.required}")
-   protected Integer       instance;                                     // Index of the current volume
+   protected Integer        instance;                                    // Index of the current volume
 
    @ManyToOne(cascade = CascadeType.MERGE, fetch = FetchType.EAGER)
    @NotNull  (message = "{evidentia.volume.required}")
-   protected Volume        volume;                                       // Volume to which this instance belongs
+   protected Volume         volume;                                      // Volume to which this instance belongs
 
    @NotNull  (message = "{evidentia.repopath.required}")
    @NotBlank (message = "{evidentia.repopath.required}")
@@ -35,7 +35,7 @@ public class VolumeInstance extends AbstractEntity implements  Comparable<Volume
    @Size(max = 255)
    protected String         path;                                        //  Node path in document repository
 
-   protected String        location;                                     // Physical archive location (topographic signature)
+   protected String         location;                                    // Physical archive location (topographic signature)
 
    @NotNull(message = "{evidentia.dateopened.required}")
    protected LocalDateTime  dateOpened;                                  // Date volume instance was opened

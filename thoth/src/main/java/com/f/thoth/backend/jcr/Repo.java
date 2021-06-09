@@ -4,6 +4,7 @@ import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 
 import javax.jcr.Node;
+import javax.jcr.PathNotFoundException;
 import javax.jcr.Repository;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
@@ -218,10 +219,27 @@ public class Repo implements HasLogger
       String childCode= path.substring(i+1);
       Node child = parent.hasNode(childCode)? parent.getNode(childCode) : parent.addNode(childCode);
       child.setProperty("jcr:name", name);
+      child.setProperty("jcr:created", TextUtil.formatDateTime(LocalDateTime.now()));
       child.setProperty("jcr:createdBy", user);
-      child.setProperty("jcr:creationDate", TextUtil.formatDateTime(LocalDateTime.now()));
       return child;
 
    }//addNode
+   
+   
+   public Node findNode( String path)
+   {
+     Node node = null;
+     try
+     {
+        if (jcrSession.itemExists(path))
+        {  node = jcrSession.getNode(path);  
+        }
+     }catch( PathNotFoundException pnf)
+     {    
+     }catch( Exception e)
+     { throw new IllegalStateException("Error. No pudo encontrar el nodo ["+ path+ "]. Razón\n"+ e.getMessage());
+     }
+     return node;
+   }//findNode
 
 }//Repo

@@ -24,6 +24,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.f.thoth.Parm;
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
@@ -262,8 +263,10 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
       Sequence expedienteSequence = numerador.obtenga(seqKey);
       expedienteCode = expedienteSequence.next();
 
-      this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ "/"+ NodeType.EXPEDIENTE.getCode()+ "/"+
-              (ownerId == null ? "": ownerId)+ "/"+ (expedienteCode == null? "[expedienteCode]" : expedienteCode);
+      this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ Parm.PATH_SEPARATOR+ 
+                  NodeType.EXPEDIENTE.getCode()+ Parm.PATH_SEPARATOR+
+                  classificationClass.getId()+ Parm.PATH_SEPARATOR+ 
+                  (expedienteCode == null? "[expedienteCode]" : expedienteCode);
       this.code = this.path;
     }
   }//buildCode

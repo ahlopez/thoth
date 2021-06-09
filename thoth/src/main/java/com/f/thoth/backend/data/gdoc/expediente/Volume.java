@@ -80,6 +80,7 @@ public class Volume extends AbstractEntity implements  NeedsProtection, Comparab
  	
    // ------------------------ Hereda de LeafExpediente -------------------------
 
+   public String            getName()                                  { return expediente.getName();}
    public void              setName ( String name)                     { expediente.setName(name);}
    
    public String            getCode()                                  { return expediente.getCode();}
