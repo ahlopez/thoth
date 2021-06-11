@@ -187,7 +187,7 @@ public class ExpedienteGenerator implements HasLogger
       createIndex(base);
 
       Node jcrGroup = createJCRExpediente(base);
-      jcrGroup.setProperty("ev:type", Nature.GRUPO.toString());
+      jcrGroup.setProperty("evid:type", Nature.GRUPO.toString());
 
       int nChildren = random.nextInt(4)+1;
       for( int i=0; i< nChildren; i++)
@@ -211,10 +211,10 @@ public class ExpedienteGenerator implements HasLogger
 
       int  volProbability = random.nextInt(100);
       if ( volProbability < 15)
-      {  jcrLeaf.setProperty("ev:type", Nature.VOLUMEN.toString());
+      {  jcrLeaf.setProperty("evid:type", Nature.VOLUMEN.toString());
          createVolume(base, admissibleTypes);
       } else
-      {  jcrLeaf.setProperty("ev:type", Nature.EXPEDIENTE.toString());
+      {  jcrLeaf.setProperty("evid:type", Nature.EXPEDIENTE.toString());
          createExpediente(base, admissibleTypes);
       }
       base.createIndex();
@@ -296,8 +296,8 @@ public class ExpedienteGenerator implements HasLogger
       volumeRepository.save(volume);
 
       Node jcrExpediente = Repo.getInstance().findNode(base.getPath());
-      jcrExpediente.setProperty("ev:type", Nature.EXPEDIENTE.toString());
-      jcrExpediente.setProperty("ev:currentInstance", "1");
+      jcrExpediente.setProperty("evid:type", Nature.EXPEDIENTE.toString());
+      jcrExpediente.setProperty("evid:currentInstance", "1");
 
       LocalDateTime dateOpened = LocalDateTime.now().minusDays(365L*4);
       LocalDateTime dateClosed = dateOpened.plusYears(1000L);
@@ -334,11 +334,11 @@ public class ExpedienteGenerator implements HasLogger
       currentInstance.setDateClosed(LocalDateTime.MAX);
       volumeInstanceRepository.saveAndFlush(currentInstance);
       Node jcrInstance = Repo.getInstance().findNode(volume.getPath()+ Parm.PATH_SEPARATOR+ nInstances);
-      jcrInstance.setProperty("ev:open", "true");
+      jcrInstance.setProperty("evid:open", "true");
 
       Node jcrVolume = Repo.getInstance().findNode(base.getPath());
-      jcrVolume.setProperty("ev:type", Nature.VOLUMEN.toString());
-      jcrVolume.setProperty("ev:currentInstance", ""+ volume.getCurrentInstance());
+      jcrVolume.setProperty("evid:type", Nature.VOLUMEN.toString());
+      jcrVolume.setProperty("evid:currentInstance", ""+ volume.getCurrentInstance());
       nVolumes++;
 
    }//createVolume
@@ -373,10 +373,10 @@ public class ExpedienteGenerator implements HasLogger
       Integer instanceNumber = instance.getInstance();
       String            path = volume.getPath()+ Parm.PATH_SEPARATOR+ instanceNumber;
       Node       jcrInstance = Repo.getInstance().addNode(path, volume.getName()+ " instance "+ instanceNumber, user.getEmail());
-      jcrInstance.setProperty("ev:instance", ""+ instanceNumber);
-      jcrInstance.setProperty("ev:opened",   TextUtil.formatDateTime(instance.getDateOpened()));
-      jcrInstance.setProperty("ev:closed",   TextUtil.formatDateTime(instance.getDateClosed()));
-      jcrInstance.setProperty("ev:open",     ""+ instance.getOpen());
+      jcrInstance.setProperty("evid:instance", ""+ instanceNumber);
+      jcrInstance.setProperty("evid:opened",   TextUtil.formatDateTime(instance.getDateOpened()));
+      jcrInstance.setProperty("evid:closed",   TextUtil.formatDateTime(instance.getDateClosed()));
+      jcrInstance.setProperty("evid:open",     ""+ instance.getOpen());
       nNodes++;
    }//createJCRInstance
 
@@ -388,10 +388,10 @@ public class ExpedienteGenerator implements HasLogger
       try
       {
          for ( DocumentType docType: admissibleTypes)
-         {   admissible.append(docType.getName()).append(";");
+         {   admissible.append(docType.getCode()).append(Parm.VALUE_SEPARATOR);
          }
          if (admissible.length() > 0)
-         {   jcrNode.setProperty("ev:admissibleTypes", admissible.toString());
+         {   jcrNode.setProperty("evid:admissibleTypes", admissible.toString());
          }
       }catch( Exception e)
       { throw new IllegalStateException("No pudo guardar tipos documentales admisibles["+ admissible.toString()+ "] en nodo["+ jcrNode.getPath()+ "]");

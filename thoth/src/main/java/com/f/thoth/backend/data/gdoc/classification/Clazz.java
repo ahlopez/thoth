@@ -14,6 +14,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.f.thoth.Parm;
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
@@ -153,9 +154,9 @@ public class Clazz extends BaseEntity implements NeedsProtection, HierarchicalEn
 
    @Override public String          formatCode()
    {
-       int i = TextUtil.indexOf(code, "/", 3);
+       int i = TextUtil.indexOf(code, Parm.PATH_SEPARATOR, 3);
        String id = code.substring(i);
-       id = TextUtil.replace(id, "/", "-");
+       id = TextUtil.replace(id, Parm.PATH_SEPARATOR, "-");
        return id;
    }//formatCode
 

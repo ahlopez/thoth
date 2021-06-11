@@ -7,6 +7,7 @@ import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 
+import com.f.thoth.Parm;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.document.CompositeDocument;
 import com.f.thoth.backend.data.gdoc.document.Document;
@@ -46,7 +47,7 @@ public class CompositeDocumentToJackExporter implements CompositeDocument.Export
          if (jackSession.itemExists(docPath))
             throw new IllegalStateException("Documento["+ docPath+ "] a crear ya existe en el repositorio");
 
-         String[] nodeNames = (null != docPath) ? docPath.split("/") : null;
+         String[] nodeNames = (null != docPath) ? docPath.split(Parm.PATH_SEPARATOR) : null;
          this.node = createNodes( nodeNames);
       }catch( Exception e)
       {
@@ -102,12 +103,12 @@ public class CompositeDocumentToJackExporter implements CompositeDocument.Export
             if ( doc.isSimple())
             {
                SimpleDocument simpleDoc = (SimpleDocument)doc;
-               SimpleDocument.Exporter simpleExporter = new SimpleDocumentToJackExporter( docPath + "/"+ simpleDoc.getId(), jackSession);
+               SimpleDocument.Exporter simpleExporter = new SimpleDocumentToJackExporter( docPath + Parm.PATH_SEPARATOR+ simpleDoc.getId(), jackSession);
                simpleDoc.export( simpleExporter);
             }else
             {
                CompositeDocument compositeDoc = (CompositeDocument)doc;
-               CompositeDocument.Exporter compositeExporter = new CompositeDocumentToJackExporter( docPath + "/"+ compositeDoc.getId(), jackSession);
+               CompositeDocument.Exporter compositeExporter = new CompositeDocumentToJackExporter( docPath + Parm.PATH_SEPARATOR+ compositeDoc.getId(), jackSession);
                compositeDoc.export( compositeExporter);
             }
             jackSession.save();

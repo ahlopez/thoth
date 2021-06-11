@@ -501,10 +501,10 @@ public class ClassificationGenerator implements HasLogger
    private synchronized void createSequence(Tenant tenant, Classification classificationClass)
    {
       String classCode = classificationClass.getCode();
-      String rootClass = TextUtil.pad(classCode.substring( classCode.lastIndexOf("/")+1), 3);
+      String rootClass = TextUtil.pad(classCode.substring( classCode.lastIndexOf(Parm.PATH_SEPARATOR)+1), 3);
       String prefix    = rootClass+ "-"+ LocalDateTime.now().getYear();;
       String suffix    = "E";
-    String seqName   = prefix+ "-"+ suffix;
+      String seqName   = prefix+ "-"+ suffix;
       if ( !numerator.sequenceExists(tenant, seqName, prefix, suffix) )
       {
          seqNumbers.add( Numerator.sequenceName(tenant, seqName, prefix, suffix));

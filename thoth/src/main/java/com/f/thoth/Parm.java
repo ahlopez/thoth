@@ -12,9 +12,12 @@ public class Parm
    public static final String     DEFAULT_ADMIN_LOGIN = "admin";
    public static final String  DEFAULT_ADMIN_PASSWORD = "admin";
    public static final String          PATH_SEPARATOR = "/";
+   public static final int            CLASS_CODE_SIZE = 2;
 
    public static final String                 TENANT  = "TENANT";
    public static final String           CURRENT_USER  = "CURRENT_USER";
+   public static final String             CLASS_ROOT  = "CLASS_ROOT";
+   public static final String        EXPEDIENTE_ROOT  = "EXPEDIENTE_ROOT";
    public static final Integer          MIN_CATEGORY  = 0;
    public static final Integer          MAX_CATEGORY  = 5;
    public static final Integer      DEFAULT_CATEGORY  = MIN_CATEGORY;

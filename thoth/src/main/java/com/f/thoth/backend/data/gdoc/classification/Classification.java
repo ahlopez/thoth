@@ -19,9 +19,9 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PositiveOrZero;
 import javax.validation.constraints.Size;
 
+import com.f.thoth.Parm;
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
@@ -37,7 +37,7 @@ import com.f.thoth.backend.data.security.UserGroup;
 
 
 /**
- * Representa una clase del esquema de clasificaciOn documental
+ * Representa una clase del esquema de clasificación documental
  */
 @NamedEntityGraphs({
    @NamedEntityGraph(
@@ -52,7 +52,6 @@ import com.f.thoth.backend.data.security.UserGroup;
                @NamedAttributeNode("dateClosed"),
                @NamedAttributeNode("classCode"),
                @NamedAttributeNode("path"),
-               @NamedAttributeNode("currentExpedienteNumber"),
                @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.BRIEF)
          },
          subgraphs = @NamedSubgraph(name = ObjectToProtect.BRIEF,
@@ -75,7 +74,6 @@ import com.f.thoth.backend.data.security.UserGroup;
                @NamedAttributeNode("dateClosed"),
                @NamedAttributeNode("classCode"),
                @NamedAttributeNode("path"),
-               @NamedAttributeNode("currentExpedienteNumber"),
                @NamedAttributeNode("metadata"),
                @NamedAttributeNode("retentionSchedule"),
                @NamedAttributeNode(value="objectToProtect", subgraph = ObjectToProtect.FULL)
@@ -130,15 +128,12 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
    protected Classification owner;                         //  Classification node to which this class belongs
 
    @NotNull(message = "{evidentia.classcode.required}")
-   protected String    classCode;                          //  Unique business code of the classification node (includes level codes+ class code)
-
+   protected String    classCode;                          //  Unique business code of the classification node at the proper level vg 01, 02, 03, etc
+   
    @NotNull  (message = "{evidentia.path.required}")
    @NotBlank (message = "{evidentia.path.required}")
    @NotEmpty (message = "{evidentia.path.required}")
    protected String    path;                               //  Classification node path in document repository
-
-   @PositiveOrZero
-   protected Integer   currentExpedienteNumber;            //  Number of the last expediente created for this class
 
    // ------------- Constructors ------------------
    public Classification()
@@ -148,22 +143,23 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
       objectToProtect = new ObjectToProtect();
    }//Classification
 
+   
    public Classification( Tenant tenant, Level level, String name, String classCode, Classification owner, ObjectToProtect objectToProtect)
    {
       if ( tenant == null)
-      {  throw new IllegalArgumentException("Tenant dueño del clasificador no puede ser nulo");         
+      {  throw new IllegalArgumentException("Tenant dueño del clasificador no puede ser nulo");
       }
       if ( !TextUtil.isValidName(name))
-      {  throw new IllegalArgumentException("Nombre["+ name+ "] es invalido");
+      {  throw new IllegalArgumentException("Nombre["+ name+ "] es inválido");
       }
       if ( level == null)
-      {   throw new IllegalArgumentException("Nivel de la clase del esquema de clasificaciOn no puede ser nulo");
+      {   throw new IllegalArgumentException("Nivel de la clase del esquema de clasificación no puede ser nulo");
       }
       if ( TextUtil.isEmpty(name))
-      {   throw new IllegalArgumentException("Nombre de la clase del esquema de clasificaciOn no puede ser nulo");
+      {   throw new IllegalArgumentException("Nombre de la clase del esquema de clasificación no puede ser nulo");
       }
       if ( objectToProtect == null)
-      {   throw new IllegalArgumentException("Objeto de seguridad de la clase del esquema de clasificaciOn no puede ser nulo");
+      {   throw new IllegalArgumentException("Objeto de seguridad de la clase del esquema de clasificación no puede ser nulo");
       }
       init();
       this.tenant           = tenant;
@@ -183,8 +179,7 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
       this.retentionSchedule       = Retention.DEFAULT;
       this.metadata                = null;
       this.classCode               = null;
-      this.path                    = "/";
-      this.currentExpedienteNumber = 0;
+      this.path                    = Parm.PATH_SEPARATOR;
 
    }//init
 
@@ -200,7 +195,8 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
    {
       if ( this.code == null)
       {
-         this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ "/"+ NodeType.CLASSIFICATION.getCode()+ "/"+
+         this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ Parm.PATH_SEPARATOR+ 
+               NodeType.CLASSIFICATION.getCode()+ Parm.PATH_SEPARATOR+
                getOwnerPath(owner)+ (classCode == null? "[classCode]" : classCode);
          this.code = this.path;
       }
@@ -232,9 +228,6 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
    public String       getPath() { return path;}
    public void         setPath ( String path) { this.path = path;}
 
-   public Integer      getCurrentExpedienteNumber() { return currentExpedienteNumber;}
-   public void         setCurrentExpedienteNumber ( Integer currentExpedienteNumber) { this.currentExpedienteNumber = currentExpedienteNumber;}
-
 
    // --------------- Object methods ---------------------
 
@@ -263,7 +256,6 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
       .append( " ["+ level.toString()+ "]")
       .append( " classCode["+ classCode+ "]")
       .append( " path["+ path+ "]")
-      .append( " currentExpedienteNumber["+ currentExpedienteNumber+ "]")
       .append( " dateOpened["+ TextUtil.formatDate(dateOpened)+ "]")
       .append( " dateClosed["+ TextUtil.formatDate(dateClosed)+ "]\n")
       .append( " retentionSchedule["+ retentionSchedule == null? "---" :  retentionSchedule.getCode()+ "]\n")
@@ -290,9 +282,9 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
 
    @Override public String      formatCode()
    {
-      int i = TextUtil.indexOf(code, "/", 3);
+      int i = TextUtil.indexOf(code, Parm.PATH_SEPARATOR, 3);
       String id = i >= 0? code.substring(i): "";
-      id = TextUtil.replace(id, "/", "-");
+      id = TextUtil.replace(id, Parm.PATH_SEPARATOR, "-");
       return id;
    }//formatCode
 
@@ -301,7 +293,7 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
       String path = "";
       while (owner != null)
       {
-         path = owner.classCode+ "/"+ path;
+         path = owner.classCode+ Parm.PATH_SEPARATOR+ path;
          owner = owner.owner;
       }
       return  path;

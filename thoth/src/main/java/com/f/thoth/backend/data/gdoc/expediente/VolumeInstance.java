@@ -12,6 +12,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.f.thoth.Parm;
 import com.f.thoth.backend.data.entity.AbstractEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 
@@ -79,7 +80,7 @@ public class VolumeInstance extends AbstractEntity implements  Comparable<Volume
 
       this.instance      = instance;
       this.volume        = volume;
-      this.path          = volume.getPath() + "/"+ instance;
+      this.path          = volume.getPath() + Parm.PATH_SEPARATOR+ instance;
       this.location      = location == null? "" : location;
       this.dateOpened    = dateOpened;
       this.dateClosed    = dateClosed;
@@ -138,7 +139,7 @@ public class VolumeInstance extends AbstractEntity implements  Comparable<Volume
        .append( " path["       + path+ "]")
        .append( " date opened["+ TextUtil.formatDateTime(dateOpened)+ "]")
        .append( " date closed["+ TextUtil.formatDateTime(dateClosed)+ "]")
-       .append( " location["  + location+ "]") 
+       .append( " location["  + location+ "]")
        .append( " open["       + open+ "]}\n");
 
       return s.toString();
@@ -153,8 +154,8 @@ public class VolumeInstance extends AbstractEntity implements  Comparable<Volume
       Volume otherVolume = other.getVolume();
       int compareVol = (this.volume == null? -1: this.volume.compareTo(otherVolume));
       if ( compareVol != 0)
-    	  return compareVol;
-      
+        return compareVol;
+
       return this.instance == null? -1 : this.instance.compareTo(other.instance);
    }// compareTo
 
@@ -167,14 +168,14 @@ public class VolumeInstance extends AbstractEntity implements  Comparable<Volume
             ((now.equals(dateOpened) || now.equals(dateClosed)) ||
                   (now.isAfter(dateOpened) && now.isBefore(dateClosed))) ;
    }//isOpen
-   
-   
+
+
    public void closeInstance()
    {
       if (isOpen())
       {  dateClosed = LocalDateTime.now();
       }
    }//closeInstance
-  
+
 
 }//VolumeInstance

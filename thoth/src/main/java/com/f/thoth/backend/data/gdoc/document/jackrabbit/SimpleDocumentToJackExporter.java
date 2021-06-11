@@ -9,6 +9,7 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.version.VersionManager;
 
+import com.f.thoth.Parm;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.document.Content;
 import com.f.thoth.backend.data.gdoc.document.Publicity;
@@ -49,7 +50,7 @@ public class SimpleDocumentToJackExporter implements SimpleDocument.Exporter
          if (jackSession.itemExists(docPath))
             throw new IllegalStateException("Documento["+ docPath+ "] a crear ya existe en el repositorio");
 
-         String[] nodeNames = (null != docPath) ? docPath.split("/") : null;
+         String[] nodeNames = (null != docPath) ? docPath.split(Parm.PATH_SEPARATOR) : null;
          this.node = createNodes( nodeNames);
       }catch(Exception e)
       {
@@ -69,7 +70,8 @@ public class SimpleDocumentToJackExporter implements SimpleDocument.Exporter
          node.setProperty("evid:publicity", publicity.toString());
          node.setProperty("evid:isrecord", isRecord? "TRUE": "FALSE");
          if (endClassification != null)
-            node.setProperty("evid:endclassification", endClassification.format(FormattingUtils.FULL_DATE_FORMATTER));
+         { node.setProperty("evid:endclassification", endClassification.format(FormattingUtils.FULL_DATE_FORMATTER));
+         }
       } catch( Exception e)
       {
          e.printStackTrace();

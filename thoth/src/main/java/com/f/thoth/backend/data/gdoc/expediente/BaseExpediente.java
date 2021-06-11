@@ -364,7 +364,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
      .append( " dateOpened["+ TextUtil.formatDateTime(dateOpened)+ "]")
      .append( " dateClosed["+ TextUtil.formatDateTime(dateClosed)+ "]\n")
      .append( " objectToProtect["+ (objectToProtect == null? "---" : objectToProtect.toString())+ "]\n")
-     .append( " expediente ownerId["+ (owner == null? "/": owner)+ "]")
+     .append( " expediente ownerId["+ (owner == null? Parm.PATH_SEPARATOR: owner)+ "]")
     //       .append( " n index-entries["+ expedienteIndex.size()+ "]")
      .append( " path["+ path+ "]")
      .append( " mac=["+ mac+ "]")
@@ -392,7 +392,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
   {
      String formattedCode = "";
      if (code != null)
-     {  int i = code.lastIndexOf("/");
+     {  int i = code.lastIndexOf(Parm.PATH_SEPARATOR);
         formattedCode = code.substring(i+1);
      }
      return formattedCode;

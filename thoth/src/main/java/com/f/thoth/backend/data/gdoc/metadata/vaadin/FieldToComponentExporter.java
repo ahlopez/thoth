@@ -2,6 +2,7 @@ package com.f.thoth.backend.data.gdoc.metadata.vaadin;
 
 import java.util.Arrays;
 
+import com.f.thoth.Parm;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.Field;
 import com.f.thoth.backend.data.gdoc.metadata.Metadata;
@@ -68,7 +69,7 @@ public class FieldToComponentExporter implements Field.Exporter
       {
       case  ENUM     :  //  String.class
          ComboBox<String> combo = new ComboBox<String>();
-         String[] values = range.split(";");
+         String[] values = range.split(Parm.VALUE_SEPARATOR);
          for (int i=0; i < values.length; i++)
             values[i] = values[i].trim();
          

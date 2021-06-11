@@ -5,6 +5,7 @@ import java.util.stream.Stream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
+import com.f.thoth.Parm;
 import com.f.thoth.app.HasLogger;
 import com.f.thoth.backend.data.Role;
 import com.f.thoth.backend.data.entity.Order;
@@ -75,7 +76,7 @@ public class StorefrontView extends PolymerTemplate<TemplateModel>
             .withProperty("orderCard", OrderCard::create)
             .withProperty("header", order -> presenter.getHeaderByOrderId(order.getId()))
             .withEventHandler("cardClick",
-                  order -> UI.getCurrent().navigate(Constant.PAGE_STOREFRONT + "/" + order.getId())));
+                  order -> UI.getCurrent().navigate(Constant.PAGE_STOREFRONT + Parm.PATH_SEPARATOR + order.getId())));
 
       getSearchBar().addFilterChangeListener(
             e -> presenter.filterChanged(getSearchBar().getFilter(), getSearchBar().isCheckboxChecked()));

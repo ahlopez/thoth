@@ -2,6 +2,8 @@ package com.f.thoth.app.security;
 
 import static com.f.thoth.Parm.CURRENT_USER;
 import static com.f.thoth.Parm.TENANT;
+import static com.f.thoth.Parm.CLASS_ROOT;
+import static com.f.thoth.Parm.EXPEDIENTE_ROOT;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -18,7 +20,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
+import com.f.thoth.Parm;
 import com.f.thoth.backend.data.Role;
+import com.f.thoth.backend.data.gdoc.document.jackrabbit.NodeType;
+import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.repositories.SingleUserRepository;
 import com.f.thoth.ui.utils.Constant;
@@ -40,7 +45,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
    private static final String LOGIN_PROCESSING_URL = "/login";
    private static final String LOGIN_FAILURE_URL    = "/login?error";
    private static final String LOGIN_URL            = "/login";
-   private static final String LOGOUT_SUCCESS_URL   = "/" + Constant.PAGE_STOREFRONT;
+   private static final String LOGOUT_SUCCESS_URL   = Parm.PATH_SEPARATOR + Constant.PAGE_STOREFRONT;
 
    private final UserDetailsService userDetailsService;
 
@@ -49,7 +54,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
    private PasswordEncoder passwordEncoder;
 
    @Autowired
-   public SecurityConfiguration(UserDetailsService userDetailsService) 
+   public SecurityConfiguration(UserDetailsService userDetailsService)
    {
       this.userDetailsService = userDetailsService;
    }
@@ -58,14 +63,14 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
     * The password encoder to use when encrypting passwords.
     */
    @Bean
-   public PasswordEncoder passwordEncoder() 
+   public PasswordEncoder passwordEncoder()
    {
       return new BCryptPasswordEncoder();
    }
 
    @Bean
    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-   public CurrentUser currentUser(SingleUserRepository userRepository) 
+   public CurrentUser currentUser(SingleUserRepository userRepository)
    {
       final String username = SecurityUtils.getUsername();
       com.f.thoth.backend.data.security.User user = (username != null) ? userRepository.findByEmailIgnoreCase(username) :  null;
@@ -74,15 +79,18 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
       }
       return () -> user;
    }//currentUser
-   
-   
+
+
    private void  saveUserContext(User currentUser)
    {
       VaadinSession session = VaadinSession.getCurrent();
       if (session != null && session.getAttribute("CURRENT_USER") == null)
       {
          session.setAttribute(CURRENT_USER, currentUser);
-         session.setAttribute(TENANT, currentUser.getTenant());         
+         Tenant tenant = currentUser.getTenant();
+         session.setAttribute(TENANT, tenant);
+         session.setAttribute(CLASS_ROOT,      tenant.getWorkspace()+ Parm.PATH_SEPARATOR+ NodeType.CLASSIFICATION.getCode());
+         session.setAttribute(EXPEDIENTE_ROOT, tenant.getWorkspace()+ Parm.PATH_SEPARATOR+ NodeType.EXPEDIENTE.getCode());
       }
    }//saveUserContext
 
@@ -91,7 +99,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
     * Registers our UserDetailsService and the password encoder to be used on login attempts.
     */
    @Override
-   protected void configure(AuthenticationManagerBuilder auth) throws Exception 
+   protected void configure(AuthenticationManagerBuilder auth) throws Exception
    {
       super.configure(auth);
       auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);

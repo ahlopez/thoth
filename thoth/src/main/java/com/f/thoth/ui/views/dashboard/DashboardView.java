@@ -12,6 +12,7 @@ import java.util.stream.IntStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
+import com.f.thoth.Parm;
 import com.f.thoth.backend.data.DashboardData;
 import com.f.thoth.backend.data.DeliveryStats;
 import com.f.thoth.backend.data.Role;
@@ -98,7 +99,7 @@ public class DashboardView extends PolymerTemplate<TemplateModel> {
             .withProperty("orderCard", OrderCard::create)
             .withProperty("header", order -> null)
             .withEventHandler("cardClick",
-                  order -> UI.getCurrent().navigate(Constant.PAGE_STOREFRONT + "/" + order.getId())));
+                  order -> UI.getCurrent().navigate(Constant.PAGE_STOREFRONT + Parm.PATH_SEPARATOR + order.getId())));
 
       grid.setSelectionMode(Grid.SelectionMode.NONE);
       grid.setDataProvider(orderDataProvider);

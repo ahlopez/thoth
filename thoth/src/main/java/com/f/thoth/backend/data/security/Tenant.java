@@ -21,6 +21,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Size;
 
+import com.f.thoth.Parm;
 import com.f.thoth.backend.data.entity.AbstractEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 
@@ -123,7 +124,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 
    @Transient
    private Set<UserGroup>        userGroups;
-  
+
 
    // ------------- Constructors ----------------------
 
@@ -142,7 +143,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 
       init();
       this.name      = TextUtil.nameTidy(name);
-      this.code      = "/"+ (code == null? name : code.toUpperCase());
+      this.code      = Parm.PATH_SEPARATOR+ (code == null? name : code.toUpperCase());
       this.workspace = code;
    }//Tenant constructor
 
@@ -158,7 +159,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 
    protected void buildCode()
    {
-      this.code = this.code == null? (name == null? "/COD" : "/"+ name): this.code;
+      this.code = this.code == null? (name == null? "/COD" : Parm.PATH_SEPARATOR+ name): this.code;
       this.workspace = code;
    }//buildCode
 
@@ -293,7 +294,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
       }
       return null;
    }//getUserGroupById
- 
+
 
 
 }//Tenant

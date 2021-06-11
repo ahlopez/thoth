@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Iterator;
 
+import com.f.thoth.Parm;
 import com.f.thoth.backend.data.DeliveryStats;
 import com.f.thoth.backend.data.OrderState;
 import com.f.thoth.backend.data.entity.Order;
@@ -33,7 +34,7 @@ public class DashboardUtils {
                ordersCountData.setSubtitle(String.format(NEXT_DELIVERY_PATTERN, order.getDueTime()));
             else
                ordersCountData.setSubtitle(String.format(NEXT_DELIVERY_PATTERN,
-                     order.getDueDate().getMonthValue() + "/" + order.getDueDate().getDayOfMonth()));
+                     order.getDueDate().getMonthValue() + Parm.PATH_SEPARATOR + order.getDueDate().getDayOfMonth()));
 
             break;
          }

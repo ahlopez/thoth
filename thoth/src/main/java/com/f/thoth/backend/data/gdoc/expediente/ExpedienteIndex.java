@@ -1,4 +1,4 @@
-package com.f.thoth.backend.data.gdoc.expediente;
+﻿package com.f.thoth.backend.data.gdoc.expediente;
 
 import java.time.LocalDateTime;
 
@@ -22,6 +22,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.f.thoth.Parm;
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
@@ -147,7 +148,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
 
    protected String             keywords;                   // Search keywords
 
-   protected String             location;                   // Signatura topogrÃ¡fica
+   protected String             location;                   // Signatura topografica
 
    @NotNull(message = "{evidentia.mac.required}")
    protected String             mac;                        // Message authentication code
@@ -155,7 +156,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
 
    // ------------- Constructors ------------------
    public ExpedienteIndex()
-   {   
+   {
    }//ExpedienteIndex null constructor
 
 
@@ -169,10 +170,10 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
    private void init(Tenant tenant, String owner)
    {
       if (tenant == null)
-      {  throw new IllegalArgumentException("Tenant dueño del índice de expediente no puede ser nulo");
+      {  throw new IllegalArgumentException("Tenant dueÃ±o del índice de expediente no puede ser nulo");
       }
       if (owner == null)
-      {  throw new IllegalArgumentException("Expediente dueño del índice de expediente no puede ser nulo");
+      {  throw new IllegalArgumentException("Expediente dueÃ±o del índice de expediente no puede ser nulo");
       }
       LocalDateTime now        = LocalDateTime.now();
       this.tenant              = tenant;
@@ -185,7 +186,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
       this.owner               = owner;
       this.metadata            = SchemaValues.EMPTY;
       this.expedienteCode      = obtainExpedienteCode(code);
-      this.path                = "/";
+      this.path                = Parm.PATH_SEPARATOR;
 //      this.entries             = new TreeSet<>();
       this.mac                 = "";
 
@@ -204,8 +205,9 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
    @Override protected void buildCode()
    {
       if ( this.code == null)
-      {  this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ "/"+ NodeType.EXPEDIENTE_INDEX.getCode()+ "/"+
-                  (owner == null? "" : owner)+ "/"+ (expedienteCode == null? "[expedienteCode]" : expedienteCode);
+      {  this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ Parm.PATH_SEPARATOR+ 
+                  NodeType.EXPEDIENTE_INDEX.getCode()+ Parm.PATH_SEPARATOR+
+                  (owner == null? "" : owner)+ Parm.PATH_SEPARATOR+ (expedienteCode == null? "[expedienteCode]" : expedienteCode);
                   //TODO: Cambiar el owner Id por el owner code
          this.code = this.path;
       }
@@ -214,7 +216,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
 
    private String  obtainExpedienteCode( String code)
    {
-      int i = code == null? -1 : code.lastIndexOf("/");
+      int i = code == null? -1 : code.lastIndexOf(Parm.PATH_SEPARATOR);
       String expedienteCode = i < 0? code: code.substring(i);
       return expedienteCode;
    }//obtainExpedienteCode
@@ -347,13 +349,13 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
 
         @Override public String            getOwner()          { return owner.toString();}
 
-        @Override    public String         formatCode()
-           {
-              int i = code.lastIndexOf("/");
-              String id = code.substring(i);
-              id = TextUtil.replace(id, "/", "-");
-              return id;
-           }//formatCode
+        @Override public String         formatCode()
+        {
+           int i = code.lastIndexOf(Parm.PATH_SEPARATOR);
+           String id = code.substring(i);
+           id = TextUtil.replace(id, Parm.PATH_SEPARATOR, "-");
+           return id;
+        }//formatCode
 
 
    // -----------------  Implements NeedsProtection ----------------

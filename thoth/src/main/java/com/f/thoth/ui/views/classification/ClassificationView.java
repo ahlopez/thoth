@@ -1,7 +1,8 @@
 package com.f.thoth.ui.views.classification;
 
+import static com.f.thoth.Parm.CLASS_CODE_SIZE;
 import static com.f.thoth.Parm.CURRENT_USER;
-
+import static com.f.thoth.Parm.TENANT;
 import static com.f.thoth.ui.utils.Constant.PAGE_ESQUEMAS_CLASIFICACION;
 import static com.f.thoth.ui.utils.Constant.TITLE_ESQUEMAS_CLASIFICACION;
 
@@ -11,9 +12,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
 import com.f.thoth.backend.data.Role;
+import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.classification.Level;
 import com.f.thoth.backend.data.gdoc.classification.Retention;
+import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.service.ClassificationService;
 import com.f.thoth.backend.service.LevelService;
@@ -45,6 +48,7 @@ public class ClassificationView extends VerticalLayout
    private ClassificationForm    classificationForm;
    private ClassificationService classificationService;
    private User                  currentUser;
+   private Tenant                tenant;
 
    private VerticalLayout        content;
    private VerticalLayout        rightSection;
@@ -67,7 +71,9 @@ public class ClassificationView extends VerticalLayout
    public ClassificationView(ClassificationService classificationService, LevelService levelService, RetentionService retentionService)
    {
       this.classificationService = classificationService;
-      this.currentUser           = (User)VaadinSession.getCurrent().getAttribute(CURRENT_USER);
+      VaadinSession vSession     = VaadinSession.getCurrent();
+      this.currentUser           = (User)vSession.getAttribute(CURRENT_USER);
+      this.tenant                = (Tenant)vSession.getAttribute(TENANT);
 
       levels = getAllLevels( levelService);
       retentionSchedules = retentionService.findAll();
@@ -181,18 +187,21 @@ public class ClassificationView extends VerticalLayout
 
    private void addClass()
    {
-      currentClass = new Classification();
       Classification owner = ownerClass.getValue();
-      currentClass.setOwner(owner);
-      Level level = getCurrentLevel(owner);
-      currentClass.setLevel(level);
+      Level          level = getCurrentLevel(owner);
+      currentClass         =  new Classification();
+      currentClass.setTenant(tenant);
+      currentClass.setLevel (level);
+      currentClass.setOwner (owner);
+      assignClassCode( currentClass);
       editClass(currentClass);
    }//addClass
+
 
    private Level  getCurrentLevel( Classification owner)
    {
       Level level      = null;
-      int currentLevel = owner.getLevel().getOrden()+ 1;
+      int currentLevel = owner == null? 0: owner.getLevel().getOrden()+ 1;
       if ( currentLevel >= levels.length)
          notifier.error("La clase del último nivel no puede tener hijos");
       else
@@ -209,7 +218,6 @@ public class ClassificationView extends VerticalLayout
       {  return;
       }
       classificationService.save(currentUser, classification);
-      // TODO: *** Guardar la clase en el repositorio
       closeEditor();
       currentClass = null;
 
@@ -277,9 +285,16 @@ public class ClassificationView extends VerticalLayout
    {
       Classification classification = event.getClassification();
       classificationService.save(currentUser, classification);
-      //TODO: *** Guardar clase en el repositorio
       updateSelector();
       closeEditor();
    }//saveClassification
+   
+   
+   private  void assignClassCode( Classification currentClass)
+   {
+      Classification parent = currentClass.getOwner();
+      int nChildren = classificationService.countByParent(parent);
+      currentClass.setClassCode(TextUtil.pad(""+ (nChildren+1), CLASS_CODE_SIZE));
+   }
 
 }//ClassificationView

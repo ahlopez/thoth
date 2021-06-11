@@ -17,6 +17,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.f.thoth.Parm;
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
@@ -120,7 +121,7 @@ public class DocumentType extends BaseEntity implements NeedsProtection, Hierarc
    public DocumentType( Tenant tenant, String name, Schema schema, DocumentType owner, boolean requiresContent)
    {
       super();
-      
+
       if( tenant == null)
          throw new IllegalArgumentException( "Tenant dueño del tipo documental no puede ser nulo");
 
@@ -192,9 +193,9 @@ public class DocumentType extends BaseEntity implements NeedsProtection, Hierarc
 
    @Override public String      formatCode()
    {
-      int i = TextUtil.indexOf(code, "/", 3);
+      int i = TextUtil.indexOf(code, Parm.PATH_SEPARATOR, 3);
       String id = code.substring(i);
-      id = TextUtil.replace(id, "/", "-");
+      id = TextUtil.replace(id, Parm.PATH_SEPARATOR, "-");
       return id;
    }//formatCode
 

@@ -49,7 +49,7 @@ public class Repo implements HasLogger
 
 
    private Repo() throws RepositoryException
-   {   
+   {
       if (jcrSession != null)
       {  throw new IllegalStateException("Repositorio JCR ya ha sido inicializado");
       }
@@ -61,7 +61,7 @@ public class Repo implements HasLogger
 
    private Repo(String host, final int port, String dbName)
          throws RepositoryException, UnknownHostException
-   { 
+   {
       synchronized( jcrSession)
       {
          if (jcrSession != null)
@@ -79,7 +79,7 @@ public class Repo implements HasLogger
       Repository repo = new Jcr(new Oak()).createRepository();
       logger.info("... Got an in-memory repo");
       return repo;
-      
+
       /*
          Ver ejemplo completo en   C:\ahl\estudio\dzone\ecm\oak-mongodb-demo-master
 
@@ -161,7 +161,7 @@ public class Repo implements HasLogger
       getLogger().info("... Got an in-memory repo");
       return repo;
        */
-      
+
    }//initJCRRepo
 
 
@@ -170,7 +170,7 @@ public class Repo implements HasLogger
       String uri = "mongodb://" + host + ":" + port;
       DocumentNodeStore store = new MongoDocumentNodeStoreBuilder().setMongoDB(uri, dbName, 0).build();
       Repository repo = new Jcr(new Oak(store)).createRepository();
-      logger.info("... Got repo at "+ uri+ "/"+ dbName);
+      logger.info("... Got repo at "+ uri+ Parm.PATH_SEPARATOR+ dbName);
       return repo;
 
    }//initRepo
@@ -204,15 +204,18 @@ public class Repo implements HasLogger
    }//initWorkspace
 
 
-   public Node addNode( String path, String name, String user) 
+   public Node addNode( String path, String name, String user)
          throws RepositoryException
    {
+      if(jcrSession.nodeExists(path))
+      {  return jcrSession.getNode(path);
+      }
       int i = path.lastIndexOf(Parm.PATH_SEPARATOR);
       if (i < 0)
       {   throw new IllegalArgumentException("Ruta del nuevo nodo es inválida["+ path+ "]");
       }
       String parentPath = path.substring(0,i);
-      if (!jcrSession.nodeExists(parentPath)) 
+      if (!jcrSession.nodeExists(parentPath))
       {   throw new IllegalArgumentException("No existe el nodo padre["+ parentPath+ "]");
       }
       Node parent = i == 0? jcrSession.getRootNode(): jcrSession.getNode(parentPath);
@@ -224,18 +227,18 @@ public class Repo implements HasLogger
       return child;
 
    }//addNode
-   
-   
+
+
    public Node findNode( String path)
    {
      Node node = null;
      try
      {
         if (jcrSession.itemExists(path))
-        {  node = jcrSession.getNode(path);  
+        {  node = jcrSession.getNode(path);
         }
      }catch( PathNotFoundException pnf)
-     {    
+     {
      }catch( Exception e)
      { throw new IllegalStateException("Error. No pudo encontrar el nodo ["+ path+ "]. Razón\n"+ e.getMessage());
      }

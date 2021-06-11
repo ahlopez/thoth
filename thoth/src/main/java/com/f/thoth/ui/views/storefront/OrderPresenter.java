@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 
+import com.f.thoth.Parm;
 import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.entity.Order;
 import com.f.thoth.backend.service.OrderService;
@@ -85,7 +86,7 @@ public class OrderPresenter {
    }
 
    void edit() {
-      UI.getCurrent().navigate(Constant.PAGE_STOREFRONT_EDIT + "/" + entityPresenter.getEntity().getId());
+      UI.getCurrent().navigate(Constant.PAGE_STOREFRONT_EDIT + Parm.PATH_SEPARATOR + entityPresenter.getEntity().getId());
    }
 
    void back() {
