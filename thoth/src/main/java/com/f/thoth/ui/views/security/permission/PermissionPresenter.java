@@ -1,5 +1,7 @@
 package com.f.thoth.ui.views.security.permission;
 
+import static com.f.thoth.Parm.TENANT;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -13,20 +15,25 @@ import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
+import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.service.PermissionService;
 import com.f.thoth.ui.components.Period;
 import com.f.thoth.ui.views.HasNotifications;
+import com.vaadin.flow.server.VaadinSession;
 
 public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements HasLogger
 {
    private final PermissionService<E>     service;
+   private final Tenant                   tenant;
    private final User                     currentUser;
 
    @Autowired
    public PermissionPresenter(PermissionService<E> service, CurrentUser currentUser, HasNotifications view)
    {
-      this.service     = service;
-      this.currentUser = currentUser.getUser();
+      this.service           = service;
+      this.currentUser       = currentUser.getUser();
+      VaadinSession vSession = VaadinSession.getCurrent();
+      this.tenant = vSession == null? null: (Tenant)vSession.getAttribute(TENANT);
 
    }//PermissionPresenter
 
@@ -63,7 +70,7 @@ public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements Ha
             }
          }
          if (nuevo)
-            newGrants.add(  new Permission(role, obj.getObjectToProtect(), period.getFromDate(), period.getToDate()));
+            newGrants.add(  new Permission(tenant, role, obj.getObjectToProtect(), period.getFromDate(), period.getToDate()));
       });
 
       return newGrants;
@@ -86,7 +93,7 @@ public class PermissionPresenter<E extends HierarchicalEntity<E>>  implements Ha
             }
          }
          if (!still)
-            newRevokes.add(  new Permission(role, oldPermit.getObjectToProtect(), period.getFromDate(), period.getToDate()));
+            newRevokes.add(  new Permission(tenant, role, oldPermit.getObjectToProtect(), period.getFromDate(), period.getToDate()));
       });
 
       return newRevokes;

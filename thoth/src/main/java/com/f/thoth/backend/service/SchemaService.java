@@ -1,5 +1,6 @@
 package com.f.thoth.backend.service;
 
+import static com.f.thoth.Parm.TENANT;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,10 +12,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
-import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.data.security.Tenant;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.repositories.SchemaRepository;
+import com.vaadin.flow.server.VaadinSession;
 
 @Service
 public class SchemaService implements FilterableCrudService<Schema>
@@ -29,7 +31,7 @@ public class SchemaService implements FilterableCrudService<Schema>
 
    public List<Schema> findAll()
    {
-      return schemaRepository.findAll(ThothSession.getCurrentTenant());
+      return schemaRepository.findAll(tenant());
    }//findAll
 
    public List<Schema> findAnyMatching(Optional<String> filter)
@@ -37,7 +39,7 @@ public class SchemaService implements FilterableCrudService<Schema>
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return schemaRepository.findByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter);
+         return schemaRepository.findByNameLikeIgnoreCase(tenant(), repositoryFilter);
       } else {
          return findAll();
       }
@@ -48,7 +50,7 @@ public class SchemaService implements FilterableCrudService<Schema>
       Optional<Schema> schema = schemaRepository.findById(id);
       return  schema.isPresent()? schema.get(): null;
    }//findById
-   
+
 
    @Override
    public Page<Schema> findAnyMatching(Optional<String> filter, Pageable pageable)
@@ -56,17 +58,17 @@ public class SchemaService implements FilterableCrudService<Schema>
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return schemaRepository.findByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter, pageable);
+         return schemaRepository.findByNameLikeIgnoreCase(tenant(), repositoryFilter, pageable);
       } else {
          return find(pageable);
       }
    }//findAnyMatching
-   
 
-   
+
+
    public Schema findByName(String name)
    {
-         return schemaRepository.findByName(ThothSession.getCurrentTenant(), name);
+         return schemaRepository.findByName(tenant(), name);
    }//findByName
 
 
@@ -75,16 +77,16 @@ public class SchemaService implements FilterableCrudService<Schema>
    {
       if (filter.isPresent()) {
          String repositoryFilter = "%" + filter.get() + "%";
-         return schemaRepository.countByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter);
+         return schemaRepository.countByNameLikeIgnoreCase(tenant(), repositoryFilter);
       } else {
-         long n = schemaRepository.countAll(ThothSession.getCurrentTenant());
+         long n = schemaRepository.countAll(tenant());
          return n;
       }
    }//countAnyMatching
 
    public Page<Schema> find(Pageable pageable)
    {
-      return schemaRepository.findBy(ThothSession.getCurrentTenant(), pageable);
+      return schemaRepository.findBy(tenant(), pageable);
    }
 
    @Override
@@ -97,19 +99,18 @@ public class SchemaService implements FilterableCrudService<Schema>
    public Schema createNew(User currentUser)
    {
       Schema schema = new Schema();
-      schema.setTenant(ThothSession.getCurrentTenant());
+      schema.setTenant(tenant());
       return schema;
    }
 
    @Override
    public Schema save(User currentUser, Schema entity)
    {
-      try {
-         Schema newSchema =  FilterableCrudService.super.save(currentUser, entity);
-         ThothSession.updateSession();
+      try
+      {  Schema newSchema =  FilterableCrudService.super.save(currentUser, entity);
          return newSchema;
-      } catch (DataIntegrityViolationException e) {
-         throw new UserFriendlyDataException("Ya hay un esquema con esa llave. Por favor escoja una llave única para el esquema");
+      } catch (DataIntegrityViolationException e)
+      {  throw new UserFriendlyDataException("Ya hay un esquema con esa llave. Por favor escoja una llave única para el esquema");
       }
 
    }//save
@@ -120,6 +121,6 @@ public class SchemaService implements FilterableCrudService<Schema>
       schemaRepository.delete(entity);
    }
 
-
+   private Tenant  tenant() { return (Tenant)VaadinSession.getCurrent().getAttribute(TENANT); }
 
 }//SchemaService

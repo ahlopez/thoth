@@ -1,5 +1,7 @@
 package com.f.thoth.backend.service;
 
+import static com.f.thoth.Parm.TENANT;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -10,10 +12,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.gdoc.classification.Retention;
-import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.data.security.Tenant;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.repositories.RetentionRepository;
+import com.vaadin.flow.server.VaadinSession;
 
 @Service
 public class RetentionService implements FilterableCrudService<Retention>
@@ -28,7 +31,7 @@ public class RetentionService implements FilterableCrudService<Retention>
 
    public List<Retention> findAll()
    {
-      return retentionRepository.findAll(ThothSession.getCurrentTenant());
+      return retentionRepository.findAll(tenant());
    }//findAll
 
    @Override
@@ -37,7 +40,7 @@ public class RetentionService implements FilterableCrudService<Retention>
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return retentionRepository.findByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter, pageable);
+         return retentionRepository.findByNameLikeIgnoreCase(tenant(), repositoryFilter, pageable);
       } else {
          return find(pageable);
       }
@@ -49,7 +52,7 @@ public class RetentionService implements FilterableCrudService<Retention>
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return retentionRepository.findByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter);
+         return retentionRepository.findByNameLikeIgnoreCase(tenant(), repositoryFilter);
       } else {
          return findAll();
       }
@@ -60,16 +63,16 @@ public class RetentionService implements FilterableCrudService<Retention>
    {
       if (filter.isPresent()) {
          String repositoryFilter = "%" + filter.get() + "%";
-         return retentionRepository.countByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter);
+         return retentionRepository.countByNameLikeIgnoreCase(tenant(), repositoryFilter);
       } else {
-         long n = retentionRepository.countAll(ThothSession.getCurrentTenant());
+         long n = retentionRepository.countAll(tenant());
          return n;
       }
    }//countAnyMatching
 
    public Page<Retention> find(Pageable pageable)
    {
-      return retentionRepository.findBy(ThothSession.getCurrentTenant(), pageable);
+      return retentionRepository.findBy(tenant(), pageable);
    }
 
    @Override
@@ -88,15 +91,16 @@ public class RetentionService implements FilterableCrudService<Retention>
    @Override
    public Retention save(User currentUser, Retention entity)
    {
-      try {
-         Retention newRetention =  FilterableCrudService.super.save(currentUser, entity);
-         ThothSession.updateSession();
+      try
+      {  Retention newRetention =  FilterableCrudService.super.save(currentUser, entity);
          return newRetention;
-      } catch (DataIntegrityViolationException e) {
-         throw new UserFriendlyDataException("Ya hay un calendario con esa llave. Por favor escoja una llave única para el calendario");
+      } catch (DataIntegrityViolationException e)
+      {  throw new UserFriendlyDataException("Ya hay un calendario con esa llave. Por favor escoja una llave única para el calendario");
       }
 
    }//save
+
+   private Tenant  tenant() { return (Tenant)VaadinSession.getCurrent().getAttribute(TENANT); }
 
 
 }//RetentionService

@@ -11,8 +11,8 @@ import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.security.Role;
-import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.service.PermissionService;
+import com.f.thoth.backend.service.RoleService;
 import com.f.thoth.ui.components.HierarchicalSelector;
 import com.f.thoth.ui.components.Notifier;
 import com.f.thoth.ui.components.Period;
@@ -36,6 +36,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.binder.ValidationException;
+import com.vaadin.flow.data.provider.ListDataProvider;
 
 /**
  * Representa la vista de actualización de permisos de ejecución/acceso a datos
@@ -45,6 +46,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
                 extends    VerticalLayout
                 implements HasNotifications
 {
+   private RoleService              roleService;
    private PermissionPresenter<E>   permissionPresenter;
    private Role                     role;
 
@@ -67,12 +69,13 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
 
 
    @Autowired
-   public AbstractPermissionView(Class<E> beanType, PermissionService<E> service, CurrentUser currentUser, String name)
+   public AbstractPermissionView(Class<E> beanType, PermissionService<E> service, RoleService roleService, CurrentUser currentUser, String name)
    {
       role                = null;
       permissionPresenter = new PermissionPresenter<>(service, currentUser, this);
       addClassName("list-view");
       setSizeFull();
+      this.roleService    = roleService;
 
       leftSection         = new VerticalLayout();
       leftSection.addClassName  ("left-section");
@@ -100,10 +103,11 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
 
    private HorizontalLayout setupRoleSelector(String name)
    {
+      Collection<Role> allRoles = roleService.findAll();
       HorizontalLayout roleLayout = new HorizontalLayout();
       roleSelector = new ComboBox<>();
       roleSelector.setLabel("Rol");
-      roleSelector.setDataProvider(ThothSession.getTenantRoles());
+      roleSelector.setDataProvider(new ListDataProvider<Role>(allRoles));
       roleSelector.setItemLabelGenerator(createItemLabelGenerator(Role::getName));
       roleSelector.setRequired(false);
       roleSelector.setRequiredIndicatorVisible(false);
@@ -267,7 +271,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
    /*
    [ERROR]AbstractPermissionView.java:[220,18] incompatible types: cannot infer type-variable(s) T
    (argument mismatch; cannot infer functional interface descriptor for ComponentEventListener<GrantRevokeEvent>)
-   
+
   public <T extends ComponentEvent<?>> Registration addListener(Class<T> eventType, ComponentEventListener<T> listener)
   {
         return getEventBus().addListener(eventType, listener);
@@ -290,7 +294,7 @@ public abstract class      AbstractPermissionView<E extends HierarchicalEntity<E
       public Role          getRole()    { return role;}
       public Period        getPeriod()  { return period;}
       public Collection<E> getGrants()  { return grants;}
-      
+
    }//GrantRevokeEvent
 
 

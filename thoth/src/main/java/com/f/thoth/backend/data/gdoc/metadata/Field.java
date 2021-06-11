@@ -13,6 +13,7 @@ import javax.validation.constraints.Size;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
+import com.f.thoth.backend.data.security.Tenant;
 
 /**
  * Representa un campo (metadato) que tiene visualización
@@ -55,15 +56,19 @@ public class Field extends BaseEntity implements Comparable<Field>
       this.columns  = 1;
    }//Field
 
-   public Field( String name, Metadata metadata, boolean visible, boolean readOnly, boolean required, int sortOrder, int columns)
+   public Field( Tenant tenant, String name, Metadata metadata, boolean visible, boolean readOnly, boolean required, int sortOrder, int columns)
    {
       super();
+      if (tenant == null)
+         throw new IllegalArgumentException("Tenant dueño del campo no puede ser nulo");
+         
       if ( !TextUtil.isIdentifier(name))
          throw new IllegalArgumentException("Nombre inválido para el campo");
 
       if ( metadata == null)
          throw new IllegalArgumentException("Metadato asociado al campo no puede ser nulo");
 
+      this.tenant   = tenant;
       this.name     = name;
       this.metadata = metadata;
       this.visible  = visible;

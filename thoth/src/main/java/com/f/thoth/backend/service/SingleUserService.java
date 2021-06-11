@@ -1,5 +1,7 @@
 package com.f.thoth.backend.service;
 
+import static com.f.thoth.Parm.TENANT;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -10,24 +12,25 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
+import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.User;
-import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.repositories.SingleUserRepository;
+import com.vaadin.flow.server.VaadinSession;
 
 @Service
 public class SingleUserService implements FilterableCrudService<User>
 {
-   private final SingleUserRepository SingleUserRepository;
+   private final SingleUserRepository singleUserRepository;
 
    @Autowired
-   public SingleUserService(SingleUserRepository SingleUserRepository)
+   public SingleUserService(SingleUserRepository singleUserRepository)
    {
-      this.SingleUserRepository = SingleUserRepository;
+      this.singleUserRepository = singleUserRepository;
    }
 
    public List<User> findAll()
    {
-      return SingleUserRepository.findAll(ThothSession.getCurrentTenant());
+      return singleUserRepository.findAll(tenant());
    }//findAll
 
    @Override
@@ -36,7 +39,7 @@ public class SingleUserService implements FilterableCrudService<User>
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return SingleUserRepository.findByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter, pageable);
+         return singleUserRepository.findByNameLikeIgnoreCase(tenant(), repositoryFilter, pageable);
       } else {
          return find(pageable);
       }
@@ -47,22 +50,27 @@ public class SingleUserService implements FilterableCrudService<User>
    {
       if (filter.isPresent()) {
          String repositoryFilter = "%" + filter.get() + "%";
-         return SingleUserRepository.countByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter);
+         return singleUserRepository.countByNameLikeIgnoreCase(tenant(), repositoryFilter);
       } else {
-         long n = SingleUserRepository.countAll(ThothSession.getCurrentTenant());
+         long n = singleUserRepository.countAll(tenant());
          return n;
       }
    }//countAnyMatching
 
    public Page<User> find(Pageable pageable)
    {
-      return SingleUserRepository.findBy(ThothSession.getCurrentTenant(), pageable);
+      return singleUserRepository.findBy(tenant(), pageable);
+   }
+
+
+   public User findByEmail(String email)
+   {  return singleUserRepository.findByEmailIgnoreCase(email);
    }
 
    @Override
    public JpaRepository<User, Long> getRepository()
    {
-      return SingleUserRepository;
+      return singleUserRepository;
    }
 
    @Override
@@ -85,5 +93,7 @@ public class SingleUserService implements FilterableCrudService<User>
       }
 
    }//save
+
+   private Tenant  tenant() { return (Tenant)VaadinSession.getCurrent().getAttribute(TENANT); }
 
 }//SingleUserService

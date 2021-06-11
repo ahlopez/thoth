@@ -1,5 +1,7 @@
 package com.f.thoth.backend.data.gdoc.document.jackrabbit;
 
+import static com.f.thoth.Parm.CURRENT_USER;
+
 import java.time.LocalDateTime;
 
 import javax.jcr.Node;
@@ -13,8 +15,9 @@ import com.f.thoth.backend.data.gdoc.document.Publicity;
 import com.f.thoth.backend.data.gdoc.document.SimpleDocument;
 import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
-import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.ui.utils.FormattingUtils;
+import com.vaadin.flow.server.VaadinSession;
 
 
 /**
@@ -98,7 +101,7 @@ public class SimpleDocumentToJackExporter implements SimpleDocument.Exporter
       try {
          Node fileHolder = node.addNode(content.getName());
          fileHolder.addMixin("mix:versionable");
-         fileHolder.setProperty("jcr:createdBy", ThothSession.getCurrentUser().getEmail());
+         fileHolder.setProperty("jcr:createdBy", ((User)VaadinSession.getCurrent().getAttribute(CURRENT_USER)).getEmail());
          fileHolder.setProperty("jcr:nodeType", "file_node");
          fileHolder.setProperty("size", content.getSize());
 

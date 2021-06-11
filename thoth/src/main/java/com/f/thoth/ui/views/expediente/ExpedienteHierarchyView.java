@@ -1,5 +1,6 @@
 package com.f.thoth.ui.views.expediente;
 
+import static com.f.thoth.Parm.TENANT;
 import static com.f.thoth.ui.utils.Constant.PAGE_JERARQUIA_EXPEDIENTES;
 import static com.f.thoth.ui.utils.Constant.TITLE_JERARQUIA_EXPEDIENTES;
 
@@ -22,7 +23,7 @@ import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.ExpedienteGroup;
 import com.f.thoth.backend.data.gdoc.expediente.Nature;
 import com.f.thoth.backend.data.gdoc.expediente.Volume;
-import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.service.BaseExpedienteService;
 import com.f.thoth.backend.service.ClassificationService;
 import com.f.thoth.backend.service.DocumentTypeService;
@@ -51,6 +52,7 @@ import com.vaadin.flow.router.BeforeEvent;
 import com.vaadin.flow.router.HasUrlParameter;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
 
 /**
  * La gestion de expedientes procede por pasos:
@@ -320,7 +322,8 @@ class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParamete
       rightSection.setVisible(false);
       if ( TextUtil.isNotEmpty(filter))
       {
-        Collection<BaseExpediente> items = baseExpedienteService.findByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), filter, selectedClass);
+        Tenant tenant   = (Tenant)VaadinSession.getCurrent().getAttribute(TENANT);
+        Collection<BaseExpediente> items = baseExpedienteService.findByNameLikeIgnoreCase(tenant, filter, selectedClass);
         if ( items.size() > 0)
         {
           searchGrid.setVisible(true);

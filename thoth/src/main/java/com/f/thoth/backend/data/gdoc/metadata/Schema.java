@@ -23,6 +23,7 @@ import org.hibernate.annotations.BatchSize;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
+import com.f.thoth.backend.data.security.Tenant;
 
 /**
  * Representa un esquema de metadatos
@@ -31,7 +32,7 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 @Table(name = "ESQUEMA", indexes = { @Index(columnList = "code")}) 
 public class Schema extends BaseEntity implements Comparable<Schema>
 {    
-   public static Schema EMPTY = new Schema("EMPTY", new TreeSet<>());
+   public static Schema EMPTY = new Schema(null, "EMPTY", new TreeSet<>());
    
    @NotBlank(message = "{evidentia.name.required}")
    @NotNull (message = "{evidentia.name.required}")
@@ -46,27 +47,31 @@ public class Schema extends BaseEntity implements Comparable<Schema>
 
 
    // ------------- Constructors ------------------
+   
    public Schema()
    {
       super();
       name   = "";
       fields = new TreeSet<>();
-      buildCode();
-   }
+   }//Schema null constructor
 
-   public Schema(String name, Set<Field> fields)
+   public Schema(Tenant tenant, String name, Set<Field> fields)
    {
       super();
+      
+      if( tenant == null && !name.equals("EMPTY"))
+         throw new IllegalArgumentException("Tenant dueño del esquema no puede se nulo");
+
       if( !TextUtil.isValidName(name))
          throw new IllegalArgumentException("Nombre inválido");
 
       if(fields == null )
          throw new IllegalArgumentException("Conjunto de campos del esquema no puede ser nulo ni vacío");
 
+      this.tenant = tenant;
       this.name   = name;
       this.fields = fields;
-      buildCode();
-   }//Schema
+   }//Schema constructor
 
    @PrePersist
    @PreUpdate

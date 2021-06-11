@@ -118,7 +118,6 @@ public class User extends Usuario
       this.email     = "";
       this.lastName  = "";
       this.groups    = new TreeSet<>();
-      buildCode();
    }//User
 
    public User( Tenant tenant, String email, String passwordHash, String lastName)
@@ -141,9 +140,9 @@ public class User extends Usuario
       this.email        = email;
       this.passwordHash = passwordHash;
       this.lastName     = lastName;
-      buildCode();
 
    }//User
+   
 
    @PrePersist
    @PreUpdate
@@ -155,8 +154,15 @@ public class User extends Usuario
       buildCode();
 
    }//prepareData
+   
 
-   @Override public void buildCode(){this.code = (tenant == null? "[Tenant]": tenant.getCode())+ ">"+ (email==null? "[email]": email);}
+   @Override public void buildCode()
+   {
+      if( this.code == null)
+      {  this.code = (tenant == null? "[Tenant]": tenant.getCode())+ ">"+ (email==null? "[email]": email);
+      }
+   }//buildCode
+   
 
    // --------------- Getters & Setters -----------------
    public String getPasswordHash() { return passwordHash;}

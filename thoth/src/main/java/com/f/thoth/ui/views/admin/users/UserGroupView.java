@@ -42,7 +42,7 @@ public class UserGroupView extends AbstractEvidentiaCrudView<UserGroup>
    private static final Converter<LocalDate, LocalDate> DATE_CONVERTER   = new LocalDateToLocalDate();
    private static final Converter<String, String>       STRING_CONVERTER = new StringToString("");
    private static final Converter<String, Integer>    CATEGORY_CONVERTER =
-                        new StringToIntegerConverter( Parm.DEFAULT_CATEGORY, "NÃºmero invÃ¡lido");
+                        new StringToIntegerConverter( Parm.DEFAULT_CATEGORY, "Número inválido");
 
    private static HierarchicalSelector<UserGroup, HasValue.ValueChangeEvent<UserGroup>> parentGroup;
 
@@ -58,7 +58,7 @@ public class UserGroupView extends AbstractEvidentiaCrudView<UserGroup>
    {
       grid.addColumn(group -> group.getName().toLowerCase()).setHeader("Grupo").setFlexGrow(60);
       grid.addColumn(group -> group.isLocked() ? "SI" : "--").setHeader("Bloqueado?").setFlexGrow(10);
-      grid.addColumn(group -> group.getCategory() == null? "0" : group.getCategory().toString()).setHeader("CategorÃ­a").setFlexGrow(30);
+      grid.addColumn(group -> group.getCategory() == null? "0" : group.getCategory().toString()).setHeader("Categoría").setFlexGrow(30);
       grid.addColumn(UserGroup::getFromDate).setHeader("Fecha Desde").setFlexGrow(50);
       grid.addColumn(UserGroup::getToDate).setHeader("Fecha Hasta").setFlexGrow(50);
       grid.addColumn(group -> group.getOwner()== null? "---" : group.getOwner().getName()).setHeader("Grupo padre").setFlexGrow(100);
@@ -81,7 +81,7 @@ public class UserGroupView extends AbstractEvidentiaCrudView<UserGroup>
       blocked.setValue(false);
       blocked.getElement().setAttribute("colspan", "1");
 
-      TextField category = new TextField("CategorÃ­a");
+      TextField category = new TextField("Categoría");
       category.setRequired(true);
       category.setValue(Parm.DEFAULT_CATEGORY.toString());
       category.setRequiredIndicatorVisible(true);
@@ -115,15 +115,15 @@ public class UserGroupView extends AbstractEvidentiaCrudView<UserGroup>
 
       binder.forField(name)
             .withConverter(STRING_CONVERTER)
-            .withValidator(text -> TextUtil.isAlphaNumeric(text), "El nombre debe ser alfanumÃ©rico")
+            .withValidator(text -> TextUtil.isAlphaNumeric(text), "El nombre debe ser alfanumérico")
             .bind("name");
 
       binder.bind(blocked, "locked");
       binder.forField(category)
-            .withValidator(text -> text.length() == 1, "CategorÃ­as solo tienen un dÃ­gito") //ValidaciÃ³n del texto
+            .withValidator(text -> text.length() == 1, "Categorías solo tienen un dígito") //Validación del texto
             .withConverter(CATEGORY_CONVERTER)
             .withValidator(cat -> cat >= Parm.MIN_CATEGORY && cat <= Parm.MAX_CATEGORY,
-                 "La categorÃ­a debe estar entre "+ Parm.MIN_CATEGORY+ " y "+ Parm.MAX_CATEGORY) // ValidaciÃ³n del nÃºmero
+                 "La categoría debe estar entre "+ Parm.MIN_CATEGORY+ " y "+ Parm.MAX_CATEGORY) // Validación del número
             .bind("category");
 
       binder.forField(fromDate)
@@ -147,7 +147,7 @@ public class UserGroupView extends AbstractEvidentiaCrudView<UserGroup>
    {
        Consumer<UserGroup> onSuccess = entity -> navigateToEntity(null);
        Consumer<UserGroup> onFail = entity -> {
-           throw new RuntimeException("La operaciÃ³n no pudo ser ejecutada.");
+           throw new RuntimeException("La operación no pudo ser ejecutada.");
        };
 
        addEditListener(e ->  entityPresenter.loadEntity(e.getItem().getId(), entity -> navigateToEntity(entity.getId().toString())));

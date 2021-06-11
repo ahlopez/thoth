@@ -59,7 +59,7 @@ public class SingleUserView extends AbstractEvidentiaCrudView<User>
    private static final Converter<String, Integer>    CATEGORY_CONVERTER =
                     new StringToIntegerConverter( Parm.DEFAULT_CATEGORY, "Categoría inválida");
 
-   private static User        singleUser = null;
+   private static User              singleUser = null;
    private static Set<UserGroup>    userGroups = new TreeSet<>();
    private static Set<Role>         userRoles  = new TreeSet<>();
 

@@ -67,21 +67,21 @@ public final class SecurityUtils
          || CustomRouteNotFoundError.class.equals(securedClass);
 
       // Always allow access to public views
-      if (publicView) {
-         return true;
+      if (publicView) 
+      {  return true;
       }
 
       Authentication userAuthentication = SecurityContextHolder.getContext().getAuthentication();
 
       // All other views require authentication
-      if (!isUserLoggedIn(userAuthentication)) {
-         return false;
+      if (!isUserLoggedIn(userAuthentication)) 
+      {   return false;
       }
 
       // Allow if no roles are required.
       Secured secured = AnnotationUtils.findAnnotation(securedClass, Secured.class);
-      if (secured == null) {
-         return true;
+      if (secured == null) 
+      {  return true;
       }
 
       List<String> allowedRoles = Arrays.asList(secured.value());
@@ -99,8 +99,8 @@ public final class SecurityUtils
       return isUserLoggedIn(SecurityContextHolder.getContext().getAuthentication());
    }
 
-   private static boolean isUserLoggedIn(Authentication authentication) {
-      return authentication != null
+   private static boolean isUserLoggedIn(Authentication authentication) 
+   {  return authentication != null
          && !(authentication instanceof AnonymousAuthenticationToken);
    }
 

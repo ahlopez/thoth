@@ -1,5 +1,7 @@
 package com.f.thoth.backend.data.security;
 
+import static com.f.thoth.Parm.CURRENT_USER;
+
 import java.time.LocalDate;
 
 import javax.persistence.Entity;
@@ -11,6 +13,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 import com.f.thoth.backend.data.entity.BaseEntity;
+import com.vaadin.flow.server.VaadinSession;
 
 /**
  * Representa un permiso de acceso a un objeto que requiere protección
@@ -25,7 +28,7 @@ public class Permission extends BaseEntity implements Comparable<Permission>
 
    @NotNull (message = "{evidentia.object.required}")
    @ManyToOne
-   public ObjectToProtect  objectToProtect;             // objeto sobre el que se concede permiso de acceso    
+   public ObjectToProtect  objectToProtect;             // objeto sobre el que se concede permiso de acceso
 
    @NotNull(message = "{evidentia.date.required}")
    private LocalDate     fromDate;                      // fecha inicial del período de concesión (inclusive)
@@ -39,42 +42,56 @@ public class Permission extends BaseEntity implements Comparable<Permission>
 
    // ------------- Constructors ------------------
    public Permission()
-   {
-      super();
-      this.grantedBy = ThothSession.getCurrentUser();
-      buildCode();
+   {  super();
+      init();
    }
 
-   public Permission( Role role, ObjectToProtect objectToProtect, LocalDate fromDate, LocalDate toDate)
+   public Permission( Tenant tenant, Role role, ObjectToProtect objectToProtect, LocalDate fromDate, LocalDate toDate)
    {
       super();
-      
+
+      if (tenant == null)
+         throw new IllegalArgumentException("Tenant que concede el permiso no puede ser nulo");
+
       if (role == null)
          throw new IllegalArgumentException("Rol a quien se concede el permiso no puede ser nulo");
 
       if (objectToProtect == null)
          throw new IllegalArgumentException("Objeto del permiso no puede ser nulo");
 
+      this.tenant            = tenant;
       this.role              = role;
       this.fromDate          = fromDate;
       this.toDate            = toDate;
       this.objectToProtect   = objectToProtect;
-      this.grantedBy         = ThothSession.getCurrentUser();
-      buildCode();
+      this.grantedBy         = (User)VaadinSession.getCurrent().getAttribute(CURRENT_USER);
    }//Permission
+   
+   
+   private void init()
+   {
+      if (this.grantedBy == null)
+      {  VaadinSession vSession = VaadinSession.getCurrent();
+         this.grantedBy = vSession == null? null: (User)vSession.getAttribute(CURRENT_USER);
+      }
+   }//init
 
+   
    @PrePersist
    @PreUpdate
    public void prepareData()
-   {
-      buildCode();
+   {  buildCode();
    }//prepareData
 
+   
    @Override protected void buildCode()
    {
-      this.code = (tenant == null? "[Tenant]" : tenant.getId())+ ">"+
-                  (role ==  null? "[role]": role.getId())+ ":"+ 
-    		         (objectToProtect == null? "[object]" : objectToProtect.getId());
+      if (this.code == null)
+      {
+          this.code = (tenant == null? "[Tenant]" : tenant.getId())+ ">"+
+                      (role ==  null? "[role]": role.getId())+ ":"+
+                      (objectToProtect == null? "[object]" : objectToProtect.getId());
+      }
    }//buildCode
 
    // -------------- Getters & Setters ----------------
@@ -99,13 +116,13 @@ public class Permission extends BaseEntity implements Comparable<Permission>
    @Override
    public boolean equals(Object o)
    {
-		if (this == o)
-			return true;
+    if (this == o)
+      return true;
 
-		if (!(o instanceof Permission )) 
-			return false;
+    if (!(o instanceof Permission ))
+      return false;
 
-		 Permission that = (Permission) o;
+     Permission that = (Permission) o;
        return this.id != null && this.id.equals(that.id);
 
    }// equals
@@ -121,20 +138,20 @@ public class Permission extends BaseEntity implements Comparable<Permission>
    {
       return this.equals(that)?  0 :
          that ==  null        ?  1 :
-         this.code == null  && that.code == null?  0 :   
+         this.code == null  && that.code == null?  0 :
          this.code != null  && that.code == null?  1 :
-         this.code == null  && that.code != null? -1 :   
+         this.code == null  && that.code != null? -1 :
          this.code.compareTo(that.code);
-      
+
    }// compareTo
 
    // --------------- Logic ---------------------
-   
+
    public boolean grants( Role role, ObjectToProtect objectWanted)
    {
       LocalDate now = LocalDate.now();
-      return this.role.equals(role) && 
-             this.objectToProtect.equals(objectWanted) && 
+      return this.role.equals(role) &&
+             this.objectToProtect.equals(objectWanted) &&
              now.compareTo(fromDate) >= 0 && now.compareTo(toDate) <= 0;
    }//grants
 

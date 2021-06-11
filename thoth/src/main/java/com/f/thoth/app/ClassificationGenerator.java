@@ -18,7 +18,7 @@ import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.gdoc.numerator.Numerator;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Tenant;
-import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.jcr.Repo;
 import com.f.thoth.backend.repositories.ClassificationRepository;
 import com.f.thoth.backend.repositories.LevelRepository;
@@ -40,11 +40,11 @@ public class ClassificationGenerator implements HasLogger
    private Set<String>               seqNumbers;
    private String                    currentUser;
 
-   public ClassificationGenerator( ClassificationRepository claseRepository,
-                                 LevelRepository levelRepository,
-                                 SchemaRepository schemaRepository,
-                                 Numerator        numerator,
-                                 Level[] level
+   public ClassificationGenerator( User user, ClassificationRepository claseRepository,
+                                   LevelRepository levelRepository,
+                                   SchemaRepository schemaRepository,
+                                   Numerator        numerator,
+                                   Level[] level
                                   )
    {
       this.claseRepository    = claseRepository;
@@ -53,7 +53,7 @@ public class ClassificationGenerator implements HasLogger
       this.numerator          = numerator;
       this.level              = level;
       this.seqNumbers         = new TreeSet<>();
-      this.currentUser        = ThothSession.getCurrentUser().getEmail();
+      this.currentUser        = user.getEmail();
 
    }//ClassificationGenerator constructor
 
@@ -61,7 +61,7 @@ public class ClassificationGenerator implements HasLogger
    public void registerClasses( Tenant tenant) throws RepositoryException, UnknownHostException
    {
       getLogger().info("... Register classification classes");
-      String classificationRootPath = initJcrClassification(tenant, NodeType.CLASSIFICATION.getCode()); 
+      String classificationRootPath = initJcrClassification(tenant, NodeType.CLASSIFICATION.getCode());
       Classification clase001 = createClass( tenant, classificationRootPath, Constant.TITLE_SEDE_CORPORATIVA                                , "01", /* 01*/       level[0], null);      //   Sede Corporativa
       Classification clase002 = createClass( tenant, classificationRootPath,   Constant.TITLE_CRP_OFICINA_GERENCIA_GENERAL                  , "01", /* 0101*/     level[1], clase001);  //   Corporativa, Gerencia_general
       Classification clase003 = createClass( tenant, classificationRootPath,     Constant.TITLE_CRP_SERIE_ACTAS                             , "01", /* 010101*/   level[2], clase002);  //   Corporativa, Actas
@@ -405,28 +405,27 @@ public class ClassificationGenerator implements HasLogger
 
    private void   printSequenceStats()
    {
-        getLogger().info("    >>> Secuencias creadas ["+ nSequences+ "]" );
+      getLogger().info("    >>> Secuencias creadas ["+ nSequences+ "]" );
       StringBuilder line = new StringBuilder();
       int i = 0;
-        for (String num: seqNumbers)
-        {
-          if ( (i % 4 == 3))
-          {
-          getLogger().info("       "+ line);
-          line.setLength(0);
-          }else if( (i % 3 != 0))
-          { line.append(", ");
-          }
-          line.append( num);
-          i++;
-        }
+      for (String num: seqNumbers)
+      {
+         if ( (i % 4 == 3))
+         {  getLogger().info("       "+ line);
+            line.setLength(0);
+         }else if( (i % 3 != 0))
+         { line.append(", ");
+         }
+         line.append( num);
+         i++;
+      }
       if (i > 0)
          getLogger().info("       "+ line);
 
    }//printSequenceStats
 
 
-   private String initJcrClassification(Tenant tenant, String classificationCode) 
+   private String initJcrClassification(Tenant tenant, String classificationCode)
          throws RepositoryException, UnknownHostException
    {
       String classificationRootPath = tenant.getWorkspace()+ Parm.PATH_SEPARATOR+ classificationCode;
@@ -441,7 +440,7 @@ public class ClassificationGenerator implements HasLogger
 
    private Classification createClass( Tenant tenant, String classificationRootPath,  String name, String classCode, Level level, Classification parent)
    {
-      Classification classificationClass = new Classification( level, name, classCode, parent, new ObjectToProtect());
+      Classification classificationClass = new Classification( tenant, level, name, classCode, parent, new ObjectToProtect());
 
       classificationClass.setTenant(tenant);
       Schema schema = null;
@@ -468,9 +467,10 @@ public class ClassificationGenerator implements HasLogger
          schema = nivel.getSchema();
       }
       SchemaValues values = new SchemaValues(schema,null);
+      values.setTenant(tenant);
       classificationClass.setMetadata(values);
       claseRepository.saveAndFlush(classificationClass);
-      storeClassInRepository( classificationClass, classificationRootPath);
+      addJCRClass( classificationClass, classificationRootPath);
       nClasses++;
       if (classificationClass.isRoot())
          createSequence(tenant, classificationClass);
@@ -480,7 +480,7 @@ public class ClassificationGenerator implements HasLogger
    }//createClass
 
 
-   private void storeClassInRepository( Classification classificationClass, String classificationRootPath)
+   private void addJCRClass( Classification classificationClass, String classificationRootPath)
    {
       try
       {
@@ -489,13 +489,13 @@ public class ClassificationGenerator implements HasLogger
          String childCode      = classificationClass.getClassCode();
          String childName      = classificationClass.getName();
          String childLevel     = ""+ classificationClass.getLevel().getOrden();
-         addChild( parentPath, childCode, childName, childLevel);
+         addJCRChild( parentPath, childCode, childName, childLevel);
       } catch(Exception e)
       {
          throw new IllegalStateException("*** No pudo guardar estructura de clasificación en el repositorio. Razón\n"+ e.getLocalizedMessage());
       }
 
-   }//storeClassInRepository
+   }//addJCRClass
 
 
    private synchronized void createSequence(Tenant tenant, Classification classificationClass)
@@ -514,7 +514,7 @@ public class ClassificationGenerator implements HasLogger
    }//createSequence
 
 
-   private Node addChild(String parentPath, String childNode, String childName, String childLevel) 
+   private Node addJCRChild(String parentPath, String childNode, String childName, String childLevel)
          throws RepositoryException, UnknownHostException
    {
       String childPath = parentPath+ Parm.PATH_SEPARATOR+ childNode;
@@ -523,6 +523,6 @@ public class ClassificationGenerator implements HasLogger
       child.setProperty("jcr:code",     childNode);
       child.setProperty("jcr:level",    childLevel);
       return child;
-   }//addChild
+   }//addJCRChild
 
 }//ClassificationGenerator

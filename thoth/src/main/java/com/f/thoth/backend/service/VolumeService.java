@@ -1,5 +1,7 @@
 package com.f.thoth.backend.service;
 
+import static com.f.thoth.Parm.TENANT;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,11 +23,11 @@ import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
-import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
 import com.f.thoth.backend.repositories.VolumeRepository;
+import com.vaadin.flow.server.VaadinSession;
 
 @Service
 public class VolumeService implements FilterableCrudService<Volume>, PermissionService<Volume>
@@ -49,7 +51,7 @@ public class VolumeService implements FilterableCrudService<Volume>, PermissionS
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return volumeRepository.findByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter, pageable);
+         return volumeRepository.findByNameLikeIgnoreCase(tenant(), repositoryFilter, pageable);
       } else
       {
          return find(pageable);
@@ -62,16 +64,16 @@ public class VolumeService implements FilterableCrudService<Volume>, PermissionS
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return volumeRepository.countByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter);
+         return volumeRepository.countByNameLikeIgnoreCase(tenant(), repositoryFilter);
       } else
       {
-         long n = volumeRepository.countAll(ThothSession.getCurrentTenant());
+         long n = volumeRepository.countAll(tenant());
          return n;
       }
    }//countAnyMatching
 
 
-   public Page<Volume> find(Pageable pageable) { return volumeRepository.findAll(ThothSession.getCurrentTenant(), pageable); }
+   public Page<Volume> find(Pageable pageable) { return volumeRepository.findAll(tenant(), pageable); }
    public Volume  findByCode(String code)      { return volumeRepository.findByCode(code);}
 
    @Override public JpaRepository<Volume, Long> getRepository() { return volumeRepository; }
@@ -80,7 +82,7 @@ public class VolumeService implements FilterableCrudService<Volume>, PermissionS
    {
       BaseExpediente baseExpediente = new BaseExpediente();
       baseExpediente.setType(Nature.VOLUMEN);
-      baseExpediente.setTenant(ThothSession.getCurrentTenant());
+      baseExpediente.setTenant(tenant());
       baseExpediente.setCreatedBy(null/*TODO: currentUser*/);
 
       Volume volume = new Volume(baseExpediente, Nature.VOLUMEN, 0, new TreeSet<DocumentType>());
@@ -101,11 +103,11 @@ public class VolumeService implements FilterableCrudService<Volume>, PermissionS
 
 
    //  ----- implements HierarchicalService ------
-   @Override public List<Volume>      findAll()                     { return volumeRepository.findAll(ThothSession.getCurrentTenant());}
+   @Override public List<Volume>      findAll()                     { return volumeRepository.findAll(tenant());}
    @Override public Optional<Volume>  findById(Long id)             { return volumeRepository.findById( id);}
    @Override public List<Volume>      findByParent ( Volume owner)  { return volumeRepository.findByParent(owner.getId());}
    @Override public int               countByParent( Volume owner)  { return volumeRepository.countByParent (owner.getId());}
-   @Override public boolean           hasChildren  ( Volume volume) 
+   @Override public boolean           hasChildren  ( Volume volume)
    { return volume.getCurrentInstance() > 0 || volumeRepository.countByChildren(volume.getId()) > 0;
    }
 
@@ -164,5 +166,7 @@ public class VolumeService implements FilterableCrudService<Volume>, PermissionS
       });
 
    }//revoke
+
+   private Tenant  tenant() { return (Tenant)VaadinSession.getCurrent().getAttribute(TENANT); }
 
 }//VolumeService

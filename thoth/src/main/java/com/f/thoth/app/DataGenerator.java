@@ -26,7 +26,6 @@ import com.f.thoth.backend.data.gdoc.metadata.Type;
 import com.f.thoth.backend.data.gdoc.numerator.Numerator;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Tenant;
-import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.UserGroup;
 import com.f.thoth.backend.jcr.Repo;
 import com.f.thoth.backend.repositories.BaseExpedienteRepository;
@@ -76,8 +75,6 @@ public class DataGenerator implements HasLogger
 
    private final Random random = new Random(1L);
 
-   @SuppressWarnings("unused")
-   private ThothSession                  session;
    private Tenant                        tenant1, tenant2;
    private TenantService                 tenantService;
    private TenantRepository              tenantRepository;
@@ -104,6 +101,7 @@ public class DataGenerator implements HasLogger
    private UserGroupRepository           userGroupRepository;
    private Numerator                     numerator;
    private Level[]                       levels;
+   private com.f.thoth.backend.data.security.User  currentUser;
 
    @Autowired
    public DataGenerator(TenantService tenantService, OrderRepository orderRepository, UserRepository userRepository,
@@ -203,7 +201,7 @@ public class DataGenerator implements HasLogger
          // -----------------  Inicialice el árbol de clasificacion documental -----------------------------
          getLogger().info("... generating classification classes" );
          ClassificationGenerator classificationGenerator =
-             new ClassificationGenerator(claseRepository, levelRepository, schemaRepository, numerator, levels);
+             new ClassificationGenerator(currentUser, claseRepository, levelRepository, schemaRepository, numerator, levels);
          classificationGenerator.registerClasses(tenant1);
 
 
@@ -225,7 +223,7 @@ public class DataGenerator implements HasLogger
          // -----------------  Generando expedientes y documentos de prueba
          getLogger().info("... generating expedientes and documents");
          ExpedienteGenerator  expedienteGenerator =
-               new ExpedienteGenerator(
+               new ExpedienteGenerator( tenant1, currentUser,
                      claseRepository, expedienteIndexRepository,
                      expedienteGroupRepository, documentTypeRepository,
                      volumeRepository, volumeInstanceRepository, schemaRepository
@@ -260,9 +258,7 @@ public class DataGenerator implements HasLogger
    private void createTenants (TenantService tenantService)
          throws RepositoryException, UnknownHostException
    {
-      session = new ThothSession(tenantService);
       tenant1 = createTenant(tenantRepository, "FCN", "FCN");
-      ThothSession.setTenant(tenant1);
       tenant2 = createTenant(tenantRepository,"SEI", "SEI");
    }//createTenants
 
@@ -404,20 +400,21 @@ public class DataGenerator implements HasLogger
    private Metadata createMeta(String name, Type type, String range)
    {
       Metadata meta = new Metadata(name, type, range);
+      meta.setTenant(tenant1);
       metadataRepository.saveAndFlush(meta);
       return meta;
    }//createMeta
 
    private Field createField(String name, Metadata meta, boolean visible, boolean readOnly, boolean required, int sortOrder, int columns)
    {
-      Field field = new Field(name, meta, visible, readOnly, required, sortOrder, columns);
+      Field field = new Field(tenant1, name, meta, visible, readOnly, required, sortOrder, columns);
       fieldRepository.saveAndFlush(field);
       return field;
    }//createField
 
    private Schema createSchema(String name)
    {
-      Schema schema = new Schema(name, new TreeSet<>());
+      Schema schema = new Schema(tenant1, name, new TreeSet<>());
       schemaRepository.saveAndFlush(schema);
       return schema;
    }//createSchema
@@ -425,7 +422,7 @@ public class DataGenerator implements HasLogger
 
    private DocumentType createDocType(String name, Schema schema, DocumentType parent, boolean requiresContent)
    {
-      DocumentType docType = new DocumentType( name, schema, parent, requiresContent);
+      DocumentType docType = new DocumentType(tenant1, name, schema, parent, requiresContent);
       documentTypeRepository.save(docType);
       return docType;
    }//createDocType
@@ -735,13 +732,11 @@ public class DataGenerator implements HasLogger
      Set<com.f.thoth.backend.data.security.Role> roleSet = new TreeSet<>();
      roleSet.add(adminRole);
      Set<UserGroup> groups = new TreeSet<>();
-     com.f.thoth.backend.data.security.User administrador = createSingleUser (
-                  tenant1, "admin@vaadin.com", "admin", "Lopez", "Alvaro", groups,
-                  new Integer(5), LocalDate.now(), LocalDate.now().plusYears(5), roleSet, true);
+     currentUser = createSingleUser ( tenant1, "admin@vaadin.com", "admin", "Lopez", "Alvaro", groups,
+                        new Integer(5), LocalDate.now(), LocalDate.now().plusYears(5), roleSet, true);
 
-      User admin =  userRepository.save( createUser("admin@vaadin.com", "Lopez", "Alvaro", passwordEncoder.encode("admin"), "admin", true));
-      ThothSession.setUser(administrador);
-      return admin;
+     User admin = userRepository.save(createUser("admin@vaadin.com", "Lopez", "Alvaro", passwordEncoder.encode("admin"), "admin", true));
+     return admin;
 
    }//createAdmin
 
@@ -751,6 +746,7 @@ public class DataGenerator implements HasLogger
          Integer userCategory, LocalDate fromDate, LocalDate toDate, Set<com.f.thoth.backend.data.security.Role>roles, boolean locked)
    {
       com.f.thoth.backend.data.security.User user = new com.f.thoth.backend.data.security.User();
+      user.setTenant(tenant1);
       user.setEmail(email);
       user.buildCode();
       user.setPasswordHash(passwordEncoder.encode(password));

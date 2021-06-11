@@ -1,5 +1,6 @@
 package com.f.thoth.backend.service;
 
+import static com.f.thoth.Parm.TENANT;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,16 +14,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
-import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.repositories.DocumentTypeRepository;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
+import com.vaadin.flow.server.VaadinSession;
 
 @Service
 public class DocumentTypeService implements FilterableCrudService<DocumentType>, PermissionService<DocumentType>
@@ -46,7 +47,7 @@ public class DocumentTypeService implements FilterableCrudService<DocumentType>,
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return documentTypeRepository.findByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter, pageable);
+         return documentTypeRepository.findByNameLikeIgnoreCase(tenant(), repositoryFilter, pageable);
       } else {
          return find(pageable);
       }
@@ -56,16 +57,16 @@ public class DocumentTypeService implements FilterableCrudService<DocumentType>,
    {
       if (filter.isPresent()) {
          String repositoryFilter = "%" + filter.get() + "%";
-         return documentTypeRepository.countByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter);
+         return documentTypeRepository.countByNameLikeIgnoreCase(tenant(), repositoryFilter);
       } else {
-         long n = documentTypeRepository.countAll(ThothSession.getCurrentTenant());
+         long n = documentTypeRepository.countAll(tenant());
          return n;
       }
    }//countAnyMatching
 
    public Page<DocumentType> find(Pageable pageable)
    {
-      return documentTypeRepository.findBy(ThothSession.getCurrentTenant(), pageable);
+      return documentTypeRepository.findBy(tenant(), pageable);
    }
 
    @Override public JpaRepository<DocumentType, Long> getRepository()
@@ -76,7 +77,7 @@ public class DocumentTypeService implements FilterableCrudService<DocumentType>,
    @Override public DocumentType createNew(User currentUser)
    {
       DocumentType documentType = new DocumentType();
-      documentType.setTenant(ThothSession.getCurrentTenant());
+      documentType.setTenant(tenant());
       return documentType;
    }//createNew
 
@@ -92,7 +93,7 @@ public class DocumentTypeService implements FilterableCrudService<DocumentType>,
 
 
    //  ----- implements HierarchicalService ------
-   @Override public List<DocumentType> findAll() { return documentTypeRepository.findAll(ThothSession.getCurrentTenant()); }
+   @Override public List<DocumentType> findAll() { return documentTypeRepository.findAll(tenant()); }
 
    @Override public Optional<DocumentType> findById(Long id)  { return documentTypeRepository.findById( id);}
 
@@ -157,6 +158,6 @@ public class DocumentTypeService implements FilterableCrudService<DocumentType>,
 
    }//revoke
 
-
+   private Tenant  tenant() { return (Tenant)VaadinSession.getCurrent().getAttribute(TENANT); }
 
 }//ClaseService

@@ -1,5 +1,7 @@
 package com.f.thoth.backend.service;
 
+import static com.f.thoth.Parm.TENANT;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -10,10 +12,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.Role;
-import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.data.security.Tenant;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.repositories.RoleRepository;
+import com.vaadin.flow.server.VaadinSession;
 
 @Service
 public class RoleService implements FilterableCrudService<Role>
@@ -28,7 +31,7 @@ public class RoleService implements FilterableCrudService<Role>
 
    public List<Role> findAll()
    {
-      return roleRepository.findAll(ThothSession.getCurrentTenant());
+      return roleRepository.findAll(tenant());
    }//findAll
 
    @Override
@@ -37,7 +40,7 @@ public class RoleService implements FilterableCrudService<Role>
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return roleRepository.findByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter, pageable);
+         return roleRepository.findByNameLikeIgnoreCase(tenant(), repositoryFilter, pageable);
       } else {
          return find(pageable);
       }
@@ -48,16 +51,16 @@ public class RoleService implements FilterableCrudService<Role>
    {
       if (filter.isPresent()) {
          String repositoryFilter = "%" + filter.get() + "%";
-         return roleRepository.countByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter);
+         return roleRepository.countByNameLikeIgnoreCase(tenant(), repositoryFilter);
       } else {
-         long n = roleRepository.countAll(ThothSession.getCurrentTenant());
+         long n = roleRepository.countAll(tenant());
          return n;
       }
    }//countAnyMatching
 
    public Page<Role> find(Pageable pageable)
    {
-      return roleRepository.findBy(ThothSession.getCurrentTenant(), pageable);
+      return roleRepository.findBy(tenant(), pageable);
    }
 
    @Override
@@ -70,21 +73,22 @@ public class RoleService implements FilterableCrudService<Role>
    public Role createNew(User currentUser)
    {
       Role role = new Role();
-      role.setTenant(ThothSession.getCurrentTenant());
+      role.setTenant(tenant());
       return role;
    }
 
    @Override
    public Role save(User currentUser, Role entity)
    {
-      try {
-         Role newRole =  FilterableCrudService.super.save(currentUser, entity);
-         ThothSession.updateSession();
+      try
+      {  Role newRole =  FilterableCrudService.super.save(currentUser, entity);
          return newRole;
-      } catch (DataIntegrityViolationException e) {
-         throw new UserFriendlyDataException("Ya hay un rol con esa llave. Por favor escoja una llave única para el rol");
+      } catch (DataIntegrityViolationException e)
+      {  throw new UserFriendlyDataException("Ya hay un rol con esa llave. Por favor escoja una llave única para el rol");
       }
 
    }//save
+
+   private Tenant  tenant() { return (Tenant)VaadinSession.getCurrent().getAttribute(TENANT); }
 
 }//RoleService

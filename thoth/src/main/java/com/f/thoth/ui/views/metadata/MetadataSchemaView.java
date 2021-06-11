@@ -1,4 +1,6 @@
-package com.f.thoth.ui.views.metadata;
+﻿package com.f.thoth.ui.views.metadata;
+
+import static com.f.thoth.Parm.CURRENT_USER;
 
 import java.util.List;
 import java.util.Optional;
@@ -8,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.annotation.Secured;
 
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
-import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.service.MetadataService;
 import com.f.thoth.backend.service.SchemaService;
@@ -26,6 +27,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
 
 @CssImport("./styles/shared-styles.css")
 @PageTitle("Metadatos | Evidentia")
@@ -49,7 +51,7 @@ public class MetadataSchemaView extends VerticalLayout
    public MetadataSchemaView(SchemaService schemaService, MetadataService metadataService)
    {
       this.schemaService   = schemaService;
-      this.currentUser     = ThothSession.getCurrentUser();
+      this.currentUser     = (User)VaadinSession.getCurrent().getAttribute(CURRENT_USER);
 
       addClassName("main-view");
       setSizeFull();
@@ -101,8 +103,9 @@ public class MetadataSchemaView extends VerticalLayout
 
    private void addSchema()
    {
-      editSchema(new Schema("Nombre", new TreeSet<>()));
+      editSchema(new Schema(currentUser.getTenant(), "Nombre", new TreeSet<>()));
    }//addSchema
+   
 
    private Grid<Schema> configureGrid()
    {
@@ -114,6 +117,7 @@ public class MetadataSchemaView extends VerticalLayout
       return grid;
 
    }//configureGrid
+   
 
    private SchemaForm configureForm(MetadataService metadataService)
    {
@@ -124,6 +128,7 @@ public class MetadataSchemaView extends VerticalLayout
       return schemaForm;
 
    }//configureForm
+   
 
    private void editSchema(Schema schema)
    {
@@ -141,6 +146,7 @@ public class MetadataSchemaView extends VerticalLayout
          addClassName("editing");
       }
    }//editSchema
+   
 
    private void closeEditor()
    {
@@ -149,6 +155,7 @@ public class MetadataSchemaView extends VerticalLayout
       removeClassName("editing");
 
    }//closeEditor
+   
 
    private void updateList()
    {
@@ -164,6 +171,7 @@ public class MetadataSchemaView extends VerticalLayout
       updateList();
       closeEditor();
    }//deleteSchema
+   
 
    private void saveSchema(SchemaForm.SaveEvent event)
    {

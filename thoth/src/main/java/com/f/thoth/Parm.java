@@ -14,6 +14,7 @@ public class Parm
    public static final String          PATH_SEPARATOR = "/";
 
    public static final String                 TENANT  = "TENANT";
+   public static final String           CURRENT_USER  = "CURRENT_USER";
    public static final Integer          MIN_CATEGORY  = 0;
    public static final Integer          MAX_CATEGORY  = 5;
    public static final Integer      DEFAULT_CATEGORY  = MIN_CATEGORY;

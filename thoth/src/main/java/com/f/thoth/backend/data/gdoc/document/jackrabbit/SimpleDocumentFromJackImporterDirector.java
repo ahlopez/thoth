@@ -63,6 +63,7 @@ public class SimpleDocumentFromJackImporterDirector implements SimpleDocument.Im
    {
       /*
       try {
+         Tenant tenant = (Tenant)VaadinSession.getCurrent().getAttribute("TENANT");
          MetaValues vals = new MetaValues();
          for (PropertyIterator propertyIter = node.getProperties(); propertyIter.hasNext(); )
          {
@@ -89,7 +90,7 @@ public class SimpleDocumentFromJackImporterDirector implements SimpleDocument.Im
                value = new ImmutableValue<LocalDateTime>(endClassification, Type.DATETIME);
             }else if ("evid:docType".equals(propertyName)) {
                String typeId = propertyValue.getString();
-               DocType docType = ThothSession.getCurrentTenant().getTypeById(typeId);
+               DocType docType = tenant.getTypeById(typeId);
                simpleDocumentImportBuilder.setDocType( docType);
                value = new ImmutableValue<String>(typeId, Type.STRING);
             }else {

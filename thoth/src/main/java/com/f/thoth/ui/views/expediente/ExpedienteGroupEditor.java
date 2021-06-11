@@ -1,5 +1,7 @@
 package com.f.thoth.ui.views.expediente;
 
+import static com.f.thoth.Parm.CURRENT_USER;
+
 import java.time.LocalDateTime;
 import java.util.Optional;
 
@@ -7,7 +9,6 @@ import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.ExpedienteGroup;
 import com.f.thoth.backend.data.security.ObjectToProtect;
-import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.service.BaseExpedienteService;
 import com.f.thoth.backend.service.ExpedienteGroupService;
@@ -21,6 +22,7 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.shared.Registration;
 
 public class ExpedienteGroupEditor extends VerticalLayout
@@ -51,7 +53,7 @@ public class ExpedienteGroupEditor extends VerticalLayout
     this.expedienteGroupService  = expedienteGroupService;
     this.baseExpedienteService   = baseExpedienteService;
     this.schemaService           = schemaService;
-    this.currentUser             = ThothSession.getCurrentUser();
+    this.currentUser             = (User)VaadinSession.getCurrent().getAttribute(CURRENT_USER);
     this.classificationClass     = classificationClass;
     this.currentGroup            = null;
 
@@ -136,8 +138,8 @@ public class ExpedienteGroupEditor extends VerticalLayout
     return newGroup;
 
   }//createGroup
- 
-  
+
+
   private void setVisibility( boolean visibility)
   {
      baseExpedienteEditor.setVisible(visibility);
@@ -187,6 +189,7 @@ public class ExpedienteGroupEditor extends VerticalLayout
      {
         boolean isNew = !group.isPersisted();
         expedienteGroupService.save(currentUser, group);
+        //TODO: *** Guardar el grupo en el repositorio
         notifier.accept("Grupo de expedientes "+ group.formatCode()+ (isNew? " creado" : " actualizado"));
      }
      closeEditor();
@@ -200,6 +203,7 @@ public class ExpedienteGroupEditor extends VerticalLayout
     {
       if (!expedienteGroupService.hasChildren(group))
       {  expedienteGroupService.delete(currentUser, group);
+         //TODO: *** Eliminar grupo de expedientes del repositorio
          notifier.accept("Grupo de expedientes "+ group.formatCode()+ " eliminado");
       }else
       {  notifier.error("Grupo de expedientes no puede ser eliminado pues contiene subgrupos");

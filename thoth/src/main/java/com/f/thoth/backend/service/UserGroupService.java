@@ -1,5 +1,7 @@
 package com.f.thoth.backend.service;
 
+import static com.f.thoth.Parm.TENANT;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -10,11 +12,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.Tenant;
-import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.UserGroup;
 import com.f.thoth.backend.repositories.UserGroupRepository;
+import com.vaadin.flow.server.VaadinSession;
 
 @Service
 public class UserGroupService implements FilterableCrudService<UserGroup>, HierarchicalService<UserGroup>
@@ -32,7 +34,7 @@ public class UserGroupService implements FilterableCrudService<UserGroup>, Hiera
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return userGroupRepository.findByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter, pageable);
+         return userGroupRepository.findByNameLikeIgnoreCase(tenant(), repositoryFilter, pageable);
       }
       else
       {
@@ -45,18 +47,18 @@ public class UserGroupService implements FilterableCrudService<UserGroup>, Hiera
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return userGroupRepository.countByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter);
+         return userGroupRepository.countByNameLikeIgnoreCase(tenant(), repositoryFilter);
       }
       else
       {
-         long n = userGroupRepository.countAll(ThothSession.getCurrentTenant());
+         long n = userGroupRepository.countAll(tenant());
          return n;
       }
    }//countAnyMatching
 
    public Page<UserGroup> find(Pageable pageable)
    {
-      return userGroupRepository.findBy(ThothSession.getCurrentTenant(), pageable);
+      return userGroupRepository.findBy(tenant(), pageable);
    }
 
    @Override public JpaRepository<UserGroup, Long> getRepository()
@@ -67,7 +69,7 @@ public class UserGroupService implements FilterableCrudService<UserGroup>, Hiera
    @Override public UserGroup createNew(User currentUser)
    {
       UserGroup userGroup = new UserGroup();
-      userGroup.setTenant(ThothSession.getCurrentTenant());
+      userGroup.setTenant(tenant());
       return userGroup;
    }//createNew
 
@@ -76,7 +78,7 @@ public class UserGroupService implements FilterableCrudService<UserGroup>, Hiera
       try
       {
          UserGroup newUserGroup =  FilterableCrudService.super.save(currentUser, entity);
-         Tenant tenant = ThothSession.getCurrentTenant();
+         Tenant tenant = tenant();
          if (tenant != null)
             tenant.addUserGroup(newUserGroup);
 
@@ -90,7 +92,7 @@ public class UserGroupService implements FilterableCrudService<UserGroup>, Hiera
    }//save
 
    //  ----- implements HierarchicalService ------
-   @Override public List<UserGroup> findAll() { return userGroupRepository.findAll(ThothSession.getCurrentTenant()); }
+   @Override public List<UserGroup> findAll() { return userGroupRepository.findAll(tenant()); }
 
    @Override public Optional<UserGroup> findById(Long id)              { return userGroupRepository.findById( id);}
 
@@ -100,5 +102,7 @@ public class UserGroupService implements FilterableCrudService<UserGroup>, Hiera
 
    @Override public List<UserGroup>     findByNameLikeIgnoreCase (Tenant tenant, String name) { return userGroupRepository.findByNameLikeIgnoreCase (tenant, name); }
    @Override public long                countByNameLikeIgnoreCase(Tenant tenant, String name) { return userGroupRepository.countByNameLikeIgnoreCase(tenant, name); }
+
+   private Tenant  tenant() { return (Tenant)VaadinSession.getCurrent().getAttribute(TENANT); }
 
 }//UserGroupService

@@ -3,6 +3,7 @@ package com.f.thoth.ui.views.admin.objects;
 import static com.f.thoth.ui.dataproviders.DataProviderUtil.createItemLabelGenerator;
 import static com.f.thoth.ui.utils.Constant.PAGE_OPERATIONS;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +14,9 @@ import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.security.Operation;
 import com.f.thoth.backend.data.security.Role;
-import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.service.OperationService;
+import com.f.thoth.backend.service.RoleService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.components.HierarchicalSelector;
 import com.f.thoth.ui.crud.AbstractEvidentiaCrudView;
@@ -32,6 +33,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.converter.Converter;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
+import com.vaadin.flow.data.provider.ListDataProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
@@ -46,9 +48,9 @@ public class OperationView extends AbstractEvidentiaCrudView<Operation>
    private static HierarchicalSelector<Operation, HasValue.ValueChangeEvent<Operation>> parentObject;
 
    @Autowired
-   public OperationView(OperationService service, CurrentUser currentUser)
+   public OperationView(OperationService service, RoleService roleService, CurrentUser currentUser)
    {
-      super(Operation.class, service, new Grid<>(), createForm(service), currentUser);
+      super(Operation.class, service, new Grid<>(), createForm(service, roleService), currentUser);
    }
 
    @Override
@@ -65,8 +67,9 @@ public class OperationView extends AbstractEvidentiaCrudView<Operation>
    @Override
    protected String getBasePage() { return PAGE_OPERATIONS;}
 
-   private static BinderCrudEditor<Operation> createForm(OperationService service)
+   private static BinderCrudEditor<Operation> createForm(OperationService service, RoleService roleService)
    {
+      List<Role> allRoles = roleService.findAll();
       TextField name = new TextField("Operación");
       name.setRequired(true);
       name.setPlaceholder("--llave--");
@@ -82,7 +85,7 @@ public class OperationView extends AbstractEvidentiaCrudView<Operation>
       ComboBox<Role> roleOwner = new ComboBox<>();
       roleOwner.getElement().setAttribute("colspan", "2");
       roleOwner.setLabel("Rol dueño");
-      roleOwner.setDataProvider(ThothSession.getTenantRoles());
+      roleOwner.setDataProvider(new ListDataProvider<Role>(allRoles));
       roleOwner.setItemLabelGenerator(createItemLabelGenerator(Role::getName));
       roleOwner.setRequired(false);
       roleOwner.setRequiredIndicatorVisible(false);

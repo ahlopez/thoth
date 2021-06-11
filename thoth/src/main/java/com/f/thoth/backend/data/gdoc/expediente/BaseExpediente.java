@@ -1,5 +1,7 @@
 package com.f.thoth.backend.data.gdoc.expediente;
 
+import static com.f.thoth.Parm.CURRENT_USER;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -37,9 +39,9 @@ import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
-import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.UserGroup;
+import com.vaadin.flow.server.VaadinSession;
 
 /**
  * Representa un nodo de la jerarquia de expedientes (expediente/sub-expediente/volumen
@@ -178,12 +180,13 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
   public BaseExpediente()
   {
     super();
+    VaadinSession vSession = VaadinSession.getCurrent();
     this.expedienteCode       = "";
     this.type                 = Nature.EXPEDIENTE;
     this.path                 = "";
     this.name                 = "";
     this.objectToProtect      = new ObjectToProtect();
-    this.createdBy            = ThothSession.getCurrentUser();
+    this.createdBy            = vSession == null? null: (User)vSession.getAttribute(CURRENT_USER);
     this.classificationClass  = null;
     this.metadataSchema       = null;
     this.metadata             = null;
@@ -200,7 +203,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
   public BaseExpediente( String expedienteCode, Nature type, String path, String name, User createdBy, Classification classificationClass,
                          Schema metadataSchema, SchemaValues metadata, LocalDateTime dateOpened, LocalDateTime dateClosed, Long ownerId,
-                         Boolean open,String keywords, String mac)
+                         Boolean open, String keywords, String mac)
   {
     if ( TextUtil.isEmpty(expedienteCode))
       throw new IllegalArgumentException("Código del expediente no puede ser nulo ni vacío");
@@ -263,9 +266,9 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
       Sequence expedienteSequence = numerador.obtenga(seqKey);
       expedienteCode = expedienteSequence.next();
 
-      this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ Parm.PATH_SEPARATOR+ 
+      this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ Parm.PATH_SEPARATOR+
                   NodeType.EXPEDIENTE.getCode()+ Parm.PATH_SEPARATOR+
-                  classificationClass.getId()+ Parm.PATH_SEPARATOR+ 
+                  classificationClass.getId()+ Parm.PATH_SEPARATOR+
                   (expedienteCode == null? "[expedienteCode]" : expedienteCode);
       this.code = this.path;
     }
@@ -377,9 +380,9 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
   @Override  public int compareTo(BaseExpediente that)
   {
     return this.equals(that)
-           ?  0 
+           ?  0
            :  that == null
-           ?  1 
+           ?  1
            :  this.code.compareTo(that.code);
   }// compareTo
 
@@ -460,7 +463,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
   public ExpedienteIndex  createIndex()
   {
     //TODO:  Iniciar el blockchain del indice
-    ExpedienteIndex expedienteIndex    = new ExpedienteIndex();
+    ExpedienteIndex expedienteIndex    = new ExpedienteIndex(tenant, code);
     ObjectToProtect idxObjectToProtect = new ObjectToProtect();
     idxObjectToProtect.setRoleOwner(getRoleOwner()); //TODO: El rol de acceso debe ser ADMIN
     expedienteIndex.setObjectToProtect( idxObjectToProtect);
@@ -470,14 +473,13 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
     expedienteIndex.setMetadata(metadata);
     expedienteIndex.setDateOpened(dateOpened);
     expedienteIndex.setDateClosed(dateClosed);
-    expedienteIndex.setOwner(ownerId);
     expedienteIndex.setExpedienteCode(expedienteCode);
     //       expedienteIndex.setEntries( new TreeSet<>());
     expedienteIndex.setOpen(open);
     expedienteIndex.setKeywords(keywords);
     expedienteIndex.setLocation(location);
     expedienteIndex.buildCode();
-    expedienteIndex.setMac("");  // TODO: El mac debe ser calculado internamente
+    expedienteIndex.setMac("");  // TODO: El mac debe ser calculado internamente con blockChain
     return expedienteIndex;
   }//createIndex
 

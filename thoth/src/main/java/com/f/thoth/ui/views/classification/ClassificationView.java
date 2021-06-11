@@ -1,5 +1,6 @@
 package com.f.thoth.ui.views.classification;
 
+import static com.f.thoth.Parm.CURRENT_USER;
 
 import static com.f.thoth.ui.utils.Constant.PAGE_ESQUEMAS_CLASIFICACION;
 import static com.f.thoth.ui.utils.Constant.TITLE_ESQUEMAS_CLASIFICACION;
@@ -13,7 +14,6 @@ import com.f.thoth.backend.data.Role;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.classification.Level;
 import com.f.thoth.backend.data.gdoc.classification.Retention;
-import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.service.ClassificationService;
 import com.f.thoth.backend.service.LevelService;
@@ -35,6 +35,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
 
 @Route(value = PAGE_ESQUEMAS_CLASIFICACION, layout = MainView.class)
 @PageTitle(TITLE_ESQUEMAS_CLASIFICACION)
@@ -66,7 +67,7 @@ public class ClassificationView extends VerticalLayout
    public ClassificationView(ClassificationService classificationService, LevelService levelService, RetentionService retentionService)
    {
       this.classificationService = classificationService;
-      this.currentUser           = ThothSession.getCurrentUser();
+      this.currentUser           = (User)VaadinSession.getCurrent().getAttribute(CURRENT_USER);
 
       levels = getAllLevels( levelService);
       retentionSchedules = retentionService.findAll();
@@ -204,10 +205,11 @@ public class ClassificationView extends VerticalLayout
 
    private void saveClass( Classification classification)
    {
-          if (classification == null)
-                  return;
-
+      if (classification == null)
+      {  return;
+      }
       classificationService.save(currentUser, classification);
+      // TODO: *** Guardar la clase en el repositorio
       closeEditor();
       currentClass = null;
 
@@ -220,6 +222,7 @@ public class ClassificationView extends VerticalLayout
       {
          if( classification != null && classification.isPersisted())
              classificationService.delete(currentUser, classification);
+             //TODO: ***  Borrar clase en el repositorio
       } catch (Exception e)
       {
          notifier.error("Clase["+ classification.getName()+ "] tiene referencias. No puede ser borrada");
@@ -274,6 +277,7 @@ public class ClassificationView extends VerticalLayout
    {
       Classification classification = event.getClassification();
       classificationService.save(currentUser, classification);
+      //TODO: *** Guardar clase en el repositorio
       updateSelector();
       closeEditor();
    }//saveClassification

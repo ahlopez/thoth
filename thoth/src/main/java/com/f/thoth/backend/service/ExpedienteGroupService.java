@@ -1,5 +1,7 @@
 package com.f.thoth.backend.service;
 
+import static com.f.thoth.Parm.TENANT;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -12,17 +14,17 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.ExpedienteGroup;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
-import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.repositories.ExpedienteGroupRepository;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
+import com.vaadin.flow.server.VaadinSession;
 
 @Service
 public class ExpedienteGroupService implements FilterableCrudService<ExpedienteGroup>, PermissionService<ExpedienteGroup>
@@ -47,7 +49,7 @@ public class ExpedienteGroupService implements FilterableCrudService<ExpedienteG
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return expedienteGroupRepository.findByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter, pageable);
+         return expedienteGroupRepository.findByNameLikeIgnoreCase(tenant(), repositoryFilter, pageable);
       } else {
          return find(pageable);
       }
@@ -58,20 +60,20 @@ public class ExpedienteGroupService implements FilterableCrudService<ExpedienteG
    {
       if (filter.isPresent()) {
          String repositoryFilter = "%" + filter.get() + "%";
-         return expedienteGroupRepository.countByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter);
+         return expedienteGroupRepository.countByNameLikeIgnoreCase(tenant(), repositoryFilter);
       } else {
-         long n = expedienteGroupRepository.countAll(ThothSession.getCurrentTenant());
+         long n = expedienteGroupRepository.countAll(tenant());
          return n;
       }
    }//countAnyMatching
 
 
    public Page<ExpedienteGroup> find(Pageable pageable)
-       { return expedienteGroupRepository.findBy(ThothSession.getCurrentTenant(), pageable);}
+       { return expedienteGroupRepository.findBy(tenant(), pageable);}
 
    public ExpedienteGroup  findByCode(String code) { return expedienteGroupRepository.findByCode(code);}
 /*
-   public Optional<ExpedienteGroup>  findParent(String parentPath) { return expedienteGroupRepository.findParent(ThothSession.getCurrentTenant(),parentPath);}
+   public Optional<ExpedienteGroup>  findParent(String parentPath) { return expedienteGroupRepository.findParent(tenant(),parentPath);}
 */
    @Override public JpaRepository<ExpedienteGroup, Long> getRepository()
        { return expedienteGroupRepository; }
@@ -79,7 +81,7 @@ public class ExpedienteGroupService implements FilterableCrudService<ExpedienteG
    @Override public ExpedienteGroup createNew(User currentUser)
    {
       BaseExpediente   baseExpediente   = new BaseExpediente();
-      baseExpediente.setTenant(ThothSession.getCurrentTenant());
+      baseExpediente.setTenant(tenant());
       baseExpediente.setCreatedBy(null /*TODO: currentUser*/);
 
       ExpedienteGroup expedienteGroup = new ExpedienteGroup();
@@ -100,7 +102,7 @@ public class ExpedienteGroupService implements FilterableCrudService<ExpedienteG
 
 
    //  ----- implements HierarchicalService ------
-   @Override public List<ExpedienteGroup>     findAll()                            {return expedienteGroupRepository.findAll(ThothSession.getCurrentTenant()); }
+   @Override public List<ExpedienteGroup>     findAll()                            {return expedienteGroupRepository.findAll(tenant()); }
    @Override public Optional<ExpedienteGroup> findById(Long id)                    {return expedienteGroupRepository.findById( id);}
    @Override public List<ExpedienteGroup>     findByParent( ExpedienteGroup owner){return expedienteGroupRepository.findByParent(owner.getOwnerId()); }
    @Override public int        countByParent ( ExpedienteGroup owner)              {return expedienteGroupRepository.countByParent (owner.getOwnerId()); }
@@ -161,5 +163,7 @@ public class ExpedienteGroupService implements FilterableCrudService<ExpedienteG
       });
 
    }//revoke
+
+   private Tenant  tenant() { return (Tenant)VaadinSession.getCurrent().getAttribute(TENANT); }
 
 }//ExpedienteGroupService

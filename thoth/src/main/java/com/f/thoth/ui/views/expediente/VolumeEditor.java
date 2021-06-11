@@ -1,5 +1,8 @@
 package com.f.thoth.ui.views.expediente;
 
+import static com.f.thoth.Parm.CURRENT_USER;
+
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +18,6 @@ import com.f.thoth.backend.data.gdoc.expediente.Volume;
 import com.f.thoth.backend.data.gdoc.expediente.VolumeInstance;
 import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.security.ObjectToProtect;
-import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.service.BaseExpedienteService;
 import com.f.thoth.backend.service.DocumentTypeService;
@@ -32,6 +34,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.shared.Registration;
 
 public class VolumeEditor extends VerticalLayout
@@ -72,7 +75,7 @@ public class VolumeEditor extends VerticalLayout
      this.baseExpedienteService   = baseExpedienteService;
      this.schemaService           = schemaService;
      this.documentTypeService     = documentTypeService;
-     this.currentUser             = ThothSession.getCurrentUser();
+     this.currentUser             = (User)VaadinSession.getCurrent().getAttribute(CURRENT_USER);
      this.classificationClass     = classificationClass;
      this.currentVolume           = null;
 
@@ -252,6 +255,7 @@ public class VolumeEditor extends VerticalLayout
          volumeService.save(currentUser, volume);
          String businessCode = volume.formatCode();
          String volType = volume.getType().toString();
+         //TODO: *** Guardar expediente en el repositorio
          notifier.accept( isNew? volType+ " creado con código "+ businessCode: volType+ " "+ businessCode+ " actualizado");
       }
       closeEditor();
@@ -266,6 +270,7 @@ public class VolumeEditor extends VerticalLayout
        String type = volume.getType().toString();
        if (!volumeService.hasChildren(currentVolume))
        {  volumeService.delete(currentUser, currentVolume);
+          //TODO: *** Eliminar expediente del repositorio
           notifier.accept(type+ " "+ volume.formatCode()+ " eliminado");
        }else
        {  notifier.error(type+ " no puede ser eliminado pues contiene documentos");

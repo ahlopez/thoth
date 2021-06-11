@@ -1,5 +1,7 @@
 package com.f.thoth.backend.service;
 
+import static com.f.thoth.Parm.TENANT;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -10,10 +12,11 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.gdoc.metadata.Metadata;
-import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.data.security.Tenant;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.repositories.MetadataRepository;
+import com.vaadin.flow.server.VaadinSession;
 
 @Service
 public class MetadataService implements FilterableCrudService<Metadata>
@@ -28,7 +31,7 @@ public class MetadataService implements FilterableCrudService<Metadata>
 
    public List<Metadata> findAll()
    {
-      return metadataRepository.findAll(ThothSession.getCurrentTenant());
+      return metadataRepository.findAll(tenant());
    }//findAll
 
    @Override
@@ -37,7 +40,7 @@ public class MetadataService implements FilterableCrudService<Metadata>
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return metadataRepository.findByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter, pageable);
+         return metadataRepository.findByNameLikeIgnoreCase(tenant(), repositoryFilter, pageable);
       } else {
          return find(pageable);
       }
@@ -48,16 +51,16 @@ public class MetadataService implements FilterableCrudService<Metadata>
    {
       if (filter.isPresent()) {
          String repositoryFilter = "%" + filter.get() + "%";
-         return metadataRepository.countByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter);
+         return metadataRepository.countByNameLikeIgnoreCase(tenant(), repositoryFilter);
       } else {
-         long n = metadataRepository.countAll(ThothSession.getCurrentTenant());
+         long n = metadataRepository.countAll(tenant());
          return n;
       }
    }//countAnyMatching
 
    public Page<Metadata> find(Pageable pageable)
    {
-      return metadataRepository.findBy(ThothSession.getCurrentTenant(), pageable);
+      return metadataRepository.findBy(tenant(), pageable);
    }
 
    @Override
@@ -70,21 +73,22 @@ public class MetadataService implements FilterableCrudService<Metadata>
    public Metadata createNew(User currentUser)
    {
       Metadata metadata = new Metadata();
-      metadata.setTenant(ThothSession.getCurrentTenant());
+      metadata.setTenant(tenant());
       return metadata;
    }
 
    @Override
    public Metadata save(User currentUser, Metadata entity)
    {
-      try {
-         Metadata newMetadata =  FilterableCrudService.super.save(currentUser, entity);
-         ThothSession.updateSession();
+      try
+      {  Metadata newMetadata =  FilterableCrudService.super.save(currentUser, entity);
          return newMetadata;
-      } catch (DataIntegrityViolationException e) {
-         throw new UserFriendlyDataException("Ya hay un rol con esa llave. Por favor escoja una llave única para el rol");
+      } catch (DataIntegrityViolationException e)
+      {  throw new UserFriendlyDataException("Ya hay un rol con esa llave. Por favor escoja una llave única para el rol");
       }
 
    }//save
+
+   private Tenant  tenant() { return (Tenant)VaadinSession.getCurrent().getAttribute(TENANT); }
 
 }//MetadataService

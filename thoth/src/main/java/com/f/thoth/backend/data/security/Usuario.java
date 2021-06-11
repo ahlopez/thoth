@@ -76,12 +76,14 @@ public abstract class Usuario extends BaseEntity implements NeedsProtection, Com
       objectToProtect.setCategory(Parm.ADMIN_CATEGORY);
    }//Usuario
 
+   
    public void prepareData()
    {
       this.fromDate  =  fromDate  != null ? fromDate : LocalDate.MIN;
       this.toDate    =  toDate    != null ? toDate   : LocalDate.now().plusDays(DEFAULT_TO_DATE);
       this.locked    =  isLocked();
    }//prepareData
+   
 
    private LocalDate yearStart()
    {

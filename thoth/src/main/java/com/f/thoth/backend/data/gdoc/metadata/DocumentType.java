@@ -24,6 +24,7 @@ import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
+import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.UserGroup;
 
@@ -116,9 +117,13 @@ public class DocumentType extends BaseEntity implements NeedsProtection, Hierarc
       init();
    }// DocType constructor
 
-   public DocumentType( String name, Schema schema, DocumentType owner, boolean requiresContent)
+   public DocumentType( Tenant tenant, String name, Schema schema, DocumentType owner, boolean requiresContent)
    {
       super();
+      
+      if( tenant == null)
+         throw new IllegalArgumentException( "Tenant dueño del tipo documental no puede ser nulo");
+
       if( TextUtil.isEmpty(name))
          throw new IllegalArgumentException( "Nombre["+ name+ "] del tipo documental es invalido");
 
@@ -128,6 +133,7 @@ public class DocumentType extends BaseEntity implements NeedsProtection, Hierarc
       if( owner != null && !owner.isPersisted())
          throw new IllegalArgumentException( "El tipo padre debe definirse antes que el tipo hijo");
 
+      this.tenant   = tenant;
       this.name     = name;
       this.owner    = owner;
       this.schema   = schema;

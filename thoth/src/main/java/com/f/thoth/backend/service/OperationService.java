@@ -1,5 +1,7 @@
 package com.f.thoth.backend.service;
 
+import static com.f.thoth.Parm.TENANT;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -12,16 +14,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Operation;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
-import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 import com.f.thoth.backend.repositories.OperationRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
+import com.vaadin.flow.server.VaadinSession;
 
 @Service
 public class OperationService implements FilterableCrudService<Operation>, PermissionService<Operation>
@@ -47,7 +49,7 @@ public class OperationService implements FilterableCrudService<Operation>, Permi
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return operationRepository.findByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter, pageable);
+         return operationRepository.findByNameLikeIgnoreCase(tenant(), repositoryFilter, pageable);
       } else {
          return find(pageable);
       }
@@ -58,16 +60,16 @@ public class OperationService implements FilterableCrudService<Operation>, Permi
    {
       if (filter.isPresent()) {
          String repositoryFilter = "%" + filter.get() + "%";
-         return operationRepository.countByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter);
+         return operationRepository.countByNameLikeIgnoreCase(tenant(), repositoryFilter);
       } else {
-         long n = operationRepository.countAll(ThothSession.getCurrentTenant());
+         long n = operationRepository.countAll(tenant());
          return n;
       }
    }//countAnyMatching
 
    public Page<Operation> find(Pageable pageable)
    {
-      return operationRepository.findBy(ThothSession.getCurrentTenant(), pageable);
+      return operationRepository.findBy(tenant(), pageable);
    }
 
    @Override
@@ -80,7 +82,7 @@ public class OperationService implements FilterableCrudService<Operation>, Permi
    public Operation createNew(User currentUser)
    {
       Operation operation = new Operation();
-      operation.setTenant(ThothSession.getCurrentTenant());
+      operation.setTenant(tenant());
       return operation;
    }
 
@@ -98,7 +100,7 @@ public class OperationService implements FilterableCrudService<Operation>, Permi
 
 
    //  ----- implements HierarchicalService ------
-   @Override public List<Operation> findAll() { return operationRepository.findAll(ThothSession.getCurrentTenant()); }
+   @Override public List<Operation> findAll() { return operationRepository.findAll(tenant()); }
 
    @Override public Optional<Operation> findById(Long id)            { return operationRepository.findById( id);}
 
@@ -167,7 +169,9 @@ public class OperationService implements FilterableCrudService<Operation>, Permi
         }
       });
 
-   }//grant
+   }//revoke
+
+   private Tenant  tenant() { return (Tenant)VaadinSession.getCurrent().getAttribute(TENANT); }
 
 
 }//ObjectToProtectService

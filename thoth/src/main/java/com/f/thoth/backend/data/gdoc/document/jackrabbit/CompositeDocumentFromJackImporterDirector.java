@@ -63,6 +63,7 @@ public class CompositeDocumentFromJackImporterDirector implements CompositeDocum
    {
       /*
       try {
+         Tenant tenant = (Tenant)VaadinSession.getCurrent().getAttribute("TENANT");
          MetaValues vals = new MetaValues();
          for (PropertyIterator propertyIter = node.getProperties(); propertyIter.hasNext(); )
          {
@@ -89,7 +90,7 @@ public class CompositeDocumentFromJackImporterDirector implements CompositeDocum
                value = new ImmutableValue<LocalDateTime>(endClassification, Type.DATETIME);
             }else if ("evid:docType".equals(propertyName)) {
                String typeId = propertyValue.getString();
-               DocType docType = ThothSession.getCurrentTenant().getTypeById(typeId);
+               DocType docType = tenant.getTypeById(typeId);
                compositeDocumentImportBuilder.setDocType( docType);
                value = new ImmutableValue<String>(typeId, Type.STRING);
             }else {

@@ -1,5 +1,7 @@
 package com.f.thoth.ui.components;
 
+import static com.f.thoth.Parm.TENANT;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -11,7 +13,6 @@ import java.util.function.Consumer;
 import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.security.Tenant;
-import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.service.HierarchicalService;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.dependency.CssImport;
@@ -23,6 +24,7 @@ import com.vaadin.flow.component.treegrid.TreeGrid;
 import com.vaadin.flow.data.provider.hierarchy.TreeData;
 import com.vaadin.flow.data.provider.hierarchy.TreeDataProvider;
 import com.vaadin.flow.data.selection.MultiSelect;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.shared.Registration;
 
 @CssImport(value="./styles/grid-tree-toggle-adjust.css", themeFor="vaadin-grid-tree-toggle")
@@ -48,7 +50,7 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
 
    public HierarchicalSelector ( HierarchicalService<T> service, Grid.SelectionMode selectionMode, String name, boolean showId, Boolean onlyLeaves, Consumer<T> action)
    {
-      this.tenant         = ThothSession.getCurrentTenant();
+      this.tenant         = (Tenant)VaadinSession.getCurrent().getAttribute(TENANT);
       this.result         = new TreeSet<>();
       this.selectionMode  = selectionMode;
       this.service        = service;

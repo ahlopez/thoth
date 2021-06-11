@@ -1,5 +1,6 @@
 package com.f.thoth.ui.views.metadata;
 
+import static com.f.thoth.Parm.CURRENT_USER;
 
 import static com.f.thoth.ui.utils.Constant.PAGE_TIPOS_DOCUMENTALES;
 import static com.f.thoth.ui.utils.Constant.TITLE_TIPOS_DOCUMENTALES;
@@ -12,7 +13,6 @@ import org.springframework.security.access.annotation.Secured;
 import com.f.thoth.backend.data.Role;
 import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
-import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.service.DocumentTypeService;
 import com.f.thoth.backend.service.SchemaService;
@@ -34,6 +34,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.VaadinSession;
 
 @Route(value = PAGE_TIPOS_DOCUMENTALES, layout = MainView.class)
 @PageTitle(TITLE_TIPOS_DOCUMENTALES)
@@ -47,23 +48,23 @@ public class DocumentTypeView extends VerticalLayout
    private VerticalLayout        leftSection;
    private VerticalLayout        content;
    private VerticalLayout        rightSection;
-   
+
    private HierarchicalSelector<DocumentType, HasValue.ValueChangeEvent<DocumentType>> ownerDocType;
    private DocumentType          currentDocType= null;
-   
+
    private Button   add      = new Button("+ Nuevo Tipo");
    private Button   delete   = new Button("Eliminar Tipo");
-   private Button   close    = new Button("Cancelar");   
+   private Button   close    = new Button("Cancelar");
    private Notifier notifier = new Notifier();
-   
+
    private List<Schema>  availableSchemas;
 
    @Autowired
    public DocumentTypeView(DocumentTypeService documentTypeService, SchemaService schemaService)
    {
       this.documentTypeService = documentTypeService;
-      this.currentUser           = ThothSession.getCurrentUser();
-      
+      this.currentUser         = (User)VaadinSession.getCurrent().getAttribute(CURRENT_USER);
+
       availableSchemas = schemaService.findAll();
 
       addClassName("main-view");
@@ -98,13 +99,13 @@ public class DocumentTypeView extends VerticalLayout
    private Component configureGrid()
    {
       ownerDocType = new HierarchicalSelector<>(
-                           documentTypeService, 
-                           Grid.SelectionMode.SINGLE, 
+                           documentTypeService,
+                           Grid.SelectionMode.SINGLE,
                            "Seleccione el tipo padre",
                            true,
                            false,
                            this::editOwner
-                           );     
+                           );
       ownerDocType.getElement().setAttribute("colspan", "4");
 
       FormLayout form = new FormLayout(ownerDocType);
@@ -117,24 +118,24 @@ public class DocumentTypeView extends VerticalLayout
       BeanValidationBinder<DocumentType> binder = new BeanValidationBinder<>(DocumentType.class);
       binder.forField(ownerDocType)
             .bind("owner");
-      
+
       return ownerDocType;
 
    }//configureGrid
-     
+
 
    private Component configureButtons()
-   {      
+   {
       add.     addThemeVariants(ButtonVariant.LUMO_PRIMARY);
       delete.  addThemeVariants(ButtonVariant.LUMO_ERROR);
       close.   addThemeVariants(ButtonVariant.LUMO_TERTIARY);
-      
+
       close.addClickShortcut(Key.ESCAPE);
-      
+
       add .addClickListener  (click -> addDocumentType());
       delete.addClickListener(click -> deleteDocumentType(currentDocType));
       close.addClickListener (click -> closeAll());
-      
+
       add   .getElement().getStyle().set("margin-left", "auto");
 
       HorizontalLayout buttons = new HorizontalLayout();
@@ -154,23 +155,23 @@ public class DocumentTypeView extends VerticalLayout
 
    }//configureForm
 
-   
+
    private void editOwner(DocumentType owner)
    {
       this.currentDocType = owner;
       editDocumentType(currentDocType);
    }//editOwner
-   
+
 
    private void addDocumentType()
    {
       currentDocType = new DocumentType();
       DocumentType owner = ownerDocType.getValue();
-      currentDocType.setOwner(owner);      
+      currentDocType.setOwner(owner);
       editDocumentType(currentDocType);
-      
+
    }//addDocumentType
-   
+
 
    private void deleteDocumentType(DocumentType documentType)
    {
@@ -185,8 +186,8 @@ public class DocumentTypeView extends VerticalLayout
       updateSelector();
       closeEditor();
    }//deleteDocumentType
-   
-   
+
+
    private void editDocumentType(DocumentType documentType)
    {
       if (documentType == null)
@@ -203,7 +204,7 @@ public class DocumentTypeView extends VerticalLayout
          rightSection.setVisible(true);
       }
    }//editDocumentType
-   
+
 
    private void closeEditor()
    {
@@ -211,15 +212,15 @@ public class DocumentTypeView extends VerticalLayout
       documentTypeForm.setVisible(false);
       documentTypeForm.removeClassName("selected-item-form");
    }//closeEditor
-   
-   
+
+
    private void closeAll()
    {
       closeEditor();
       currentDocType = null;
-      ownerDocType.resetSelector();      
+      ownerDocType.resetSelector();
    }//closeAll
-   
+
 
    private void updateSelector()
    {

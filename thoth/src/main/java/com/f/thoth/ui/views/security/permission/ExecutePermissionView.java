@@ -6,6 +6,7 @@ import org.springframework.security.access.annotation.Secured;
 import com.f.thoth.app.security.CurrentUser;
 import com.f.thoth.backend.data.security.Operation;
 import com.f.thoth.backend.service.PermissionService;
+import com.f.thoth.backend.service.RoleService;
 import com.f.thoth.ui.MainView;
 import com.f.thoth.ui.utils.Constant;
 import com.vaadin.flow.router.PageTitle;
@@ -17,9 +18,9 @@ import com.vaadin.flow.router.Route;
 public class ExecutePermissionView extends AbstractPermissionView<Operation>
 {
    @Autowired
-   public ExecutePermissionView( PermissionService<Operation> service, CurrentUser currentUser)
+   public ExecutePermissionView( PermissionService<Operation> service, RoleService roleService, CurrentUser currentUser)
    {
-      super(Operation.class, service, currentUser, Constant.TITLE_PERMISOS_EJECUCION);
+      super(Operation.class, service, roleService, currentUser, Constant.TITLE_PERMISOS_EJECUCION);
    }
    
    @Override 

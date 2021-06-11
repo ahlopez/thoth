@@ -1,12 +1,6 @@
 package com.f.thoth.ui.views.login;
 
-import static com.f.thoth.Parm.TENANT;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.f.thoth.app.security.SecurityUtils;
-import com.f.thoth.backend.data.security.ThothSession;
-import com.f.thoth.backend.repositories.TenantRepository;
 import com.f.thoth.ui.utils.Constant;
 import com.f.thoth.ui.views.storefront.StorefrontView;
 import com.vaadin.flow.component.dependency.JsModule;
@@ -19,7 +13,6 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.VaadinSession;
 
 @Route
 @PageTitle("Evidentia")
@@ -28,8 +21,6 @@ import com.vaadin.flow.server.VaadinSession;
 public class LoginView extends LoginOverlay
    implements AfterNavigationObserver, BeforeEnterObserver 
 {
-	@Autowired TenantRepository tenantRepository;
-
    public LoginView() 
    {
       LoginI18n i18n = LoginI18n.createDefault();
@@ -47,22 +38,22 @@ public class LoginView extends LoginOverlay
       setForgotPasswordButtonVisible(false);
       setAction("login");
    }//LoginView
+   
 
    @Override
    public void beforeEnter(BeforeEnterEvent event) 
    {
-      if (SecurityUtils.isUserLoggedIn()) {
-         event.forwardTo(StorefrontView.class);
-      } else {
-         setOpened(true);
+      if (SecurityUtils.isUserLoggedIn()) 
+      { event.forwardTo(StorefrontView.class);
+      } else 
+      {  setOpened(true);
       }
    }//beforeEnter
+   
 
    @Override
    public void afterNavigation(AfterNavigationEvent event) 
    {
-	  VaadinSession session = VaadinSession.getCurrent();
-	  session.setAttribute(TENANT, ThothSession.getCurrentTenant());//TODO: Salvar aquí también el currrent user
       setError(event.getLocation().getQueryParameters().getParameters().containsKey("error"));
    }//afterNavigation
 

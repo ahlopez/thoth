@@ -1,5 +1,8 @@
 package com.f.thoth.app.security;
 
+import static com.f.thoth.Parm.CURRENT_USER;
+import static com.f.thoth.Parm.TENANT;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Bean;
@@ -16,9 +19,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 
 import com.f.thoth.backend.data.Role;
-import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.repositories.SingleUserRepository;
 import com.f.thoth.ui.utils.Constant;
+import com.vaadin.flow.server.VaadinSession;
 
 /**
  * Configures spring security, doing the following:
@@ -39,6 +43,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
    private static final String LOGOUT_SUCCESS_URL   = "/" + Constant.PAGE_STOREFRONT;
 
    private final UserDetailsService userDetailsService;
+
 
    @Autowired
    private PasswordEncoder passwordEncoder;
@@ -63,9 +68,24 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
    public CurrentUser currentUser(SingleUserRepository userRepository) 
    {
       final String username = SecurityUtils.getUsername();
-      com.f.thoth.backend.data.security.User user = (username != null) ? userRepository.findByEmailIgnoreCase(ThothSession.getTenant(),  username) :  null;
+      com.f.thoth.backend.data.security.User user = (username != null) ? userRepository.findByEmailIgnoreCase(username) :  null;
+      if (user != null)
+      {   saveUserContext(user);
+      }
       return () -> user;
    }//currentUser
+   
+   
+   private void  saveUserContext(User currentUser)
+   {
+      VaadinSession session = VaadinSession.getCurrent();
+      if (session != null && session.getAttribute("CURRENT_USER") == null)
+      {
+         session.setAttribute(CURRENT_USER, currentUser);
+         session.setAttribute(TENANT, currentUser.getTenant());         
+      }
+   }//saveUserContext
+
 
    /**
     * Registers our UserDetailsService and the password encoder to be used on login attempts.

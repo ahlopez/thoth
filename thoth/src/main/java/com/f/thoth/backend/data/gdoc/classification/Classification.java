@@ -31,6 +31,7 @@ import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
+import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.UserGroup;
 
@@ -145,11 +146,13 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
       super();
       init();
       objectToProtect = new ObjectToProtect();
-      buildCode();
-   }
+   }//Classification
 
-   public Classification( Level level, String name, String classCode, Classification owner, ObjectToProtect objectToProtect)
+   public Classification( Tenant tenant, Level level, String name, String classCode, Classification owner, ObjectToProtect objectToProtect)
    {
+      if ( tenant == null)
+      {  throw new IllegalArgumentException("Tenant dueño del clasificador no puede ser nulo");         
+      }
       if ( !TextUtil.isValidName(name))
       {  throw new IllegalArgumentException("Nombre["+ name+ "] es invalido");
       }
@@ -163,12 +166,12 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
       {   throw new IllegalArgumentException("Objeto de seguridad de la clase del esquema de clasificaciOn no puede ser nulo");
       }
       init();
+      this.tenant           = tenant;
       this.level            = level;
       this.name             = TextUtil.nameTidy(name);
       this.classCode        = classCode;
       this.owner            = owner;
       this.objectToProtect  = objectToProtect;
-      buildCode();
    }//Classification constructor
 
    private void init()
@@ -195,7 +198,7 @@ public class Classification extends BaseEntity implements  NeedsProtection, Hier
 
    @Override protected void buildCode()
    {
-      if ( code == null)
+      if ( this.code == null)
       {
          this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ "/"+ NodeType.CLASSIFICATION.getCode()+ "/"+
                getOwnerPath(owner)+ (classCode == null? "[classCode]" : classCode);

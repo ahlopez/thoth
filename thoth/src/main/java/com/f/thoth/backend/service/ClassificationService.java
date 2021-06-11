@@ -1,5 +1,7 @@
 package com.f.thoth.backend.service;
 
+import static com.f.thoth.Parm.TENANT;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -12,18 +14,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.classification.Level;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
-import com.f.thoth.backend.data.security.ThothSession;
+import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.repositories.ClassificationRepository;
 import com.f.thoth.backend.repositories.LevelRepository;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
+import com.vaadin.flow.server.VaadinSession;
 
 @Service
 public class ClassificationService implements FilterableCrudService<Classification>, PermissionService<Classification>
@@ -44,17 +46,17 @@ public class ClassificationService implements FilterableCrudService<Classificati
       this.levelRepository               = levelRepository;
       this.objectToProtectRepository     = objectToProtectRepository;
    }//ClassificationService constructor
-   
-   
-   public Classification findByCode( String classCode) {  return claseRepository.findByCode(ThothSession.getCurrentTenant(), classCode); }
-   
+
+
+   public Classification findByCode( String classCode) {  return claseRepository.findByCode(tenant(), classCode); }
+
 
    @Override public Page<Classification> findAnyMatching(Optional<String> filter, Pageable pageable)
    {
       if (filter.isPresent())
       {
          String repositoryFilter = "%" + filter.get() + "%";
-         return claseRepository.findByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter, pageable);
+         return claseRepository.findByNameLikeIgnoreCase(tenant(), repositoryFilter, pageable);
       } else {
          return find(pageable);
       }
@@ -64,16 +66,16 @@ public class ClassificationService implements FilterableCrudService<Classificati
    {
       if (filter.isPresent()) {
          String repositoryFilter = "%" + filter.get() + "%";
-         return claseRepository.countByNameLikeIgnoreCase(ThothSession.getCurrentTenant(), repositoryFilter);
+         return claseRepository.countByNameLikeIgnoreCase(tenant(), repositoryFilter);
       } else {
-         long n = claseRepository.countAll(ThothSession.getCurrentTenant());
+         long n = claseRepository.countAll(tenant());
          return n;
       }
    }//countAnyMatching
 
    public Page<Classification> find(Pageable pageable)
    {
-      return claseRepository.findBy(ThothSession.getCurrentTenant(), pageable);
+      return claseRepository.findBy(tenant(), pageable);
    }
 
    @Override public JpaRepository<Classification, Long> getRepository()
@@ -84,7 +86,7 @@ public class ClassificationService implements FilterableCrudService<Classificati
    @Override public Classification createNew(User currentUser)
    {
       Classification clase = new Classification();
-      clase.setTenant(ThothSession.getCurrentTenant());
+      clase.setTenant(tenant());
       return clase;
    }//createNew
 
@@ -108,7 +110,7 @@ public class ClassificationService implements FilterableCrudService<Classificati
 
 
    //  ----- implements HierarchicalService ------
-   @Override public List<Classification> findAll() { return claseRepository.findAll(ThothSession.getCurrentTenant()); }
+   @Override public List<Classification> findAll() { return claseRepository.findAll(tenant()); }
 
    @Override public Optional<Classification> findById(Long id)  { return claseRepository.findById( id);}
 
@@ -173,6 +175,6 @@ public class ClassificationService implements FilterableCrudService<Classificati
 
    }//revoke
 
-
+   private Tenant  tenant() { return (Tenant)VaadinSession.getCurrent().getAttribute(TENANT); }
 
 }//ClassificcationService

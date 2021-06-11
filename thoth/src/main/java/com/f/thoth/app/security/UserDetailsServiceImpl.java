@@ -10,7 +10,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.f.thoth.backend.data.security.ThothSession;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.repositories.SingleUserRepository;
 
@@ -24,7 +23,6 @@ import com.f.thoth.backend.repositories.SingleUserRepository;
 @Primary
 public class UserDetailsServiceImpl implements UserDetailsService 
 {
-
    private final SingleUserRepository userRepository;
 
    @Autowired
@@ -45,7 +43,7 @@ public class UserDetailsServiceImpl implements UserDetailsService
    @Override
    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException 
    {
-      User user = userRepository.findByEmailIgnoreCase(ThothSession.getCurrentTenant(), username);
+      User user = userRepository.findByEmailIgnoreCase(username);
       if (null == user) 
       {
          throw new UsernameNotFoundException("No hay un usuario con nombre[" + username+ "]");

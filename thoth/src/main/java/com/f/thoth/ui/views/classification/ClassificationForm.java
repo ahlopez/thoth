@@ -147,12 +147,12 @@ public class ClassificationForm extends FormLayout
 
       return buttons; 
    }//createButtonsLayout
+   
 
    private void validateAndSave(Classification clase) 
    {
       if (binder.isValid()) 
-      {
-         close();
+      {  close();
          fireEvent(new SaveEvent(this, clase));
       }
    }//validateAndSave
@@ -171,38 +171,33 @@ public class ClassificationForm extends FormLayout
       }//ClassificationFormEvent
 
       public Classification getClassification() 
-      {
-         return clase;
+      {   return clase;
       }
    }//ClassificationFormEvent
 
    public static class SaveEvent extends ClassificationFormEvent 
    {
       SaveEvent(ClassificationForm source, Classification clase) 
-      {
-         super(source, clase);
+      {  super(source, clase);
       }
    }//SaveEvent
 
    public static class DeleteEvent extends ClassificationFormEvent 
    {
       DeleteEvent(ClassificationForm source, Classification clase) 
-      {
-         super(source, clase);
+      {  super(source, clase);
       }
    }//DeleteEvent
 
    public static class CloseEvent extends ClassificationFormEvent 
    {
       CloseEvent(ClassificationForm source) 
-      {
-         super(source, null);
+      {  super(source, null);
       }
    }//CloseEvent
 
    public <T extends ComponentEvent<?>> Registration addListener(Class<T> eventType, ComponentEventListener<T> listener) 
-   {
-      return getEventBus().addListener(eventType, listener);
+   {  return getEventBus().addListener(eventType, listener);
    }//addListener
 
 }//ClassificationForm

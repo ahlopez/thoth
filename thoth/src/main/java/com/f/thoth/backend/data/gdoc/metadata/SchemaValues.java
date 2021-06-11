@@ -1,5 +1,7 @@
 package com.f.thoth.backend.data.gdoc.metadata;
 
+import static com.f.thoth.Parm.TENANT;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -13,18 +15,18 @@ import javax.validation.constraints.NotNull;
 import com.f.thoth.Parm;
 import com.f.thoth.backend.data.entity.AbstractEntity;
 import com.f.thoth.backend.data.security.Tenant;
-import com.f.thoth.backend.data.security.ThothSession;
+import com.vaadin.flow.server.VaadinSession;
 
 @Entity
 @Table(name = "FIELD_VALUES")
 public class SchemaValues extends AbstractEntity implements SchemaValuesImporter, Comparable<SchemaValues>
 {
    public static final SchemaValues  EMPTY = new SchemaValues();
-   
+
    @ManyToOne
    @NotNull (message = "{evidentia.tenant.required}")
    protected Tenant tenant;
-   
+
    @NotNull(message="{evientia.schema.required}")
    @ManyToOne
    @JoinColumn(name="esquema_id")
@@ -33,32 +35,36 @@ public class SchemaValues extends AbstractEntity implements SchemaValuesImporter
    private String    valores;                   // Value for each field of the schema separated by Constant.VALUE_SEPARATOR
 
    public SchemaValues()
-   {  
+   {
       super();
-      tenant  = ThothSession.getCurrentTenant();
-      schema  = Schema.EMPTY;
-      valores = null;
-  
+      init( Schema.EMPTY, null);
+      
    }//SchemaValues constructor
-   
+
 
    public SchemaValues( Schema schema, String values)
    {
       super();
-      if (schema == null)
-          throw new IllegalArgumentException("Esquema de los valores no puede ser nulo");
-
-      this.tenant  = ThothSession.getCurrentTenant();
-      this.schema  = schema;
-      this.valores = values;
+      init(schema, values);
 
    }//SchemaValues constructor
+   
+   private void init(Schema schema, String values)
+   {
+      if (schema == null)
+         throw new IllegalArgumentException("Esquema de los valores no puede ser nulo");
+
+      VaadinSession vSession = VaadinSession.getCurrent();
+      this.tenant = vSession == null? null: (Tenant)vSession.getAttribute(TENANT);
+      this.schema  = schema;
+      this.valores = values;
+   }//init
 
 
    public SchemaValues( SchemaValues.ImporterDirector importerDirector)
    {
       super();
-      
+
       schema  = null;
       valores = null;
       importerDirector.dirija( this);
@@ -77,7 +83,7 @@ public class SchemaValues extends AbstractEntity implements SchemaValuesImporter
 
       return msg.toString();
    }//isValid
-   
+
 
    // ------------------------   Getters && Setters ----------------------------
 
@@ -91,10 +97,9 @@ public class SchemaValues extends AbstractEntity implements SchemaValuesImporter
    public void           setValues(String valores) { this.valores = valores; }
    @Override public void addValue( String value)
    {
-      if (valores == null)
-         valores = value;
-      else
-          valores = valores+ Parm.VALUE_SEPARATOR+ value;
+     valores = valores == null
+                       ?  value
+                       :  valores+ Parm.VALUE_SEPARATOR+ value;
    }//addValue
 
    // ------------------------   Builders ----------------------------
@@ -121,7 +126,7 @@ public class SchemaValues extends AbstractEntity implements SchemaValuesImporter
    {
       public void dirija( SchemaValuesImporter importer);
    }
-   
+
 
    // --------------- Object methods ---------------------
 
@@ -145,9 +150,9 @@ public class SchemaValues extends AbstractEntity implements SchemaValuesImporter
    {
       StringBuilder s = new StringBuilder();
       s.append( "SchemaValues{"+super.toString())
-       .append(  "tenant["+ tenant.getCode()+ "] ")
-       .append(  "schema["+ schema.getName()+ "] ")
-       .append(  "value["+ valores+ "]}\n");
+       .append( "tenant["+ tenant.getCode()+ "] ")
+       .append( "schema["+ schema.getName()+ "] ")
+       .append( "value["+ valores+ "]}\n");
 
       return s.toString();
    }//toString
@@ -160,13 +165,13 @@ public class SchemaValues extends AbstractEntity implements SchemaValuesImporter
              this.getId().compareTo(that.getId());
 
    }// compareTo
-   
+
    // ----------------------------- Logic --------------------------------
    public Iterator<String> iterator()
    {
       if ( valores == null )
          return new ArrayList<String>().iterator();
-      
+
       String vals[] = valores.split(Parm.VALUE_SEPARATOR);
       return Arrays.asList(vals).iterator();
    }//iterator

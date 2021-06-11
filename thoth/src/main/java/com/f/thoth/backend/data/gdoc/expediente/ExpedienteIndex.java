@@ -31,6 +31,7 @@ import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
+import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.UserGroup;
 
@@ -129,7 +130,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
    @NotNull(message = "{evidentia.dateclosed.required}")
    protected LocalDateTime      dateClosed;                 // Date expediente was closed
 
-   protected Long               owner;                      // Id of ExpedienteGroup to which this SUBEXPEDIENTE/VOLUMEN belongs
+   protected String             owner;                      // Business Id(code) of Group/Expediente/Volume to which the index belongs
 
    @NotNull(message = "{evidentia.expedientecode.required}")
    protected String             expedienteCode;             // Expediente code
@@ -154,23 +155,28 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
 
    // ------------- Constructors ------------------
    public ExpedienteIndex()
-   {
-          this( null, null);
+   {   
    }//ExpedienteIndex null constructor
 
 
-   public ExpedienteIndex(String code, Long owner)
+   public ExpedienteIndex(Tenant tenant, String owner)
    {
       super();
-      init(code, owner);
-      buildCode();
+      init(tenant, owner);
    }//ExpedienteIndex constructor
 
 
-   private void init(String code, Long owner)
+   private void init(Tenant tenant, String owner)
    {
+      if (tenant == null)
+      {  throw new IllegalArgumentException("Tenant dueño del índice de expediente no puede ser nulo");
+      }
+      if (owner == null)
+      {  throw new IllegalArgumentException("Expediente dueño del índice de expediente no puede ser nulo");
+      }
       LocalDateTime now        = LocalDateTime.now();
-      this.code                = code;
+      this.tenant              = tenant;
+      this.code                = null;
       this.name                = "[EXPEDIENTE_INDEX]";
       this.type                = NodeType.EXPEDIENTE_INDEX;
       this.objectToProtect     = new ObjectToProtect();
@@ -197,26 +203,27 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
 
    @Override protected void buildCode()
    {
-      this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ "/"+ NodeType.EXPEDIENTE_INDEX.getCode()+ "/"+
+      if ( this.code == null)
+      {  this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ "/"+ NodeType.EXPEDIENTE_INDEX.getCode()+ "/"+
                   (owner == null? "" : owner)+ "/"+ (expedienteCode == null? "[expedienteCode]" : expedienteCode);
                   //TODO: Cambiar el owner Id por el owner code
-      this.code = this.path;
+         this.code = this.path;
+      }
    }//buildCode
 
 
    private String  obtainExpedienteCode( String code)
    {
-           int i = code == null? -1 : code.lastIndexOf("/");
-           String expedienteCode = i < 0? code: code.substring(i);
-           return expedienteCode;
+      int i = code == null? -1 : code.lastIndexOf("/");
+      String expedienteCode = i < 0? code: code.substring(i);
+      return expedienteCode;
    }//obtainExpedienteCode
 
 
    // -------------- Getters & Setters ----------------
    public void             setObjectToProtect(ObjectToProtect objectToProtect) { this.objectToProtect = objectToProtect;}
 
-   public String           getOwnerPath()                             { return owner.toString();}
-   public void             setOwner(Long owner)                       { this.owner = owner;}
+   public void             setOwner(String owner)                     { this.owner = owner;}
 
    public void             setName( String name)                      { this.name = name;}
 
