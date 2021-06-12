@@ -1,12 +1,17 @@
 package com.f.thoth.backend.service;
 
+import static com.f.thoth.Parm.EXPEDIENTE_ROOT;
 import static com.f.thoth.Parm.TENANT;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
+
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -15,6 +20,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
+import com.f.thoth.Parm;
+import com.f.thoth.backend.data.entity.util.TextUtil;
+import com.f.thoth.backend.data.gdoc.document.jackrabbit.NodeType;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.Nature;
 import com.f.thoth.backend.data.gdoc.expediente.Volume;
@@ -24,6 +32,7 @@ import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.User;
+import com.f.thoth.backend.jcr.Repo;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
 import com.f.thoth.backend.repositories.VolumeRepository;
@@ -60,16 +69,12 @@ public class VolumeService implements FilterableCrudService<Volume>, PermissionS
 
 
    @Override public long countAnyMatching(Optional<String> filter)
-   {
-      if (filter.isPresent())
-      {
-         String repositoryFilter = "%" + filter.get() + "%";
-         return volumeRepository.countByNameLikeIgnoreCase(tenant(), repositoryFilter);
-      } else
-      {
-         long n = volumeRepository.countAll(tenant());
-         return n;
-      }
+   {  long n = filter.isPresent()
+             ? volumeRepository.countByNameLikeIgnoreCase(tenant(), "%" + filter.get() + "%")
+             : volumeRepository.countAll(tenant());
+      
+      return n;
+                   
    }//countAnyMatching
 
 
@@ -92,14 +97,79 @@ public class VolumeService implements FilterableCrudService<Volume>, PermissionS
    @Override public Volume save(User currentUser, Volume Volume)
    {
       try
-      {
-         return FilterableCrudService.super.save(currentUser, Volume);
+      {  Volume volume = FilterableCrudService.super.save(currentUser, Volume);
+         saveJCRVolume(currentUser, volume);
+         return volume;
       } catch (DataIntegrityViolationException e)
-      {
-         throw new UserFriendlyDataException("Ya hay un volumen con esa identificación. Por favor escoja un identificador único para el volumen");
+      {  throw new UserFriendlyDataException("Ya hay un volumen con esa identificación. Por favor escoja un identificador único para el volumen");
       }
 
    }//save
+   
+   
+   private void saveJCRVolume(User currentUser, Volume volume)
+   {
+      try
+      {
+         VaadinSession vSession   = VaadinSession.getCurrent();
+         String      parentPath   = (String)vSession.getAttribute(EXPEDIENTE_ROOT);
+         Long          parentId   = volume.getOwnerId();
+         if (parentId != null)
+         {   Optional<Volume> parent = volumeRepository.findById(parentId);
+             if (parent.isPresent()) 
+             {  parentPath =  parent.get().getPath();
+             }
+         }
+         Node groupJCR = addJCRChild( currentUser, parentPath, volume);
+         updateJCRVolume(groupJCR, volume);
+      } catch(Exception e)
+      {
+         throw new IllegalStateException("*** No pudo guardar estructura de clasificación en el repositorio. Razón\n"+ e.getLocalizedMessage());
+      }
+   }//saveJCRVolume
+
+
+   private Node addJCRChild(User currentUser, String parentPath, Volume volume)
+         throws RepositoryException, UnknownHostException
+   {
+      String volumeCode = volume.getExpedienteCode();
+      String  childPath = parentPath+ Parm.PATH_SEPARATOR+ volumeCode;
+      Node        child = Repo.getInstance().addNode(childPath, volume.getName(), currentUser.getEmail());
+      child.setProperty("jcr:nodeType", NodeType.VOLUMEN.getCode());
+      child.setProperty("evid:code",    volumeCode);
+      return child;
+   }//addJCRChild
+   
+   
+   private void updateJCRVolume(Node groupJCR, Volume volume)
+   {
+      try
+      {
+         groupJCR.setProperty("evid:type",           Nature.VOLUMEN.toString());
+         groupJCR.setProperty("evid:class",          volume.getClassificationClass().formatCode());
+         groupJCR.setProperty("evid:schema",         volume.getMetadataSchema().getCode());
+         groupJCR.setProperty("evid:opened",         TextUtil.formatDateTime(volume.getDateOpened()));
+         groupJCR.setProperty("evid:closed",         TextUtil.formatDateTime(volume.getDateClosed()));
+         groupJCR.setProperty("evid:open",           volume.getOpen().toString());
+         groupJCR.setProperty("evid:location",       volume.getLocation());
+         groupJCR.setProperty("evid:keywords",       volume.getKeywords());
+         groupJCR.setProperty("evid:curentInstance", volume.getCurrentInstance().toString());
+         
+         // TODO: Revisar como incorporar los campos objectToProtect, metadata, expedienteIndex, mac, admissibleTypes en el repositorio
+         // protected ObjectToProtect   objectToProtect;            // Associated security object
+         // protected SchemaValues      metadata;                   // Metadata values of the associated expediente
+         // protected ExpedienteIndex   expedienteIndex;            // Expediente index entries
+         // protected String            mac;                        // Message authentication code
+         // protected Set<DocumentType> admissibleTypes;            // Admissible document types in this volume
+
+      } catch(Exception e)
+      {   throw new IllegalStateException("No pudo actualizar volumen["+ volume.formatCode()+ "] en el repositorio. Razón\n"+ e.getMessage());
+      }
+     
+   }//updateJCRVolume
+
+
+   //TODO: Falta implementar el delete en el repositorio JCR
 
 
    //  ----- implements HierarchicalService ------

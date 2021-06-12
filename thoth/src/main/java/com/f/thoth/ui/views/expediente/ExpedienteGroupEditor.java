@@ -189,7 +189,6 @@ public class ExpedienteGroupEditor extends VerticalLayout
      {
         boolean isNew = !group.isPersisted();
         expedienteGroupService.save(currentUser, group);
-        //TODO: *** Guardar el grupo en el repositorio
         notifier.accept("Grupo de expedientes "+ group.formatCode()+ (isNew? " creado" : " actualizado"));
      }
      closeEditor();
@@ -203,7 +202,6 @@ public class ExpedienteGroupEditor extends VerticalLayout
     {
       if (!expedienteGroupService.hasChildren(group))
       {  expedienteGroupService.delete(currentUser, group);
-         //TODO: *** Eliminar grupo de expedientes del repositorio
          notifier.accept("Grupo de expedientes "+ group.formatCode()+ " eliminado");
       }else
       {  notifier.error("Grupo de expedientes no puede ser eliminado pues contiene subgrupos");

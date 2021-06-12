@@ -255,7 +255,6 @@ public class VolumeEditor extends VerticalLayout
          volumeService.save(currentUser, volume);
          String businessCode = volume.formatCode();
          String volType = volume.getType().toString();
-         //TODO: *** Guardar expediente en el repositorio
          notifier.accept( isNew? volType+ " creado con código "+ businessCode: volType+ " "+ businessCode+ " actualizado");
       }
       closeEditor();
@@ -270,7 +269,6 @@ public class VolumeEditor extends VerticalLayout
        String type = volume.getType().toString();
        if (!volumeService.hasChildren(currentVolume))
        {  volumeService.delete(currentUser, currentVolume);
-          //TODO: *** Eliminar expediente del repositorio
           notifier.accept(type+ " "+ volume.formatCode()+ " eliminado");
        }else
        {  notifier.error(type+ " no puede ser eliminado pues contiene documentos");

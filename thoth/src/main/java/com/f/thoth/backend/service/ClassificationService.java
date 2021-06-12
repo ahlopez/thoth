@@ -130,7 +130,7 @@ public class ClassificationService implements FilterableCrudService<Classificati
          String parentPath      = parent ==  null? classRootPath: parent.getPath();
          String childCode       = classificationClass.getClassCode();
          String childName       = classificationClass.getName();
-         String childLevel      = ""+ classificationClass.getLevel().getOrden();
+         String childLevel      = classificationClass.getLevel().getCode();
          Node classificationJCR = addJCRChild( currentUser, parentPath, childCode, childName, childLevel);
          updateJCRClassification(classificationJCR, classificationClass);
       } catch(Exception e)
@@ -140,14 +140,14 @@ public class ClassificationService implements FilterableCrudService<Classificati
    }//saveJCRClassification
 
 
-   private Node addJCRChild(User currentUser, String parentPath, String childNode, String childName, String childLevel)
+   private Node addJCRChild(User currentUser, String parentPath, String childCode, String childName, String childLevel)
          throws RepositoryException, UnknownHostException
    {
-      String childPath = parentPath+ Parm.PATH_SEPARATOR+ childNode;
+      String childPath = parentPath+ Parm.PATH_SEPARATOR+ childCode;
       Node child = Repo.getInstance().addNode(childPath, childName, currentUser.getEmail());
-      child.setProperty("jcr:nodeType", NodeType.CLASSIFICATION.name());
-      child.setProperty("jcr:code",     childNode);
-      child.setProperty("jcr:level",    childLevel);
+      child.setProperty("jcr:nodeTypeName", NodeType.CLASSIFICATION.name());
+      child.setProperty("evid:code",        childCode);     // Subclass code inside the parent class  vg 01, 02, etc
+      child.setProperty("evid:level",       childLevel);
       return child;
    }//addJCRChild
    
@@ -156,10 +156,10 @@ public class ClassificationService implements FilterableCrudService<Classificati
    {
       try
       {
-         classificationJCR.setProperty("evid:classCode", classificationClass.formatCode());
-         classificationJCR.setProperty("evid:level",     classificationClass.getLevel().getCode());
+         classificationJCR.setProperty("evid:classCode", classificationClass.formatCode()); // Complete class code vg 01-01-01, 01-01-02, etc
          classificationJCR.setProperty("evid:opened",    TextUtil.formatDate(classificationClass.getDateOpened()));
          classificationJCR.setProperty("evid:closed",    TextUtil.formatDate(classificationClass.getDateClosed()));
+         classificationJCR.setProperty("evid:open",      ""+ classificationClass.isOpen());
          classificationJCR.setProperty("evid:retention", classificationClass.getRetentionSchedule().getCode());
          // protected SchemaValues metadata;                        //TODO:  Metadata values of the associated classification.level
       } catch(Exception e)

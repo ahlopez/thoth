@@ -5,7 +5,7 @@ package com.f.thoth.backend.data.gdoc.document.jackrabbit;
  */
 public enum NodeType
 {
-    CLASSIFICATION ("CLS") ,EXPEDIENTE("EXP"), DOCUMENT("DOC"), EXPEDIENTE_INDEX("IDX") ;
+    CLASSIFICATION ("CLS") ,EXPEDIENTE("EXP"), VOLUMEN("VOL"), DOCUMENT("DOC"), EXPEDIENTE_INDEX("IDX") ;
 	
 	private String code;
 	

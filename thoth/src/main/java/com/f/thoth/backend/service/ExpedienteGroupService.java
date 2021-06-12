@@ -1,11 +1,16 @@
 package com.f.thoth.backend.service;
 
+import static com.f.thoth.Parm.EXPEDIENTE_ROOT;
 import static com.f.thoth.Parm.TENANT;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -14,13 +19,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
+import com.f.thoth.Parm;
+import com.f.thoth.backend.data.entity.util.TextUtil;
+import com.f.thoth.backend.data.gdoc.document.jackrabbit.NodeType;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.ExpedienteGroup;
+import com.f.thoth.backend.data.gdoc.expediente.Nature;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.User;
+import com.f.thoth.backend.jcr.Repo;
 import com.f.thoth.backend.repositories.ExpedienteGroupRepository;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
@@ -92,13 +102,78 @@ public class ExpedienteGroupService implements FilterableCrudService<ExpedienteG
 
    @Override public ExpedienteGroup save(User currentUser, ExpedienteGroup expediente)
    {
-      try {
-         return FilterableCrudService.super.save(currentUser, expediente);
+      try 
+      {  ExpedienteGroup group = FilterableCrudService.super.save(currentUser, expediente);
+         saveJCRExpedienteGroup(currentUser, group);
+         return group;
       } catch (DataIntegrityViolationException e) {
          throw new UserFriendlyDataException("Ya hay un expediente con esa identificación. Por favor escoja un identificador único para el expediente");
       }
 
    }//save
+   
+   
+   private void saveJCRExpedienteGroup(User currentUser, ExpedienteGroup group)
+   {
+      try
+      {
+         VaadinSession vSession   = VaadinSession.getCurrent();
+         String      parentPath   = (String)vSession.getAttribute(EXPEDIENTE_ROOT);
+         Long          parentId   = group.getOwnerId();
+         if (parentId != null)
+         {   Optional<ExpedienteGroup> parent = expedienteGroupRepository.findById(parentId);
+             if (parent.isPresent()) 
+             {  parentPath =  parent.get().getPath();
+             }
+         }
+         Node groupJCR = addJCRChild( currentUser, parentPath, group);
+         updateJCRExpedienteGroup(groupJCR, group);
+      } catch(Exception e)
+      {
+         throw new IllegalStateException("*** No pudo guardar estructura de clasificación en el repositorio. Razón\n"+ e.getLocalizedMessage());
+      }
+   }//saveJCRExpedienteGroup
+
+
+   private Node addJCRChild(User currentUser, String parentPath,ExpedienteGroup group)
+         throws RepositoryException, UnknownHostException
+   {
+      String expedienteCode = group.getExpedienteCode();
+      String      childPath = parentPath+ Parm.PATH_SEPARATOR+ expedienteCode;
+      Node            child = Repo.getInstance().addNode(childPath, group.getName(), currentUser.getEmail());
+      child.setProperty("jcr:nodeType", NodeType.EXPEDIENTE.name());
+      child.setProperty("evid:code",    expedienteCode);
+      return child;
+   }//addJCRChild
+   
+   
+   private void updateJCRExpedienteGroup(Node groupJCR, ExpedienteGroup group)
+   {
+      try
+      {
+         groupJCR.setProperty("evid:type",      Nature.GRUPO.toString());
+         groupJCR.setProperty("evid:class",     group.getClassificationClass().formatCode());
+         groupJCR.setProperty("evid:schema",    group.getMetadataSchema().getCode());
+         groupJCR.setProperty("evid:opened",    TextUtil.formatDateTime(group.getDateOpened()));
+         groupJCR.setProperty("evid:closed",    TextUtil.formatDateTime(group.getDateClosed()));
+         groupJCR.setProperty("evid:open",      group.getOpen().toString());
+         groupJCR.setProperty("evid:location",  group.getLocation());
+         groupJCR.setProperty("evid:keywords",  group.getKeywords());
+         
+         // TODO: Revisar como incorporar los campos objectToProtect, metadata, expedienteIndex, mac en el repositorio
+         // protected ObjectToProtect   objectToProtect;            // Associated security object
+         // protected SchemaValues      metadata;                   // Metadata values of the associated expediente
+         // protected ExpedienteIndex   expedienteIndex;            // Expediente index entries
+         // protected String            mac;                        // Message authentication code
+
+      } catch(Exception e)
+      {   throw new IllegalStateException("No pudo actualizar grupo de expedientes["+ group.formatCode()+ "] en el repositorio. Razón\n"+ e.getMessage());
+      }
+     
+   }//updateJCRExpedienteGroup
+
+
+   //TODO: Falta implementar el delete en el repositorio JCR
 
 
    //  ----- implements HierarchicalService ------

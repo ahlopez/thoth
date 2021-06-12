@@ -107,6 +107,9 @@ public class ExpedienteGroup extends AbstractEntity implements  NeedsProtection,
   public String            getPath()                                  { return expediente.getPath();}
   public void              setPath ( String path)                     { expediente.setPath(path);}
 
+  public String            getLocation()                              { return expediente.getLocation();}
+  public void              setLocation ( String location)             { expediente.setLocation(location);}
+
   public String            getKeywords()                              { return expediente.getKeywords();}
   public void              setKeywords( String keywords)              { expediente.setKeywords(keywords);}
 
