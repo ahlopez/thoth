@@ -6,18 +6,13 @@ import java.util.List;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.classification.Retention;
 import com.f.thoth.ui.utils.converters.LocalDateToLocalDate;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentEvent;
 import com.vaadin.flow.component.ComponentEventListener;
-import com.vaadin.flow.component.Key;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Label;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
@@ -28,8 +23,8 @@ public class ClassificationForm extends FormLayout
 {
    private static final Converter<LocalDate, LocalDate> DATE_CONVERTER   = new LocalDateToLocalDate();
 
-   private Button save   = new Button("Guardar Clase");
-   private Button close  = new Button("Cancelar");
+  // private Button save   = new Button("Guardar Clase");
+  // private Button close  = new Button("Cancelar");
 
    Binder<Classification> binder       = new BeanValidationBinder<>(Classification.class);
    
@@ -81,7 +76,7 @@ public class ClassificationForm extends FormLayout
             fromDate,
             toDate,
             schedule,
-            createButtonsLayout(),
+       //     createButtonsLayout(),
             valuesForm
             );
 
@@ -126,6 +121,7 @@ public class ClassificationForm extends FormLayout
       valuesForm.setClassification(clase);
    }//setClassification
 
+   /*
    private Component createButtonsLayout() 
    {
       save.addThemeVariants  (ButtonVariant.LUMO_PRIMARY);
@@ -147,6 +143,7 @@ public class ClassificationForm extends FormLayout
 
       return buttons; 
    }//createButtonsLayout
+   */
    
 
    private void validateAndSave(Classification clase) 

@@ -57,12 +57,6 @@ public class ClassificationView extends VerticalLayout
    private Classification        currentClass= null;
    private Notifier              notifier    = new Notifier();
 
-   private Button add      = new Button("+ Nueva Clase");
-   private Button save     = new Button("Guardar clase");
-   private Button delete   = new Button("Eliminar clase");
-   private Button close    = new Button("Cancelar");
-
-
    private Level[] levels;
    private List<Retention>  retentionSchedules;
 
@@ -122,7 +116,6 @@ public class ClassificationView extends VerticalLayout
                            true,
                            false,
                            this::editOwner
-
                            );
       ownerClass.getElement().setAttribute("colspan", "3");
 
@@ -144,26 +137,29 @@ public class ClassificationView extends VerticalLayout
 
    private Component configureButtons()
    {
-      add.     addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-      save.    addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-      delete.  addThemeVariants(ButtonVariant.LUMO_ERROR);
-      close.   addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+      Button add      = new Button("+ Nueva Clase");
+      add.   addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+      add.   getElement().getStyle().set("margin-left", "auto");
+      add.   addClickShortcut(Key.ENTER);
+      add.   addClickListener  (click -> addClass());
 
-      save.addClickShortcut (Key.ENTER);
-      close.addClickShortcut(Key.ESCAPE);
+      Button delete = new Button("Eliminar Clase");
+      delete.addClickShortcut (Key.DELETE);
+      delete.addThemeVariants  (ButtonVariant.LUMO_ERROR);
+      delete.getElement().getStyle().set("margin-left", "auto");
+      delete.addClickListener  (click -> deleteClass(currentClass));
+      
+      Button close    = new Button("Cancelar");
+      close. addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+      close. addClickShortcut(Key.ESCAPE);
+      close. addClickListener (click -> closeAll());
 
-      add .addClickListener  (click -> addClass());
-      save.addClickListener  (click -> saveClass(currentClass));
-      delete.addClickListener(click -> deleteClass(currentClass));
-      close.addClickListener (click -> closeAll());
-
-      save.getElement().getStyle().set("margin-left", "auto");
       add .getElement().getStyle().set("margin-left", "auto");
 
       HorizontalLayout buttons = new HorizontalLayout();
       buttons.setWidthFull();
       buttons.setPadding(true);
-      buttons.add( delete, save, close, add);
+      buttons.add(close, delete, add);
       return buttons;
    }//configureButtons
 
@@ -198,6 +194,24 @@ public class ClassificationView extends VerticalLayout
    }//addClass
 
 
+   private void deleteClass(Classification classification)
+   {
+     if (classification != null  && classification.isPersisted())
+     {
+       if (!classificationService.hasChildren(currentClass))
+       {  Classification parentClass = currentClass.getOwner();
+          classificationService.delete(currentUser, currentClass);
+          ownerClass.selectInGrid(parentClass);
+          notifier.accept( "Clasificador "+ classification.formatCode()+ " eliminado");
+       }else
+       {  notifier.error("Clasificador "+ classification.formatCode()+ " no puede ser eliminado pues contiene hijos");
+       }
+     }
+     closeEditor();
+   }//deleteClass
+   
+
+
    private Level  getCurrentLevel( Classification owner)
    {
       Level level      = null;
@@ -210,34 +224,6 @@ public class ClassificationView extends VerticalLayout
       return level;
 
    }//getCurrentLevel
-
-
-   private void saveClass( Classification classification)
-   {
-      if (classification == null)
-      {  return;
-      }
-      classificationService.save(currentUser, classification);
-      closeEditor();
-      currentClass = null;
-
-   }//saveClass
-
-
-   private void deleteClass(Classification classification)
-   {
-      try
-      {
-         if( classification != null && classification.isPersisted())
-             classificationService.delete(currentUser, classification);
-             //TODO: ***  Borrar clase en el repositorio
-      } catch (Exception e)
-      {
-         notifier.error("Clase["+ classification.getName()+ "] tiene referencias. No puede ser borrada");
-      }
-      updateSelector();
-      closeEditor();
-   }//deleteClass
 
 
    private void editClass(Classification classification)
@@ -284,10 +270,14 @@ public class ClassificationView extends VerticalLayout
    private void saveClassification(ClassificationForm.SaveEvent event)
    {
       Classification classification = event.getClassification();
+      boolean isNew = !classification.isPersisted();
       classificationService.save(currentUser, classification);
-      updateSelector();
+      ownerClass.selectInGrid(classification);
       closeEditor();
+      notifier.accept("Clasificador "+ classification.formatCode()+ (isNew? " creado" : " actualizado"));
+
    }//saveClassification
+   
    
    
    private  void assignClassCode( Classification currentClass)

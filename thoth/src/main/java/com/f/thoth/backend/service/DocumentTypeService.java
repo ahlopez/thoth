@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.jcr.Session;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -159,5 +161,32 @@ public class DocumentTypeService implements FilterableCrudService<DocumentType>,
    }//revoke
 
    private Tenant  tenant() { return (Tenant)VaadinSession.getCurrent().getAttribute(TENANT); }
+   
+
+   public static void RegisterCustomNodeTypes(Session session, String cndFileName)
+         throws Exception 
+   {
+      /*   
+          
+      NodeTypeManager manager = (NodeTypeManager) session.getWorkspace().getNodeTypeManager();
+      Jackrabbit Node Type definition language  (CND)
+      http://jackrabbit.apache.org/jcr/node-type-notation.html
+
+      Loading a CND into JackRabbit OAK
+      the CndImporter is in jackrabbit-jcr-commons, which
+      should work with Jackrabbit Oak as well.
+      https://github.com/apache/jackrabbit-oak/blob/trunk/oak-jcr/src/test/java/org/apache/jackrabbit/oak/jcr/nodetype/NodeTypeTest.java#L257
+      
+       Register the custom node types defined in the CND file
+       manager.registerNodeTypes(new FileInputStream(cndFileName), NodeTypeManager.TEXT_X_JCR_CND);
+      
+       */
+      
+   }//RegisterCustomNodeTypes
+ 
+  
+  
+   
+   
 
 }//ClaseService

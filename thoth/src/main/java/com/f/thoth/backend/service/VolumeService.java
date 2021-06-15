@@ -22,7 +22,6 @@ import org.springframework.stereotype.Service;
 
 import com.f.thoth.Parm;
 import com.f.thoth.backend.data.entity.util.TextUtil;
-import com.f.thoth.backend.data.gdoc.document.jackrabbit.NodeType;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
 import com.f.thoth.backend.data.gdoc.expediente.Nature;
 import com.f.thoth.backend.data.gdoc.expediente.Volume;
@@ -135,25 +134,25 @@ public class VolumeService implements FilterableCrudService<Volume>, PermissionS
       String volumeCode = volume.getExpedienteCode();
       String  childPath = parentPath+ Parm.PATH_SEPARATOR+ volumeCode;
       Node        child = Repo.getInstance().addNode(childPath, volume.getName(), currentUser.getEmail());
-      child.setProperty("jcr:nodeType", NodeType.VOLUMEN.getCode());
+      child.setProperty("jcr:nodeType", volume.getType().toString());
       child.setProperty("evid:code",    volumeCode);
       return child;
    }//addJCRChild
    
    
-   private void updateJCRVolume(Node groupJCR, Volume volume)
+   private void updateJCRVolume(Node volumeJCR, Volume volume)
    {
       try
       {
-         groupJCR.setProperty("evid:type",           Nature.VOLUMEN.toString());
-         groupJCR.setProperty("evid:class",          volume.getClassificationClass().formatCode());
-         groupJCR.setProperty("evid:schema",         volume.getMetadataSchema().getCode());
-         groupJCR.setProperty("evid:opened",         TextUtil.formatDateTime(volume.getDateOpened()));
-         groupJCR.setProperty("evid:closed",         TextUtil.formatDateTime(volume.getDateClosed()));
-         groupJCR.setProperty("evid:open",           volume.getOpen().toString());
-         groupJCR.setProperty("evid:location",       volume.getLocation());
-         groupJCR.setProperty("evid:keywords",       volume.getKeywords());
-         groupJCR.setProperty("evid:curentInstance", volume.getCurrentInstance().toString());
+         volumeJCR.setProperty("evid:type",           volume.getType().toString());
+         volumeJCR.setProperty("evid:class",          volume.getClassificationClass().formatCode());
+         volumeJCR.setProperty("evid:schema",         volume.getMetadataSchema().getCode());
+         volumeJCR.setProperty("evid:opened",         TextUtil.formatDateTime(volume.getDateOpened()));
+         volumeJCR.setProperty("evid:closed",         TextUtil.formatDateTime(volume.getDateClosed()));
+         volumeJCR.setProperty("evid:open",           volume.getOpen().toString());
+         volumeJCR.setProperty("evid:location",       volume.getLocation());
+         volumeJCR.setProperty("evid:keywords",       volume.getKeywords());
+         volumeJCR.setProperty("evid:curentInstance", volume.getCurrentInstance().toString());
          
          // TODO: Revisar como incorporar los campos objectToProtect, metadata, expedienteIndex, mac, admissibleTypes en el repositorio
          // protected ObjectToProtect   objectToProtect;            // Associated security object
@@ -238,5 +237,6 @@ public class VolumeService implements FilterableCrudService<Volume>, PermissionS
    }//revoke
 
    private Tenant  tenant() { return (Tenant)VaadinSession.getCurrent().getAttribute(TENANT); }
+   
 
 }//VolumeService

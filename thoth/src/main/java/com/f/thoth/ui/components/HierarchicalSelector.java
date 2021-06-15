@@ -293,8 +293,8 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
       fn.accept(path);
 
    }//backtrackParents
-
-
+   
+   
    private  TreeDataProvider<T>  getDataProvider(HierarchicalService<T> service )
    {
       gridNodes = service.findAll();
@@ -377,7 +377,19 @@ public class HierarchicalSelector<T extends HierarchicalEntity<T>, E extends Has
       treeGrid.setDataProvider(dataProvider);
       dataProvider.refreshAll();
    }//refresh
+   
+   
+   public void selectInGrid(T item)
+   {
+     result.clear();
+     refresh();
+     if (item != null)
+     {  backtrackParents(treeGrid::expand, item);
+     }
+   }//selectInGrid
 
+
+   // ------------------ Select only the leaves of the selection tree ----------------
 
    private Collection<T> selectLeaves(Collection<T> items)
    {

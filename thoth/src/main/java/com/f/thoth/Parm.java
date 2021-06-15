@@ -12,6 +12,7 @@ public class Parm
    public static final String     DEFAULT_ADMIN_LOGIN = "admin";
    public static final String  DEFAULT_ADMIN_PASSWORD = "admin";
    public static final String          PATH_SEPARATOR = "/";
+   public static final String          CODE_SEPARATOR = ":";
    public static final int            CLASS_CODE_SIZE = 2;
 
    public static final String                 TENANT  = "TENANT";

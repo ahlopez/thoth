@@ -2,11 +2,15 @@ package com.f.thoth.backend.service;
 
 import static com.f.thoth.Parm.TENANT;
 
+import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -15,6 +19,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
+import com.f.thoth.Parm;
+import com.f.thoth.backend.data.entity.util.TextUtil;
+import com.f.thoth.backend.data.gdoc.document.jackrabbit.NodeType;
 import com.f.thoth.backend.data.gdoc.expediente.Volume;
 import com.f.thoth.backend.data.gdoc.expediente.VolumeInstance;
 import com.f.thoth.backend.data.security.ObjectToProtect;
@@ -22,6 +29,7 @@ import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.User;
+import com.f.thoth.backend.jcr.Repo;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
 import com.f.thoth.backend.repositories.VolumeInstanceRepository;
@@ -90,12 +98,62 @@ public class VolumeInstanceService  implements FilterableCrudService<VolumeInsta
    @Override public VolumeInstance save(User currentUser, VolumeInstance VolumeInstance)
    {
       try
-      { return FilterableCrudService.super.save(currentUser, VolumeInstance);
+      { VolumeInstance instance = FilterableCrudService.super.save(currentUser, VolumeInstance);
+        saveJCRInstance(currentUser, instance);
+        return instance;
       } catch (DataIntegrityViolationException e)
       {
          throw new UserFriendlyDataException("Ya hay una instancia de volumen con esa identificación. Por favor escoja un identificador único para la instancia");
       }
    }//save
+
+   
+   
+   private void saveJCRInstance(User currentUser, VolumeInstance instance)
+   {
+      try
+      {
+         String  parentPath  = instance.getVolume().getPath();
+         Node    instanceJCR = addJCRChild( currentUser, parentPath, instance);
+         updateJCRInstance(instanceJCR, instance);
+      } catch(Exception e)
+      {
+         throw new IllegalStateException("*** No pudo guardar estructura de clasificación en el repositorio. Razón\n"+ e.getLocalizedMessage());
+      }
+   }//saveJCRVolume
+
+
+   private Node addJCRChild(User currentUser, String parentPath, VolumeInstance instance)
+         throws RepositoryException, UnknownHostException
+   {
+      Volume       volume = instance.getVolume();
+      String instanceCode = instance.getInstance().toString();
+      String    childPath = parentPath+ Parm.PATH_SEPARATOR+ ""+ instanceCode;
+      Node          child = Repo.getInstance().addNode(childPath, "volume "+ volume.getName()+ " - instance "+ instanceCode, currentUser.getEmail());
+      child.setProperty("jcr:nodeType", NodeType.INSTANCE.toString());
+      child.setProperty("evid:code",    instance.formatCode());
+      return child;
+   }//addJCRChild
+   
+   
+   private void updateJCRInstance(Node instanceJCR, VolumeInstance instance)
+   {
+      try
+      {
+         instanceJCR.setProperty("evid:type",           NodeType.INSTANCE.getCode());
+         instanceJCR.setProperty("evid:instance",       instance.getInstance().toString());
+         instanceJCR.setProperty("evid:location",       instance.getLocation());
+         instanceJCR.setProperty("evid:opened",         TextUtil.formatDateTime(instance.getDateOpened()));
+         instanceJCR.setProperty("evid:closed",         TextUtil.formatDateTime(instance.getDateClosed()));
+         instanceJCR.setProperty("evid:open",           instance.getOpen().toString());
+      } catch(Exception e)
+      {   throw new IllegalStateException("No pudo actualizar instancia["+ instance.formatCode()+ "] en el repositorio. Razón\n"+ e.getMessage());
+      }
+     
+   }//updateJCRInstance
+
+
+   //TODO: Falta implementar el delete en el repositorio JCR
 
 
    //  ----- implements HierarchicalService ------

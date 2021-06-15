@@ -88,7 +88,7 @@ public class ExpedienteGroupEditor extends VerticalLayout
 
     delete = new Button("Eliminar");
     delete.addClickShortcut (Key.DELETE);
-    delete.addThemeVariants  (ButtonVariant.LUMO_CONTRAST);
+    delete.addThemeVariants  (ButtonVariant.LUMO_ERROR);
     delete.getElement().getStyle().set("margin-left", "auto");
     delete.setWidth("20%");
     delete.addClickListener  (click -> deleteGroup(currentGroup));

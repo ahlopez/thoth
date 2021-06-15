@@ -1,5 +1,7 @@
 package com.f.thoth.backend.data.gdoc.expediente;
 
+import static com.f.thoth.Parm.CODE_SEPARATOR;
+
 import java.time.LocalDateTime;
 
 import javax.persistence.CascadeType;
@@ -87,6 +89,11 @@ public class VolumeInstance extends AbstractEntity implements  Comparable<Volume
       this.open          = false;
 
    }//Volume
+   
+   
+   public String  formatCode()
+   {  return volume.formatCode()+ CODE_SEPARATOR+ instance;
+   }
 
 
    // ------------------ Getters & Setters ----------------------

@@ -2,7 +2,6 @@ package com.f.thoth.ui.views.expediente;
 
 import static com.f.thoth.Parm.CURRENT_USER;
 
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -110,7 +109,7 @@ public class VolumeEditor extends VerticalLayout
 
      delete = new Button("Eliminar");
      delete.addClickShortcut (Key.DELETE);
-     delete.addThemeVariants  (ButtonVariant.LUMO_CONTRAST);
+     delete.addThemeVariants  (ButtonVariant.LUMO_ERROR);
      delete.getElement().getStyle().set("margin-left", "auto");
      delete.setWidth("20%");
      delete.addClickListener  (click -> deleteVolume(currentVolume));
