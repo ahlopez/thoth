@@ -26,7 +26,7 @@
     <failOnMissingWebXml>false</failOnMissingWebXml>
 
     <!-- Dependencies -->
-    <vaadin.version>14.4.3</vaadin.version>
+    <vaadin.version>14.5.3</vaadin.version>
     <vaadin.multiselectcombo.version>3.0.2</vaadin.multiselectcombo.version>
     <!--  <vaadin.crudui.version>4.3.2</vaadin.crudui.version> -->
 
