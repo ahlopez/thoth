@@ -1,4 +1,4 @@
-﻿package com.f.thoth.ui.views.metadata;
+package com.f.thoth.ui.views.metadata;
 
 import static com.f.thoth.Parm.CURRENT_USER;
 
@@ -105,7 +105,7 @@ public class MetadataSchemaView extends VerticalLayout
    {
       editSchema(new Schema(currentUser.getTenant(), "Nombre", new TreeSet<>()));
    }//addSchema
-   
+
 
    private Grid<Schema> configureGrid()
    {
@@ -117,7 +117,7 @@ public class MetadataSchemaView extends VerticalLayout
       return grid;
 
    }//configureGrid
-   
+
 
    private SchemaForm configureForm(MetadataService metadataService)
    {
@@ -128,7 +128,7 @@ public class MetadataSchemaView extends VerticalLayout
       return schemaForm;
 
    }//configureForm
-   
+
 
    private void editSchema(Schema schema)
    {
@@ -146,7 +146,7 @@ public class MetadataSchemaView extends VerticalLayout
          addClassName("editing");
       }
    }//editSchema
-   
+
 
    private void closeEditor()
    {
@@ -155,7 +155,7 @@ public class MetadataSchemaView extends VerticalLayout
       removeClassName("editing");
 
    }//closeEditor
-   
+
 
    private void updateList()
    {
@@ -171,7 +171,7 @@ public class MetadataSchemaView extends VerticalLayout
       updateList();
       closeEditor();
    }//deleteSchema
-   
+
 
    private void saveSchema(SchemaForm.SaveEvent event)
    {

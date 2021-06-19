@@ -1,4 +1,4 @@
-﻿package com.f.thoth.backend.data.gdoc.expediente;
+package com.f.thoth.backend.data.gdoc.expediente;
 
 import java.time.LocalDateTime;
 
@@ -205,7 +205,7 @@ public class ExpedienteIndex extends BaseEntity implements  NeedsProtection, Hie
    @Override protected void buildCode()
    {
       if ( this.code == null)
-      {  this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ Parm.PATH_SEPARATOR+ 
+      {  this.path = (tenant    == null? "/[tenant]": tenant.getWorkspace())+ Parm.PATH_SEPARATOR+
                   NodeType.EXPEDIENTE_INDEX.getCode()+ Parm.PATH_SEPARATOR+
                   (owner == null? "" : owner)+ Parm.PATH_SEPARATOR+ (expedienteCode == null? "[expedienteCode]" : expedienteCode);
                   //TODO: Cambiar el owner Id por el owner code

@@ -33,7 +33,9 @@
     <!--... jackrabbit -->
     <jackrabbit.oak.version>1.36</jackrabbit.oak.version>
     <jcr.version>2.0</jcr.version>
-    
+    <oak.store.document.version>1.36</oak.store.document.version>
+    <jackrabbit.jcr.commons.version>2.21.6</jackrabbit.jcr.commons.version>
+
     <!--... mongo -->
     <mongodb.driver.version>3.12.7</mongodb.driver.version>
     <mongodb.driver.core.version>4.0.5</mongodb.driver.core.version>
@@ -95,7 +97,7 @@
         <enabled>false</enabled>
       </snapshots>
     </repository>
-    
+
     <repository>
       <id>vaadin-prereleases</id>
       <url>https://maven.vaadin.com/vaadin-prereleases</url>
@@ -198,11 +200,11 @@
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-spring</artifactId>
     </dependency>
-    
+
     <dependency>
        <groupId>org.vaadin.gatanaso</groupId>
        <artifactId>multiselect-combo-box-flow</artifactId>
-       <version>${vaadin.multiselectcombo.version}</version> 
+       <version>${vaadin.multiselectcombo.version}</version>
     </dependency>
 
     <dependency>
@@ -330,8 +332,17 @@
     <dependency>
       <groupId>org.apache.jackrabbit</groupId>
       <artifactId>oak-store-document</artifactId>
-      <version>1.36</version>
+      <version>${oak.store.document.version}</version>
     </dependency>
+
+
+    <!-- https://mvnrepository.com/artifact/org.apache.jackrabbit/jackrabbit-jcr-commons -->
+    <dependency>
+      <groupId>org.apache.jackrabbit</groupId>
+      <artifactId>jackrabbit-jcr-commons</artifactId>
+      <version>${jackrabbit.jcr.commons.version}</version>
+    </dependency>
+
 
 
     <!-- ::::::::::::::::::::::::::::::::::End jackrabbit, Oak, Mongodb:::::::::::::::::::::::::::::::::;;; -->
