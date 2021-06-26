@@ -29,11 +29,11 @@ import com.f.thoth.backend.data.security.Tenant;
  * Representa un esquema de metadatos
  */
 @Entity
-@Table(name = "ESQUEMA", indexes = { @Index(columnList = "code")}) 
+@Table(name = "ESQUEMA", indexes = { @Index(columnList = "code")})
 public class Schema extends BaseEntity implements Comparable<Schema>
-{    
+{
    public static Schema EMPTY = new Schema(null, "EMPTY", new TreeSet<>());
-   
+
    @NotBlank(message = "{evidentia.name.required}")
    @NotNull (message = "{evidentia.name.required}")
    @NotEmpty(message = "{evidentia.name.required}")
@@ -47,7 +47,7 @@ public class Schema extends BaseEntity implements Comparable<Schema>
 
 
    // ------------- Constructors ------------------
-   
+
    public Schema()
    {
       super();
@@ -58,7 +58,7 @@ public class Schema extends BaseEntity implements Comparable<Schema>
    public Schema(Tenant tenant, String name, Set<Field> fields)
    {
       super();
-      
+
       if( tenant == null && !name.equals("EMPTY"))
          throw new IllegalArgumentException("Tenant dueño del esquema no puede se nulo");
 
@@ -98,9 +98,9 @@ public class Schema extends BaseEntity implements Comparable<Schema>
 
    public Set<Field>  getFields() { return fields;}
    public void        setFields( Set<Field> fields){ this.fields = fields;}
-   
+
    // --------------- Builders ---------------------
-   
+
    public interface Exporter
    {
       public void initExport();
@@ -108,9 +108,10 @@ public class Schema extends BaseEntity implements Comparable<Schema>
       public void exportField(Field field);
       public void endExport();
       public Object getProduct();
-      
+
    }//Exporter
-   
+
+
    public Object export( Schema.Exporter exporter)
    {
       exporter.initExport();
@@ -174,13 +175,13 @@ public class Schema extends BaseEntity implements Comparable<Schema>
    {
       return other == null?  1 :  this.equals(other)? 0:  this.code.compareTo( other.code);
    }
-   
+
    // -------------------------- Logic ------------------------------
 
    public Iterator<Field> iterator()    { return fields.iterator(); }
-   
+
    public void deleteField(Field field) { fields.remove(field); }
-   
+
    public void addField( Field field)   { fields.add(field); }
 
 }//Schema

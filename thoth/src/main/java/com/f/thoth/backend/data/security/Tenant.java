@@ -87,7 +87,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
    @NotNull(message = "{evidentia.date.required}")
    protected LocalDate  toDate;                      // Fecha hasta la cual puede usar el sistema (inclusive)
 
-   protected String  workspace;                      // Raíz del workspace del repositorio asignado al Tenant
+   protected String  workspace;                      // Ruta de la raíz del workspace del repositorio asignado al Tenant
 
    protected boolean locked = false;                 // Está el Tenant bloqueado? (No puede usar el sistema)
 
@@ -143,8 +143,6 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 
       init();
       this.name      = TextUtil.nameTidy(name);
-      this.code      = Parm.PATH_SEPARATOR+ (code == null? name : code.toUpperCase());
-      this.workspace = code;
    }//Tenant constructor
 
 
@@ -159,8 +157,11 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 
    protected void buildCode()
    {
-      this.code = this.code == null? (name == null? "/COD" : Parm.PATH_SEPARATOR+ name): this.code;
-      this.workspace = code;
+      if ( this.code == null)
+      {
+        this.code      = Parm.PATH_SEPARATOR+ name;
+        this.workspace = code;
+      }
    }//buildCode
 
    private void init()
@@ -169,7 +170,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
 
       administrator= "";
       name         = "[name]";
-      code         = "/COD";
+      code         = null;
       fromDate     = now;
       toDate       = now.plusYears(1);
       workspace    = code;
@@ -189,11 +190,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
    public void         setCode(String code) { this.code = code; }
 
    public String       getName()  { return name;}
-   public void         setName( String name)
-   {
-      this.name = name;
-      buildCode();
-   }
+   public void         setName( String name) { this.name = name; }
 
    public void           setLocked(boolean locked) { this.locked = locked;}
    public boolean        isLocked()

@@ -458,8 +458,6 @@ public class DataGenerator implements HasLogger
       tenant.setToDate(now.plusYears(random.nextInt(10)));
       tenantRepository.save(tenant);
       Repo.getInstance().initWorkspace(tenant.getWorkspace(), name, code);
-
-
       return tenant;
    }//createTenant
 

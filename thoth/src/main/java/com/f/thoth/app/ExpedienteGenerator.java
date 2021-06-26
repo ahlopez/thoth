@@ -115,6 +115,14 @@ public class ExpedienteGenerator implements HasLogger
 
    private BufferedReader  openNamesFile(String names)
    {
+      /*
+       * Paths may be used with the Files class to operate on files, directories, and other types of files. 
+       * For example, suppose we want a BufferedReader to read text from a file "access.log". 
+       * The file is located in a directory "logs" relative to the current working directory and is UTF-8 encoded.
+       * 
+       * Path path = FileSystems.getDefault().getPath("logs", "access.log");
+       * BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
+       */
       BufferedReader namesReader = null;
       try
       {

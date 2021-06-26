@@ -1,7 +1,15 @@
 package com.f.thoth.backend.jcr;
 
+import java.io.BufferedReader;
 import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.jcr.Node;
 import javax.jcr.PathNotFoundException;
@@ -10,11 +18,14 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.SimpleCredentials;
 
+import org.apache.jackrabbit.commons.cnd.CndImporter;
 import org.apache.jackrabbit.oak.Oak;
 import org.apache.jackrabbit.oak.jcr.Jcr;
 import org.apache.jackrabbit.oak.plugins.document.DocumentNodeStore;
 import org.apache.jackrabbit.oak.plugins.document.mongo.MongoDocumentNodeStoreBuilder;
 import org.slf4j.Logger;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 
 import com.f.thoth.Parm;
 import com.f.thoth.app.HasLogger;
@@ -35,11 +46,11 @@ public class Repo implements HasLogger
    {
       try
       {
-      if ( INSTANCE == null)
-      {  INSTANCE = Parm.IN_MEMORY_JCR_REPO
-                  ? new Repo()
-                  : new Repo(Parm.DEFAULT_REPO_HOST, Parm.DEFAULT_REPO_PORT, Parm.DEFAULT_REPO_NAME);
-      }
+         if ( INSTANCE == null)
+         {  INSTANCE = Parm.IN_MEMORY_JCR_REPO
+                     ? new Repo()
+                     : new Repo(Parm.DEFAULT_REPO_HOST, Parm.DEFAULT_REPO_PORT, Parm.DEFAULT_REPO_NAME);
+         }
       } catch(Exception e)
       { throw new IllegalStateException("No pudo inicializar Repositorio Documental. Razón\n"+ e.getMessage());
       }
@@ -195,13 +206,59 @@ public class Repo implements HasLogger
       {
          Node node = jcrSession.getRootNode();
          Node jcrWorkspace = node.addNode(workspacePath.substring(1));
-         jcrWorkspace.setProperty("name", name);
-         logger.info("    >>> Tenant["+ tenantName+ "] workspace["+ name+ "], path["+ jcrWorkspace.getPath()+ "]");
+         jcrWorkspace.setProperty("jcr:name", name);
+         jcrWorkspace.setProperty("jcr:created", TextUtil.formatDateTime(LocalDateTime.now()));
          if ( !workspacePath.equals( jcrWorkspace.getPath()))
-         { throw new RepositoryException("Workspace path["+ workspacePath+ "] diferente del path en repositorio["+ jcrWorkspace.getPath()+ "]");
+         { logger.info("Workspace path["+ workspacePath+ "] diferente del path en repositorio["+ jcrWorkspace.getPath()+ "]");
+           System.exit(-1);
          }
+         logger.info("    >>> Tenant["+ tenantName+   "], "+
+                     "workspace["+ name+              "], "+
+                     "path["+ jcrWorkspace.getPath()+ "], "+
+                     "created["+ jcrWorkspace.getProperty("jcr:created").getValue().toString()+ "]");
+         loadTypes(workspacePath.substring(1));
       }
    }//initWorkspace
+
+
+   private void loadTypes(String workspaceName )
+   {
+         List<Path> cndFiles = getCndFiles(workspaceName);
+         cndFiles.forEach( cndPath->
+         {
+            try
+            {
+               BufferedReader cndReader = Files.newBufferedReader(cndPath, StandardCharsets.UTF_8);
+               CndImporter.registerNodeTypes(cndReader, jcrSession);
+               getLogger().info("    >>> Cargó cnd ["+ cndPath.getFileName()+ "]");
+            }catch (Exception e)
+            {  getLogger().info("No pudo cargar definiciones de Tipos de Nodo para workspace["+ workspaceName+ "]. Razón\n"+ e.getMessage());
+               System.exit(-1);
+            }
+            
+         });
+
+   }//loadTypes
+   
+   
+   private List<Path>  getCndFiles(String workspaceName)
+   {
+      List<Path> cndFiles = new ArrayList<>();
+      try
+      {
+         Resource resource = new ClassPathResource("defs");
+         Path     dirPath  = Paths.get(resource.getFile().getPath());
+         cndFiles =  Files.list(dirPath)
+                          .filter(path -> (path.getFileName()).toString().toLowerCase()
+                          .startsWith(workspaceName.toLowerCase()))
+                          .collect(Collectors.toList());
+      }catch(Exception e)
+      {  getLogger().info("No pudo obtener lista de archivos con las definiciones de tipos de nodo, para el worspace["+ workspaceName+ "]");
+         System.exit(-1);
+      }
+      return cndFiles;    
+
+   }//getCndFiles
 
 
    public Node addNode( String path, String name, String user)
@@ -244,5 +301,7 @@ public class Repo implements HasLogger
      }
      return node;
    }//findNode
+
+
 
 }//Repo
