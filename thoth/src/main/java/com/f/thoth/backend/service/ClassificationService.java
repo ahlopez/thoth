@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
@@ -63,32 +64,30 @@ public class ClassificationService implements FilterableCrudService<Classificati
    @Override public Page<Classification> findAnyMatching(Optional<String> filter, Pageable pageable)
    {
       if (filter.isPresent())
-      {
-         String repositoryFilter = "%" + filter.get() + "%";
+      {  String repositoryFilter = "%" + filter.get() + "%";
          return claseRepository.findByNameLikeIgnoreCase(tenant(), repositoryFilter, pageable);
-      } else {
-         return find(pageable);
+      } else 
+      {  return find(pageable);
       }
    }//findAnyMatching
 
    @Override public long countAnyMatching(Optional<String> filter)
    {
-      if (filter.isPresent()) {
-         String repositoryFilter = "%" + filter.get() + "%";
+      if (filter.isPresent()) 
+      {  String repositoryFilter = "%" + filter.get() + "%";
          return claseRepository.countByNameLikeIgnoreCase(tenant(), repositoryFilter);
-      } else {
-         long n = claseRepository.countAll(tenant());
+      } else 
+      {  long n = claseRepository.countAll(tenant());
          return n;
       }
    }//countAnyMatching
 
    public Page<Classification> find(Pageable pageable)
-   {
-      return claseRepository.findBy(tenant(), pageable);
+   {  return claseRepository.findBy(tenant(), pageable);
    }
 
    @Override public JpaRepository<Classification, Long> getRepository()
-   { return claseRepository;
+   {  return claseRepository;
    }
 
    @Override public Classification createNew(User currentUser)
@@ -100,7 +99,8 @@ public class ClassificationService implements FilterableCrudService<Classificati
 
    @Override public Classification save(User currentUser, Classification clazz)
    {
-      try {
+      try 
+      {
          /*
          ObjectToProtect associatedObject = clazz.getObjectToProtect();
          if ( !associatedObject.isPersisted())
@@ -113,8 +113,8 @@ public class ClassificationService implements FilterableCrudService<Classificati
          Classification classification = claseRepository.save(clazz);
          saveJCRClassification(currentUser, classification);
          return classification;
-      } catch (DataIntegrityViolationException e) {
-         throw new UserFriendlyDataException("Ya hay una Clase con esa llave. Por favor escoja una llave única para la clase");
+      } catch (DataIntegrityViolationException e) 
+      {  throw new UserFriendlyDataException("Ya hay una Clase con esa llave. Por favor escoja una llave única para la clase");
       }
 
    }//save
@@ -130,24 +130,25 @@ public class ClassificationService implements FilterableCrudService<Classificati
          String parentPath      = parent ==  null? classRootPath: parent.getPath();
          String childCode       = classificationClass.getClassCode();
          String childName       = classificationClass.getName();
-         String childLevel      = classificationClass.getLevel().getCode();
+         Long   childLevel      = classificationClass.getLevel().getId();
          Node classificationJCR = addJCRChild( currentUser, parentPath, childCode, childName, childLevel);
          updateJCRClassification(classificationJCR, classificationClass);
       } catch(Exception e)
-      {
-         throw new IllegalStateException("*** No pudo guardar estructura de clasificación en el repositorio. Razón\n"+ e.getLocalizedMessage());
+      {  throw new IllegalStateException("*** No pudo guardar estructura de clasificación en el repositorio. Razón\n"+ e.getLocalizedMessage());
       }
    }//saveJCRClassification
 
 
-   private Node addJCRChild(User currentUser, String parentPath, String childCode, String childName, String childLevel)
+   private Node addJCRChild(User currentUser, String parentPath, String childCode, String childName, Long childLevel)
          throws RepositoryException, UnknownHostException
    {
+      String ns= nameSpace();                    
       String childPath = parentPath+ Parm.PATH_SEPARATOR+ childCode;
-      Node child = Repo.getInstance().addNode(childPath, childName, currentUser.getEmail());
-      child.setProperty("jcr:nodeTypeName", NodeType.CLASSIFICATION.name());
-      child.setProperty("evid:code",        childCode);     // Subclass code inside the parent class  vg 01, 02, etc
-      child.setProperty("evid:level",       childLevel);
+      Node   child     = Repo.getInstance().addNode(childPath, childName, currentUser.getEmail());
+      child.setProperty( "jcr:nodeTypeName", NodeType.CLASSIFICATION.name());
+      child.setProperty( ns+ "id",    UUID.randomUUID().toString());    
+      child.setProperty( ns+ "code",  childCode);     // Subclass code inside the parent class  vg 01, 02, etc
+      child.setProperty( ns+ "level", childLevel);
       return child;
    }//addJCRChild
    
@@ -156,11 +157,13 @@ public class ClassificationService implements FilterableCrudService<Classificati
    {
       try
       {
-         classificationJCR.setProperty("evid:classCode", classificationClass.formatCode()); // Complete class code vg 01-01-01, 01-01-02, etc
-         classificationJCR.setProperty("evid:opened",    TextUtil.formatDate(classificationClass.getDateOpened()));
-         classificationJCR.setProperty("evid:closed",    TextUtil.formatDate(classificationClass.getDateClosed()));
-         classificationJCR.setProperty("evid:open",      ""+ classificationClass.isOpen());
-         classificationJCR.setProperty("evid:retention", classificationClass.getRetentionSchedule().getCode());
+         String ns= nameSpace();
+         classificationJCR.setProperty( ns+ "tenant",    classificationClass.getTenant().getId());
+         classificationJCR.setProperty( ns+ "classCode", classificationClass.formatCode()); // Complete class code vg 01-01-01, 01-01-02, etc
+         classificationJCR.setProperty( ns+ "opened",    TextUtil.formatDate(classificationClass.getDateOpened()));
+         classificationJCR.setProperty( ns+ "closed",    TextUtil.formatDate(classificationClass.getDateClosed()));
+         classificationJCR.setProperty( ns+ "open",      ""+ classificationClass.isOpen());
+         classificationJCR.setProperty( ns+ "retention", classificationClass.getRetentionSchedule().getId());
          // protected SchemaValues metadata;                        //TODO:  Metadata values of the associated classification.level
       } catch(Exception e)
       {   throw new IllegalStateException("No pudo actualizar clase["+ classificationClass.formatCode()+ "]. Razón\n"+ e.getMessage());
@@ -195,15 +198,12 @@ public class ClassificationService implements FilterableCrudService<Classificati
    }//findGrants
 
    @Override public List<Classification> findObjectsGranted( Role role)
-   {
-      return claseRepository.findClasesGranted(role);
+   {  return claseRepository.findClasesGranted(role);
    }
 
    public void grantRevoke( User currentUser, Role role, Set<Permission> newGrants, Set<Permission> newRevokes)
-   {
-      grant ( currentUser, role, newGrants);
+   {  grant ( currentUser, role, newGrants);
       revoke( currentUser, role, newRevokes);
-
    }//grantRevoke
 
    public void grant( User currentUser, Role role, Set<Permission> newGrants)
@@ -236,6 +236,9 @@ public class ClassificationService implements FilterableCrudService<Classificati
 
    }//revoke
 
-   private Tenant  tenant() { return (Tenant)VaadinSession.getCurrent().getAttribute(TENANT); }
+   private Tenant  tenant()     { return (Tenant)VaadinSession.getCurrent().getAttribute(TENANT); }   
+   
+   private String nameSpace()   { return tenant().getName()+ ":";}
+
 
 }//ClassificcationService

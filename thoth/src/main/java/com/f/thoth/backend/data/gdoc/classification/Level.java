@@ -127,5 +127,7 @@ public class Level extends BaseEntity implements Comparable<Level>
 
    // --------------- Logic ---------------------
    public boolean isRoot() { return orden == 1;}
+   
+   public boolean isDefault() { return this.name.toLowerCase().equals("default");}
 
 }//Level

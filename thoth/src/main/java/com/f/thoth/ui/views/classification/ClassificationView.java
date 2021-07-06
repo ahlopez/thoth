@@ -57,8 +57,8 @@ public class ClassificationView extends VerticalLayout
    private Classification        currentClass= null;
    private Notifier              notifier    = new Notifier();
 
-   private Level[] levels;
-   private List<Retention>  retentionSchedules;
+   private Level[]               levels;
+   private List<Retention>       retentionSchedules;
 
 
    @Autowired
@@ -99,13 +99,24 @@ public class ClassificationView extends VerticalLayout
    private Level[] getAllLevels( LevelService levelService)
    {
       List<Level> allLevels  = levelService.findAll();
-      int         nLevels    = allLevels.size();
+      int         nLevels    =  allLevels.size();
+      if ( nLevels > 1)
+      {  for (int l= 0; l < nLevels; l++)
+         {  if ( allLevels.get(l).isDefault())
+            {   allLevels.remove(l);
+                nLevels--;
+                break;
+            }
+         }
+      }
+      
       Level[]     levels     = new Level[nLevels];
       for( int i=0; i < nLevels; i++)
-      { levels[i] = allLevels.get(i);
+      {  levels[i] = allLevels.get(i);
       }
       return levels;
    }//getAllLevels
+   
 
    private Component configureGrid()
    {

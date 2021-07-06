@@ -1,19 +1,27 @@
 /*  Classification Node Type definition */
 
-<fcn = 'http://fconsultor.com/fcn'>
-[fcn:classification] >  nt:base    orderable  primaryitem fcn:clase
-  - fcn:id                ( LONG      )  primary mandatory protected         // Identificador unico del clasificador
-  - fcn:code              ( STRING    )  primary mandatory protected         // Business code del clasificador
-  - fcn:tenant            ( REFERENCE )  primary mandatory protected         // Tenant dueño del clasificador
-  - fcn:owner             ( REFERENCE )  primary mandatory protected         // Classification node to which this class belongs
-  - fcn:name              ( STRING    )  primary mandatory protected         // Classification class name
-  - fcn:level             ( REFERENCE )  primary mandatory protected         // Classification level in the classification tree
-  - fcn:classCode         ( STRING    )  primary mandatory protected         // Unique business code of the classification node at the proper level vg 01, 02, 03, etc
-  - fcn:dateOpened        ( DATE      )  primary mandatory protected         // Date classification class was opened
-  - fcn:dateClosed        ( DATE      )  primary mandatory protected         // Date classification class was closed
-  - fcn:retentionSchedule ( REFERENCE )  primary mandatory protected         // Retention Calendar associated to the class
-  + fcn:clase (nt:base) mandatory
+<FCN = 'http://fconsultor.com/FCN'>
+[FCN:classification] >  nt:base    orderable  primaryitem FCN:clase
+  - FCN:id                ( String    )  primary mandatory protected         // Identificador unico del clasificador
+  - FCN:tenant            ( LONG      )  primary mandatory protected         // Tenant dueño del clasificador
+  - FCN:code              ( STRING    )  primary mandatory protected         // Business code del clasificador
+  - FCN:name              ( STRING    )  primary mandatory protected         // Classification class name
+  - FCN:level             ( LONG      )  primary mandatory protected         // Classification level in the classification tree
+  - FCN:retentionSchedule ( LONG      )  primary mandatory protected         // Retention Calendar associated to the class
+  - FCN:classCode         ( STRING    )  primary mandatory protected         // Unique business code of the classification node at the proper level vg 01, 02, 03, etc
+  - FCN:dateOpened        ( DATE      )  primary mandatory protected         // Date classification class was opened
+  - FCN:dateClosed        ( DATE      )  primary mandatory protected         // Date classification class was closed
+  + FCN:clase (nt:base) mandatory
 
 //  - metadata          SchemaValues                Metadata values of the associated classification.level
 //  - version           int                         Número de versión
 //  - objectToProtect   ObjectToProtect             Associated security object
+//  - owner             Classification              Classification node to which this class belongs
+
+/*
+  1.   Crear el nodo fcn:clase ... si es que se necesita
+  2.   Asignar los metadatos definidos para la clase
+  4.   Eliminar las clases de Clasificación no utilizadas
+  4.   ¿Como incluir Solr, ElasticSearch?
+
+*/
