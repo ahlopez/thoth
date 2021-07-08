@@ -55,6 +55,7 @@ public class Field extends BaseEntity implements Comparable<Field>
       this.sortOrder= 0;
       this.columns  = 1;
    }//Field
+   
 
    public Field( Tenant tenant, String name, Metadata metadata, boolean visible, boolean readOnly, boolean required, int sortOrder, int columns)
    {
@@ -84,9 +85,10 @@ public class Field extends BaseEntity implements Comparable<Field>
    @PreUpdate
    public void prepareData()
    {
-      this.name     =  TextUtil.nameTidy(name).toLowerCase();
+//      this.name     =  TextUtil.nameTidy(name).toLowerCase();
       buildCode();
    }//prepareData
+   
 
    @Override protected void buildCode()
    {
@@ -167,14 +169,14 @@ public class Field extends BaseEntity implements Comparable<Field>
    @Override public String toString()
    {
       StringBuilder s = new StringBuilder();
-      s.append(" Field{"+ super.toString())
+      s.append("{ Field{"+ super.toString())
        .append(" name["+      name+ "]")
        .append(" metadata["+ metadata.toString()+ "]")
        .append(" visible["+   visible+ "]")
        .append(" readOnly["+  readOnly+ "]")
        .append(" required["+  required+ "]")
        .append(" sortOrder["+ sortOrder+ "]")
-       .append("}\n");
+       .append("}");
 
       return s.toString();
    }//toString

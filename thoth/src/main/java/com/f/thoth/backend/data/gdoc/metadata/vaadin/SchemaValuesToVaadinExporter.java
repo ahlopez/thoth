@@ -7,7 +7,7 @@ import java.util.List;
 import com.f.thoth.Parm;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
-import com.f.thoth.backend.data.gdoc.metadata.SchemaValues.Exporter;
+import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -16,7 +16,7 @@ import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 
-public class SchemaValuesToVaadinExporter implements Exporter
+public class SchemaValuesToVaadinExporter implements SchemaValues.Exporter
 {
    private SchemaToVaadinExporter schemaExporter;
    private Component              exportedSchema;

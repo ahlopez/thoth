@@ -112,7 +112,7 @@ version
 [nt:base]
   abstract
   - jcr:primaryType (NAME) mandatory autocreated protected COMPUTE
-  - jcr:mixinTypes (NAME) protected multiple COMPUTE
+  - jcr:mixinTypes  (NAME) protected multiple COMPUTE
 
 //------------------------------------------------------------------------------
 // S T A N D A R D   A P P L I C A T I O N   N O D E   T Y P E S
@@ -481,14 +481,14 @@ version
  * @since 1.0
  */
 [nt:nodeType]
-  - jcr:nodeTypeName (NAME) protected mandatory
-  - jcr:supertypes (NAME) protected multiple
-  - jcr:isAbstract (BOOLEAN) protected mandatory
-  - jcr:isQueryable (BOOLEAN) protected mandatory
-  - jcr:isMixin (BOOLEAN) protected mandatory
+  - jcr:nodeTypeName           (NAME)    protected mandatory
+  - jcr:supertypes             (NAME)    protected multiple
+  - jcr:isAbstract             (BOOLEAN) protected mandatory
+  - jcr:isQueryable            (BOOLEAN) protected mandatory
+  - jcr:isMixin                (BOOLEAN) protected mandatory
   - jcr:hasOrderableChildNodes (BOOLEAN) protected mandatory
-  - jcr:primaryItemName (NAME) protected
-  + jcr:propertyDefinition (nt:propertyDefinition) = nt:propertyDefinition protected sns
+  - jcr:primaryItemName        (NAME)    protected
+  + jcr:propertyDefinition  (nt:propertyDefinition)  = nt:propertyDefinition protected  sns
   + jcr:childNodeDefinition (nt:childNodeDefinition) = nt:childNodeDefinition protected sns
 
 /**
@@ -498,22 +498,23 @@ version
  * @since 1.0
  */
 [nt:propertyDefinition]
-  - jcr:name (NAME) protected
-  - jcr:autoCreated (BOOLEAN) protected mandatory
-  - jcr:mandatory (BOOLEAN) protected mandatory
-  - jcr:onParentVersion (STRING) protected mandatory
-      < 'COPY', 'VERSION', 'INITIALIZE', 'COMPUTE', 'IGNORE', 'ABORT'
-  - jcr:protected (BOOLEAN) protected mandatory
-  - jcr:requiredType (STRING) protected mandatory
-    < 'STRING', 'URI', 'BINARY', 'LONG', 'DOUBLE',
-      'DECIMAL', 'BOOLEAN', 'DATE', 'NAME', 'PATH',
-      'REFERENCE', 'WEAKREFERENCE', 'UNDEFINED'
-  - jcr:valueConstraints (STRING) protected multiple
-  - jcr:defaultValues (UNDEFINED) protected multiple
-  - jcr:multiple (BOOLEAN) protected mandatory
-  - jcr:availableQueryOperators (NAME) protected mandatory multiple
-  - jcr:isFullTextSearchable (BOOLEAN) protected mandatory
-  - jcr:isQueryOrderable (BOOLEAN) protected mandatory
+  - jcr:name                (NAME)          protected
+  - jcr:autoCreated         (BOOLEAN)       protected mandatory
+  - jcr:mandatory           (BOOLEAN)       protected mandatory
+  - jcr:onParentVersion     (STRING)        protected mandatory
+                                      < 'COPY',    'VERSION', 'INITIALIZE',
+                                        'COMPUTE', 'IGNORE',  'ABORT'
+  - jcr:protected           (BOOLEAN) protected mandatory
+  - jcr:requiredType        (STRING) protected  mandatory
+                                      < 'STRING',    'URI',     'BINARY', 'LONG', 'DOUBLE',
+                                        'DECIMAL',   'BOOLEAN', 'DATE',   'NAME', 'PATH',
+                                        'REFERENCE', 'WEAKREFERENCE',     'UNDEFINED'
+  - jcr:valueConstraints        (STRING)    protected multiple
+  - jcr:defaultValues           (UNDEFINED) protected multiple
+  - jcr:multiple                (BOOLEAN)   protected mandatory
+  - jcr:availableQueryOperators (NAME)      protected mandatory multiple
+  - jcr:isFullTextSearchable    (BOOLEAN)   protected mandatory
+  - jcr:isQueryOrderable        (BOOLEAN)   protected mandatory
 
 /**
  * This node type used to store a child node definition within a node type definition,
@@ -522,15 +523,16 @@ version
  * @since 1.0
  */
 [nt:childNodeDefinition]
-  - jcr:name (NAME) protected
-  - jcr:autoCreated (BOOLEAN) protected mandatory
-  - jcr:mandatory (BOOLEAN) protected mandatory
-  - jcr:onParentVersion (STRING) protected mandatory
-      < 'COPY', 'VERSION', 'INITIALIZE', 'COMPUTE', 'IGNORE', 'ABORT'
-  - jcr:protected (BOOLEAN) protected mandatory
+  - jcr:name                 (NAME)             protected
+  - jcr:autoCreated          (BOOLEAN)          protected mandatory
+  - jcr:mandatory            (BOOLEAN)          protected mandatory
+  - jcr:onParentVersion      (STRING)           protected mandatory
+                                 < 'COPY',    'VERSION', 'INITIALIZE',
+                                   'COMPUTE', 'IGNORE',  'ABORT'
+  - jcr:protected            (BOOLEAN)          protected mandatory
   - jcr:requiredPrimaryTypes (NAME) = 'nt:base' protected mandatory multiple
-  - jcr:defaultPrimaryType (NAME) protected
-  - jcr:sameNameSiblings (BOOLEAN) protected mandatory
+  - jcr:defaultPrimaryType   (NAME)             protected
+  - jcr:sameNameSiblings     (BOOLEAN)          protected mandatory
 
 //------------------------------------------------------------------------------
 // Q U E R Y
@@ -541,7 +543,7 @@ version
  */
 [nt:query]
   - jcr:statement (STRING)
-  - jcr:language (STRING)
+  - jcr:language  (STRING)
 
 //------------------------------------------------------------------------------
 // L I F E C Y C L E   M A N A G E M E N T
@@ -562,8 +564,8 @@ version
  */
 [mix:lifecycle]
   mixin
-  - jcr:lifecyclePolicy (REFERENCE) protected INITIALIZE
-  - jcr:currentLifecycleState (STRING) protected INITIALIZE
+  - jcr:lifecyclePolicy       (REFERENCE) protected INITIALIZE
+  - jcr:currentLifecycleState (STRING)    protected INITIALIZE
 
 //------------------------------------------------------------------------------
 // J A C K R A B B I T   I N T E R N A L S
@@ -575,9 +577,9 @@ version
 [rep:system]
   orderable
   + jcr:versionStorage (rep:versionStorage) = rep:versionStorage mandatory protected ABORT
-  + jcr:nodeTypes (rep:nodeTypes) = rep:nodeTypes mandatory protected ABORT
+  + jcr:nodeTypes      (rep:nodeTypes)      = rep:nodeTypes      mandatory protected ABORT
   // @since 2.0
-  + jcr:activities (rep:Activities) = rep:Activities mandatory protected ABORT
+  + jcr:activities     (rep:Activities)     = rep:Activities     mandatory protected ABORT
   // @since 2.0
   + jcr:configurations (rep:Configurations) = rep:Configurations protected ABORT
   + * (nt:base) = nt:base IGNORE

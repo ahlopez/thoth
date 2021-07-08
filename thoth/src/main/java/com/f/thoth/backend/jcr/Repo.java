@@ -200,7 +200,7 @@ public class Repo implements HasLogger
    }//loginToRepo
 
 
-   public void initWorkspace(String workspacePath, String name, String tenantName) throws RepositoryException
+   public void initWorkspace(String workspacePath, String name) throws RepositoryException
    {
       if ( !jcrSession.nodeExists(workspacePath))
       {
@@ -212,7 +212,7 @@ public class Repo implements HasLogger
          { logger.info("Workspace path["+ workspacePath+ "] diferente del path en repositorio["+ jcrWorkspace.getPath()+ "]");
            System.exit(-1);
          }
-         logger.info("    >>> Tenant["+ tenantName+   "], "+
+         logger.info("    >>> Tenant["+ name+   "], "+
                      "workspace["+ name+              "], "+
                      "path["+ jcrWorkspace.getPath()+ "], "+
                      "created["+ jcrWorkspace.getProperty("jcr:created").getValue().toString()+ "]");
@@ -301,6 +301,16 @@ public class Repo implements HasLogger
      }
      return node;
    }//findNode
+   
+   
+   public void save()
+   {
+      try
+      {  jcrSession.save();
+      } catch( Exception e)
+      {  throw new IllegalStateException("No pudo guardar nodo del repositorio. Razón\n"+ e.getMessage());
+      }
+   }//save
 
 
 

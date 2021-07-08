@@ -228,10 +228,12 @@ public class ClassificationView extends VerticalLayout
       Level level      = null;
       int currentLevel = owner == null? 0: owner.getLevel().getOrden()+ 1;
       if ( currentLevel >= levels.length)
+      {  closeEditor();
          notifier.error("La clase del último nivel no puede tener hijos");
-      else
-         level = levels[currentLevel];
-
+         
+      }else
+      {   level = levels[currentLevel];
+      }
       return level;
 
    }//getCurrentLevel
@@ -240,13 +242,12 @@ public class ClassificationView extends VerticalLayout
    private void editClass(Classification classification)
    {
       if (classification == null)
-      {
-         closeEditor();
+      {  closeEditor();
       } else
       {
          if( classification.isPersisted())
-            classification = classificationService.load(classification.getId());
-
+         {  classification = classificationService.load(classification.getId());
+         }
          classificationForm.setVisible(true);
          classificationForm.setClassification(classification);
          rightSection.setVisible(true);

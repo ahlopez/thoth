@@ -134,7 +134,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
       init();
    }//Tenant null constructor
 
-   public Tenant( String name, String code)
+   public Tenant( String name)
    {
       super();
 
@@ -142,7 +142,7 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
          throw new IllegalArgumentException("Nombre["+ name+ "] es inválido");
 
       init();
-      this.name      = TextUtil.nameTidy(name);
+      this.name = name;
    }//Tenant constructor
 
 
@@ -150,7 +150,6 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
    @PreUpdate
    public void prepareData()
    {
-      this.name     =  TextUtil.nameTidy(name);
       buildCode();
    }//prepareData
 

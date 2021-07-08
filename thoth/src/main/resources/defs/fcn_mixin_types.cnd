@@ -1,0 +1,72 @@
+
+<FCN = 'http://fconsultor.com/FCN'>
+
+[FCN:Documento] >  nt:base       mixin
+  - FCN:Identificacion   ( STRING    )  primary   mandatory                // Id of the document
+  - FCN:Tenant           ( STRING    )            mandatory                // Id of Tenant that owns the document
+  - FCN:Autor            ( STRING    )            mandatory                // Author of the document
+
+
+[FCN:Sede] >  nt:base       mixin
+  - FCN:Desde            ( STRING    )            mandatory                // Fecha desde
+  - FCN:Hasta            ( STRING    )            mandatory                // Fecha hasta
+  - FCN:Colores          ( STRING    )            mandatory                // Color
+  - FCN:Seguridad        ( STRING    )            mandatory                // Categoría de seguridad
+
+
+[FCN:Obligacion] >  nt:base       mixin
+  - FCN:Identificacion   ( STRING    )  primary   mandatory                // Obligacion id
+  - FCN:Concepto         ( STRING    )            mandatory                // Concepto
+  - FCN:Remitente        ( STRING    )            mandatory                // Remite
+  - FCN:Valor            ( STRING    )            mandatory                // Valor de la obligacion
+
+
+[FCN:Factura] >  nt:base       mixin
+  - FCN:Obligacion       ( STRING    )  primary   mandatory                // Commitment que aplica a la factura
+  - FCN:APagarEn         ( STRING    )            mandatory                // Due date
+  - FCN:Valor            ( STRING    )            mandatory                // Valor cobrado
+
+
+[FCN:Pago] >  nt:base       mixin
+  - FCN:Identificacion   ( STRING    )  primary   mandatory                // Id del pago
+  - FCN:Valor            ( STRING    )            mandatory                // Valor pagado
+  - FCN:PagadoEn         ( STRING    )            mandatory                // Fecha de pago
+
+
+[FCN:Remision] >  nt:base       mixin
+  - FCN:Identificacion   ( STRING    )  primary   mandatory                // Id de la remision
+  - FCN:Obligacion       ( STRING    )            mandatory                // Id del commitment de la remision
+  - FCN:Fecha            ( STRING    )            mandatory                // Fecha de remision
+
+
+[FCN:Recibo] >  nt:base       mixin
+  - FCN:Identificacion   ( STRING    )  primary   mandatory                // Id del recibo
+  - FCN:Despacho         ( STRING    )            mandatory                // Id de la remision
+  - FCN:Fecha            ( STRING    )            mandatory                // Fecha de recibo
+
+
+[FCN:Office] >  nt:base       mixin
+  - FCN:Jefe             ( STRING    )            mandatory                // Jefe de la oficina
+  - FCN:Desde            ( STRING    )            mandatory                // Fecha de apertura
+  - FCN:Hasta            ( STRING    )            mandatory                // Fecha de cierre
+  - FCN:Colores          ( STRING    )            mandatory                // Color de las paredes
+
+
+[FCN:Series] >  nt:base       mixin
+  - FCN:Desde            ( STRING    )            mandatory                // Fecha de apertura
+  - FCN:Hasta            ( STRING    )            mandatory                // Fecha de cierre
+  - FCN:Seguridad        ( STRING    )            mandatory                // Categoría de seguridad
+
+
+[FCN:Other] >  nt:base       mixin
+  - FCN:Nombre           ( STRING    )            mandatory                // Categoría de seguridad
+  - FCN:Jefe             ( STRING    )            mandatory                // Categoría de seguridad
+  - FCN:Desde            ( STRING    )            mandatory                // Fecha de apertura
+  - FCN:Hasta            ( STRING    )            mandatory                // Fecha de cierre
+  - FCN:Cantidad         ( STRING    )            mandatory                // Categoría de seguridad
+  - FCN:Edad             ( STRING    )            mandatory                // Categoría de seguridad
+  - FCN:Razon            ( STRING    )            mandatory                // Categoría de seguridad
+
+
+[FCN:SHORT] >  nt:base       mixin
+  - FCN:Colores          ( STRING    )  primary   mandatory                // Categoría de seguridad

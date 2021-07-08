@@ -87,6 +87,8 @@ public class SchemaValues extends AbstractEntity implements SchemaValuesImporter
 
    // ------------------------   Getters && Setters ----------------------------
 
+   public String        getName()    { return schema.getName();}
+   
    public Tenant         getTenant() { return tenant; }
    public void           setTenant(Tenant tenant) { this.tenant = tenant; }
 

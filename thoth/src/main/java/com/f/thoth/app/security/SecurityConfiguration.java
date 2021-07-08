@@ -91,6 +91,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
          session.setAttribute(TENANT, tenant);
          session.setAttribute(CLASS_ROOT,      tenant.getWorkspace()+ Parm.PATH_SEPARATOR+ NodeType.CLASSIFICATION.getCode());
          session.setAttribute(EXPEDIENTE_ROOT, tenant.getWorkspace()+ Parm.PATH_SEPARATOR+ NodeType.EXPEDIENTE.getCode());
+         // TODO: Ojo, si la definición de tipos es jerárquica, EXPEDIENTE_ROOT debe ser una clase, no un path cualquiera
       }
    }//saveUserContext
 

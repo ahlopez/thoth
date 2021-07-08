@@ -1,17 +1,18 @@
 /*  Classification Node Type definition */
 
 <FCN = 'http://fconsultor.com/FCN'>
-[FCN:classification] >  nt:base    orderable  primaryitem FCN:clase
-  - FCN:id                ( String    )  primary mandatory protected         // Identificador unico del clasificador
-  - FCN:tenant            ( LONG      )  primary mandatory protected         // Tenant dueño del clasificador
-  - FCN:code              ( STRING    )  primary mandatory protected         // Business code del clasificador
-  - FCN:name              ( STRING    )  primary mandatory protected         // Classification class name
-  - FCN:level             ( LONG      )  primary mandatory protected         // Classification level in the classification tree
-  - FCN:retentionSchedule ( LONG      )  primary mandatory protected         // Retention Calendar associated to the class
-  - FCN:classCode         ( STRING    )  primary mandatory protected         // Unique business code of the classification node at the proper level vg 01, 02, 03, etc
-  - FCN:dateOpened        ( DATE      )  primary mandatory protected         // Date classification class was opened
-  - FCN:dateClosed        ( DATE      )  primary mandatory protected         // Date classification class was closed
-  + FCN:clase (nt:base) mandatory
+[FCN:classification] >  nt:base   orderable
+  //- FCN:id                ( STRING )  primary mandatory protected      // UUID identifier of Classification class node
+  - FCN:tenant            ( LONG   )  primary mandatory protected      // Id of Tenant that owns the Classification schema
+  - FCN:level             ( LONG   )  primary mandatory protected      // Id of Classification level in the classification tree
+  - FCN:retentionSchedule ( LONG   )  primary mandatory                // Id of Retention Calendar associated to the class
+  - FCN:code              ( STRING )  primary mandatory protected      // Classification class code within the parent node (child single code)
+  - FCN:name              ( STRING )  primary mandatory protected      // Classification class name
+  - FCN:classCode         ( STRING )  primary mandatory protected      // Complete structured business code vg 01-01-01, 01-01-02, etc
+  - FCN:dateOpened        ( DATE   )  primary mandatory protected      // Date classification class was opened
+  - FCN:dateClosed        ( DATE   )  primary mandatory                // Date classification class was closed
+  + FCN:subclase   (FCN:classification)
+  + FCN:dossier    (FCN:expediente)
 
 //  - metadata          SchemaValues                Metadata values of the associated classification.level
 //  - version           int                         Número de versión
@@ -23,5 +24,6 @@
   2.   Asignar los metadatos definidos para la clase
   4.   Eliminar las clases de Clasificación no utilizadas
   4.   ¿Como incluir Solr, ElasticSearch?
-
 */
+
+[FCN:expediente] >  nt:base  orderable

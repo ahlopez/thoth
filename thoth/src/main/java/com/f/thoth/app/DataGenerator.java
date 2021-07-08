@@ -258,8 +258,8 @@ public class DataGenerator implements HasLogger
    private void createTenants (TenantService tenantService)
          throws RepositoryException, UnknownHostException
    {
-      tenant1 = createTenant(tenantRepository, "FCN", "FCN");
-      tenant2 = createTenant(tenantRepository,"SEI", "SEI");
+      tenant1 = createTenant(tenantRepository, "FCN");
+      tenant2 = createTenant(tenantRepository, "SEI");
    }//createTenants
 
 
@@ -280,6 +280,7 @@ public class DataGenerator implements HasLogger
    {
       Metadata nameMeta =        createMeta ("String", Type.STRING, "length > 0");
       Field    nameField       = createField("Nombre",         nameMeta, true, false, true, 1, 2);
+      Field    tenantField     = createField("Tenant",         nameMeta, true, false, true, 1, 2);
       Field    bossField       = createField("Jefe",           nameMeta, true, false, true, 2, 2);
       Field    commitmentField = createField("Obligacion",     nameMeta, true, false, true, 1, 2);
       Field    dispatchField   = createField("Despacho",       nameMeta, true, true,  true, 2, 1);
@@ -311,6 +312,7 @@ public class DataGenerator implements HasLogger
 
       Schema   docSchema =  createSchema("Documento");
       docSchema.addField(idField);
+      docSchema.addField(tenantField);
       docSchema.addField(authorField);
       schemaRepository.saveAndFlush(docSchema);
 
@@ -447,17 +449,17 @@ public class DataGenerator implements HasLogger
 
 
 
-   private Tenant createTenant(TenantRepository tenantRepository, String name, String code)
+   private Tenant createTenant(TenantRepository tenantRepository, String name)
          throws RepositoryException, UnknownHostException
    {
-      Tenant tenant = new Tenant(name, code);
+      Tenant tenant = new Tenant(name);
       tenant.setLocked(false);
       tenant.setAdministrator("admin@vaadin.com");
       LocalDate now = LocalDate.now();
       tenant.setFromDate( now.minusMonths(random.nextInt(36)));
       tenant.setToDate(now.plusYears(random.nextInt(10)));
       tenantRepository.save(tenant);
-      Repo.getInstance().initWorkspace(tenant.getWorkspace(), name, code);
+      Repo.getInstance().initWorkspace(tenant.getWorkspace(), name);
       return tenant;
    }//createTenant
 
