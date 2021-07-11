@@ -454,23 +454,22 @@ public class ClassificationGenerator implements HasLogger
             nivel.setTenant(tenant);
             schema = nivel.getSchema();
             if ( !schema.isPersisted())
-            {
-               schema.setTenant(tenant);
+            {  schema.setTenant(tenant);
                schemaRepository.saveAndFlush(schema);
             }
             levelRepository.saveAndFlush(nivel);
-         }else {
-            classificationClass.setLevel(newLevel);
+         }else 
+         {  classificationClass.setLevel(newLevel);
             schema = newLevel.getSchema();
          }
-      }else {
-         schema = nivel.getSchema();
+      }else 
+      {  schema = nivel.getSchema();
       }
-      SchemaValues values = new SchemaValues(schema,null);
+      SchemaValues values = new SchemaValues(schema, null);
       values.setTenant(tenant);
       classificationClass.setMetadata(values);
       claseRepository.saveAndFlush(classificationClass);
-      addJCRClass( classificationClass, classificationRootPath);
+      saveJCRClassification( classificationClass, classificationRootPath);
       nClasses++;
       if (classificationClass.isRoot())
          createSequence(tenant, classificationClass);
@@ -480,22 +479,60 @@ public class ClassificationGenerator implements HasLogger
    }//createClass
 
 
-   private void addJCRClass( Classification classificationClass, String classificationRootPath)
+   private void saveJCRClassification( Classification classificationClass, String classificationRootPath)
    {
       try
       {
-         Classification parent = classificationClass.getOwner();
-         String parentPath     = parent ==  null? classificationRootPath: parent.getPath();
-         String childCode      = classificationClass.getClassCode();
-         String childName      = classificationClass.getName();
-         String childLevel     = ""+ classificationClass.getLevel().getOrden();
-         addJCRChild( parentPath, childCode, childName, childLevel);
+         Classification parent  = classificationClass.getOwner();
+         String parentPath      = parent ==  null? classificationRootPath: parent.getPath();
+         String childCode       = classificationClass.getClassCode();
+         String childName       = classificationClass.getName();
+         String childLevel      = ""+ classificationClass.getLevel().getOrden();
+         String namespace       = classificationClass.getTenant().getName()+ ":";
+         Node classificationJCR = addJCRClassification( namespace, parentPath, childCode, childName, childLevel);
+         updateJCRClassification(namespace, classificationJCR, classificationClass);
+         Repo.getInstance().save();
       } catch(Exception e)
-      {
-         throw new IllegalStateException("*** No pudo guardar estructura de clasificación en el repositorio. Razón\n"+ e.getLocalizedMessage());
+      { throw new IllegalStateException("*** No pudo guardar estructura de clasificación en el repositorio. Razón\n"+ e.getLocalizedMessage());
       }
 
-   }//addJCRClass
+   }//saveJCRClassification
+
+
+   private Node addJCRClassification(String namespace, String parentPath, String childCode, String childName, String childLevel)
+         throws RepositoryException, UnknownHostException
+   {
+      String childPath = parentPath+ Parm.PATH_SEPARATOR+ childCode;
+      Node   child     = Repo.getInstance().addNode(childPath, childName, currentUser);
+      child.setProperty( "jcr:nodeTypeName", NodeType.CLASSIFICATION.name());
+      child.addMixin   ( "mix:referenceable");
+      child.setProperty( namespace+ "code",  childCode);     // Subclass code inside the parent class  vg 01, 02, etc
+      child.setProperty( namespace+ "level", childLevel);
+      return child;
+   }//addJCRClassification
+  
+   
+   private void updateJCRClassification(String namespace, Node classificationJCR, Classification classificationClass)
+   {
+      try
+      {
+         classificationJCR.setProperty( namespace+ "tenant"           , classificationClass.getTenant().getId());
+         classificationJCR.setProperty( namespace+ "retentionSchedule", classificationClass.getRetentionSchedule().getId());
+         classificationJCR.setProperty( namespace+ "classCode"        , classificationClass.formatCode()); // Complete class code vg 01-01-01, 01-01-02, etc
+         boolean isOpen   = classificationClass.isOpen();
+         classificationJCR.setProperty   ( namespace+ "open"      , isOpen);
+         if (isOpen)
+         {  classificationJCR.setProperty( namespace+ "dateOpened", TextUtil.formatDate(classificationClass.getDateOpened()));
+         }  else
+         {  classificationJCR.setProperty( namespace+ "dateClosed", TextUtil.formatDate(classificationClass.getDateClosed()));
+         }
+         Repo.getInstance().updateMixin( classificationJCR, namespace, classificationClass.getMetadata());
+         Repo.getInstance().save();    // TODO: Revisar si funciona para multiusuario, o si toca tener una sesión para cada usuario (guardada en la vaadin session)
+      } catch(Exception e)
+      {   throw new IllegalStateException("No pudo actualizar clase["+ classificationClass.formatCode()+ "]. Razón\n"+ e.getMessage());
+      }
+     
+   }//updateJCRClassification
 
 
    private synchronized void createSequence(Tenant tenant, Classification classificationClass)
@@ -513,16 +550,5 @@ public class ClassificationGenerator implements HasLogger
       }
    }//createSequence
 
-
-   private Node addJCRChild(String parentPath, String childNode, String childName, String childLevel)
-         throws RepositoryException, UnknownHostException
-   {
-      String childPath = parentPath+ Parm.PATH_SEPARATOR+ childNode;
-      Node child = Repo.getInstance().addNode(childPath, childName, currentUser);
-      child.setProperty("jcr:nodeType", NodeType.CLASSIFICATION.name());
-      child.setProperty("jcr:code",     childNode);
-      child.setProperty("jcr:level",    childLevel);
-      return child;
-   }//addJCRChild
 
 }//ClassificationGenerator

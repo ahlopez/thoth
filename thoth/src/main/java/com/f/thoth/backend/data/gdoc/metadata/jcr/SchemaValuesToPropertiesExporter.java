@@ -22,17 +22,22 @@ public class SchemaValuesToPropertiesExporter implements SchemaValues.Exporter
 
    @Override   public void exportSchema(Schema schema) { fields = schema.getFields();}
 
-   @Override   public void exportValues(String valores){ values = valores.split(Parm.VALUE_SEPARATOR); }
+   @Override   public void exportValues(String valores){ values = valores == null? null: valores.split(Parm.VALUE_SEPARATOR); }
 
    @Override   public void endExport() 
    {
-      if ( fields.size() != values.length)
-      {   throw new IllegalStateException("Número de valores a exportar["+ values.length+ "] diferente de número de propiedades a crear["+ fields.size()+ "]");
-      }
-      properties = new ArrayList<>();
-      int      i = 0;
-      for(Field field: fields)
-      {   properties.add(new Property(field, values[i++]));
+      if (values != null)
+      {
+         if ( fields.size() != values.length)
+         {   throw new IllegalStateException("Número de valores a exportar["+ values.length+ "] diferente de número de propiedades a crear["+ fields.size()+ "]");
+         }
+         properties = new ArrayList<>();
+         int      i = 0;
+         for(Field field: fields)
+         {   properties.add(new Property(field, i < values.length? values[i++]: null));
+         }
+      } else
+      {  properties = new ArrayList<>();
       }
    }//endExport
 

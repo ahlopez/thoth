@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.jcr.Node;
@@ -30,6 +31,10 @@ import org.springframework.core.io.Resource;
 import com.f.thoth.Parm;
 import com.f.thoth.app.HasLogger;
 import com.f.thoth.backend.data.entity.util.TextUtil;
+import com.f.thoth.backend.data.gdoc.metadata.Field;
+import com.f.thoth.backend.data.gdoc.metadata.Property;
+import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
+import com.f.thoth.backend.data.gdoc.metadata.jcr.SchemaValuesToPropertiesExporter;
 
 public class Repo implements HasLogger
 {
@@ -224,13 +229,14 @@ public class Repo implements HasLogger
    private void loadTypes(String workspaceName )
    {
          List<Path> cndFiles = getCndFiles(workspaceName);
+         getLogger().info("    >>> Loading "+ cndFiles.size()+ " files of type definitions");
          cndFiles.forEach( cndPath->
          {
             try
             {
                BufferedReader cndReader = Files.newBufferedReader(cndPath, StandardCharsets.UTF_8);
                CndImporter.registerNodeTypes(cndReader, jcrSession);
-               getLogger().info("    >>> Cargó cnd ["+ cndPath.getFileName()+ "]");
+               getLogger().info("    >>> ["+ cndPath.getFileName()+ "]... loaded");
             }catch (Exception e)
             {  getLogger().info("No pudo cargar definiciones de Tipos de Nodo para workspace["+ workspaceName+ "]. Razón\n"+ e.getMessage());
                System.exit(-1);
@@ -311,7 +317,53 @@ public class Repo implements HasLogger
       {  throw new IllegalStateException("No pudo guardar nodo del repositorio. Razón\n"+ e.getMessage());
       }
    }//save
-
+   
+   
+   public String updateMixin( Node node, String namespace, SchemaValues metadata) throws RepositoryException
+   {
+      if (metadata == null)
+      {   return null;
+      }
+      SchemaValues.Exporter metaExporter = new SchemaValuesToPropertiesExporter();
+      @SuppressWarnings("unchecked")
+      List<Property> properties          = (List<Property>)metadata.export( metaExporter);
+      String msg  = checkRequired( metadata, properties);
+      if ( msg == null)
+      {
+         node.addMixin(namespace + metadata.getName());
+         for ( Property p: properties)
+         {  node.setProperty( namespace+ p.getName(), p.getValue()); 
+           // System.out.println(" >>> "+ namespace+ p.getName()+ "= ["+ p.getValue()+ "]");
+         }
+      }
+      return msg;
+   }//updateMixin
+   
+   
+   private String checkRequired( SchemaValues metadata, List<Property> properties)
+   {
+      Set<Field>     fields              = metadata.getSchema().getFields();
+      StringBuilder msg = new StringBuilder();
+      for ( Field field : fields)
+      {  if (field.isRequired() && !propertyExists(field, properties))
+         {   msg.append("Campo requerido[" + field.getName()+ "] no existe\n");
+         }
+      }
+      return  msg.length() == 0? null : msg.toString();
+   }//checkRequired
+   
+   
+   private boolean propertyExists(Field field, List<Property> properties)
+   {
+      boolean ok = false;
+      for (Property p: properties)
+      {  if (p.hasName(field.getName()))
+         {  ok = true;  
+            break;
+         }
+      }
+      return ok;
+   }//propertyExists
 
 
 }//Repo

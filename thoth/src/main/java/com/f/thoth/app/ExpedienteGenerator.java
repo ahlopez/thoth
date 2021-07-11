@@ -86,7 +86,7 @@ public class ExpedienteGenerator implements HasLogger
    public ExpedienteGenerator(  Tenant tenant, User currentUser,
                                 ClassificationRepository claseRepository, ExpedienteIndexRepository expedienteIndexRepository,
                                 ExpedienteGroupRepository expedienteGroupRepository, DocumentTypeRepository documentTypeRepository,
-                                VolumeRepository volumeRepository, VolumeInstanceRepository volumeInstanceRepository, 
+                                VolumeRepository volumeRepository, VolumeInstanceRepository volumeInstanceRepository,
                                 SchemaRepository schemaRepository
                               )
    {
@@ -116,10 +116,10 @@ public class ExpedienteGenerator implements HasLogger
    private BufferedReader  openNamesFile(String names)
    {
       /*
-       * Paths may be used with the Files class to operate on files, directories, and other types of files. 
-       * For example, suppose we want a BufferedReader to read text from a file "access.log". 
+       * Paths may be used with the Files class to operate on files, directories, and other types of files.
+       * For example, suppose we want a BufferedReader to read text from a file "access.log".
        * The file is located in a directory "logs" relative to the current working directory and is UTF-8 encoded.
-       * 
+       *
        * Path path = FileSystems.getDefault().getPath("logs", "access.log");
        * BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
        */
@@ -252,11 +252,12 @@ public class ExpedienteGenerator implements HasLogger
       base.setMac                 (generateMac());
  //   base.setMetadata            (SchemaValues.EMPTY);
       base.buildCode();
+      
 
       return base;
 
    }//createBase
-   
+
    private void createIndex(BaseExpediente base)
    {
       ExpedienteIndex idx = base.createIndex();
@@ -267,21 +268,30 @@ public class ExpedienteGenerator implements HasLogger
    private Node createJCRExpediente(BaseExpediente base)
          throws RepositoryException, UnknownHostException
    {
-      Schema schema = base.getMetadataSchema();
-      Long  ownerId = base.getOwnerId();
+      Tenant tenant = base.getTenant();
       Node node = Repo.getInstance().addNode( base.getPath(), base.getName(), base.getCreatedBy().getEmail());
-      node.setProperty("evd:id",             ""+ base.getId());
-      node.setProperty("evd:tenant",         base.getTenant().getCode());
-      node.setProperty("evd:code",           base.formatCode());
-      node.setProperty("evd:type",           base.getType().toString());
-      node.setProperty("evd:classification", base.getClassificationClass().formatCode());
-      node.setProperty("evd:schema",         schema == null? "" : schema.getName());
-      node.setProperty("evd:dateOpened",     TextUtil.formatDateTime(base.getDateOpened()));
-      node.setProperty("evd:dateClosed",     TextUtil.formatDateTime(base.getDateClosed()));
-      node.setProperty("evd:ownerId",        ""+ (ownerId == null? "" : ownerId));
-      node.setProperty("evd:open", ""+       base.getOpen());
-      node.setProperty("evd:location",       base.getLocation());
-      node.setProperty("evd:keywords",       base.getKeywords());
+      node.addMixin   ( "mix:referenceable");
+      node.setProperty("FCN:tenant",         tenant.getId());
+      node.setProperty("FCN:expedienteCode", base.formatCode());
+      node.setProperty("FCN:type",           base.getType().toString());
+      node.setProperty("FCN:classification", base.getClassificationClass().formatCode());
+      node.setProperty("FCN:open",           base.isOpen());
+      if ( base.isOpen())
+      {  node.setProperty("FCN:dateOpened",  TextUtil.formatDateTime(base.getDateOpened()));
+      }  else
+      {  node.setProperty("FCN:dateClosed",  TextUtil.formatDateTime(base.getDateClosed()));      
+      }
+      if (base.getLocation() != null)
+      {  node.setProperty("FCN:location",       base.getLocation());
+      }
+      if (TextUtil.isNotEmpty( base.getKeywords()))
+      {  String[] keywords = base.getKeywords().split(Parm.VALUE_SEPARATOR);
+         for( String keyword: keywords)
+         {  node.setProperty("FCN:keywords", keyword);
+         }
+      }
+  //    updateMixin( node, tenant.getName()+ ":", SchemaValues metadata);
+      Repo.getInstance().save();    
       nNodes++;
       return node;
 

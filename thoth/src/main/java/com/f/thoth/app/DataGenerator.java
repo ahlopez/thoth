@@ -279,36 +279,36 @@ public class DataGenerator implements HasLogger
    private Level[] createMetadata()
    {
       Metadata nameMeta =        createMeta ("String", Type.STRING, "length > 0");
-      Field    nameField       = createField("Nombre",         nameMeta, true, false, true, 1, 2);
-      Field    tenantField     = createField("Tenant",         nameMeta, true, false, true, 1, 2);
-      Field    bossField       = createField("Jefe",           nameMeta, true, false, true, 2, 2);
-      Field    commitmentField = createField("Obligacion",     nameMeta, true, false, true, 1, 2);
-      Field    dispatchField   = createField("Despacho",       nameMeta, true, true,  true, 2, 1);
-      Field    idField         = createField("Identificacion", nameMeta, true, false, true, 1, 1);
-      Field    authorField     = createField("Autor",          nameMeta, true, false, true, 2, 1);
-      Field    conceptField    = createField("Concepto",       nameMeta, false,false, true, 2, 1);
-      Field    remiteField     = createField("Remitente",      nameMeta, true, false, true, 3, 2);
+      Field    nameField       = createField("Nombre",         nameMeta, true, false, false, 1, 2);
+      Field    tenantField     = createField("Tenant",         nameMeta, true, false, false, 1, 2);
+      Field    bossField       = createField("Jefe",           nameMeta, true, false, false, 2, 2);
+      Field    commitmentField = createField("Obligacion",     nameMeta, true, false, false, 1, 2);
+      Field    dispatchField   = createField("Despacho",       nameMeta, true, true,  false, 2, 1);
+      Field    idField         = createField("Identificacion", nameMeta, true, false, false, 1, 1);
+      Field    authorField     = createField("Autor",          nameMeta, true, false, false, 2, 1);
+      Field    conceptField    = createField("Concepto",       nameMeta, false,false, false, 2, 1);
+      Field    remiteField     = createField("Remitente",      nameMeta, true, false, false, 3, 2);
 
       Metadata dateMeta  = createMeta ("Fecha", Type.DATETIME, "not null");
-      Field    fromField = createField("Desde",      dateMeta, true, false, true, 3, 2);
-      Field    toField   = createField("Hasta",      dateMeta, true, false, true, 4, 2);
-      Field    dateField = createField("Fecha",      dateMeta, true, true,  true, 3, 2);
-      Field    dueDate   = createField("APagarEn",   dateMeta, true, true,  true, 2, 2);
-      Field    paidDate  = createField("PagadoEn",   dateMeta, true, false, true, 3, 2);
+      Field    fromField = createField("Desde",      dateMeta, true, false, false, 3, 2);
+      Field    toField   = createField("Hasta",      dateMeta, true, false, false, 4, 2);
+      Field    dateField = createField("Fecha",      dateMeta, true, true,  false, 3, 2);
+      Field    dueDate   = createField("APagarEn",   dateMeta, true, true,  false, 2, 2);
+      Field    paidDate  = createField("PagadoEn",   dateMeta, true, false, false, 3, 2);
 
       Metadata enumMeta   = createMeta ("Color",    Type.ENUM, "Verde;Rojo;Azul;Magenta;Cyan");
-      Field    colorField = createField("Colores",   enumMeta, true, false, true, 5, 1);
+      Field    colorField = createField("Colores",   enumMeta, true, false, false, 5, 1);
 
       Metadata claseMeta     = createMeta ("Security", Type.ENUM, "Restringido;Confidencial;Interno;Público");
-      Field    securityField = createField("Seguridad", claseMeta, true, false, true, 5, 1);
+      Field    securityField = createField("Seguridad", claseMeta, true, false, false, 5, 1);
 
       Metadata intMeta   = createMeta ("Entero", Type.INTEGER, " >0; < 100");
-      Field    cantField = createField("Cantidad", intMeta, true, false, true, 5, 1);
-      Field    edadField = createField("Edad",     intMeta, true, true,  true, 6, 1);
+      Field    cantField = createField("Cantidad", intMeta, true, false, false, 5, 1);
+      Field    edadField = createField("Edad",     intMeta, true, true,  false, 6, 1);
 
       Metadata decMeta   = createMeta ("Decimal", Type.DECIMAL," >= 0.0");
-      Field    ratioField= createField("Razon", decMeta, true, false, true, 7, 1);
-      Field    valueField= createField("Valor", decMeta, true, false, true, 4, 1);
+      Field    ratioField= createField("Razon", decMeta, true, false, false, 7, 1);
+      Field    valueField= createField("Valor", decMeta, true, false, false, 4, 1);
 
       Schema   docSchema =  createSchema("Documento");
       docSchema.addField(idField);

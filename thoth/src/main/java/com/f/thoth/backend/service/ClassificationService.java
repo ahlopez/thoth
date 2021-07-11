@@ -24,10 +24,6 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.classification.Level;
 import com.f.thoth.backend.data.gdoc.document.jackrabbit.NodeType;
-import com.f.thoth.backend.data.gdoc.metadata.Field;
-import com.f.thoth.backend.data.gdoc.metadata.Property;
-import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
-import com.f.thoth.backend.data.gdoc.metadata.jcr.SchemaValuesToPropertiesExporter;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
@@ -111,8 +107,8 @@ public class ClassificationService implements FilterableCrudService<Classificati
          */
          Level level = clazz.getLevel();
          if ( !level.isPersisted())
-            levelRepository.saveAndFlush(level);
-
+         {  levelRepository.saveAndFlush(level);
+         }
          Classification classification = claseRepository.save(clazz);
          saveJCRClassification(currentUser, classification);
          return classification;
@@ -134,7 +130,7 @@ public class ClassificationService implements FilterableCrudService<Classificati
          String childCode       = classificationClass.getClassCode();
          String childName       = classificationClass.getName();
          Long   childLevel      = classificationClass.getLevel().getId();
-         Node classificationJCR = addJCRChild( currentUser, parentPath, childCode, childName, childLevel);
+         Node classificationJCR = addJCRClassification( currentUser, parentPath, childCode, childName, childLevel);
          updateJCRClassification(classificationJCR, classificationClass);
       } catch(Exception e)
       {  throw new IllegalStateException("*** No pudo guardar estructura de clasificación en el repositorio. Razón\n"+ e.getLocalizedMessage());
@@ -142,7 +138,7 @@ public class ClassificationService implements FilterableCrudService<Classificati
    }//saveJCRClassification
 
 
-   private Node addJCRChild(User currentUser, String parentPath, String childCode, String childName, Long childLevel)
+   private Node addJCRClassification(User currentUser, String parentPath, String childCode, String childName, Long childLevel)
          throws RepositoryException, UnknownHostException
    {
       String ns= nameSpace();                    
@@ -153,7 +149,7 @@ public class ClassificationService implements FilterableCrudService<Classificati
       child.setProperty( ns+ "code",  childCode);     // Subclass code inside the parent class  vg 01, 02, etc
       child.setProperty( ns+ "level", childLevel);
       return child;
-   }//addJCRChild
+   }//addJCRClassification
    
    
    private void updateJCRClassification(Node classificationJCR, Classification classificationClass)
@@ -161,68 +157,23 @@ public class ClassificationService implements FilterableCrudService<Classificati
       try
       {
          String ns= nameSpace();
-         //classificationJCR.setProperty( ns+ "id",        classificationClass.getId());    
-         classificationJCR.setProperty( ns+ "tenant",    classificationClass.getTenant().getId());
-         classificationJCR.setProperty( ns+ "classCode", classificationClass.formatCode()); // Complete class code vg 01-01-01, 01-01-02, etc
-         classificationJCR.setProperty( ns+ "opened",    TextUtil.formatDate(classificationClass.getDateOpened()));
-         classificationJCR.setProperty( ns+ "closed",    TextUtil.formatDate(classificationClass.getDateClosed()));
-         classificationJCR.setProperty( ns+ "open",      ""+ classificationClass.isOpen());
-         classificationJCR.setProperty( ns+ "retention", classificationClass.getRetentionSchedule().getId());
-         updateJCRMetadata( classificationJCR, classificationClass.getMetadata());
-         Repo.getInstance().save();    // TODO: Esto solo debe funcionar para un usuario. Corregir para multiusuario
+         classificationJCR.setProperty( ns+ "tenant"           , classificationClass.getTenant().getId());
+         classificationJCR.setProperty( ns+ "retentionSchedule", classificationClass.getRetentionSchedule().getId());
+         classificationJCR.setProperty( ns+ "classCode"        , classificationClass.formatCode()); // Complete class code vg 01-01-01, 01-01-02, etc
+         boolean isOpen   = classificationClass.isOpen();
+         classificationJCR.setProperty   ( ns+ "open"      , isOpen);
+         if (isOpen)
+         {  classificationJCR.setProperty( ns+ "dateOpened", TextUtil.formatDate(classificationClass.getDateOpened()));
+         }  else
+         {  classificationJCR.setProperty( ns+ "dateClosed", TextUtil.formatDate(classificationClass.getDateClosed()));
+         }
+         Repo.getInstance().updateMixin( classificationJCR, ns, classificationClass.getMetadata());
+         Repo.getInstance().save();    // TODO: Revisar si funciona para multiusuario, o si toca tener una sesión para cada usuario (guardada en la vaadin session)
       } catch(Exception e)
       {   throw new IllegalStateException("No pudo actualizar clase["+ classificationClass.formatCode()+ "]. Razón\n"+ e.getMessage());
       }
      
    }//updateJCRClassification
-   
-   
-   private String updateJCRMetadata( Node classificationJCR, SchemaValues metadata) throws RepositoryException
-   {
-      if (metadata == null)
-      {   return null;
-      }
-      SchemaValues.Exporter metaExporter = new SchemaValuesToPropertiesExporter();
-      @SuppressWarnings("unchecked")
-      List<Property> properties          = (List<Property>)metadata.export( metaExporter);
-      String msg  = checkRequired( metadata, properties);
-      if ( msg == null)
-      {
-         String ns      = nameSpace();
-         classificationJCR.addMixin(ns + metadata.getName());
-         for ( Property p: properties)
-         {  classificationJCR.setProperty( ns+ p.getName(), p.getValue()); 
-            System.out.println(" >>> "+ ns+ p.getName()+ "= ["+ p.getValue()+ "]");
-         }
-      }
-      return msg;
-   }//updateJCRMetadata
-   
-   
-   private String checkRequired( SchemaValues metadata, List<Property> properties)
-   {
-      Set<Field>     fields              = metadata.getSchema().getFields();
-      StringBuilder msg = new StringBuilder();
-      for ( Field field : fields)
-      {  if (!isRequired(field, properties))
-         {   msg.append("Campo requerido[" + field.getName()+ "] no existe\n");
-         }
-      }
-      return  msg.length() == 0? null : msg.toString();
-   }//checkRequired
-   
-   
-   private boolean isRequired(Field field, List<Property> properties)
-   {
-      boolean ok = false;
-      for (Property p: properties)
-      {  if (p.hasName(field.getName()))
-         {  ok = true;  
-            break;
-         }
-      }
-      return ok;
-   }//isRequired
 
    //TODO: Falta implementar el delete en el repositorio JCR
 

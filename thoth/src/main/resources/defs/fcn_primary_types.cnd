@@ -1,0 +1,62 @@
+/*  Classification Node Type definition */
+
+<FCN = 'http://fconsultor.com/FCN'>
+
+[FCN:expediente] >  nt:base   orderable
+
+  - FCN:expedienteCode      ( STRING    ) primary mandatory   // Business id, unique
+  - FCN:tenant              ( LONG      ) mandatory           // Id of Tenant that owns the Expediente schema
+  - FCN:classificationClass ( REFERENCE ) mandatory           // Classification class to which this expediente belongs (Subserie si TRD)
+  - FCN:type                ( STRING    ) mandatory           // Expediente tipo GRUPO/ HOJA/ EXPEDIENTE/ VOLUME
+  - FCN:name                ( STRING    ) mandatory           // Expediente name
+  - FCN:createdBy           ( STRING    ) mandatory           // User that created this expediente
+  - FCN:open                ( BOOLEAN   ) mandatory           // Is the expediente currently open?
+  - FCN:dateOpened          ( STRING    )                     // Date expediente was opened
+  - FCN:dateClosed          ( STRING    )                     // Date expediente was closed
+  - FCN:location            ( STRING    )                     // Physical archive location (topographic signature)
+  - FCN:keywords            ( STRING    ) multiple            // Search keywords
+  - FCN:mac                 ( STRING    )                     // Message authentication code
+
+  + FCN:branch   (FCN:expediente)
+  + FCN:leaf     (FCN:volume)
+  + FCN:doc      (FCN:document)
+
+[FCN:volume]   >  nt:base   orderable
+
+[FCN:document] >  nt:base   orderable
+
+/*
+   Expediente class fields not in repository node
+
+  //- FCN:id                  ( STRING          )   through mix:referenceable    // UUID identifier of Classification class node
+  //- FCN:objectToProtect     ( ObjectToProtect )                                // Associated security object
+  //- FCN:expedienteIndex     ( ExpedienteIndex )                                // Expediente index entries
+  //- FCN:path                ( String          )   through node hierarchy       // Node path in document repository
+  //- FCN:metadataSchema      ( Schema          )   through mixin                // Metadata Schema
+  //- FCN:metadata            ( SchemaValues    )   through mixin                // Metadata values of the associated expediente
+  //- FCN:ownerId             ( Long            )   through node hierarchy       // Id of Branch Expediente to which this Branch/Leaf/Volume belongs
+*/
+
+[FCN:classification] >  nt:base   orderable
+
+  - FCN:tenant            ( LONG    ) primary  mandatory  protected     // Id of Tenant that owns the Classification schema
+  - FCN:level             ( LONG    ) primary  mandatory  protected     // Id of Classification level in the classification tree
+  - FCN:retentionSchedule ( LONG    ) primary  mandatory                // Id of Retention Calendar associated to the class
+  - FCN:code              ( STRING  ) primary  mandatory  protected     // Class code within the parent node vg 01, 02, etc
+  - FCN:classCode         ( STRING  ) primary  mandatory  protected     // Complete structured business code vg 01-01-01, 01-01-02, etc
+  - FCN:name              ( STRING  ) primary  mandatory  protected     // Classification class name
+  - FCN:open              ( BOOLEAN ) primary  mandatory                // Is the classification class open ?
+  - FCN:dateOpened        ( DATE    ) primary                           // Date classification class was opened
+  - FCN:dateClosed        ( DATE    ) primary                           // Date classification class was closed
+
+  + FCN:subclase   (FCN:classification)
+//  + FCN:dossier    (FCN:expediente)
+
+
+  // primary mandatory protected
+  //- FCN:id            ( STRING )  primary mandatory protected      // UUID identifier of Classification class node
+  //- metadata          SchemaValues                                 // Metadata values of the associated classification.level
+  //- version           int                                          // Número de versión
+  //- objectToProtect   ObjectToProtect                              // Associated security object
+  //- owner             Classification                               // Classification node to which this class belongs
+
