@@ -1,6 +1,10 @@
 
 <FCN = 'http://fconsultor.com/FCN'>
 
+[FCN:Volume] >  nt:base       mixin
+  - FCN:currentInstance  ( LONG      )  primary  mandatory                 // Id of the document
+  - FCN:admissibleTypes  ( STRING    )           mandatory multiple        // Id of Tenant that owns the document
+
 [FCN:Documento] >  nt:base       mixin
   - FCN:Identificacion   ( STRING    )  primary                            // Id of the document
   - FCN:Tenant           ( STRING    )                                     // Id of Tenant that owns the document

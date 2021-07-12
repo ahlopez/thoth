@@ -23,6 +23,7 @@ import com.f.thoth.backend.data.security.NeedsProtection;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
+import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.UserGroup;
 
@@ -68,15 +69,18 @@ public class Volume extends AbstractEntity implements  NeedsProtection, Comparab
 
 
    // ---------------------- getters & setters ---------------------
-   public BaseExpediente            getExpediente()                               { return expediente;}
-   public void                      setExpediente(BaseExpediente expediente)      { this.expediente = expediente;} 	
+   public BaseExpediente            getExpediente()                                       { return expediente;}
+   public void                      setExpediente(BaseExpediente expediente)              { this.expediente = expediente;} 	
 
-   public Set<DocumentType>         getAdmissibleTypes()   { return admissibleTypes;}
+   public Set<DocumentType>         getAdmissibleTypes()                                  { return admissibleTypes;}
    public void                      setAdmissibleTypes(Set<DocumentType> admissibleTypes) { this.admissibleTypes = admissibleTypes;}
-   public void                      clearTypes() { this.admissibleTypes.clear();}
+   public void                      clearTypes()                                          { this.admissibleTypes.clear();}
    
-   public Integer                   getCurrentInstance()                          { return currentInstance;}
-   public void                      setCurrentInstance ( Integer currentInstance) { this.currentInstance = currentInstance;}
+   public Integer                   getCurrentInstance()                                  { return currentInstance;}
+   public void                      setCurrentInstance ( Integer currentInstance)         { this.currentInstance = currentInstance;}
+   
+   public Tenant                    getTenant()                                           { return expediente.getTenant();}
+   public boolean                   isOpen()                                              { return expediente.isOpen();}
  	
    // ------------------------ Hereda de LeafExpediente -------------------------
 

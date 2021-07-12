@@ -17,6 +17,7 @@ import javax.validation.constraints.Size;
 import com.f.thoth.Parm;
 import com.f.thoth.backend.data.entity.AbstractEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
+import com.f.thoth.backend.data.security.Tenant;
 
 /**
  * Representa un volumen documental (segun Moreq)
@@ -118,6 +119,8 @@ public class VolumeInstance extends AbstractEntity implements  Comparable<Volume
 
    public Boolean       getOpen()                     { return open;}
    public void          setOpen(Boolean open)         { this.open = open;}
+   
+   public Tenant        getTenant()                   { return volume.getTenant();}
 
    // ------------------- Object ---------------------------------
 

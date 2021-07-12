@@ -189,14 +189,13 @@ public class ExpedienteGenerator implements HasLogger
    private ExpedienteGroup creeExpedienteGroup(Tenant tenant, User user, Classification classificationClass, Long ownerId)
          throws RepositoryException, UnknownHostException
    {
-      BaseExpediente   base   = createBase( classificationClass, user, ownerId);
+      BaseExpediente   base  = createBase( classificationClass, user, ownerId);
       ExpedienteGroup branch = new ExpedienteGroup(base);
       expedienteGroupRepository.saveAndFlush(branch);
       createIndex(base);
-
-      Node jcrGroup = createJCRExpediente(base);
-      jcrGroup.setProperty("evid:type", Nature.GRUPO.toString());
-
+      
+      @SuppressWarnings("unused")
+      Node jcrGroup = createJCRGroup( base);
       int nChildren = random.nextInt(4)+1;
       for( int i=0; i< nChildren; i++)
       {  creeExpediente( tenant, user, classificationClass, base.getId());
@@ -206,6 +205,16 @@ public class ExpedienteGenerator implements HasLogger
       return branch;
 
    }//creeExpedienteGroup
+   
+
+   
+   private Node createJCRGroup( BaseExpediente base)
+         throws RepositoryException, UnknownHostException
+   {
+      Node jcrGroup = createJCRExpediente(base, null);
+      jcrGroup.setProperty("jcr:nodeTypeName", Nature.GRUPO.toString());
+      return jcrGroup;
+   }//createJCRGroup
 
 
 
@@ -214,16 +223,13 @@ public class ExpedienteGenerator implements HasLogger
    {
       BaseExpediente   base   = createBase( classificationClass, user, ownerId);
       Set<DocumentType> admissibleTypes = generateAdmissibleTypes();
-      Node jcrLeaf = createJCRExpediente(base);
-      setAdmissibleTypes(jcrLeaf, admissibleTypes);
+      Node jcrLeaf = createJCRExpediente(base, admissibleTypes);
 
       int  volProbability = random.nextInt(100);
       if ( volProbability < 15)
-      {  jcrLeaf.setProperty("evid:type", Nature.VOLUMEN.toString());
-         createVolume(base, admissibleTypes);
+      {  createVolume(base, jcrLeaf, admissibleTypes);
       } else
-      {  jcrLeaf.setProperty("evid:type", Nature.EXPEDIENTE.toString());
-         createExpediente(base, admissibleTypes);
+      {  createExpediente(base, jcrLeaf, admissibleTypes);
       }
       base.createIndex();
       nLeaves++;
@@ -252,7 +258,7 @@ public class ExpedienteGenerator implements HasLogger
       base.setMac                 (generateMac());
  //   base.setMetadata            (SchemaValues.EMPTY);
       base.buildCode();
-      
+
 
       return base;
 
@@ -265,72 +271,90 @@ public class ExpedienteGenerator implements HasLogger
    }//createIndex
 
 
-   private Node createJCRExpediente(BaseExpediente base)
+   private Node createJCRExpediente(BaseExpediente base, Set<DocumentType> admissibleTypes)
          throws RepositoryException, UnknownHostException
    {
-      Tenant tenant = base.getTenant();
+      Tenant tenant    = base.getTenant();
+      String namespace = tenant.getName()+ ":";
       Node node = Repo.getInstance().addNode( base.getPath(), base.getName(), base.getCreatedBy().getEmail());
       node.addMixin   ( "mix:referenceable");
-      node.setProperty("FCN:tenant",         tenant.getId());
-      node.setProperty("FCN:expedienteCode", base.formatCode());
-      node.setProperty("FCN:type",           base.getType().toString());
-      node.setProperty("FCN:classification", base.getClassificationClass().formatCode());
-      node.setProperty("FCN:open",           base.isOpen());
+      node.setProperty(namespace+ "tenant",         tenant.getId());
+      node.setProperty(namespace+ "expedienteCode", base.formatCode());
+      Node clase = Repo.getInstance().findNode( base.getClassificationClass().getPath());
+      node.setProperty(namespace+ "classification", clase.getIdentifier());
+      if (admissibleTypes != null)
+      {  for( DocumentType admissibleType: admissibleTypes)
+         {  node.setProperty(namespace+ "admissibleTypes", admissibleType.getCode());
+         }
+      }
+      node.setProperty(namespace+ "open",           base.isOpen());
       if ( base.isOpen())
-      {  node.setProperty("FCN:dateOpened",  TextUtil.formatDateTime(base.getDateOpened()));
+      {  node.setProperty(namespace+ "dateOpened",  TextUtil.formatDateTime(base.getDateOpened()));
       }  else
-      {  node.setProperty("FCN:dateClosed",  TextUtil.formatDateTime(base.getDateClosed()));      
+      {  node.setProperty(namespace+ "dateClosed",  TextUtil.formatDateTime(base.getDateClosed()));
       }
       if (base.getLocation() != null)
-      {  node.setProperty("FCN:location",       base.getLocation());
+      {  node.setProperty(namespace+ "location",    base.getLocation());
       }
       if (TextUtil.isNotEmpty( base.getKeywords()))
       {  String[] keywords = base.getKeywords().split(Parm.VALUE_SEPARATOR);
          for( String keyword: keywords)
-         {  node.setProperty("FCN:keywords", keyword);
+         {  node.setProperty(namespace+ "keywords", keyword);
          }
       }
-  //    updateMixin( node, tenant.getName()+ ":", SchemaValues metadata);
-      Repo.getInstance().save();    
+      if ( base.getMac() != null )
+      {  node.setProperty(namespace+ "mac", base.getMac());
+      }
+      Schema schema = base.getMetadataSchema();
+      if ( schema != null)
+      {  Repo.getInstance().updateMixin( node, namespace, schema, base.getMetadata());
+      }
+      Repo.getInstance().save();
       nNodes++;
       return node;
-
-      /*
-      protected ObjectToProtect   objectToProtect;             // Associated security object
-      protected SchemaValues      metadata;                    // Metadata values of the associated expediente
-      protected String            mac;                         // Message authentication code
-      protected Integer           currentInstance;
-      */
 
    }//createJCRExpediente
 
 
 
-   private void createExpediente(BaseExpediente base, Set<DocumentType> admissibleTypes)
+   private void createExpediente(BaseExpediente base, Node jcrExpediente, Set<DocumentType> admissibleTypes)
         throws RepositoryException, UnknownHostException
    {
       base.setType(Nature.EXPEDIENTE);
       Volume volume = new Volume( base, Nature.EXPEDIENTE, 1, admissibleTypes);
       volumeRepository.save(volume);
 
-      Node jcrExpediente = Repo.getInstance().findNode(base.getPath());
-      jcrExpediente.setProperty("evid:type", Nature.EXPEDIENTE.toString());
-      jcrExpediente.setProperty("evid:currentInstance", "1");
+      createJCRExpediente( jcrExpediente, admissibleTypes);
 
-      LocalDateTime dateOpened = LocalDateTime.now().minusDays(365L*4);
-      LocalDateTime dateClosed = dateOpened.plusYears(1000L);
-      VolumeInstance expedienteInstance = createVolumeInstance( volume, 1, dateOpened, dateClosed);
+      VolumeInstance expedienteInstance = createVolumeInstance( volume, jcrExpediente, 1, true, base.getDateOpened(), LocalDateTime.MAX);
       expedienteInstance.setOpen(true);
       volumeInstanceRepository.saveAndFlush(expedienteInstance);
-      createJCRInstance(expedienteInstance);
+      createJCRInstance(expedienteInstance, jcrExpediente);
 
       nLeavesFinal++;
 
    }//createExpediente
+   
+   
+   private void createJCRExpediente( Node jcrExpediente, Set<DocumentType> admissibleTypes)
+         throws RepositoryException, UnknownHostException
+   {
+      jcrExpediente.addMixin("FCN:volume");
+      String namespace = tenant.getName()+ ":";
+      jcrExpediente.setProperty("jcr:nodeTypeName", Nature.EXPEDIENTE.toString());
+      jcrExpediente.setProperty(namespace+ "expedienteType",  Nature.EXPEDIENTE.toString());
+      jcrExpediente.setProperty(namespace+ "currentInstance", 0L);
+      if (admissibleTypes != null)
+      {  for( DocumentType admissibleType: admissibleTypes)
+         {  jcrExpediente.setProperty(namespace+ "admissibleTypes", admissibleType.getCode());
+         }
+      }
+      
+   }//createJCRExpediente
 
 
 
-   private void createVolume(BaseExpediente base, Set<DocumentType> admissibleTypes)
+   private void createVolume(BaseExpediente base, Node jcrVol, Set<DocumentType> admissibleTypes)
        throws RepositoryException, UnknownHostException
    {
       base.setType(Nature.VOLUMEN);
@@ -339,27 +363,32 @@ public class ExpedienteGenerator implements HasLogger
       int nInstances = random.nextInt(3)+1;
       volume.setCurrentInstance(nInstances);
       volumeRepository.save(volume);
+      
+      createJCRVolume(jcrVol, volume);
       LocalDateTime dateOpened =  LocalDateTime.now().minusDays(365L*4);
       LocalDateTime dateClosed =  dateOpened.plusDays(365L);
-      for (int instance=1; instance <= nInstances; instance++)
+      for (int instance=0; instance < nInstances; instance++)
       {
-         currentInstance = createVolumeInstance(volume, instance, dateOpened, dateClosed);
+         boolean isOpen  = (instance == nInstances-1);
+         currentInstance = createVolumeInstance(volume, jcrVol, instance, isOpen, dateOpened, isOpen? LocalDateTime.MAX : dateClosed);
          dateOpened      = dateClosed.plusDays(1L);
          dateClosed      = dateOpened.plusDays(365L);
-         createJCRInstance(currentInstance);
       }
       currentInstance.setOpen(true);
       currentInstance.setDateClosed(LocalDateTime.MAX);
       volumeInstanceRepository.saveAndFlush(currentInstance);
-      Node jcrInstance = Repo.getInstance().findNode(volume.getPath()+ Parm.PATH_SEPARATOR+ nInstances);
-      jcrInstance.setProperty("evid:open", "true");
-
-      Node jcrVolume = Repo.getInstance().findNode(base.getPath());
-      jcrVolume.setProperty("evid:type", Nature.VOLUMEN.toString());
-      jcrVolume.setProperty("evid:currentInstance", ""+ volume.getCurrentInstance());
       nVolumes++;
 
    }//createVolume
+   
+   
+   private void  createJCRVolume(Node jcrVol, Volume volume)
+         throws RepositoryException, UnknownHostException
+   {
+      String  namespace = tenant.getName()+ ":";
+      jcrVol.setProperty("jcr:nodeTypeName", Nature.VOLUMEN.toString());
+      jcrVol.setProperty(namespace+ "currentInstance", ""+ volume.getCurrentInstance());
+   }//createJCRVolume
 
 
    private Volume createVolumeHeader(BaseExpediente base, Set<DocumentType> admissibleTypes)
@@ -373,49 +402,33 @@ public class ExpedienteGenerator implements HasLogger
    }//createVolumeHeader
 
 
-   private VolumeInstance createVolumeInstance( Volume vol, int instanceNumber, LocalDateTime dateOpened, LocalDateTime dateClosed)
+   private VolumeInstance createVolumeInstance( Volume vol, Node jcrVol, int instanceNumber, boolean open, LocalDateTime dateOpened, LocalDateTime dateClosed)
        throws RepositoryException, UnknownHostException
    {
       VolumeInstance instance = new VolumeInstance( vol, instanceNumber, "[Loc]", dateOpened , dateClosed);
-      instance.setOpen(false);
+      instance.setOpen(open);
       volumeInstanceRepository.saveAndFlush(instance);
+      createJCRInstance(instance, jcrVol);
       nInstances++;
       return instance;
    }//createVolumeInstance
 
 
-   private void createJCRInstance(VolumeInstance instance)
+   private void createJCRInstance(VolumeInstance instance, Node jcrVol)
       throws RepositoryException, UnknownHostException
    {
+      String       namespace = tenant.getName()+ ":";
       Volume          volume = instance.getVolume();
       Integer instanceNumber = instance.getInstance();
       String            path = volume.getPath()+ Parm.PATH_SEPARATOR+ instanceNumber;
       Node       jcrInstance = Repo.getInstance().addNode(path, volume.getName()+ " instance "+ instanceNumber, user.getEmail());
-      jcrInstance.setProperty("evid:instance", ""+ instanceNumber);
-      jcrInstance.setProperty("evid:opened",   TextUtil.formatDateTime(instance.getDateOpened()));
-      jcrInstance.setProperty("evid:closed",   TextUtil.formatDateTime(instance.getDateClosed()));
-      jcrInstance.setProperty("evid:open",     ""+ instance.getOpen());
+      jcrInstance.setProperty(namespace+ "instance", instanceNumber);
+      jcrInstance.setProperty(namespace+ "open",     instance.getOpen());
+      jcrInstance.setProperty(namespace+ "opened",   TextUtil.formatDateTime(instance.getDateOpened()));
+      jcrInstance.setProperty(namespace+ "closed",   TextUtil.formatDateTime(instance.getDateClosed()));
+      //TODO:   Simular  - FCN:location            ( STRING    )                     // Physical archive location (topographic signature)
       nNodes++;
    }//createJCRInstance
-
-
-   private void setAdmissibleTypes(Node jcrNode, Set<DocumentType> admissibleTypes)
-       throws RepositoryException
-   {
-      StringBuilder admissible = new StringBuilder();
-      try
-      {
-         for ( DocumentType docType: admissibleTypes)
-         {   admissible.append(docType.getCode()).append(Parm.VALUE_SEPARATOR);
-         }
-         if (admissible.length() > 0)
-         {   jcrNode.setProperty("evid:admissibleTypes", admissible.toString());
-         }
-      }catch( Exception e)
-      { throw new IllegalStateException("No pudo guardar tipos documentales admisibles["+ admissible.toString()+ "] en nodo["+ jcrNode.getPath()+ "]");
-      }
-   }//setAdmissibleTypes
-
 
 
    private String generateName()
@@ -459,11 +472,11 @@ public class ExpedienteGenerator implements HasLogger
 
    private String generateMac()
    {
-      // Crear un BlockChain
+      //TODO: Crear un BlockChain
       // Generar el mac del expediente usando el mac de cada documento y el precedente del block
       //
 
-      return ""; //TODO:
+      return "";
    }//generateMac
 
 

@@ -7,7 +7,7 @@
   - FCN:expedienteCode      ( STRING    ) primary mandatory   // Business id, unique
   - FCN:tenant              ( LONG      ) mandatory           // Id of Tenant that owns the Expediente schema
   - FCN:classificationClass ( REFERENCE ) mandatory           // Classification class to which this expediente belongs (Subserie si TRD)
-  - FCN:type                ( STRING    ) mandatory           // Expediente tipo GRUPO/ HOJA/ EXPEDIENTE/ VOLUME
+  - FCN:expedienteType      ( STRING    ) mandatory           // Expediente tipo GRUPO/ HOJA/ EXPEDIENTE/ VOLUME
   - FCN:name                ( STRING    ) mandatory           // Expediente name
   - FCN:createdBy           ( STRING    ) mandatory           // User that created this expediente
   - FCN:open                ( BOOLEAN   ) mandatory           // Is the expediente currently open?
@@ -22,12 +22,21 @@
   + FCN:doc      (FCN:document)
 
 [FCN:volume]   >  nt:base   orderable
+  - FCN:currentInstance   ( LONG      ) primary mandatory     // Current instance of this volume. For EXPEDIENTE it is always zero (0)
+  - FCN:admissibleTypes   ( STRING    ) multiple              // Admisible document types that can be included in the volume
+  + FCN:volInstance       ( FCN:volumeInstance)
 
 [FCN:document] >  nt:base   orderable
 
-/*
-   Expediente class fields not in repository node
+[FCN:volumeInstance]   >  nt:base   orderable
+  - FCN:instance            ( LONG      ) primary mandatory   // Volume instance number. It is always zero (0) for type=EXPEDIENTE, >= 0 for VOLUME
+  - FCN:open                ( BOOLEAN   ) mandatory           // Is the instance currently open?
+  - FCN:dateOpened          ( STRING    )                     // Date instance was opened
+  - FCN:dateClosed          ( STRING    )                     // Date instance was closed
+  - FCN:location            ( STRING    )                     // Physical archive location (topographic signature)
 
+
+/*
   //- FCN:id                  ( STRING          )   through mix:referenceable    // UUID identifier of Classification class node
   //- FCN:objectToProtect     ( ObjectToProtect )                                // Associated security object
   //- FCN:expedienteIndex     ( ExpedienteIndex )                                // Expediente index entries
@@ -46,11 +55,11 @@
   - FCN:classCode         ( STRING  ) primary  mandatory  protected     // Complete structured business code vg 01-01-01, 01-01-02, etc
   - FCN:name              ( STRING  ) primary  mandatory  protected     // Classification class name
   - FCN:open              ( BOOLEAN ) primary  mandatory                // Is the classification class open ?
-  - FCN:dateOpened        ( DATE    ) primary                           // Date classification class was opened
-  - FCN:dateClosed        ( DATE    ) primary                           // Date classification class was closed
+  - FCN:dateOpened        ( STRING  ) primary                           // Date classification class was opened
+  - FCN:dateClosed        ( STRING  ) primary                           // Date classification class was closed
 
   + FCN:subclase   (FCN:classification)
-//  + FCN:dossier    (FCN:expediente)
+  + FCN:dossier    (FCN:expediente)
 
 
   // primary mandatory protected

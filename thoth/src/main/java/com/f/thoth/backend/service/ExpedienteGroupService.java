@@ -102,7 +102,7 @@ public class ExpedienteGroupService implements FilterableCrudService<ExpedienteG
 
    @Override public ExpedienteGroup save(User currentUser, ExpedienteGroup expediente)
    {
-      try 
+      try
       {  ExpedienteGroup group = FilterableCrudService.super.save(currentUser, expediente);
          saveJCRExpedienteGroup(currentUser, group);
          return group;
@@ -111,8 +111,8 @@ public class ExpedienteGroupService implements FilterableCrudService<ExpedienteG
       }
 
    }//save
-   
-   
+
+
    private void saveJCRExpedienteGroup(User currentUser, ExpedienteGroup group)
    {
       try
@@ -122,7 +122,7 @@ public class ExpedienteGroupService implements FilterableCrudService<ExpedienteG
          Long          parentId   = group.getOwnerId();
          if (parentId != null)
          {   Optional<ExpedienteGroup> parent = expedienteGroupRepository.findById(parentId);
-             if (parent.isPresent()) 
+             if (parent.isPresent())
              {  parentPath =  parent.get().getPath();
              }
          }
@@ -138,28 +138,36 @@ public class ExpedienteGroupService implements FilterableCrudService<ExpedienteG
    private Node addJCRChild(User currentUser, String parentPath,ExpedienteGroup group)
          throws RepositoryException, UnknownHostException
    {
+      String namespace      = currentUser.getTenant().getName()+ ":";
       String expedienteCode = group.getExpedienteCode();
       String      childPath = parentPath+ Parm.PATH_SEPARATOR+ expedienteCode;
       Node            child = Repo.getInstance().addNode(childPath, group.getName(), currentUser.getEmail());
-      child.setProperty("jcr:nodeType", NodeType.EXPEDIENTE.name());
-      child.setProperty("evid:code",    expedienteCode);
+      child.setProperty("jcr:nodeTypeName", NodeType.EXPEDIENTE.name());
+      child.setProperty(namespace+ "code",  expedienteCode);
       return child;
    }//addJCRChild
-   
-   
+
+
    private void updateJCRExpedienteGroup(Node groupJCR, ExpedienteGroup group)
    {
       try
       {
-         groupJCR.setProperty("evid:type",      Nature.GRUPO.toString());
-         groupJCR.setProperty("evid:class",     group.getClassificationClass().formatCode());
-         groupJCR.setProperty("evid:schema",    group.getMetadataSchema().getCode());
-         groupJCR.setProperty("evid:opened",    TextUtil.formatDateTime(group.getDateOpened()));
-         groupJCR.setProperty("evid:closed",    TextUtil.formatDateTime(group.getDateClosed()));
-         groupJCR.setProperty("evid:open",      group.getOpen().toString());
-         groupJCR.setProperty("evid:location",  group.getLocation());
-         groupJCR.setProperty("evid:keywords",  group.getKeywords());
-         
+         String namespace      = group.getTenant().getName()+ ":";
+         groupJCR.setProperty(namespace+ "type",      Nature.GRUPO.toString());
+         groupJCR.setProperty(namespace+ "class",     group.getClassificationClass().formatCode());
+         groupJCR.setProperty(namespace+ "schema",    group.getMetadataSchema().getCode());
+         groupJCR.setProperty(namespace+ "open",      group.isOpen());
+         groupJCR.setProperty(namespace+ "opened",    TextUtil.formatDateTime(group.getDateOpened()));
+         groupJCR.setProperty(namespace+ "closed",    TextUtil.formatDateTime(group.getDateClosed()));
+         groupJCR.setProperty(namespace+ "location",  group.getLocation());
+         String keywords = group.getKeywords();
+         if (keywords != null)
+         {  String[] keys = keywords.split(Parm.VALUE_SEPARATOR);
+            for( String k: keys)
+            {  groupJCR.setProperty(namespace+ "keywords", k);
+            }
+         }
+
          // TODO: Revisar como incorporar los campos objectToProtect, metadata, expedienteIndex, mac en el repositorio
          // protected ObjectToProtect   objectToProtect;            // Associated security object
          // protected SchemaValues      metadata;                   // Metadata values of the associated expediente
@@ -169,7 +177,7 @@ public class ExpedienteGroupService implements FilterableCrudService<ExpedienteG
       } catch(Exception e)
       {   throw new IllegalStateException("No pudo actualizar grupo de expedientes["+ group.formatCode()+ "] en el repositorio. Razón\n"+ e.getMessage());
       }
-     
+
    }//updateJCRExpedienteGroup
 
 

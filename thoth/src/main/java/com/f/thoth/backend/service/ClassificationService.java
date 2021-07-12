@@ -24,6 +24,7 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.classification.Level;
 import com.f.thoth.backend.data.gdoc.document.jackrabbit.NodeType;
+import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
@@ -167,7 +168,8 @@ public class ClassificationService implements FilterableCrudService<Classificati
          }  else
          {  classificationJCR.setProperty( ns+ "dateClosed", TextUtil.formatDate(classificationClass.getDateClosed()));
          }
-         Repo.getInstance().updateMixin( classificationJCR, ns, classificationClass.getMetadata());
+         SchemaValues metadata = classificationClass.getMetadata();
+         Repo.getInstance().updateMixin( classificationJCR, ns, metadata.getSchema(), metadata );
          Repo.getInstance().save();    // TODO: Revisar si funciona para multiusuario, o si toca tener una sesión para cada usuario (guardada en la vaadin session)
       } catch(Exception e)
       {   throw new IllegalStateException("No pudo actualizar clase["+ classificationClass.formatCode()+ "]. Razón\n"+ e.getMessage());

@@ -33,6 +33,7 @@ import com.f.thoth.app.HasLogger;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.metadata.Field;
 import com.f.thoth.backend.data.gdoc.metadata.Property;
+import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.gdoc.metadata.SchemaValues;
 import com.f.thoth.backend.data.gdoc.metadata.jcr.SchemaValuesToPropertiesExporter;
 
@@ -319,8 +320,9 @@ public class Repo implements HasLogger
    }//save
    
    
-   public String updateMixin( Node node, String namespace, SchemaValues metadata) throws RepositoryException
+   public String updateMixin( Node node, String namespace, Schema schema, SchemaValues metadata) throws RepositoryException
    {
+      node.addMixin(namespace + schema.getName());
       if (metadata == null)
       {   return null;
       }
@@ -329,9 +331,7 @@ public class Repo implements HasLogger
       List<Property> properties          = (List<Property>)metadata.export( metaExporter);
       String msg  = checkRequired( metadata, properties);
       if ( msg == null)
-      {
-         node.addMixin(namespace + metadata.getName());
-         for ( Property p: properties)
+      {  for ( Property p: properties)
          {  node.setProperty( namespace+ p.getName(), p.getValue()); 
            // System.out.println(" >>> "+ namespace+ p.getName()+ "= ["+ p.getValue()+ "]");
          }

@@ -107,8 +107,8 @@ public class VolumeInstanceService  implements FilterableCrudService<VolumeInsta
       }
    }//save
 
-   
-   
+
+
    private void saveJCRInstance(User currentUser, VolumeInstance instance)
    {
       try
@@ -126,30 +126,32 @@ public class VolumeInstanceService  implements FilterableCrudService<VolumeInsta
    private Node addJCRChild(User currentUser, String parentPath, VolumeInstance instance)
          throws RepositoryException, UnknownHostException
    {
+      String namespace    = currentUser.getTenant().getName()+ ":";
       Volume       volume = instance.getVolume();
       String instanceCode = instance.getInstance().toString();
       String    childPath = parentPath+ Parm.PATH_SEPARATOR+ ""+ instanceCode;
       Node          child = Repo.getInstance().addNode(childPath, "volume "+ volume.getName()+ " - instance "+ instanceCode, currentUser.getEmail());
       child.setProperty("jcr:nodeType", NodeType.INSTANCE.toString());
-      child.setProperty("evid:code",    instance.formatCode());
+      child.setProperty(namespace+ "code",    instance.formatCode());
       return child;
    }//addJCRChild
-   
-   
+
+
    private void updateJCRInstance(Node instanceJCR, VolumeInstance instance)
    {
       try
       {
-         instanceJCR.setProperty("evid:type",           NodeType.INSTANCE.getCode());
-         instanceJCR.setProperty("evid:instance",       instance.getInstance().toString());
-         instanceJCR.setProperty("evid:location",       instance.getLocation());
-         instanceJCR.setProperty("evid:opened",         TextUtil.formatDateTime(instance.getDateOpened()));
-         instanceJCR.setProperty("evid:closed",         TextUtil.formatDateTime(instance.getDateClosed()));
-         instanceJCR.setProperty("evid:open",           instance.getOpen().toString());
+         String namespace    = instance.getTenant().getName()+ ":";
+         instanceJCR.setProperty(namespace+ "type",     NodeType.INSTANCE.getCode());
+         instanceJCR.setProperty(namespace+ "instance", instance.getInstance().toString());
+         instanceJCR.setProperty(namespace+ "location", instance.getLocation());
+         instanceJCR.setProperty(namespace+ "open",     instance.isOpen());
+         instanceJCR.setProperty(namespace+ "opened",   TextUtil.formatDateTime(instance.getDateOpened()));
+         instanceJCR.setProperty(namespace+ "closed",   TextUtil.formatDateTime(instance.getDateClosed()));
       } catch(Exception e)
       {   throw new IllegalStateException("No pudo actualizar instancia["+ instance.formatCode()+ "] en el repositorio. Razón\n"+ e.getMessage());
       }
-     
+
    }//updateJCRInstance
 
 

@@ -119,7 +119,7 @@ public class BaseExpediente extends BaseEntity implements  NeedsProtection, Comp
 
   @NotNull(message = "{evidentia.disposicion.required}")
   @Enumerated(EnumType.STRING)
-  private Nature              type;                        // Expediente tipo GRUPO/ HOJA/ EXPEDIENTE/ VOLUME
+  protected Nature            type;                        // Expediente tipo GRUPO/ HOJA/ EXPEDIENTE/ VOLUME
 
   @NotNull  (message = "{evidentia.repopath.required}")
   @NotBlank (message = "{evidentia.repopath.required}")

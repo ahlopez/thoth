@@ -71,9 +71,9 @@ public class VolumeService implements FilterableCrudService<Volume>, PermissionS
    {  long n = filter.isPresent()
              ? volumeRepository.countByNameLikeIgnoreCase(tenant(), "%" + filter.get() + "%")
              : volumeRepository.countAll(tenant());
-      
+
       return n;
-                   
+
    }//countAnyMatching
 
 
@@ -104,8 +104,8 @@ public class VolumeService implements FilterableCrudService<Volume>, PermissionS
       }
 
    }//save
-   
-   
+
+
    private void saveJCRVolume(User currentUser, Volume volume)
    {
       try
@@ -115,7 +115,7 @@ public class VolumeService implements FilterableCrudService<Volume>, PermissionS
          Long          parentId   = volume.getOwnerId();
          if (parentId != null)
          {   Optional<Volume> parent = volumeRepository.findById(parentId);
-             if (parent.isPresent()) 
+             if (parent.isPresent())
              {  parentPath =  parent.get().getPath();
              }
          }
@@ -131,29 +131,38 @@ public class VolumeService implements FilterableCrudService<Volume>, PermissionS
    private Node addJCRChild(User currentUser, String parentPath, Volume volume)
          throws RepositoryException, UnknownHostException
    {
+      String namespace    = currentUser.getTenant().getName()+ ":";
       String volumeCode = volume.getExpedienteCode();
       String  childPath = parentPath+ Parm.PATH_SEPARATOR+ volumeCode;
       Node        child = Repo.getInstance().addNode(childPath, volume.getName(), currentUser.getEmail());
       child.setProperty("jcr:nodeType", volume.getType().toString());
-      child.setProperty("evid:code",    volumeCode);
+      child.setProperty(namespace+ "code",    volumeCode);
       return child;
    }//addJCRChild
-   
-   
+
+
    private void updateJCRVolume(Node volumeJCR, Volume volume)
    {
       try
       {
-         volumeJCR.setProperty("evid:type",           volume.getType().toString());
-         volumeJCR.setProperty("evid:class",          volume.getClassificationClass().formatCode());
-         volumeJCR.setProperty("evid:schema",         volume.getMetadataSchema().getCode());
-         volumeJCR.setProperty("evid:opened",         TextUtil.formatDateTime(volume.getDateOpened()));
-         volumeJCR.setProperty("evid:closed",         TextUtil.formatDateTime(volume.getDateClosed()));
-         volumeJCR.setProperty("evid:open",           volume.getOpen().toString());
-         volumeJCR.setProperty("evid:location",       volume.getLocation());
-         volumeJCR.setProperty("evid:keywords",       volume.getKeywords());
-         volumeJCR.setProperty("evid:curentInstance", volume.getCurrentInstance().toString());
-         
+         String namespace = volume.getTenant().getName()+ ":";
+         volumeJCR.setProperty(namespace+ "type",           volume.getType().toString());
+         volumeJCR.setProperty(namespace+ "class",          volume.getClassificationClass().formatCode());
+         volumeJCR.setProperty(namespace+ "schema",         volume.getMetadataSchema().getCode());
+         volumeJCR.setProperty(namespace+ "open",           volume.isOpen());
+         volumeJCR.setProperty(namespace+ "opened",         TextUtil.formatDateTime(volume.getDateOpened()));
+         volumeJCR.setProperty(namespace+ "closed",         TextUtil.formatDateTime(volume.getDateClosed()));
+         volumeJCR.setProperty(namespace+ "location",       volume.getLocation());
+         volumeJCR.setProperty(namespace+ "keywords",       volume.getKeywords());
+         volumeJCR.setProperty(namespace+ "curentInstance", volume.getCurrentInstance().toString());
+
+         String keywords = volume.getKeywords();
+         if (keywords != null)
+         {  String[] keys = keywords.split(Parm.VALUE_SEPARATOR);
+            for( String k: keys)
+            {  volumeJCR.setProperty(namespace+ "keywords", k);
+            }
+         }
          // TODO: Revisar como incorporar los campos objectToProtect, metadata, expedienteIndex, mac, admissibleTypes en el repositorio
          // protected ObjectToProtect   objectToProtect;            // Associated security object
          // protected SchemaValues      metadata;                   // Metadata values of the associated expediente
@@ -164,7 +173,7 @@ public class VolumeService implements FilterableCrudService<Volume>, PermissionS
       } catch(Exception e)
       {   throw new IllegalStateException("No pudo actualizar volumen["+ volume.formatCode()+ "] en el repositorio. Razón\n"+ e.getMessage());
       }
-     
+
    }//updateJCRVolume
 
 
@@ -237,6 +246,6 @@ public class VolumeService implements FilterableCrudService<Volume>, PermissionS
    }//revoke
 
    private Tenant  tenant() { return (Tenant)VaadinSession.getCurrent().getAttribute(TENANT); }
-   
+
 
 }//VolumeService
