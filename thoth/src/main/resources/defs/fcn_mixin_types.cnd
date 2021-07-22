@@ -2,75 +2,75 @@
 <FCN = 'http://fconsultor.com/FCN'>
 
 [FCN:Volume] >  nt:base       mixin
-  - FCN:currentInstance  ( LONG      )  primary  mandatory                 // Id of the document
-  - FCN:admissibleTypes  ( STRING    )           mandatory multiple        // Id of Tenant that owns the document
+  - FCN:currentInstance  ( LONG      )  primary  mandatory       // Id of the document
+  - FCN:admissibleTypes  ( STRING    )           multiple        // Id of Tenant that owns the document
 
 [FCN:Documento] >  nt:base       mixin
-  - FCN:Identificacion   ( STRING    )  primary                            // Id of the document
-  - FCN:Tenant           ( STRING    )                                     // Id of Tenant that owns the document
-  - FCN:Autor            ( STRING    )                                     // Author of the document
+  - FCN:Identificacion   ( STRING    )  primary                  // Id of the document
+  - FCN:Tenant           ( STRING    )                           // Id of Tenant that owns the document
+  - FCN:Autor            ( STRING    )                           // Author of the document
 
 
 [FCN:Sede] >  nt:base       mixin
-  - FCN:Desde            ( STRING    )                                     // Fecha desde
-  - FCN:Hasta            ( STRING    )                                     // Fecha hasta
-  - FCN:Colores          ( STRING    )                                     // Color
-  - FCN:Seguridad        ( STRING    )                                     // Categoría de seguridad
+  - FCN:Desde            ( STRING    )                           // Fecha desde
+  - FCN:Hasta            ( STRING    )                           // Fecha hasta
+  - FCN:Colores          ( STRING    )                           // Color
+  - FCN:Seguridad        ( STRING    )                           // Categoría de seguridad
 
 
 [FCN:Obligacion] >  nt:base       mixin
-  - FCN:Identificacion   ( STRING    )  primary                            // Obligacion id
-  - FCN:Concepto         ( STRING    )                                     // Concepto
-  - FCN:Remitente        ( STRING    )                                     // Remite
-  - FCN:Valor            ( STRING    )                                     // Valor de la obligacion
+  - FCN:Identificacion   ( STRING    )  primary                  // Obligacion id
+  - FCN:Concepto         ( STRING    )                           // Concepto
+  - FCN:Remitente        ( STRING    )                           // Remite
+  - FCN:Valor            ( STRING    )                           // Valor de la obligacion
 
 
 [FCN:Factura] >  nt:base       mixin
-  - FCN:Obligacion       ( STRING    )  primary                            // Commitment que aplica a la factura
-  - FCN:APagarEn         ( STRING    )                                     // Due date
-  - FCN:Valor            ( STRING    )                                     // Valor cobrado
+  - FCN:Obligacion       ( STRING    )  primary                  // Commitment que aplica a la factura
+  - FCN:APagarEn         ( STRING    )                           // Due date
+  - FCN:Valor            ( STRING    )                           // Valor cobrado
 
 
 [FCN:Pago] >  nt:base       mixin
-  - FCN:Identificacion   ( STRING    )  primary                            // Id del pago
-  - FCN:Valor            ( STRING    )                                     // Valor pagado
-  - FCN:PagadoEn         ( STRING    )                                     // Fecha de pago
+  - FCN:Identificacion   ( STRING    )  primary                  // Id del pago
+  - FCN:Valor            ( STRING    )                           // Valor pagado
+  - FCN:PagadoEn         ( STRING    )                           // Fecha de pago
 
 
 [FCN:Remision] >  nt:base       mixin
-  - FCN:Identificacion   ( STRING    )  primary                            // Id de la remision
-  - FCN:Obligacion       ( STRING    )                                     // Id del commitment de la remision
-  - FCN:Fecha            ( STRING    )                                     // Fecha de remision
+  - FCN:Identificacion   ( STRING    )  primary                  // Id de la remision
+  - FCN:Obligacion       ( STRING    )                           // Id del commitment de la remision
+  - FCN:Fecha            ( STRING    )                           // Fecha de remision
 
 
 [FCN:Recibo] >  nt:base       mixin
-  - FCN:Identificacion   ( STRING    )  primary                            // Id del recibo
-  - FCN:Despacho         ( STRING    )                                     // Id de la remision
-  - FCN:Fecha            ( STRING    )                                     // Fecha de recibo
+  - FCN:Identificacion   ( STRING    )  primary                  // Id del recibo
+  - FCN:Despacho         ( STRING    )                           // Id de la remision
+  - FCN:Fecha            ( STRING    )                           // Fecha de recibo
 
 
 [FCN:Office] >  nt:base       mixin
-  - FCN:Jefe             ( STRING    )                                     // Jefe de la oficina
-  - FCN:Desde            ( STRING    )                                     // Fecha de apertura
-  - FCN:Hasta            ( STRING    )                                     // Fecha de cierre
-  - FCN:Colores          ( STRING    )                                     // Color de las paredes
+  - FCN:Jefe             ( STRING    )                           // Jefe de la oficina
+  - FCN:Desde            ( STRING    )                           // Fecha de apertura
+  - FCN:Hasta            ( STRING    )                           // Fecha de cierre
+  - FCN:Colores          ( STRING    )                           // Color de las paredes
 
 
 [FCN:Series] >  nt:base       mixin
-  - FCN:Desde            ( STRING    )                                     // Fecha de apertura
-  - FCN:Hasta            ( STRING    )                                     // Fecha de cierre
-  - FCN:Seguridad        ( STRING    )                                     // Categoría de seguridad
+  - FCN:Desde            ( STRING    )                           // Fecha de apertura
+  - FCN:Hasta            ( STRING    )                           // Fecha de cierre
+  - FCN:Seguridad        ( STRING    )                           // Categoría de seguridad
 
 
 [FCN:Other] >  nt:base       mixin
-  - FCN:Nombre           ( STRING    )                                     // Categoría de seguridad
-  - FCN:Jefe             ( STRING    )                                     // Categoría de seguridad
-  - FCN:Desde            ( STRING    )                                     // Fecha de apertura
-  - FCN:Hasta            ( STRING    )                                     // Fecha de cierre
-  - FCN:Cantidad         ( STRING    )                                     // Categoría de seguridad
-  - FCN:Edad             ( STRING    )                                     // Categoría de seguridad
-  - FCN:Razon            ( STRING    )                                     // Categoría de seguridad
+  - FCN:Nombre           ( STRING    )                           // Nombre del documento
+  - FCN:Jefe             ( STRING    )                           // Jefe de la oficina
+  - FCN:Desde            ( STRING    )                           // Fecha de apertura
+  - FCN:Hasta            ( STRING    )                           // Fecha de cierre
+  - FCN:Cantidad         ( STRING    )                           // Cantidad
+  - FCN:Edad             ( STRING    )                           // Edad
+  - FCN:Razon            ( STRING    )                           // Nota textual
 
 
 [FCN:SHORT] >  nt:base       mixin
-  - FCN:Colores          ( STRING    )  primary   mandatory                // Categoría de seguridad
+  - FCN:Colores          ( STRING    )  primary                  // colores

@@ -339,7 +339,7 @@ public class ExpedienteGenerator implements HasLogger
    private void createJCRExpediente( Node jcrExpediente, Set<DocumentType> admissibleTypes)
          throws RepositoryException, UnknownHostException
    {
-      jcrExpediente.addMixin("FCN:volume");
+      jcrExpediente.addMixin("FCN:Volume");
       String namespace = tenant.getName()+ ":";
       jcrExpediente.setProperty("jcr:nodeTypeName", Nature.EXPEDIENTE.toString());
       jcrExpediente.setProperty(namespace+ "expedienteType",  Nature.EXPEDIENTE.toString());
@@ -386,7 +386,8 @@ public class ExpedienteGenerator implements HasLogger
          throws RepositoryException, UnknownHostException
    {
       String  namespace = tenant.getName()+ ":";
-      jcrVol.setProperty("jcr:nodeTypeName", Nature.VOLUMEN.toString());
+      String  volNature = Nature.VOLUMEN.toString();
+      jcrVol.setProperty("jcr:nodeTypeName", volNature);
       jcrVol.setProperty(namespace+ "currentInstance", ""+ volume.getCurrentInstance());
    }//createJCRVolume
 

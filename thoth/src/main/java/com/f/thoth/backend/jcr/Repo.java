@@ -322,6 +322,9 @@ public class Repo implements HasLogger
    
    public String updateMixin( Node node, String namespace, Schema schema, SchemaValues metadata) throws RepositoryException
    {
+      if( schema == null || schema.getName().equals("EMPTY"))
+         return null;
+      
       node.addMixin(namespace + schema.getName());
       if (metadata == null)
       {   return null;
