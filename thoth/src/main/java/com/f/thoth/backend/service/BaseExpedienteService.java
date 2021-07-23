@@ -1,11 +1,17 @@
 package com.f.thoth.backend.service;
 
+import static com.f.thoth.Parm.CURRENT_USER;
+import static com.f.thoth.Parm.PATH_SEPARATOR;
 import static com.f.thoth.Parm.TENANT;
 
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+
+import javax.jcr.Node;
+import javax.jcr.RepositoryException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -14,13 +20,21 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
+import com.f.thoth.Parm;
+import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.classification.Classification;
 import com.f.thoth.backend.data.gdoc.expediente.BaseExpediente;
+import com.f.thoth.backend.data.gdoc.expediente.Nature;
+import com.f.thoth.backend.data.gdoc.expediente.Volume;
+import com.f.thoth.backend.data.gdoc.expediente.VolumeInstance;
+import com.f.thoth.backend.data.gdoc.metadata.DocumentType;
+import com.f.thoth.backend.data.gdoc.metadata.Schema;
 import com.f.thoth.backend.data.security.ObjectToProtect;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.User;
+import com.f.thoth.backend.jcr.Repo;
 import com.f.thoth.backend.repositories.BaseExpedienteRepository;
 import com.f.thoth.backend.repositories.ObjectToProtectRepository;
 import com.f.thoth.backend.repositories.PermissionRepository;
@@ -185,5 +199,106 @@ public class BaseExpedienteService implements FilterableCrudService<BaseExpedien
   }//revoke
 
   private Tenant  tenant() { return (Tenant)VaadinSession.getCurrent().getAttribute(TENANT); }
+  
+  // ------------------------ JCR ------------------------------
+
+  public void createClassRoot(String expedienteRootPath, Classification rootClass)
+      throws RepositoryException, UnknownHostException
+  {
+     VaadinSession vSession = VaadinSession.getCurrent();
+     User         user      = (User)vSession.getAttribute(CURRENT_USER);
+     String       code      = ""+ rootClass.getId();
+     String       clazzPath =  expedienteRootPath+ PATH_SEPARATOR+ code;
+     Repo.getInstance().addNode( clazzPath, code, user.getEmail());
+  }//createClassRoot
+  
+  
+  
+  public Node createJCRGroup( BaseExpediente base)
+        throws RepositoryException, UnknownHostException
+  {
+     Node jcrGroup = createJCRExpediente(base, null);
+     jcrGroup.setProperty("jcr:nodeTypeName", Nature.GRUPO.toString());
+     return jcrGroup;
+  }//createJCRGroup
+  
+  
+  
+  public void  createJCRVolume(Node jcrVol, Volume volume)
+        throws RepositoryException, UnknownHostException
+  {
+     VaadinSession vSession = VaadinSession.getCurrent();
+     Tenant          tenant = (Tenant)vSession.getAttribute(TENANT);
+     String       namespace = tenant.getName()+ ":";
+     String       volNature = Nature.VOLUMEN.toString();
+     jcrVol.setProperty("jcr:nodeTypeName", volNature);
+     jcrVol.setProperty(namespace+ "currentInstance", ""+ volume.getCurrentInstance());
+  }//createJCRVolume
+  
+
+  
+  public void createJCRInstance(VolumeInstance instance, Node jcrVol)
+     throws RepositoryException, UnknownHostException
+  {
+     VaadinSession vSession = VaadinSession.getCurrent();
+     Tenant          tenant = (Tenant)vSession.getAttribute(TENANT);
+     User              user = (User)vSession.getAttribute(CURRENT_USER);
+     String       namespace = tenant.getName()+ ":";
+     Volume          volume = instance.getVolume();
+     Integer instanceNumber = instance.getInstance();
+     String            path = volume.getPath()+ Parm.PATH_SEPARATOR+ instanceNumber;
+     Node       jcrInstance = Repo.getInstance().addNode(path, volume.getName()+ " instance "+ instanceNumber, user.getEmail());
+     jcrInstance.setProperty(namespace+ "instance", instanceNumber);
+     jcrInstance.setProperty(namespace+ "open",     instance.getOpen());
+     jcrInstance.setProperty(namespace+ "opened",   TextUtil.formatDateTime(instance.getDateOpened()));
+     jcrInstance.setProperty(namespace+ "closed",   TextUtil.formatDateTime(instance.getDateClosed()));
+     //TODO:   Simular  - FCN:location            ( STRING    )                     // Physical archive location (topographic signature)
+  }//createJCRInstance
+  
+
+
+  private Node createJCRExpediente(BaseExpediente base, Set<DocumentType> admissibleTypes)
+        throws RepositoryException, UnknownHostException
+  {
+     Tenant tenant    = base.getTenant();
+     String namespace = tenant.getName()+ ":";
+     Node node = Repo.getInstance().addNode( base.getPath(), base.getName(), base.getCreatedBy().getEmail());
+     node.addMixin   ( "mix:referenceable");
+     node.setProperty(namespace+ "tenant",         tenant.getId());
+     node.setProperty(namespace+ "expedienteCode", base.formatCode());
+     Node clase = Repo.getInstance().findNode( base.getClassificationClass().getPath());
+     node.setProperty(namespace+ "classification", clase.getIdentifier());
+     if (admissibleTypes != null)
+     {  for( DocumentType admissibleType: admissibleTypes)
+        {  node.setProperty(namespace+ "admissibleTypes", admissibleType.getCode());
+        }
+     }
+     node.setProperty(namespace+ "open",           base.isOpen());
+     if ( base.isOpen())
+     {  node.setProperty(namespace+ "dateOpened",  TextUtil.formatDateTime(base.getDateOpened()));
+     }  else
+     {  node.setProperty(namespace+ "dateClosed",  TextUtil.formatDateTime(base.getDateClosed()));
+     }
+     if (base.getLocation() != null)
+     {  node.setProperty(namespace+ "location",    base.getLocation());
+     }
+     if (TextUtil.isNotEmpty( base.getKeywords()))
+     {  String[] keywords = base.getKeywords().split(Parm.VALUE_SEPARATOR);
+        for( String keyword: keywords)
+        {  node.setProperty(namespace+ "keywords", keyword);
+        }
+     }
+     if ( base.getMac() != null )
+     {  node.setProperty(namespace+ "mac", base.getMac());
+     }
+     Schema schema = base.getMetadataSchema();
+     if ( schema != null)
+     {  Repo.getInstance().updateMixin( node, namespace, schema, base.getMetadata());
+     }
+     Repo.getInstance().save();
+     return node;
+
+  }//createJCRExpediente
+  
 
 }//BaseExpedienteService
