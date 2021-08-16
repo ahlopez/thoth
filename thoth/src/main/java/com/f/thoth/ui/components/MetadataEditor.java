@@ -76,13 +76,14 @@ public class MetadataEditor extends VerticalLayout
    private String getValuesFromFields( Component schemaFields)
    {
       if ( schemaFields == null)
-         return null;
-
+      {  return null;
+      }
       List<Component> fields = new ArrayList<>();
       schemaFields.getChildren().forEach( c ->
       {
          if (c instanceof HasValue<?,?>)
-            fields.add(c);
+         {   fields.add(c);
+         }
       });
 
       int i= 0;
@@ -92,7 +93,6 @@ public class MetadataEditor extends VerticalLayout
          if (i++ > 0)
          {  values.append(Parm.VALUE_SEPARATOR);
          }
-         
          Object  val = ((HasValue<?,?>)field).getValue();
          values.append( val == null? Parm.NULL_VALUE: val.toString());
       }

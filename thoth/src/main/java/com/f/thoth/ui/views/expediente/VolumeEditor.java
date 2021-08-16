@@ -48,8 +48,8 @@ public class VolumeEditor extends VerticalLayout
    private MultiselectComboBox<DocumentType> docTypes;
    private TextField                   currentInstance;
 
-   private Volume                      currentVolume;
    private Classification              classificationClass;
+   private Volume                      currentVolume;
    private User                        currentUser;
 
    private BaseExpedienteEditor        baseExpedienteEditor;

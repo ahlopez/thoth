@@ -104,8 +104,7 @@ public class BaseExpedienteEditor extends FormLayout
       boolean metaSelected = (selectedSchema != null);
       metadataEditor.setVisible(metaSelected);
       if (metaSelected)
-      {
-        selectedExpediente.setMetadataSchema(selectedSchema);
+      { selectedExpediente.setMetadataSchema(selectedSchema);
         metadataEditor.editMetadata(selectedSchema, selectedExpediente.getMetadata());
       }
      });
@@ -160,8 +159,7 @@ public class BaseExpedienteEditor extends FormLayout
           .asRequired()
           .withConverter(DATE_CONVERTER)
           .withValidator( dateFrom ->
-           {
-             LocalDateTime dateTo = dateClosed.getValue();
+           { LocalDateTime dateTo = dateClosed.getValue();
              return dateTo == null || (dateFrom != null && dateFrom.equals(dateTo) || dateFrom.isBefore(dateTo));
            },         "Fecha de cierre debe posterior a la de apertura")
           .bind("dateOpened");
@@ -170,8 +168,7 @@ public class BaseExpedienteEditor extends FormLayout
           .asRequired()
           .withConverter(DATE_CONVERTER)
           .withValidator( dateTo ->
-           {
-             LocalDateTime dateFrom = dateOpened.getValue();
+           { LocalDateTime dateFrom = dateOpened.getValue();
              boolean ok =  dateFrom != null && dateTo != null && ( dateTo.equals(dateFrom) || dateTo.isAfter(dateFrom));
              return ok;
            },       "Fecha de cierre debe posterior a la de apertura")
