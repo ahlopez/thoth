@@ -427,7 +427,7 @@ public class ExpedienteGenerator implements HasLogger
       jcrInstance.setProperty(namespace+ "open",     instance.getOpen());
       jcrInstance.setProperty(namespace+ "opened",   TextUtil.formatDateTime(instance.getDateOpened()));
       jcrInstance.setProperty(namespace+ "closed",   TextUtil.formatDateTime(instance.getDateClosed()));
-      //TODO:   Simular  - FCN:location            ( STRING    )                     // Physical archive location (topographic signature)
+      //TODO:   Simular  - FCN:location            ( STRING    )                     // Physical archive location  (topographic signature)
       nNodes++;
    }//createJCRInstance
 
