@@ -22,11 +22,49 @@
   + FCN:doc      (FCN:document)
 
 [FCN:volume]   >  nt:base   orderable
-  - FCN:currentInstance   ( LONG      ) primary mandatory     // Current instance of this volume. For EXPEDIENTE it is always zero (0)
-  - FCN:admissibleTypes   ( STRING    ) multiple              // Admisible document types that can be included in the volume
-  + FCN:volInstance       ( FCN:volumeInstance)
+  - FCN:currentInstance     ( LONG      ) primary mandatory   // Current instance of this volume. For EXPEDIENTE it is always zero (0)
+  - FCN:admissibleTypes     ( STRING    ) multiple            // Admisible document types that can be included in the volume
+  + FCN:volInstance         ( FCN:volumeInstance)
 
 [FCN:document] >  nt:base   orderable
+  - FCN:tenant              ( LONG      ) mandatory           // Id of Tenant that owns the Document
+  - FCN:asunto              ( STRING    ) mandatory           // Administrative theme/workflow (asunto) which the document belongs
+  - FCN:createdBy           ( STRING    ) mandatory           // User/area/institution responsible for the document
+  - FCN:creationDate        ( STRING    ) mandatory           // Date included in the document
+  - FCN:filigId             ( STRING    ) mandatory           // External id number given to the document (radicado)
+  - FCN:reference           ( STRING    )                     // Optional reference id that links the document to a workflow
+
+/*  Metadatos minimos de los documentos electrónicos de archivo según decreto 1080
+    Ver también metadatos Bogotá, pag 54, 56.
+
+    DE CONTENIDO
+    1. Tipo de recurso de información                           (obligatorio al identificar)[intranet, ofimática, pág web, seguridad, erp, aplicación]
+    2. Tipo documental                                          (obligatorio al clasificar) [según tabla de tipos documentales]
+    3. Título del documento                                     (obligatorio al clasificar) [según defina el autor]
+    4. Autor o emisor responsable del contenido, destinatario, nombre de la entidad y persona que creó el documento (obligatorio al identificar) [creador/ al recibir]
+    5. Clasificación (nivel) de acceso                          (obligatorio al clasificar) [según se defina por la oficina, o por el tema, u otro]
+    6. Fecha de creación, transmisión y recepción               (obligatorio al identificar, transmitir, y recibir) [al crear, transmitir, recibir]
+    7. Folio físico o electrónico                               (obligatorio al clasificar)
+    8. Tema o asunto administrativo al que se vincula (trámite) (obligatorio al clasificar)
+    9. Palabras clave                                           (opcional al clasificar)
+
+    DE ESTRUCTURA
+    10. Descripción                                             (obligatorio al crear, obligatorio al recibir)
+    11. Formato                                                 (obligatorio al crear, obligatorio al recibir)
+    12. Estado                                                  (obligatorio al clasificar, obligatorio al tramitar)
+    13. Proceso administrativo                                  (obligatorio al crear, obligatorio al clasificar el doc recibido)
+    14. Unidad administrativa ressponsable                      (obligatorio al crear, obligatorio al clasificar)
+    15. Perfil autorizado                                       (obligatorio al clasificar)
+    16. Ubicación en el sistema físico, o lógico                (obligatorio al clasificar y al transferir)
+    17. Serie/Subserie documental                               (obligatorio al clasificar)
+
+    DE CONTEXTO
+    18. Jurídico-Administrativo                                 (obligatorio al clasificar)
+    19. Documental                                              (obligatorio al clasificar)
+    20. De procedencia                                          (obligatorio al recibir)
+    21. Procedimental                                           (obligatorio al tramitar)
+    22. Tecnológico                                             (obligatorio al crear, obligatorio al recibir)
+*/
 
 [FCN:volumeInstance]   >  nt:base   orderable
   - FCN:instance            ( LONG      ) primary mandatory   // Volume instance number. It is always zero (0) for type=EXPEDIENTE, >= 0 for VOLUME

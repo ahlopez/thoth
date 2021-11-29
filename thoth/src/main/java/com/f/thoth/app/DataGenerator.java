@@ -1,5 +1,8 @@
 package com.f.thoth.app;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.net.UnknownHostException;
 import java.time.LocalDate;
 import java.util.Random;
@@ -10,6 +13,8 @@ import javax.annotation.PostConstruct;
 import javax.jcr.RepositoryException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.f.thoth.Parm;
@@ -194,7 +199,7 @@ public class DataGenerator implements HasLogger
          // ------------------ Genere un conjunto de usuarios y grupos de usuarios -------------------------------
          getLogger().info("... generating users");
          createAdmin(userRepository, singleUserRepository, passwordEncoder);
-         User baker   = createBaker(userRepository, passwordEncoder);
+         User baker   = createBaker  (userRepository, passwordEncoder);
          User barista = createBarista(userRepository, passwordEncoder);
 
 
@@ -205,7 +210,8 @@ public class DataGenerator implements HasLogger
          classificationGenerator.registerClasses(tenant1);
 
 
-         // A set of products without constrains that can be deleted
+         // Create users and users groups
+         getLogger().info("... generating users");
          createDeletableUsers(userRepository, passwordEncoder);
 
          getLogger().info("... generating user groups");
@@ -222,11 +228,14 @@ public class DataGenerator implements HasLogger
 
          // -----------------  Generando expedientes y documentos de prueba
          getLogger().info("... generating expedientes and documents");
+         BufferedReader expedienteNamesReader = openFile("data/theNames.txt");
+         BufferedReader documentAsuntosReader = openFile("data/documentAsuntos.txt");
          ExpedienteGenerator  expedienteGenerator =
                new ExpedienteGenerator( tenant1, currentUser,
                      claseRepository, expedienteIndexRepository,
                      expedienteGroupRepository, documentTypeRepository,
-                     volumeRepository, volumeInstanceRepository, schemaRepository
+                     volumeRepository, volumeInstanceRepository, schemaRepository, 
+                     expedienteNamesReader, documentAsuntosReader
                      );
 
          int nExpedientes = expedienteGenerator.registerExpedientes(tenant1);
@@ -253,6 +262,31 @@ public class DataGenerator implements HasLogger
       }
 
    }//loadData
+   
+   
+   private BufferedReader  openFile(String fileName)
+   {
+      /*
+       * Paths may be used with the Files class to operate on files, directories, and other types of files.
+       * For example, suppose we want a BufferedReader to read text from a file "access.log".
+       * The file is located in a directory "logs" relative to the current working directory and is UTF-8 encoded.
+       *
+       * Path path = FileSystems.getDefault().getPath("logs", "access.log");
+       * BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
+       */
+      BufferedReader theReader = null;
+      try
+      {
+         Resource resource = new ClassPathResource(fileName);
+         File theFile    = resource.getFile();
+         theReader       = new BufferedReader( new FileReader(theFile));
+         getLogger().info("    >>> Opened ["+ fileName+ "]");
+      }catch( Exception e)
+      {  throw new IllegalStateException("No pudo abrir archivo ["+ fileName+ "]. Causa\n"+ e.getMessage());
+      }
+      return theReader;
+   }//openFile
+
 
 
    private void createTenants (TenantService tenantService)

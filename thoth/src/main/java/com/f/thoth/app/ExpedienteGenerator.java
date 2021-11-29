@@ -1,8 +1,6 @@
 package com.f.thoth.app;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -12,9 +10,6 @@ import java.util.TreeSet;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
-
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
 
 import com.f.thoth.Parm;
 import com.f.thoth.backend.data.entity.util.TextUtil;
@@ -51,6 +46,7 @@ public class ExpedienteGenerator implements HasLogger
    private User                       user;
    private final Random               random = new Random(1L);
    private BufferedReader             expedienteNamesReader;
+   private BufferedReader             documentAsuntosReader;
    private int                        nNodes;
    private int                        nExpedientes;
    private int                        nBranches;
@@ -58,8 +54,12 @@ public class ExpedienteGenerator implements HasLogger
    private int                        nLeavesFinal;
    private int                        nVolumes;
    private int                        nInstances;
+   private int                        nDocs;
+   private int                        nDocsInVolumes;
+   private int                        nDocsInExpedientes;
    private List<Schema>               availableSchemas;
    private List<DocumentType>         availableTypes;
+   private DocumentGenerator          docGenerator;
 
    private static String KEYWORD_NAMES[] = {
          "belleza",      "escepticismo", "nostalgia",    "justicia",     "esperanza",    "tentación",   "nación",       "espiritualidad",
@@ -87,7 +87,7 @@ public class ExpedienteGenerator implements HasLogger
                                 ClassificationRepository claseRepository, ExpedienteIndexRepository expedienteIndexRepository,
                                 ExpedienteGroupRepository expedienteGroupRepository, DocumentTypeRepository documentTypeRepository,
                                 VolumeRepository volumeRepository, VolumeInstanceRepository volumeInstanceRepository,
-                                SchemaRepository schemaRepository
+                                SchemaRepository schemaRepository, BufferedReader expedienteNamesReader, BufferedReader documentAsuntosReader
                               )
    {
       this.tenant                     = tenant;
@@ -99,6 +99,9 @@ public class ExpedienteGenerator implements HasLogger
       this.volumeInstanceRepository   = volumeInstanceRepository;
       this.availableSchemas           = schemaRepository.findAll(this.tenant);
       this.availableTypes             = documentTypeRepository.findAll();
+      this.expedienteNamesReader      = expedienteNamesReader;
+      this.documentAsuntosReader      = documentAsuntosReader;
+      this.docGenerator               = new DocumentGenerator(tenant, currentUser);
 
       nNodes       = 0;
       nExpedientes = 0;
@@ -108,39 +111,13 @@ public class ExpedienteGenerator implements HasLogger
       nVolumes     = 0;
       nInstances   = 0;
 
-      expedienteNamesReader           = openNamesFile("data/theNames.txt");
-
    }//ExpedienteGenerator constructor
-
-
-   private BufferedReader  openNamesFile(String names)
-   {
-      /*
-       * Paths may be used with the Files class to operate on files, directories, and other types of files.
-       * For example, suppose we want a BufferedReader to read text from a file "access.log".
-       * The file is located in a directory "logs" relative to the current working directory and is UTF-8 encoded.
-       *
-       * Path path = FileSystems.getDefault().getPath("logs", "access.log");
-       * BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8);
-       */
-      BufferedReader namesReader = null;
-      try
-      {
-         Resource resource = new ClassPathResource(names);
-         File namesFile    = resource.getFile();
-         namesReader       = new BufferedReader( new FileReader(namesFile));
-         getLogger().info("    >>> Opened ["+ names+ "]");
-      }catch( Exception e)
-      {  throw new IllegalStateException("No pudo abrir archivo de nombres de expediente["+ names+ "]. Causa\n"+ e.getMessage());
-      }
-      return namesReader;
-   }//openNamesFile
 
 
    public int  registerExpedientes( Tenant tenant) throws RepositoryException, UnknownHostException
    {
-      String workspace = tenant.getWorkspace();
-      String expedienteRootPath =  workspace+ Parm.PATH_SEPARATOR+ NodeType.EXPEDIENTE.getCode();
+      String workspace          = tenant.getWorkspace();
+      String expedienteRootPath = workspace+ Parm.PATH_SEPARATOR+ NodeType.EXPEDIENTE.getCode();
       Repo.getInstance().addNode( expedienteRootPath, "Expediente_Root de Tenant["+ tenant.getName()+ "]", user.getEmail());
       nNodes++;
 
@@ -153,13 +130,16 @@ public class ExpedienteGenerator implements HasLogger
          {   creeExpediente( tenant, user, classificationClass, null);
          }
      }
-      getLogger().info("    >>> Expedientes created["+ nExpedientes+ "]");
-      getLogger().info("    >>> Branch Expedientes ["+ nBranches+    "]");
-      getLogger().info("    >>> Leaf   Expedientes ["+ nLeaves+      "]");
-      getLogger().info("    >>> Expedientes        ["+ nLeavesFinal+ "]");
-      getLogger().info("    >>> Volumes            ["+ nVolumes+     "]");
-      getLogger().info("    >>> Volume instances   ["+ nInstances+   "]");
-      getLogger().info("    >>> Repository nodes   ["+ nNodes+       "]");
+      getLogger().info("    >>> Expedientes created["+ nExpedientes+       "]");
+      getLogger().info("    >>> Branch Expedientes ["+ nBranches+          "]");
+      getLogger().info("    >>> Leaf   Expedientes ["+ nLeaves+            "]");
+      getLogger().info("    >>> Expedientes        ["+ nLeavesFinal+       "]");
+      getLogger().info("    >>> Volumes            ["+ nVolumes+           "]");
+      getLogger().info("    >>> Volume instances   ["+ nInstances+         "]");
+      getLogger().info("    >>> Repository nodes   ["+ nNodes+             "]");
+      getLogger().info("    >>> Documents          ["+ nDocs+              "]");
+      getLogger().info("    >>> Docs in volumes    ["+ nDocsInVolumes+     "]");
+      getLogger().info("    >>> Docs in expedientes["+ nDocsInExpedientes+ "]");
       return nExpedientes;
    }//registerExpedientes
 
@@ -168,7 +148,7 @@ public class ExpedienteGenerator implements HasLogger
        throws RepositoryException, UnknownHostException
    {
       String code      = ""+ rootClass.getId();
-      String clazzPath =  expedienteRootPath+ Parm.PATH_SEPARATOR+ code;
+      String clazzPath = expedienteRootPath+ Parm.PATH_SEPARATOR+ code;
       Repo.getInstance().addNode( clazzPath, code, user.getEmail());
       nNodes++;
    }//createClassRoot
@@ -193,7 +173,7 @@ public class ExpedienteGenerator implements HasLogger
       ExpedienteGroup branch = new ExpedienteGroup(base);
       expedienteGroupRepository.saveAndFlush(branch);
       createIndex(base);
-      
+
       @SuppressWarnings("unused")
       Node jcrGroup = createJCRGroup( base);
       int nChildren = random.nextInt(4)+1;
@@ -205,9 +185,9 @@ public class ExpedienteGenerator implements HasLogger
       return branch;
 
    }//creeExpedienteGroup
-   
 
-   
+
+
    private Node createJCRGroup( BaseExpediente base)
          throws RepositoryException, UnknownHostException
    {
@@ -258,7 +238,6 @@ public class ExpedienteGenerator implements HasLogger
       base.setMac                 (generateMac());
  //   base.setMetadata            (SchemaValues.EMPTY);
       base.buildCode();
-
 
       return base;
 
@@ -319,26 +298,28 @@ public class ExpedienteGenerator implements HasLogger
 
    private void createExpediente(BaseExpediente base, Node jcrExpediente, Set<DocumentType> admissibleTypes)
         throws RepositoryException, UnknownHostException
-   {
+   { // A leaf expediente is implemented as a Volume with one and only one instance
       base.setType(Nature.EXPEDIENTE);
       Volume volume = new Volume( base, Nature.EXPEDIENTE, 1, admissibleTypes);
       volumeRepository.save(volume);
 
-      createJCRExpediente( jcrExpediente, admissibleTypes);
+      createJCRExpedienteNucleus( jcrExpediente, admissibleTypes);
 
       VolumeInstance expedienteInstance = createVolumeInstance( volume, jcrExpediente, 1, true, base.getDateOpened(), LocalDateTime.MAX);
       expedienteInstance.setOpen(true);
       volumeInstanceRepository.saveAndFlush(expedienteInstance);
-      createJCRInstance(expedienteInstance, jcrExpediente);
-
+      Node jcrInstance = createJCRInstance(expedienteInstance, jcrExpediente);
+      int nInExpediente   = docGenerator.generateDocs(jcrInstance, documentAsuntosReader);
+      nDocsInExpedientes += nInExpediente;
+      nDocs              += nInExpediente;
       nLeavesFinal++;
 
    }//createExpediente
-   
-   
-   private void createJCRExpediente( Node jcrExpediente, Set<DocumentType> admissibleTypes)
+
+
+   private void createJCRExpedienteNucleus( Node jcrExpediente, Set<DocumentType> admissibleTypes)
          throws RepositoryException, UnknownHostException
-   {
+   {  // A leaf expediente is implemented as a Volume with one and only one instance
       jcrExpediente.addMixin("FCN:Volume");
       String namespace = tenant.getName()+ ":";
       jcrExpediente.setProperty("jcr:nodeTypeName", Nature.EXPEDIENTE.toString());
@@ -349,8 +330,8 @@ public class ExpedienteGenerator implements HasLogger
          {  jcrExpediente.setProperty(namespace+ "admissibleTypes", admissibleType.getCode());
          }
       }
-      
-   }//createJCRExpediente
+
+   }//createJCRExpedienteNucleus
 
 
 
@@ -363,7 +344,7 @@ public class ExpedienteGenerator implements HasLogger
       int nInstances = random.nextInt(3)+1;
       volume.setCurrentInstance(nInstances);
       volumeRepository.save(volume);
-      
+
       createJCRVolume(jcrVol, volume);
       LocalDateTime dateOpened =  LocalDateTime.now().minusDays(365L*4);
       LocalDateTime dateClosed =  dateOpened.plusDays(365L);
@@ -380,8 +361,8 @@ public class ExpedienteGenerator implements HasLogger
       nVolumes++;
 
    }//createVolume
-   
-   
+
+
    private void  createJCRVolume(Node jcrVol, Volume volume)
          throws RepositoryException, UnknownHostException
    {
@@ -409,13 +390,16 @@ public class ExpedienteGenerator implements HasLogger
       VolumeInstance instance = new VolumeInstance( vol, instanceNumber, "[Loc]", dateOpened , dateClosed);
       instance.setOpen(open);
       volumeInstanceRepository.saveAndFlush(instance);
-      createJCRInstance(instance, jcrVol);
+      Node jcrInstance = createJCRInstance(instance, jcrVol);
       nInstances++;
+      int nInVolume = docGenerator.generateDocs(jcrInstance, documentAsuntosReader);
+      nDocsInVolumes += nInVolume;
+      nDocs          += nInVolume;
       return instance;
    }//createVolumeInstance
 
 
-   private void createJCRInstance(VolumeInstance instance, Node jcrVol)
+   private Node createJCRInstance(VolumeInstance instance, Node jcrVol)
       throws RepositoryException, UnknownHostException
    {
       String       namespace = tenant.getName()+ ":";
@@ -429,6 +413,7 @@ public class ExpedienteGenerator implements HasLogger
       jcrInstance.setProperty(namespace+ "closed",   TextUtil.formatDateTime(instance.getDateClosed()));
       //TODO:   Simular  - FCN:location            ( STRING    )                     // Physical archive location  (topographic signature)
       nNodes++;
+      return jcrInstance;
    }//createJCRInstance
 
 

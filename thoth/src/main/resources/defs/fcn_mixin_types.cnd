@@ -5,10 +5,11 @@
   - FCN:currentInstance  ( LONG      )  primary  mandatory       // Id of the document
   - FCN:admissibleTypes  ( STRING    )           multiple        // Id of Tenant that owns the document
 
-[FCN:Documento] >  nt:base       mixin
-  - FCN:Identificacion   ( STRING    )  primary                  // Id of the document
-  - FCN:Tenant           ( STRING    )                           // Id of Tenant that owns the document
-  - FCN:Autor            ( STRING    )                           // Author of the document
+[FCN:Correspondence] >  nt:base       mixin
+  - FCN:author           ( STRING    )                           // Author of the document
+  - FCN:recipient        ( STRING    )                           // Recipient to whom the document is sent
+  - FCN:subject          ( STRING    ) mandatory                 // Document subject matter
+  - FCN:keywords         ( STRING    ) multiple                  // Search keywords
 
 
 [FCN:Sede] >  nt:base       mixin
