@@ -405,7 +405,7 @@ public class ClassificationGenerator implements HasLogger
 
    private void   printSequenceStats()
    {
-      getLogger().info("    >>> Secuencias creadas ["+ nSequences+ "]" );
+      getLogger().info("    >>> Secuences created ["+ nSequences+ "]" );
       StringBuilder line = new StringBuilder();
       int i = 0;
       for (String num: seqNumbers)
@@ -458,11 +458,11 @@ public class ClassificationGenerator implements HasLogger
                schemaRepository.saveAndFlush(schema);
             }
             levelRepository.saveAndFlush(nivel);
-         }else 
+         }else
          {  classificationClass.setLevel(newLevel);
             schema = newLevel.getSchema();
          }
-      }else 
+      }else
       {  schema = nivel.getSchema();
       }
       SchemaValues values = new SchemaValues(schema, null);
@@ -510,8 +510,8 @@ public class ClassificationGenerator implements HasLogger
       child.setProperty( namespace+ "level", childLevel);
       return child;
    }//addJCRClassification
-  
-   
+
+
    private void updateJCRClassification(String namespace, Node classificationJCR, Classification classificationClass)
    {
       try
@@ -532,7 +532,7 @@ public class ClassificationGenerator implements HasLogger
       } catch(Exception e)
       {   throw new IllegalStateException("No pudo actualizar clase["+ classificationClass.formatCode()+ "]. Razón\n"+ e.getMessage());
       }
-     
+
    }//updateJCRClassification
 
 

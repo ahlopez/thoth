@@ -325,7 +325,8 @@ public class Repo implements HasLogger
       if( schema == null || schema.getName().equals("EMPTY"))
          return null;
       
-      node.addMixin(namespace + schema.getName());
+      String mixinName = namespace+ schema.getName();
+      node.addMixin(mixinName);
       if (metadata == null)
       {   return null;
       }

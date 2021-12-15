@@ -234,7 +234,7 @@ public class DataGenerator implements HasLogger
                new ExpedienteGenerator( tenant1, currentUser,
                      claseRepository, expedienteIndexRepository,
                      expedienteGroupRepository, documentTypeRepository,
-                     volumeRepository, volumeInstanceRepository, schemaRepository, 
+                     volumeRepository, volumeInstanceRepository, schemaRepository,
                      expedienteNamesReader, documentAsuntosReader
                      );
 
@@ -262,8 +262,8 @@ public class DataGenerator implements HasLogger
       }
 
    }//loadData
-   
-   
+
+
    private BufferedReader  openFile(String fileName)
    {
       /*
@@ -319,16 +319,19 @@ public class DataGenerator implements HasLogger
       Field    commitmentField = createField("Obligacion",     nameMeta, true, false, false, 1, 2);
       Field    dispatchField   = createField("Despacho",       nameMeta, true, true,  false, 2, 1);
       Field    idField         = createField("Identificacion", nameMeta, true, false, false, 1, 1);
-      Field    authorField     = createField("Autor",          nameMeta, true, false, false, 2, 1);
+      Field    createdByField  = createField("Autor",          nameMeta, true, false, false, 2, 1);
       Field    conceptField    = createField("Concepto",       nameMeta, false,false, false, 2, 1);
       Field    remiteField     = createField("Remitente",      nameMeta, true, false, false, 3, 2);
+      Field    asuntoField     = createField("Asunto",         nameMeta, true, false, true,  3, 3);
+      Field    referenceField  = createField("Referencia",     nameMeta, true, false, true,  4, 1);
 
-      Metadata dateMeta  = createMeta ("Fecha", Type.DATETIME, "not null");
-      Field    fromField = createField("Desde",      dateMeta, true, false, false, 3, 2);
-      Field    toField   = createField("Hasta",      dateMeta, true, false, false, 4, 2);
-      Field    dateField = createField("Fecha",      dateMeta, true, true,  false, 3, 2);
-      Field    dueDate   = createField("APagarEn",   dateMeta, true, true,  false, 2, 2);
-      Field    paidDate  = createField("PagadoEn",   dateMeta, true, false, false, 3, 2);
+      Metadata dateMeta        = createMeta ("Fecha", Type.DATETIME, "not null");
+      Field    fromField       = createField("Desde",      dateMeta, true, false, false, 3, 2);
+      Field    toField         = createField("Hasta",      dateMeta, true, false, false, 4, 2);
+      Field    dateField       = createField("Fecha",      dateMeta, true, true,  false, 3, 2);
+      Field    dueDate         = createField("APagarEn",   dateMeta, true, true,  false, 2, 2);
+      Field    paidDate        = createField("PagadoEn",   dateMeta, true, false, false, 3, 2);
+      Field    creationDateField  = createField("CreadoEn",   dateMeta, true, false, false, 3, 2);
 
       Metadata enumMeta   = createMeta ("Color",    Type.ENUM, "Verde;Rojo;Azul;Magenta;Cyan");
       Field    colorField = createField("Colores",   enumMeta, true, false, false, 5, 1);
@@ -344,10 +347,13 @@ public class DataGenerator implements HasLogger
       Field    ratioField= createField("Razon", decMeta, true, false, false, 7, 1);
       Field    valueField= createField("Valor", decMeta, true, false, false, 4, 1);
 
-      Schema   docSchema =  createSchema("Documento");
-      docSchema.addField(idField);
+      Schema   docSchema =  createSchema("Document");
       docSchema.addField(tenantField);
-      docSchema.addField(authorField);
+      docSchema.addField(idField);
+      docSchema.addField(createdByField);
+      docSchema.addField(asuntoField);
+      docSchema.addField(creationDateField);
+      docSchema.addField(referenceField);
       schemaRepository.saveAndFlush(docSchema);
 
       Schema  sedeSchema = createSchema("Sede");

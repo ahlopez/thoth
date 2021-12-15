@@ -26,6 +26,7 @@
   - FCN:admissibleTypes     ( STRING    ) multiple            // Admisible document types that can be included in the volume
   + FCN:volInstance         ( FCN:volumeInstance)
 
+/*
 [FCN:document] >  nt:base   orderable
   - FCN:tenant              ( LONG      ) mandatory           // Id of Tenant that owns the Document
   - FCN:asunto              ( STRING    ) mandatory           // Administrative theme/workflow (asunto) which the document belongs
@@ -34,7 +35,7 @@
   - FCN:filigId             ( STRING    ) mandatory           // External id number given to the document (radicado)
   - FCN:reference           ( STRING    )                     // Optional reference id that links the document to a workflow
 
-/*  Metadatos minimos de los documentos electrónicos de archivo según decreto 1080
+    Metadatos minimos de los documentos electrónicos de archivo según decreto 1080
     Ver también metadatos Bogotá, pag 54, 56.
 
     DE CONTENIDO

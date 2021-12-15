@@ -44,28 +44,30 @@ public class DocumentGenerator
        // 3. Cree el nodo padre del documento compuesto
        Node   header    = parent.addNode(idNumber);
        String namespace = tenant.getName()+ ":";
-       header.setProperty("jcr:nodeTypeName", Nature.DOC_HEADER.toString());
-       header.addMixin   ( "mix:referenceable");
-       header.setProperty(namespace+ "tenant",       tenant.getId());
+       filingId++;
+       //System.out.println("filingId["+ filingId+ "]"); System.out.flush();
        try 
        {
+          header.addMixin   ("mix:referenceable");
+          header.setProperty("jcr:nodeTypeName", Nature.DOC_HEADER.toString());
+          header.setProperty(namespace+ "tenant",       tenant.getId());
+          header.setProperty(namespace+ "filingId",     idNumber);
+          header.setProperty(namespace+ "createdBy",    user.getEmail());
           header.setProperty(namespace+ "asunto",       documentAsuntosReader.readLine());
+          header.setProperty(namespace+ "creationDate", generateCreationDate());
+          header.setProperty(namespace+ "reference",    TextUtil.pad( filingId, 10));
        } catch (Exception e)
        {  throw new IllegalStateException("No pudo leer asunto del documento");
        }
-       header.setProperty(namespace+ "createdBy",    user.getEmail());
-       header.setProperty(namespace+ "creationDate", generateCreationDate());
-       header.setProperty(namespace+ "filingId",     idNumber);
-       header.setProperty(namespace+ "reference",    TextUtil.pad( filingId, 10));
        
-       // - Document primary type attributes
-       // - FCN:tenant              ( LONG      ) mandatory           // Id of Tenant that owns the Document
-       // - FCN:asunto              ( STRING    ) mandatory           // Administrative theme/workflow (asunto) which the document belongs
-       // - FCN:createdBy           ( STRING    ) mandatory           // User/area/institution responsible for the document
-       // - FCN:creationDate        ( STRING    ) mandatory           // Date included in the document
-       // - FCN:filigId             ( STRING    ) mandatory           // External id number given to the document (radicado)
-       // - FCN:reference           ( STRING    )                     // Optional reference id that links the document to a workflow
-      
+       /* - Document primary type attributes
+       - FCN:tenant              ( LONG      ) mandatory              // Id of Tenant that owns the Document
+       - FCN:filingId            ( STRING    ) mandatory              // External id number given to the document (radicado)
+       - FCN:createdBy           ( STRING    ) mandatory              // User/area/institution responsible for the document
+       - FCN:asunto              ( STRING    ) mandatory              // Administrative theme/workflow (asunto) which the document belongs
+       - FCN:creationDate        ( STRING    ) mandatory              // Date included in the document
+       - FCN:reference           ( STRING    )                        // Optional reference id that links the document to a workflow
+       */
        // 4. Para todos los documentos hijos
        for (int docInstance = 0; docInstance < nSubDocs; docInstance++)
        {

@@ -5,6 +5,14 @@
   - FCN:currentInstance  ( LONG      )  primary  mandatory       // Id of the document
   - FCN:admissibleTypes  ( STRING    )           multiple        // Id of Tenant that owns the document
 
+[FCN:Document] >  nt:base   mixin orderable
+  - FCN:tenant              ( LONG      ) mandatory              // Id of Tenant that owns the Document
+  - FCN:filingId            ( STRING    ) mandatory              // External id number given to the document (radicado)
+  - FCN:createdBy           ( STRING    ) mandatory              // User/area/institution responsible for the document
+  - FCN:asunto              ( STRING    ) mandatory              // Administrative theme/workflow (asunto) which the document belongs
+  - FCN:creationDate        ( STRING    ) mandatory              // Date included in the document
+  - FCN:reference           ( STRING    )                        // Optional reference id that links the document to a workflow
+
 [FCN:Correspondence] >  nt:base       mixin
   - FCN:author           ( STRING    )                           // Author of the document
   - FCN:recipient        ( STRING    )                           // Recipient to whom the document is sent

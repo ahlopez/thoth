@@ -157,6 +157,7 @@ public class ExpedienteGenerator implements HasLogger
    private void creeExpediente( Tenant tenant, User user, Classification classificationClass, Long ownerId)
          throws RepositoryException, UnknownHostException
    {
+     // System.out.println("nExpedientes["+ nExpedientes+ "]"); System.out.flush();
       int branchProbability =  random.nextInt(100);
       if ( branchProbability < 20)
       {  creeExpedienteGroup(tenant, user, classificationClass, ownerId);
@@ -229,7 +230,7 @@ public class ExpedienteGenerator implements HasLogger
       base.setObjectToProtect     (new ObjectToProtect());
       base.setCreatedBy           (user);
       base.setClassificationClass (classificationClass);
-      base.setMetadataSchema      (availableSchemas.get(random.nextInt(availableSchemas.size()))  );
+      base.setMetadataSchema      (getSchema());
       base.setDateOpened          (now);
       base.setDateClosed          (now.plusYears(200L));
       base.setOwnerId             (parentId);
@@ -242,6 +243,16 @@ public class ExpedienteGenerator implements HasLogger
       return base;
 
    }//createBase
+   
+
+   private Schema  getSchema()
+   {
+      Schema schema = availableSchemas.get(random.nextInt(availableSchemas.size()));
+      while ( schema.getName().equals("Document") )
+      { schema = availableSchemas.get(random.nextInt(availableSchemas.size()));
+      }
+      return schema;
+   }//getSchema
 
    private void createIndex(BaseExpediente base)
    {
@@ -395,6 +406,7 @@ public class ExpedienteGenerator implements HasLogger
       int nInVolume = docGenerator.generateDocs(jcrInstance, documentAsuntosReader);
       nDocsInVolumes += nInVolume;
       nDocs          += nInVolume;
+      //System.out.println("  nDocs["+ nDocs+ "]"); System.out.flush();
       return instance;
    }//createVolumeInstance
 
