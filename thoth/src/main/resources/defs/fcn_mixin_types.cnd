@@ -13,6 +13,9 @@
   - FCN:creationDate        ( STRING    ) mandatory              // Date included in the document
   - FCN:reference           ( STRING    )                        // Optional reference id that links the document to a workflow
 
+[FCN:DocumentInstance] >  nt:base   mixin orderable
+  - FCN:instanceId          ( LONG      ) mandatory              // Document instance sequence number
+
 [FCN:Correspondence] >  nt:base       mixin
   - FCN:author           ( STRING    )                           // Author of the document
   - FCN:recipient        ( STRING    )                           // Recipient to whom the document is sent

@@ -12,6 +12,7 @@ import com.f.thoth.backend.data.entity.util.TextUtil;
 import com.f.thoth.backend.data.gdoc.expediente.Nature;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.User;
+import com.f.thoth.backend.jcr.Repo;
 
 public class DocumentGenerator
 {
@@ -19,7 +20,7 @@ public class DocumentGenerator
    private User         user;
    private Random       random;
    private static long  filingId = 0L;
-   
+
    // C:\ahl\des\wk1\docgen\data
 
    public DocumentGenerator( Tenant tenant, User user)
@@ -29,26 +30,26 @@ public class DocumentGenerator
       this.random  = new Random(1L);
 
    }//DocumentGenerator
-   
-   
-   
+
+
+
    public int generateDocs(Node parent, BufferedReader documentAsuntosReader)
          throws RepositoryException, UnknownHostException
    {
        // 1. Obtenga todos los documentos hijos que componen el documento
        int nSubDocs = random.nextInt(2)+ 1;
-       
+
        // 2. Asigne el radicado que identifica el documento
        String idNumber = generateRadicado();
-       
+
        // 3. Cree el nodo padre del documento compuesto
        Node   header    = parent.addNode(idNumber);
        String namespace = tenant.getName()+ ":";
        filingId++;
-       //System.out.println("filingId["+ filingId+ "]"); System.out.flush();
-       try 
+       try
        {
           header.addMixin   ("mix:referenceable");
+          header.addMixin   (namespace+ "Document");
           header.setProperty("jcr:nodeTypeName", Nature.DOC_HEADER.toString());
           header.setProperty(namespace+ "tenant",       tenant.getId());
           header.setProperty(namespace+ "filingId",     idNumber);
@@ -56,28 +57,24 @@ public class DocumentGenerator
           header.setProperty(namespace+ "asunto",       documentAsuntosReader.readLine());
           header.setProperty(namespace+ "creationDate", generateCreationDate());
           header.setProperty(namespace+ "reference",    TextUtil.pad( filingId, 10));
+          Repo.getInstance().save();
+
        } catch (Exception e)
-       {  throw new IllegalStateException("No pudo leer asunto del documento");
+       {  throw new IllegalStateException("No pudo crear header del documento. Raz�n\n"+ e.getMessage());
        }
-       
-       /* - Document primary type attributes
-       - FCN:tenant              ( LONG      ) mandatory              // Id of Tenant that owns the Document
-       - FCN:filingId            ( STRING    ) mandatory              // External id number given to the document (radicado)
-       - FCN:createdBy           ( STRING    ) mandatory              // User/area/institution responsible for the document
-       - FCN:asunto              ( STRING    ) mandatory              // Administrative theme/workflow (asunto) which the document belongs
-       - FCN:creationDate        ( STRING    ) mandatory              // Date included in the document
-       - FCN:reference           ( STRING    )                        // Optional reference id that links the document to a workflow
-       */
+
        // 4. Para todos los documentos hijos
-       for (int docInstance = 0; docInstance < nSubDocs; docInstance++)
+       for (long docInstance = 0; docInstance < nSubDocs; docInstance++)
        {
-          // 5.     Cree el documento
+          // 5.     Cree la instancia del documento item
           Node item = header.addNode(idNumber+ "_"+ docInstance);
           item.setProperty("jcr:nodeTypeName",  Nature.DOC_ITEM.toString());
-          
-          // 6.         Cree los metadatos
-          
-          // 7.         Cree  el contenido
+
+          // 6.         Cree los metadatos de la instancia item
+          item.addMixin   (namespace+ "DocumentInstance");
+          item.setProperty(namespace+ "instanceId",  docInstance);
+
+          // 7.         Cree  el contenido documental
           /*
           public static void addFileNode(Session session, String absPath, FileDetail fileDetail)
                 throws RepositoryException, IOException
@@ -114,13 +111,15 @@ public class DocumentGenerator
             System.out.println("File Saved...");
         }
             */
+          
+          Repo.getInstance().save();
 
        }
-        
+
       return nSubDocs;
    }//generateDocs
-   
-   
+
+
    private String generateRadicado()
    {
       filingId++;
@@ -136,7 +135,7 @@ public class DocumentGenerator
       return TextUtil.formatDate( createdOn);
    }//generateCreationDate
 
-   
+
 
 }//DocumentGenerator
 
