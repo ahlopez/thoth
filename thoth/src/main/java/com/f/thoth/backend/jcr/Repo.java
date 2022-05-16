@@ -1,6 +1,8 @@
 package com.f.thoth.backend.jcr;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -12,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.jcr.Binary;
 import javax.jcr.Node;
 import javax.jcr.PathNotFoundException;
 import javax.jcr.Repository;
@@ -31,6 +34,7 @@ import org.springframework.core.io.Resource;
 import com.f.thoth.Parm;
 import com.f.thoth.app.HasLogger;
 import com.f.thoth.backend.data.entity.util.TextUtil;
+import com.f.thoth.backend.data.gdoc.expediente.Nature;
 import com.f.thoth.backend.data.gdoc.metadata.Field;
 import com.f.thoth.backend.data.gdoc.metadata.Property;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
@@ -71,7 +75,9 @@ public class Repo implements HasLogger
       {  throw new IllegalStateException("Repositorio JCR ya ha sido inicializado");
       }
       logger          = getLogger();
+      checkCnds(5, "FCN");
       Repository repo = initJCRRepo();
+      checkCnds(6, "FCN");
       jcrSession      = loginToRepo(repo, Parm.DEFAULT_ADMIN_LOGIN, Parm.DEFAULT_ADMIN_PASSWORD);
 
    }//Repo
@@ -95,6 +101,7 @@ public class Repo implements HasLogger
    {
       Repository repo = new Jcr(new Oak()).createRepository();
       logger.info("... Got an in-memory repo");
+      checkCnds(7, "FCN");
       return repo;
 
       /*
@@ -200,6 +207,7 @@ public class Repo implements HasLogger
       }
       Session session = jcrRepo.login(new SimpleCredentials(userCode, passwordHash.toCharArray()));
       logger.info("... acquired session to jcr(JackRabbit) repo, user["+ userCode+ "], pwd["+ passwordHash+ "]");
+      checkCnds(8, "FCN");
       return session;
 
       //   jcr spec:    return  Repository.login(Credentials credentials, workspaceName);
@@ -218,6 +226,7 @@ public class Repo implements HasLogger
          { logger.info("Workspace path["+ workspacePath+ "] diferente del path en repositorio["+ jcrWorkspace.getPath()+ "]");
            System.exit(-1);
          }
+         checkCnds(9, name);
          logger.info("    >>> Tenant["+ name+   "], "+
                      "workspace["+ name+              "], "+
                      "path["+ jcrWorkspace.getPath()+ "], "+
@@ -225,6 +234,19 @@ public class Repo implements HasLogger
          loadTypes(workspacePath.substring(1));
       }
    }//initWorkspace
+   
+   
+   public void checkCnds(int place, String code)
+   {
+      try {
+           List<Path> cndList =  getCndFiles(code);
+           getLogger().info(">>> place="+ place+ " cnds=" + cndList.size());
+      }catch(Exception e)
+      {   
+         getLogger().info("*** No pudo obtener el numero de cnd files. Razon\n"+ e.getMessage());
+      }
+   }//checkCnds
+
 
 
    private void loadTypes(String workspaceName )
@@ -235,6 +257,8 @@ public class Repo implements HasLogger
          {
             try
             {
+               long cndSize = Files.size(cndPath);
+               getLogger().info(cndPath.getFileName()+ " size=["+cndSize+"]");
                BufferedReader cndReader = Files.newBufferedReader(cndPath, StandardCharsets.UTF_8);
                CndImporter.registerNodeTypes(cndReader, jcrSession);
                getLogger().info("    >>> ["+ cndPath.getFileName()+ "]... loaded");
@@ -242,15 +266,16 @@ public class Repo implements HasLogger
             {  getLogger().info("No pudo cargar definiciones de Tipos de Nodo para workspace["+ workspaceName+ "]. Razón\n"+ e.getMessage());
                System.exit(-1);
             }
-            
+
          });
 
    }//loadTypes
-   
-   
+
+
    private List<Path>  getCndFiles(String workspaceName)
    {
       List<Path> cndFiles = new ArrayList<>();
+      System.out.println("workspaceName("+ workspaceName+ ")");
       try
       {
          Resource resource = new ClassPathResource("defs");
@@ -260,10 +285,10 @@ public class Repo implements HasLogger
                           .startsWith(workspaceName.toLowerCase()))
                           .collect(Collectors.toList());
       }catch(Exception e)
-      {  getLogger().info("No pudo obtener lista de archivos con las definiciones de tipos de nodo, para el worspace["+ workspaceName+ "]");
+      {  getLogger().info("No pudo obtener lista de archivos con las definiciones de tipos de nodo, para el workspace["+ workspaceName+ "]");
          System.exit(-1);
       }
-      return cndFiles;    
+      return cndFiles;
 
    }//getCndFiles
 
@@ -308,8 +333,8 @@ public class Repo implements HasLogger
      }
      return node;
    }//findNode
-   
-   
+
+
    public void save()
    {
       try
@@ -318,13 +343,13 @@ public class Repo implements HasLogger
       {  throw new IllegalStateException("No pudo guardar nodo del repositorio. Razón\n"+ e.getMessage());
       }
    }//save
-   
-   
+
+
    public String updateMixin( Node node, String namespace, Schema schema, SchemaValues metadata) throws RepositoryException
    {
       if( schema == null || schema.getName().equals("EMPTY"))
          return null;
-      
+
       String mixinName = namespace+ schema.getName();
       node.addMixin(mixinName);
       if (metadata == null)
@@ -336,14 +361,34 @@ public class Repo implements HasLogger
       String msg  = checkRequired( metadata, properties);
       if ( msg == null)
       {  for ( Property p: properties)
-         {  node.setProperty( namespace+ p.getName(), p.getValue()); 
+         {  node.setProperty( namespace+ p.getName(), p.getValue());
            // System.out.println(" >>> "+ namespace+ p.getName()+ "= ["+ p.getValue()+ "]");
          }
       }
       return msg;
    }//updateMixin
-   
-   
+
+
+
+   public Node setContent(Node parent, File contentFile) throws Exception
+   {
+      Node content       = parent.addNode("jcr:content", "nt:resource");
+      Path path          = contentFile.toPath();
+      Long size          = (Long)Files.getAttribute( path, "size");
+      String contentType = Files.probeContentType(path);
+      FileInputStream is = new FileInputStream(contentFile);
+      Binary      binary = jcrSession.getValueFactory().createBinary(is);
+      LocalDateTime  now = LocalDateTime.now();
+
+      content.setProperty("jcr:nodeTypeName",  Nature.DOC_ITEM.toString()+ "_CONTENT");
+      content.setProperty("jcr:mimeType",      contentType);
+      content.setProperty("jcr:data",          binary);
+      content.setProperty("jcr:lastModified",  TextUtil.formatDateTime(now));
+      content.setProperty("size",              size);
+      return content;
+   }//setContent
+
+
    private String checkRequired( SchemaValues metadata, List<Property> properties)
    {
       Set<Field>     fields              = metadata.getSchema().getFields();
@@ -355,19 +400,22 @@ public class Repo implements HasLogger
       }
       return  msg.length() == 0? null : msg.toString();
    }//checkRequired
-   
-   
+
+
    private boolean propertyExists(Field field, List<Property> properties)
    {
       boolean ok = false;
       for (Property p: properties)
       {  if (p.hasName(field.getName()))
-         {  ok = true;  
+         {  ok = true;
             break;
          }
       }
       return ok;
    }//propertyExists
+
+
+
 
 
 }//Repo

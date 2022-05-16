@@ -1,6 +1,7 @@
 package com.f.thoth.app;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.net.UnknownHostException;
 import java.time.LocalDate;
 import java.util.Random;
@@ -8,7 +9,11 @@ import java.util.Random;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+
 import com.f.thoth.backend.data.entity.util.TextUtil;
+import com.f.thoth.backend.data.gdoc.document.jackrabbit.NodeType;
 import com.f.thoth.backend.data.gdoc.expediente.Nature;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.User;
@@ -45,76 +50,53 @@ public class DocumentGenerator
        // 3. Cree el nodo padre del documento compuesto
        Node   header    = parent.addNode(idNumber);
        String namespace = tenant.getName()+ ":";
-       filingId++;
+
        try
        {
           header.addMixin   ("mix:referenceable");
-          header.addMixin   (namespace+ "Document");
-          header.setProperty("jcr:nodeTypeName", Nature.DOC_HEADER.toString());
+      //    header.addMixin   (namespace+ "Document");
+          /* Pendiente:  El tipo de nodo debe estar en el primary_types.
+           * El nombre del nodo, no  lo sé. Por ahora, se está usando el definido en NodeType.
+           */
+          header.setProperty("jcr:nodeType",            namespace+ "basic_document");
+          header.setProperty("jcr:nodeTypeName",        namespace+ NodeType.DOCUMENT_INSTANCE.getCode());
           header.setProperty(namespace+ "tenant",       tenant.getId());
           header.setProperty(namespace+ "filingId",     idNumber);
           header.setProperty(namespace+ "createdBy",    user.getEmail());
           header.setProperty(namespace+ "asunto",       documentAsuntosReader.readLine());
           header.setProperty(namespace+ "creationDate", generateCreationDate());
-          header.setProperty(namespace+ "reference",    TextUtil.pad( filingId, 10));
+          header.setProperty(namespace+ "reference",    generateReference());
           Repo.getInstance().save();
 
        } catch (Exception e)
-       {  throw new IllegalStateException("No pudo crear header del documento. Raz�n\n"+ e.getMessage());
+       {  throw new IllegalStateException("No pudo crear header del documento. Razón\n"+ e.getMessage());
        }
 
        // 4. Para todos los documentos hijos
        for (long docInstance = 0; docInstance < nSubDocs; docInstance++)
        {
-          // 5.     Cree la instancia del documento item
-          Node item = header.addNode(idNumber+ "_"+ docInstance);
-          item.setProperty("jcr:nodeTypeName",  Nature.DOC_ITEM.toString());
+          try
+          {
+             // 5.     Cree la instancia del documento item
+             Node item = header.addNode(idNumber+ "_"+ docInstance);
+             item.setProperty("jcr:nodeType",      Nature.DOC_ITEM.toString());
+             item.setProperty("jcr:nodeTypeName",  Nature.DOC_ITEM.toString());
+             item.setProperty("jcr:createdBy",     user.getEmail());
 
-          // 6.         Cree los metadatos de la instancia item
-          item.addMixin   (namespace+ "DocumentInstance");
-          item.setProperty(namespace+ "instanceId",  docInstance);
+             // 6.         Cree los metadatos de la instancia item
+             item.addMixin   (namespace+ "DocumentInstance");
+             item.setProperty(namespace+ "instanceId",  docInstance);
 
-          // 7.         Cree  el contenido documental
-          /*
-          public static void addFileNode(Session session, String absPath, FileDetail fileDetail)
-                throws RepositoryException, IOException
-        {
-            // FIXME add null check for all incoming parameters
-            // FIXME refactor this method to reduce duplicate codes
-            Node node = createNodes(session, absPath);
-            if (node.hasNode(fileDetail.getFileName()))
-            {   System.out.println("File already added.");
-                return;
-            }
-
-            Node fileHolder = node.addNode(fileDetail.getFileName()); // Created a node with that of file Name
-            fileHolder.addMixin("mix:versionable");
-            fileHolder.setProperty("jcr:createdBy", fileDetail.getCreatedBy());
-            fileHolder.setProperty("jcr:nodeType", NodeType.FILE.getValue());
-            fileHolder.setProperty("size", fileDetail.getSize());
-
-            Node file1 = fileHolder.addNode("theFile", "nt:file"); // create node of type file.
-
-            Date now = new Date();
-            now.toInstant().toString();
-
-            Node content = file1.addNode("jcr:content", "nt:resource");
-            content.setProperty("jcr:mimeType", fileDetail.getContentType());
-
-            Binary binary = session.getValueFactory().createBinary(fileDetail.getFileData());
-
-            content.setProperty("jcr:data", binary);
-            content.setProperty("jcr:lastModified", now.toInstant().toString());
-            session.save();
-            VersionManager vm = session.getWorkspace().getVersionManager();
-            vm.checkin(fileHolder.getPath());
-            System.out.println("File Saved...");
-        }
-            */
-          
+             // 7.         Cree  el contenido documental
+             File contentFile  = generateContent();
+             Repo.getInstance().setContent(item, contentFile);
+          } catch( Exception e)
+          {
+             throw new IllegalStateException("No pudo crear contenido documental, instancia["+ docInstance+ "] "+
+                                             "archivo["+ filingId+ "]. Razón\n"+ e.getMessage());
+          }
           Repo.getInstance().save();
-
-       }
+       }//for ( docInstance ...
 
       return nSubDocs;
    }//generateDocs
@@ -126,6 +108,11 @@ public class DocumentGenerator
       return TextUtil.pad( filingId, 10);
    }//generateRadicado
 
+   private String generateReference()
+   {
+      return filingId == 0?  "" : TextUtil.pad(filingId-1, 10);
+   }//generateReference
+
 
    private String generateCreationDate()
    {
@@ -134,6 +121,22 @@ public class DocumentGenerator
       LocalDate createdOn =  now.minusDays(daysElapsed);
       return TextUtil.formatDate( createdOn);
    }//generateCreationDate
+
+
+   private File  generateContent()
+   {
+      File  contentFile = null;
+      String fileName = "data/file"+ filingId+ ".pdf";
+      try
+      {
+         Resource resource = new ClassPathResource(fileName);
+         contentFile       = resource.getFile();
+      }catch( Exception e)
+      {  throw new IllegalStateException("No pudo abrir archivo ["+ fileName+ "]. Causa\n"+ e.getMessage());
+      }
+      return contentFile;
+
+   }//generateContent
 
 
 

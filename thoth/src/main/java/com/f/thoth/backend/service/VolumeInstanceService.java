@@ -131,7 +131,7 @@ public class VolumeInstanceService  implements FilterableCrudService<VolumeInsta
       String instanceCode = instance.getInstance().toString();
       String    childPath = parentPath+ Parm.PATH_SEPARATOR+ ""+ instanceCode;
       Node          child = Repo.getInstance().addNode(childPath, "volume "+ volume.getName()+ " - instance "+ instanceCode, currentUser.getEmail());
-      child.setProperty("jcr:nodeType", NodeType.INSTANCE.toString());
+      child.setProperty("jcr:nodeType", NodeType.VOLUME_INSTANCE.toString());
       child.setProperty(namespace+ "code",    instance.formatCode());
       return child;
    }//addJCRChild
@@ -142,7 +142,7 @@ public class VolumeInstanceService  implements FilterableCrudService<VolumeInsta
       try
       {
          String namespace    = instance.getTenant().getName()+ ":";
-         instanceJCR.setProperty(namespace+ "type",     NodeType.INSTANCE.getCode());
+         instanceJCR.setProperty(namespace+ "type",     NodeType.VOLUME_INSTANCE.getCode());
          instanceJCR.setProperty(namespace+ "instance", instance.getInstance().toString());
          instanceJCR.setProperty(namespace+ "location", instance.getLocation());
          instanceJCR.setProperty(namespace+ "open",     instance.isOpen());
@@ -231,7 +231,7 @@ public class VolumeInstanceService  implements FilterableCrudService<VolumeInsta
       });
 
    }//revoke
-   
+
 
    private Tenant  tenant() { return (Tenant)VaadinSession.getCurrent().getAttribute(TENANT); }
 

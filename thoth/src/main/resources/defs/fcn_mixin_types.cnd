@@ -1,9 +1,20 @@
 
 <FCN = 'http://fconsultor.com/FCN'>
 
+/* Tanto los expedientes normales como los volumenes comparten la misma estructura de tipo Volumen.
+   La diferencia es que los expedientes normales solo tienen una instancia del volumen.
+   Ambos,  expedientes o volumenes tienen una lista de tipos documentales admisibles,
+   de forma que sea posible restringir el tipo de documentos que se incluyen en un expediente.
+*/
+
 [FCN:Volume] >  nt:base       mixin
   - FCN:currentInstance  ( LONG      )  primary  mandatory       // Id of the document
   - FCN:admissibleTypes  ( STRING    )           multiple        // Id of Tenant that owns the document
+
+/*  Todo documento tiene un encabezamiento de tipo obligatorio basic_document (ver primary_types) que contiene los metadatos basicos.
+    El documento es un composite que puede contener multiples sub-documentos (instancias). Cada instancia tiene un tipo
+    (mixin) DocumentInstance que tiene como minimo un campo de secuencia de la instancia dentro del documento (Primera secuencia = 0).
+*/
 
 [FCN:Document] >  nt:base   mixin orderable
   - FCN:tenant              ( LONG      ) mandatory              // Id of Tenant that owns the Document
@@ -16,6 +27,11 @@
 [FCN:DocumentInstance] >  nt:base   mixin orderable
   - FCN:instanceId          ( LONG      ) mandatory              // Document instance sequence number
 
+/*
+    A medida que se avanza en el workflow que genera y usa el documento se van adicionando nuevos metadatos (via
+    mixin types) de acuerdo con la naturaleza del documento y la necesidad del proceso. Por ejemplo,
+    Correspondence, Sede, Obligacion, Factura, Pago, Remision, Recibo, Office, Series, etc.
+*/
 [FCN:Correspondence] >  nt:base       mixin
   - FCN:author           ( STRING    )                           // Author of the document
   - FCN:recipient        ( STRING    )                           // Recipient to whom the document is sent
