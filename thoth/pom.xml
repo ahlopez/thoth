@@ -37,7 +37,7 @@
     <jackrabbit.jcr.commons.version>2.21.6</jackrabbit.jcr.commons.version>
 
     <!--... mongo -->
-    <mongodb.driver.version>3.12.7</mongodb.driver.version>
+    <mongodb.driver.version>3.12.8</mongodb.driver.version>
     <mongodb.driver.core.version>4.0.5</mongodb.driver.core.version>
 
     <!--... spring -->
