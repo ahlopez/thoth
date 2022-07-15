@@ -34,7 +34,6 @@ import org.springframework.core.io.Resource;
 import com.f.thoth.Parm;
 import com.f.thoth.app.HasLogger;
 import com.f.thoth.backend.data.entity.util.TextUtil;
-import com.f.thoth.backend.data.gdoc.expediente.Nature;
 import com.f.thoth.backend.data.gdoc.metadata.Field;
 import com.f.thoth.backend.data.gdoc.metadata.Property;
 import com.f.thoth.backend.data.gdoc.metadata.Schema;
@@ -281,8 +280,7 @@ public class Repo implements HasLogger
          Resource resource = new ClassPathResource("defs");
          Path     dirPath  = Paths.get(resource.getFile().getPath());
          cndFiles =  Files.list(dirPath)
-                          .filter(path -> (path.getFileName()).toString().toLowerCase()
-                          .startsWith(workspaceName.toLowerCase()))
+                          .filter(path -> (path.getFileName()).toString().toLowerCase().startsWith(workspaceName.toLowerCase()))
                           .collect(Collectors.toList());
       }catch(Exception e)
       {  getLogger().info("No pudo obtener lista de archivos con las definiciones de tipos de nodo, para el workspace["+ workspaceName+ "]");
@@ -370,9 +368,8 @@ public class Repo implements HasLogger
 
 
 
-   public Node setContent(Node parent, File contentFile) throws Exception
+   public Node setContent(Node parent, File contentFile, String namespace) throws Exception
    {
-      Node content       = parent.addNode("jcr:content", "nt:resource");
       Path path          = contentFile.toPath();
       Long size          = (Long)Files.getAttribute( path, "size");
       String contentType = Files.probeContentType(path);
@@ -380,11 +377,13 @@ public class Repo implements HasLogger
       Binary      binary = jcrSession.getValueFactory().createBinary(is);
       LocalDateTime  now = LocalDateTime.now();
 
-      content.setProperty("jcr:nodeTypeName",  Nature.DOC_ITEM.toString()+ "_CONTENT");
+      Node content       = parent.addNode("jcr:content", "nt:resource");
+      content.addMixin   ("mix:DocumentContent");
       content.setProperty("jcr:mimeType",      contentType);
       content.setProperty("jcr:data",          binary);
-      content.setProperty("jcr:lastModified",  TextUtil.formatDateTime(now));
-      content.setProperty("size",              size);
+      content.setProperty("jcr:lastModified",  now.format(Parm.DATE_FORMATTER));
+      content.setProperty("size", size);
+
       return content;
    }//setContent
 

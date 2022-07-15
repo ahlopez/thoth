@@ -33,7 +33,7 @@
 
 /*  Todo documento tiene un encabezamiento de tipo obligatorio basic_document (ver primary_types) que contiene los metadatos basicos.
     El documento es un composite que puede contener multiples sub-documentos (instancias). Cada instancia tiene un tipo
-    (mixin) DocumentInstance que tiene como minimo un campo de secuencia de la instancia dentro del documento (Primera secuencia = 0).
+    doc_item que tiene como minimo un campo de secuencia de la instancia dentro del documento (Primera secuencia = 0).
 */
 [FCN:basic_document] >  nt:base   orderable
   - FCN:tenant              ( LONG      ) mandatory           // Id of Tenant that owns the Document
@@ -42,6 +42,13 @@
   - FCN:asunto              ( STRING    ) mandatory           // Administrative theme/workflow (asunto) which the document belongs
   - FCN:creationDate        ( STRING    ) mandatory           // Date included in the document
   - FCN:reference           ( STRING    )                     // Optional reference id that links the document to a workflow
+
+[FCN:basic_document_instance] >  nt:base    orderable
+  - FCN:instanceId          ( LONG      ) mandatory              // Document instance sequence number
+
+[FCN:basic_document_instance_content] >  nt:base
+  - FCN:content_id          ( LONG      ) mandatory              // Content sequence number
+
 
 /*
     Metadatos minimos de los documentos electrónicos de archivo según decreto 1080

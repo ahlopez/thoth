@@ -14,7 +14,7 @@
 /*  Todo documento tiene un encabezamiento de tipo obligatorio basic_document (ver primary_types) que contiene los metadatos basicos.
     El documento es un composite que puede contener multiples sub-documentos (instancias). Cada instancia tiene un tipo
     (mixin) DocumentInstance que tiene como minimo un campo de secuencia de la instancia dentro del documento (Primera secuencia = 0).
-*/
+    *** Por ahora no se están usando estos dos mixin. Se usan en cambio los primary types. ***
 
 [FCN:Document] >  nt:base   mixin orderable
   - FCN:tenant              ( LONG      ) mandatory              // Id of Tenant that owns the Document
@@ -23,9 +23,10 @@
   - FCN:asunto              ( STRING    ) mandatory              // Administrative theme/workflow (asunto) which the document belongs
   - FCN:creationDate        ( STRING    ) mandatory              // Date included in the document
   - FCN:reference           ( STRING    )                        // Optional reference id that links the document to a workflow
+*/
 
-[FCN:DocumentInstance] >  nt:base   mixin orderable
-  - FCN:instanceId          ( LONG      ) mandatory              // Document instance sequence number
+[mix:DocumentContent] >  nt:base   mixin orderable
+  - size                    ( LONG      ) mandatory              // Document content size
 
 /*
     A medida que se avanza en el workflow que genera y usa el documento se van adicionando nuevos metadatos (via

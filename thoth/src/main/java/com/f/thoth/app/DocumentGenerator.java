@@ -13,8 +13,6 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import com.f.thoth.backend.data.entity.util.TextUtil;
-import com.f.thoth.backend.data.gdoc.document.jackrabbit.NodeType;
-import com.f.thoth.backend.data.gdoc.expediente.Nature;
 import com.f.thoth.backend.data.security.Tenant;
 import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.jcr.Repo;
@@ -54,12 +52,9 @@ public class DocumentGenerator
        try
        {
           header.addMixin   ("mix:referenceable");
-      //    header.addMixin   (namespace+ "Document");
-          /* Pendiente:  El tipo de nodo debe estar en el primary_types.
-           * El nombre del nodo, no  lo sé. Por ahora, se está usando el definido en NodeType.
-           */
-          header.setProperty("jcr:nodeType",            namespace+ "basic_document");
-          header.setProperty("jcr:nodeTypeName",        namespace+ NodeType.DOCUMENT_INSTANCE.getCode());
+          String headerTypeName = namespace+ "basic_document";
+          header.setProperty("jcr:nodeType",            headerTypeName);
+          header.setProperty("jcr:nodeTypeName",        headerTypeName);
           header.setProperty(namespace+ "tenant",       tenant.getId());
           header.setProperty(namespace+ "filingId",     idNumber);
           header.setProperty(namespace+ "createdBy",    user.getEmail());
@@ -79,17 +74,15 @@ public class DocumentGenerator
           {
              // 5.     Cree la instancia del documento item
              Node item = header.addNode(idNumber+ "_"+ docInstance);
-             item.setProperty("jcr:nodeType",      Nature.DOC_ITEM.toString());
-             item.setProperty("jcr:nodeTypeName",  Nature.DOC_ITEM.toString());
-             item.setProperty("jcr:createdBy",     user.getEmail());
-
-             // 6.         Cree los metadatos de la instancia item
-             item.addMixin   (namespace+ "DocumentInstance");
+             String itemTypeName = namespace+"basic_document_instance";
+             item.setProperty("jcr:nodeType",           itemTypeName);
+             item.setProperty("jcr:nodeTypeName",       itemTypeName);
+             item.setProperty("jcr:createdBy",          user.getEmail());
              item.setProperty(namespace+ "instanceId",  docInstance);
 
-             // 7.         Cree  el contenido documental
+             // 6.         Cree  el contenido documental
              File contentFile  = generateContent();
-             Repo.getInstance().setContent(item, contentFile);
+             Repo.getInstance().setContent(item, contentFile, namespace);
           } catch( Exception e)
           {
              throw new IllegalStateException("No pudo crear contenido documental, instancia["+ docInstance+ "] "+

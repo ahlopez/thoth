@@ -253,7 +253,7 @@ public class DataGenerator implements HasLogger
          getLogger().info("... generating orders");
          createOrders(orderRepository, productSupplier, pickupLocationSupplier, barista, baker);
 */
-         getLogger().info("Generated evidentia test data");
+         getLogger().info("... Generated evidentia test data");
 
       } catch (Exception e)
       {
