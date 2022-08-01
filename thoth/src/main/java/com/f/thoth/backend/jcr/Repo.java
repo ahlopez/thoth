@@ -381,7 +381,8 @@ public class Repo implements HasLogger
       content.addMixin   ("mix:DocumentContent");
       content.setProperty("jcr:mimeType",      contentType);
       content.setProperty("jcr:data",          binary);
-      content.setProperty("jcr:lastModified",  now.format(Parm.DATE_FORMATTER));
+      String snow        = now.format(Parm.DATE_FORMATTER);
+      content.setProperty("jcr:lastModified",  snow);
       content.setProperty("size", size);
 
       return content;

@@ -26,7 +26,7 @@ public class Parm
    public static final Integer          ADMIN_CATEGORY  = MAX_CATEGORY - 1;
    public static final String          VALUE_SEPARATOR  = ";";
    public static final LocalDateTime      END_OF_TIMES  = LocalDateTime.parse("5000-12-31T11:59:59");
-   public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm:ss");
+   public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");
    public static final String               NULL_VALUE  = "*";
    
 }//Parm

@@ -40,7 +40,7 @@
   - FCN:filigId             ( STRING    ) mandatory           // External id number given to the document (radicado)
   - FCN:createdBy           ( STRING    ) mandatory           // User/area/institution responsible for the document
   - FCN:asunto              ( STRING    ) mandatory           // Administrative theme/workflow (asunto) which the document belongs
-  - FCN:creationDate        ( STRING    ) mandatory           // Date included in the document
+  - FCN:creationDate        ( DATE      ) mandatory           // Date included in the document
   - FCN:reference           ( STRING    )                     // Optional reference id that links the document to a workflow
 
 [FCN:basic_document_instance] >  nt:base    orderable
