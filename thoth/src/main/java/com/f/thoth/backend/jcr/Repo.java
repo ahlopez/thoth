@@ -103,87 +103,7 @@ public class Repo implements HasLogger
       checkCnds(7, "FCN");
       return repo;
 
-      /*
-         Ver ejemplo completo en   C:\ahl\estudio\dzone\ecm\oak-mongodb-demo-master
-
-         2021/06/04 : From the JackRabbit Oak Repository Construction page at https://jackrabbit.apache.org/oak/docs/construct.html
-         DB db = new MongoClient("127.0.0.1", 27017).getDB("test2");
-         DocumentNodeStore ns = new DocumentMK.Builder().
-         setMongoDB(db).getNodeStore();
-         Repository repo = new Jcr(new Oak(ns)).createRepository();
-
-         2021/06/04: Adaptation of the following article and Oak documentation
-         Repository repo = initRepo("mongodb://localhost", 27017, "oak");
-
-         2021/06/04: From the Dzone article "Creating a Content Repository Using Jackrabbit Oak and MongoDB, Bishnu Mishra  Apr. 07, 18"
-         String uri = "mongodb://" + host + ":" + port;
-         DocumentNodeStore ns = new DocumentMK.Builder().setMongoDB(uri, "oak_demo", 16).getNodeStore();
-         Repository repo = new Jcr(new Oak(ns)).createRepository();
-
-         2021/06/04: From the Dzone article ibid,   Creating File Nodes
-         Node fileNodeParent = session.getNode("pathToParentNode"); // /node1/node2/
-         Node fileNode = fileNodeParent.addNode("theFile", "nt:file");
-         Node content = fileNode.addNode("jcr:content", "nt:resource");
-         InputStream is = getFileInputStream();//Get the file data as stream.
-         Binary binary = session.getValueFactory().createBinary(is);
-         content.setProperty("jcr:data", binary);
-         session.save();
-         // To enable versioning use VersionManager
-         VersionManager vm = session.getWorkspace().getVersionManager();
-         vm.checkin(fileNode.getPath());
-
-         2021/06/04: From the Dzone article ibid,   Retrieving File From Repository
-         Node fileNodeParent = session.getNode("pathToParentNode"); // /node1/node2/
-         Node fileContent = fileNodeParent.getNode("theFile").getNode("jcr:content");
-         Binary bin = fileContent.getProperty("jcr:data").getBinary();
-         InputStream stream = bin.getStream();
-         byte[] bytes = IOUtils.toByteArray(stream);
-         bin.dispose();
-         stream.close();
-
-         2021/06/04: From the Dzone article ibid,   Retrieving Version of a Content
-         VersionManager vm = session.getWorkspace().getVersionManager();
-         javax.jcr.version.VersionHistory versionHistory = vm.getVersionHistory("filePath");
-         Version currentVersion = vm.getBaseVersion(filePath);// This is the current version of the file
-         VersionIterator itr = versionHistory.getAllVersions();// gets all the versions of that content
-
-         We can iterate over the VersionIterator to get specific versions and its properties.
-         Similarly, we can restore a specific version of a content.
-
-         //Restoring a specific version
-         VersionManager vm = session.getWorkspace().getVersionManager();
-         Version version = (Version) session.getNodeByIdentifier("versionId");
-         vm.restore(version, false);// boolean flag governs what happens in case of an identifier collision.
-
-         2021/06/04:  To access the repository (example) - See https://jackrabbit.apache.org/oak/docs/construct.html
-         Session session = repo.login( new SimpleCredentials("admin", "admin".toCharArray()));
-         Node root = session.getRootNode();
-         if (root.hasNode("hello"))
-         {
-             Node hello = root.getNode("hello");
-             long count = hello.getProperty("count").getLong();
-             hello.setProperty("count", count + 1);
-             System.out.println("found the hello node, count = " + count);
-         } else
-         {
-             System.out.println("creating the hello node");
-             root.addNode("hello").setProperty("count", 1);
-         }
-         session.save();
-
-         2021/06/04:  To logout and close the store - See https://jackrabbit.apache.org/oak/docs/construct.html
-         session.logout();
-         // depending on NodeStore implementation either:
-         // close FileStore
-         fs.close();
-         // or close DocumentNodeStore
-         ns.dispose();
-
-      // Gets an in-memory repo
-      repo = new Jcr(new Oak()).createRepository();
-      getLogger().info("... Got an in-memory repo");
-      return repo;
-       */
+      //   Ver ejemplo completo en   C:\ahl\estudio\dzone\ecm\oak-mongodb-demo-master
 
    }//initJCRRepo
 
@@ -233,15 +153,15 @@ public class Repo implements HasLogger
          loadTypes(workspacePath.substring(1));
       }
    }//initWorkspace
-   
-   
+
+
    public void checkCnds(int place, String code)
    {
       try {
            List<Path> cndList =  getCndFiles(code);
            getLogger().info(">>> place="+ place+ " cnds=" + cndList.size());
       }catch(Exception e)
-      {   
+      {
          getLogger().info("*** No pudo obtener el numero de cnd files. Razon\n"+ e.getMessage());
       }
    }//checkCnds
@@ -274,7 +194,6 @@ public class Repo implements HasLogger
    private List<Path>  getCndFiles(String workspaceName)
    {
       List<Path> cndFiles = new ArrayList<>();
-      System.out.println("workspaceName("+ workspaceName+ ")");
       try
       {
          Resource resource = new ClassPathResource("defs");
@@ -360,7 +279,6 @@ public class Repo implements HasLogger
       if ( msg == null)
       {  for ( Property p: properties)
          {  node.setProperty( namespace+ p.getName(), p.getValue());
-           // System.out.println(" >>> "+ namespace+ p.getName()+ "= ["+ p.getValue()+ "]");
          }
       }
       return msg;
