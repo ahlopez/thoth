@@ -105,6 +105,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
       super.configure(auth);
       auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
    }//configure
+   
 
    /**
     * Require login to access internal pages and configure login form.

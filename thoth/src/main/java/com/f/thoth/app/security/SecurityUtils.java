@@ -42,9 +42,9 @@ public final class SecurityUtils
    public static String getUsername() 
    {
       SecurityContext context = SecurityContextHolder.getContext();
-      Object principal = context.getAuthentication().getPrincipal();
-      if(principal instanceof UserDetails) {
-         UserDetails userDetails = (UserDetails) context.getAuthentication().getPrincipal();
+      Object        principal = context.getAuthentication().getPrincipal();
+      if(principal instanceof UserDetails) 
+      {  UserDetails userDetails = (UserDetails) context.getAuthentication().getPrincipal();
          return userDetails.getUsername();
       }
       
@@ -63,8 +63,8 @@ public final class SecurityUtils
    public static boolean isAccessGranted(Class<?> securedClass) 
    {
       final boolean publicView = LoginView.class.equals(securedClass)
-         || AccessDeniedView.class.equals(securedClass)
-         || CustomRouteNotFoundError.class.equals(securedClass);
+                              || AccessDeniedView.class.equals(securedClass)
+                              || CustomRouteNotFoundError.class.equals(securedClass);
 
       // Always allow access to public views
       if (publicView) 
@@ -89,20 +89,24 @@ public final class SecurityUtils
             .anyMatch(allowedRoles::contains);
       
    }//isAccessGranted
+   
+   
 
    /**
     * Checks if the user is logged in.
     *
     * @return true if the user is logged in. False otherwise.
     */
-   public static boolean isUserLoggedIn() {
-      return isUserLoggedIn(SecurityContextHolder.getContext().getAuthentication());
+   public static boolean isUserLoggedIn() 
+   {  return isUserLoggedIn(SecurityContextHolder.getContext().getAuthentication());
    }
+   
 
    private static boolean isUserLoggedIn(Authentication authentication) 
    {  return authentication != null
-         && !(authentication instanceof AnonymousAuthenticationToken);
+                            && !(authentication instanceof AnonymousAuthenticationToken);
    }
+   
 
    /**
     * Tests if the request is an internal framework request. The test consists of

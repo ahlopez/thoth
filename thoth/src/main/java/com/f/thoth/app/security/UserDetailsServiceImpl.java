@@ -27,9 +27,9 @@ public class UserDetailsServiceImpl implements UserDetailsService
 
    @Autowired
    public UserDetailsServiceImpl(SingleUserRepository userRepository) 
-   {
-      this.userRepository = userRepository;
+   {   this.userRepository = userRepository;
    }
+   
 
    /**
     *
@@ -45,11 +45,9 @@ public class UserDetailsServiceImpl implements UserDetailsService
    {
       User user = userRepository.findByEmailIgnoreCase(username);
       if (null == user) 
-      {
-         throw new UsernameNotFoundException("No hay un usuario con nombre[" + username+ "]");
+      { throw new UsernameNotFoundException("No hay un usuario con nombre[" + username+ "]");
       } else 
-      {
-         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPasswordHash(),
+      { return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPasswordHash(),
                Collections.singletonList(new SimpleGrantedAuthority(user.getRole())));
       }
    }//loadUserByUsername

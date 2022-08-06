@@ -470,7 +470,7 @@ public class ExpedienteGenerator implements HasLogger
    {
       //TODO: Crear un BlockChain
       // Generar el mac del expediente usando el mac de cada documento y el precedente del block
-      //
+      // Examinar la tecnología R3
 
       return "";
    }//generateMac

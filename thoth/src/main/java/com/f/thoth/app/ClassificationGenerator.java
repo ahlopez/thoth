@@ -547,7 +547,7 @@ public class ClassificationGenerator implements HasLogger
       {
          seqNumbers.add( Numerator.sequenceName(tenant, seqName, prefix, suffix));
          nSequences++;
-         numerator.getSequence(tenant, seqName, prefix, suffix, 0L, 1, 5);
+         numerator.getSequence(tenant, seqName, prefix, suffix, 0L/*initial*/, 1/*increment*/, 5/*length*/);
       }
    }//createSequence
 

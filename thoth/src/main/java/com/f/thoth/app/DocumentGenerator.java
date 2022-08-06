@@ -88,7 +88,9 @@ public class DocumentGenerator
              throw new IllegalStateException("No pudo crear contenido documental, instancia["+ docInstance+ "] "+
                                              "archivo["+ filingId+ "]. Razón\n"+ e.getMessage());
           }
-          Repo.getInstance().save();
+          // Recuerde que solo se verifican los errores de persistencia en el repositorio al ejecutar el save().
+          // Múltiples operaciones en el repositorio pueden acumularse antes de verificarlas con el save()
+          Repo.getInstance().save();   
        }//for ( docInstance ...
 
       return nSubDocs;
@@ -100,6 +102,7 @@ public class DocumentGenerator
       filingId++;
       return TextUtil.pad( filingId, 10);
    }//generateRadicado
+   
 
    private String generateReference()
    {
