@@ -24,7 +24,7 @@ import com.f.thoth.Parm;
 import com.f.thoth.backend.data.entity.BaseEntity;
 
 /**
- *  Representa un usuario sencillo o compuesto del sistema
+ *  Representa un usuario sencillo o compuesto (grupo de usuarios) del sistema
  */
 @MappedSuperclass
 public abstract class Usuario extends BaseEntity implements NeedsProtection, Comparable<Usuario>
@@ -40,11 +40,11 @@ public abstract class Usuario extends BaseEntity implements NeedsProtection, Com
    @NotNull     (message= "{evidentia.category.required}")
    @Min(value=0, message= "{evidentia.category.minvalue}")
    @Max(value=5, message= "{evidentia.category.maxvalue}")
-   protected Integer           userCategory;         // Security category
+   protected Integer           userCategory;         // Security category (User level)
 
    @NotNull(message = "{evidentia.objectToProtect.required}")
    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-   protected ObjectToProtect   objectToProtect;      // Associated security object
+   protected ObjectToProtect   objectToProtect;      // Associated security object that protects the Usuario
 
    @NotNull(message = "{evidentia.date.required}")
    @PastOrPresent(message="{evidentia.date.pastorpresent}")
@@ -69,11 +69,11 @@ public abstract class Usuario extends BaseEntity implements NeedsProtection, Com
       name            = "[name]";
       locked          = false;
       fromDate        = yearStart();
-      userCategory    = Parm.DEFAULT_CATEGORY;
+      userCategory    = Parm.DEFAULT_CATEGORY;          // The default category of this Usuario
       toDate          = yearStart().plusYears(1);
       roles           = new TreeSet<>();
       objectToProtect = new ObjectToProtect();
-      objectToProtect.setCategory(Parm.ADMIN_CATEGORY);
+      objectToProtect.setCategory(Parm.ADMIN_CATEGORY); // The min category of a user to be allowed to operate on this Usuario
    }//Usuario
 
    
@@ -131,7 +131,7 @@ public abstract class Usuario extends BaseEntity implements NeedsProtection, Com
 
    @Override public boolean         canBeAccessedBy(Integer userCategory) { return objectToProtect.canBeAccessedBy(userCategory);}
 
-   @Override public boolean         isOwnedBy( User user)           { return objectToProtect.isOwnedBy(user);}
+   @Override public boolean         isOwnedBy( User user)                 { return objectToProtect.isOwnedBy(user);}
 
    @Override public boolean         isOwnedBy( Role role)                 { return objectToProtect.isOwnedBy(role);}
 
@@ -204,7 +204,7 @@ public abstract class Usuario extends BaseEntity implements NeedsProtection, Com
    }//getRole
    */
 
-
+   //TODO: Implement getRole() as defined above
    public String getRole() {
       return "admin";
    }

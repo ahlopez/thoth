@@ -64,3 +64,15 @@ Ok        PAGE_ESQUEMAS_CLASIFICACION                = "esquema_clasificacion";
            PAGE_PRESTAMO_EXPEDIENTE                = "prestamo_expediente";
            PAGE_DEVOLUCION                         = "retorno_expediente";
         PAGE_INDICES_ARCHIVO                       = "indice_archivo";
+
+
+// Pendientes:
+// * Revisar la configuración de seguridad SecurityConfiguration.java
+     + LOGOUT_SUCCESS_URL
+     + si la definición de tipos es jerárquica, EXPEDIENTE_ROOT debe ser una clase, no un path cualquiera
+
+
+
+
+
+

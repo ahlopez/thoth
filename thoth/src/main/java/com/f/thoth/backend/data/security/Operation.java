@@ -24,7 +24,8 @@ import com.f.thoth.backend.data.entity.HierarchicalEntity;
 import com.f.thoth.backend.data.entity.util.TextUtil;
 
 /**
- * Representa una operacion que puede ser ejecutada
+ * Representa una operacion que puede ser ejecutada sobre un objeto que requiere protección
+ * Las operaciones están agrupadas según una estructura lógica jerárquica
  */
 @NamedEntityGraphs({
    @NamedEntityGraph(
@@ -82,7 +83,7 @@ public class Operation extends BaseEntity implements NeedsProtection, Hierarchic
 
    @NotNull(message = "{evidentia.objectToProtect.required}")
    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
-   protected ObjectToProtect  objectToProtect;  // Associated security object
+   protected ObjectToProtect  objectToProtect;  // Object on which operation acts
 
    // --------------------- Construccion -------------------------
    public Operation()
@@ -93,6 +94,7 @@ public class Operation extends BaseEntity implements NeedsProtection, Hierarchic
       init();
       buildCode();
    }//Operation constructor
+   
 
    public Operation( String name, ObjectToProtect objectToProtect, Operation owner)
    {
@@ -150,7 +152,7 @@ public class Operation extends BaseEntity implements NeedsProtection, Hierarchic
    public Integer               getCategory() {return objectToProtect.getCategory();}
    public void                  setCategory(Integer category) {objectToProtect.setCategory(category);}
 
-   public User            getUserOwner() {return objectToProtect.getUserOwner();}
+   public User                  getUserOwner() {return objectToProtect.getUserOwner();}
    public void                  setUserOwner(User userOwner) {objectToProtect.setUserOwner(userOwner);}
 
    public Role                  getRoleOwner() {return objectToProtect.getRoleOwner();}
@@ -174,7 +176,7 @@ public class Operation extends BaseEntity implements NeedsProtection, Hierarchic
 
    @Override public boolean         canBeAccessedBy(Integer userCategory) { return objectToProtect.canBeAccessedBy(userCategory);}
 
-   @Override public boolean         isOwnedBy( User user)           { return objectToProtect.isOwnedBy(user);}
+   @Override public boolean         isOwnedBy( User user)                 { return objectToProtect.isOwnedBy(user);}
 
    @Override public boolean         isOwnedBy( Role role)                 { return objectToProtect.isOwnedBy(role);}
 

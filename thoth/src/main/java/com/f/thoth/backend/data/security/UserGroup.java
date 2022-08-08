@@ -14,7 +14,8 @@ import javax.persistence.Table;
 import com.f.thoth.backend.data.entity.HierarchicalEntity;
 
 /**
- * Representa un Grupo de Usuarios
+ * Representa un Grupo de Usuarios.
+ * Los grupos de usuarios son organizados jerarquicamente
  */
 @NamedEntityGraphs({
    @NamedEntityGraph(

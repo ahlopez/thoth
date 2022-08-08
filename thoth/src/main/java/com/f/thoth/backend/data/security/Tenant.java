@@ -115,6 +115,10 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
    @Valid
    private Set<UserGroup>  userGroups;
    */
+   //TODO: Tenant debe ser Singleton, cargado cuando se carga su primer usuario.
+   //TODO: Precargar los roles, users y groups crea el problema que al administrar dichos roles, users, groups
+   //      se deberían actualizar en RAM los roles, users, groups  creados/editados/borrados.
+   //      Procurar borrar esta lógica y cargar los objetos correspondientes cuando se requieran
 
    @Transient
    private Set<Role>             roles;
@@ -191,8 +195,8 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
    public String       getName()  { return name;}
    public void         setName( String name) { this.name = name; }
 
-   public void           setLocked(boolean locked) { this.locked = locked;}
-   public boolean        isLocked()
+   public void         setLocked(boolean locked) { this.locked = locked;}
+   public boolean      isLocked()
    {
       if( locked)
          return true;
@@ -256,7 +260,6 @@ public class Tenant extends AbstractEntity implements Comparable<Tenant>
    public int compareTo(Tenant that)
    {
       return this.equals(that)?  0 :
-         that ==  null        ?  1 :
          this.name == null  && that.name == null?  0 :
          this.name != null  && that.name == null?  1 :
          this.name == null  && that.name != null? -1 :

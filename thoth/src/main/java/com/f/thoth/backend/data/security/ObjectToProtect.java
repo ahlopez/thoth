@@ -55,6 +55,8 @@ import com.f.thoth.Parm;
 @Table(name = "OBJECT_TO_PROTECT")
 public class ObjectToProtect
 {
+   //TODO: Por qué este objeto no implementa NeedsProtection?
+   //TODO: Por qué este objeto no hereda de BaseEntity o AbstractEntity?
    public static final String BRIEF = "ObjectToProtect.brief";
    public static final String FULL  = "ObjectToProtect.full";
 
@@ -166,7 +168,11 @@ public class ObjectToProtect
 
    // -----------------  Logic ----------------
    public boolean isPersisted() { return id != null;}
-
+   
+   /* For an object to be accessed by a User two conditions must be met:
+    * a)  The User/UserGroup that wants to access it must have a category equal or greater than that of the object 
+    * b)  The Role of the User that wants to access it must have permission to operate on the object
+    */
    public boolean canBeAccessedBy(Integer userCategory) { return userCategory != null && category.compareTo(userCategory) <= 0;}
 
    public boolean isOwnedBy( User user)                 { return userOwner    != null && userOwner.equals(user);}
@@ -187,7 +193,7 @@ public class ObjectToProtect
             return true;
       }
       return false;
-   }
+   }//admits
 
 
 

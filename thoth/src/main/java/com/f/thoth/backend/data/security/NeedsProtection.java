@@ -1,7 +1,10 @@
 package com.f.thoth.backend.data.security;
 
 /**
- * Representa un objeto que requiere protección
+ * Representa un objeto que requiere protección.
+ * Los objetos que requieren protección son abstractos,
+ * pueden ser físicos tales como clases, expedientes, o documentos,
+ * o pueden ser lógicos tales como operaciones
  */
 public interface NeedsProtection
 {

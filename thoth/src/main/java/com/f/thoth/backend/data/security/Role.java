@@ -21,7 +21,7 @@ public class Role extends BaseEntity implements Comparable<Role>
 {
    @NotBlank(message = "{evidentia.name.required}")
    @NotEmpty(message = "{evidentia.name.required}")
-   @Size(max = 50)
+   @Size(max = 80)
    private String name;
 
    public Role()
@@ -86,7 +86,6 @@ public class Role extends BaseEntity implements Comparable<Role>
    public int compareTo(Role that)
    {
       return this.equals(that)?  0 :
-         that ==  null        ?  1 :
          this.code == null  && that.code == null?  0 :
          this.code != null  && that.code == null?  1 :
          this.code == null  && that.code != null? -1 :

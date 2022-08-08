@@ -203,9 +203,14 @@ public class User extends Usuario
    public int hashCode() { return id == null? 25777: id.hashCode();}
 
    @Override
-   public String toString() { return "User{" + super.toString() +
-         " lastName[" + lastName + "] email[" + email + "]"+
-         " groups["+ groups.size()+ "] roles["+ roles.size()+ "]}\n";}
+   public String toString() 
+   {   
+      return "User{" + super.toString() +
+              " lastName[" + lastName + "]"+  
+              " email[" + email + "]"+
+              " groups["+ groups.size()+ "]"+
+              " roles["+ roles.size()+ "]}\n";
+   }//toString
 
 
    // --------------- Logic ---------------------
@@ -220,12 +225,20 @@ public class User extends Usuario
       if ( ! object.canBeAccessedBy( this.userCategory))
          return false;
 
+      boolean roleCan= false;
       for ( Role r : roles)
       {
          if ( r.canAccess( object))
-            return true;
+         {  roleCan = true;
+            break;
+         }
       }
+      if ( !roleCan)
+         return false;
 
+      if (groups.size() == 0)
+         return true;
+      
       for (UserGroup ug: groups)
       {
          if (ug.canAccess(object))
