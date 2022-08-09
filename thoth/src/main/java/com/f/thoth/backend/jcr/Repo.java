@@ -74,9 +74,7 @@ public class Repo implements HasLogger
       {  throw new IllegalStateException("Repositorio JCR ya ha sido inicializado");
       }
       logger          = getLogger();
-      checkCnds(5, "FCN");
       Repository repo = initJCRRepo();
-      checkCnds(6, "FCN");
       jcrSession      = loginToRepo(repo, Parm.DEFAULT_ADMIN_LOGIN, Parm.DEFAULT_ADMIN_PASSWORD);
 
    }//Repo
@@ -100,7 +98,6 @@ public class Repo implements HasLogger
    {
       Repository repo = new Jcr(new Oak()).createRepository();
       logger.info("... Got an in-memory repo");
-      checkCnds(7, "FCN");
       return repo;
 
       //   Ver ejemplo completo en   C:\ahl\estudio\dzone\ecm\oak-mongodb-demo-master
@@ -126,7 +123,6 @@ public class Repo implements HasLogger
       }
       Session session = jcrRepo.login(new SimpleCredentials(userCode, passwordHash.toCharArray()));
       logger.info("... acquired session to jcr(JackRabbit) repo, user["+ userCode+ "], pwd["+ passwordHash+ "]");
-      checkCnds(8, "FCN");
       return session;
 
       //   jcr spec:    return  Repository.login(Credentials credentials, workspaceName);
@@ -145,7 +141,6 @@ public class Repo implements HasLogger
          { logger.info("Workspace path["+ workspacePath+ "] diferente del path en repositorio["+ jcrWorkspace.getPath()+ "]");
            System.exit(-1);
          }
-         checkCnds(9, name);
          logger.info("    >>> Tenant["+ name+   "], "+
                      "workspace["+ name+              "], "+
                      "path["+ jcrWorkspace.getPath()+ "], "+
@@ -155,6 +150,12 @@ public class Repo implements HasLogger
    }//initWorkspace
 
 
+   /**
+    * Para propósitos de debugging.
+    * Verifica la existencia de los archivos .cnd que definen los primary and mixin types of JCR
+    * @param place   Localización en el código fuente de este chequeo
+    * @param code    Código del namespace del .cnd en su definición
+    */
    public void checkCnds(int place, String code)
    {
       try {

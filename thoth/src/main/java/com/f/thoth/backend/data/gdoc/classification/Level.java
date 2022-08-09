@@ -29,7 +29,7 @@ public class Level extends BaseEntity implements Comparable<Level>
    @NotBlank(message = "{evidentia.name.required}")
    @NotEmpty(message = "{evidentia.name.required}")
    @Size(max = 50)
-   private String name;                                     // Nombre del nivel
+   private String name;                                     // Nombre del nivel, vg oficina,  serie, subserie
    
    @NotNull (message="{evidentia.orden.required}")
    @PositiveOrZero(message="{evidentia.orden.positive}")

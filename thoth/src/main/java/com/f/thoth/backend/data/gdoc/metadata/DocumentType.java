@@ -30,7 +30,10 @@ import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.UserGroup;
 
 /**
- * Representa un tipo documental
+ * Representa un tipo documental.
+ * Los tipos documentales se pueden tener herencia,
+ * de forma que un tipo documental hijo hereda
+ * el(los) esquema(s) de metadatos de sus ancestros
  */
 @NamedEntityGraphs({
    @NamedEntityGraph(
@@ -98,7 +101,7 @@ public class DocumentType extends BaseEntity implements NeedsProtection, Hierarc
 
    protected boolean          requiresContent;
 
-   // Considerar definirlo como "Abstract"    boolean according to JCR pag 39 &3.7.1.3
+   // TODO: Considerar definirlo como "Abstract"    boolean according to JCR pag 39 &3.7.1.3
    // Considerar definirlo como "Mixin"       boolean according to JCR pag 39 &3.7.1.4
    // Considerar definirlo como "Queryable"   boolean according to JCR pag 39 &3.7.1.5
    // Considerar definirlo como "Orderable"   boolean according to JCR pag 39 &3.7.1.6 (para expedientes)
@@ -140,7 +143,7 @@ public class DocumentType extends BaseEntity implements NeedsProtection, Hierarc
       this.schema   = schema;
       this.requiresContent = requiresContent;
       this.objectToProtect = new ObjectToProtect();
-
+  
    }//DocType
 
    private void init()
@@ -207,7 +210,7 @@ public class DocumentType extends BaseEntity implements NeedsProtection, Hierarc
 
    @Override public boolean         canBeAccessedBy(Integer userCategory) { return objectToProtect.canBeAccessedBy(userCategory);}
 
-   @Override public boolean         isOwnedBy( User user)           { return objectToProtect.isOwnedBy(user);}
+   @Override public boolean         isOwnedBy( User user)                 { return objectToProtect.isOwnedBy(user);}
 
    @Override public boolean         isOwnedBy( Role role)                 { return objectToProtect.isOwnedBy(role);}
 

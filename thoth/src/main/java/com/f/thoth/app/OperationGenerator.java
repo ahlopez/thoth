@@ -7,7 +7,7 @@ import com.f.thoth.backend.repositories.OperationRepository;
 import com.f.thoth.ui.utils.Constant;
 
 /**
- * Representa el conjunto de operaciones permitidas a un usuario
+ * Representa el conjunto de operaciones permitidas a un usuario, por menús u otro procedimiiento ejecutable
  */
 public class OperationGenerator
 {

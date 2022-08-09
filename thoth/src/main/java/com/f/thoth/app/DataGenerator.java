@@ -130,7 +130,6 @@ public class DataGenerator implements HasLogger
    {
       try
       {
-         Repo.getInstance().checkCnds(100, "FCN" );
          if (userRepository.count() != 0L)
          {  getLogger().info("Using existing database");
             return;
@@ -140,7 +139,6 @@ public class DataGenerator implements HasLogger
 
          // ------------ Cree los tenants y sus roles ----------------------------
          getLogger().info("... generating tenants");
-         Repo.getInstance().checkCnds(0, "FCN" );
          createTenants(tenantService);
 
          getLogger().info("... generating roles");
@@ -151,6 +149,7 @@ public class DataGenerator implements HasLogger
          createRoles(tenant2, roles2);
 
          // ----------- Respetar este orden para la inicializacion de los siguientes default -------------
+         //TODO:  Eliminar estos defaults tan pronto sea posible
          getLogger().info("... generating defaults");
 
          Schema.EMPTY.setTenant(tenant1);
@@ -217,7 +216,7 @@ public class DataGenerator implements HasLogger
                      volumeRepository, volumeInstanceRepository, schemaRepository,
                      expedienteNamesReader, documentAsuntosReader
                      );
-          int nExpedientes = expedienteGenerator.registerExpedientes(tenant1);
+         int nExpedientes = expedienteGenerator.registerExpedientes(tenant1);
          getLogger().info("    >>> End expedientes generation. "+ nExpedientes+ " expedientes generated");
          getLogger().info("... Generated evidentia test data");
 
@@ -458,18 +457,14 @@ public class DataGenerator implements HasLogger
    private Tenant createTenant(TenantRepository tenantRepository, String name)
          throws RepositoryException, UnknownHostException
    {
-      Repo.getInstance().checkCnds(1, name);
       Tenant tenant = new Tenant(name);
-      Repo.getInstance().checkCnds(2, name);
       tenant.setLocked(false);
       tenant.setAdministrator("admin@vaadin.com");
       LocalDate now = LocalDate.now();
       tenant.setFromDate( now.minusMonths(random.nextInt(36)));
       tenant.setToDate(now.plusYears(random.nextInt(10)));
       tenantRepository.save(tenant);
-      Repo.getInstance().checkCnds(3, name);
       Repo.getInstance().initWorkspace(tenant.getWorkspace(), name);
-      Repo.getInstance().checkCnds(4, name);
       return tenant;
    }//createTenant
 
