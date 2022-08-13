@@ -45,7 +45,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
    private static final String LOGIN_PROCESSING_URL = "/login";
    private static final String LOGIN_FAILURE_URL    = "/login?error";
    private static final String LOGIN_URL            = "/login";
-   private static final String LOGOUT_SUCCESS_URL   = Parm.PATH_SEPARATOR + Constant.PAGE_STOREFRONT;
+   private static final String LOGOUT_SUCCESS_URL   = Parm.PATH_SEPARATOR + Constant.PAGE_EVIDENTIAFRONT;
 
    private final UserDetailsService userDetailsService;
 
@@ -105,7 +105,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter
       super.configure(auth);
       auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder);
    }//configure
-   
+
 
    /**
     * Require login to access internal pages and configure login form.

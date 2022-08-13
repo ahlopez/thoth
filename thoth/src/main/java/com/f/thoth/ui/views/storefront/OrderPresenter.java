@@ -86,7 +86,7 @@ public class OrderPresenter {
    }
 
    void edit() {
-      UI.getCurrent().navigate(Constant.PAGE_STOREFRONT_EDIT + Parm.PATH_SEPARATOR + entityPresenter.getEntity().getId());
+      UI.getCurrent().navigate(Constant.PAGE_EVIDENTIAFRONT_EDIT + Parm.PATH_SEPARATOR + entityPresenter.getEntity().getId());
    }
 
    void back() {

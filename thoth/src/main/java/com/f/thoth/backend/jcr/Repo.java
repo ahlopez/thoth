@@ -294,14 +294,13 @@ public class Repo implements HasLogger
       String contentType = Files.probeContentType(path);
       FileInputStream is = new FileInputStream(contentFile);
       Binary      binary = jcrSession.getValueFactory().createBinary(is);
-      LocalDateTime  now = LocalDateTime.now();
+      String         now = TextUtil.formatDateTime(LocalDateTime.now());
 
       Node content       = parent.addNode("jcr:content", "nt:resource");
       content.addMixin   ("mix:DocumentContent");
       content.setProperty("jcr:mimeType",      contentType);
       content.setProperty("jcr:data",          binary);
-      String snow        = now.format(Parm.DATE_FORMATTER);
-      content.setProperty("jcr:lastModified",  snow);
+      content.setProperty("jcr:lastModified",  now);
       content.setProperty("size", size);
 
       return content;

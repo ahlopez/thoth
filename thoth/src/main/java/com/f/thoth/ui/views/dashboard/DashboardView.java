@@ -99,7 +99,7 @@ public class DashboardView extends PolymerTemplate<TemplateModel> {
             .withProperty("orderCard", OrderCard::create)
             .withProperty("header", order -> null)
             .withEventHandler("cardClick",
-                  order -> UI.getCurrent().navigate(Constant.PAGE_STOREFRONT + Parm.PATH_SEPARATOR + order.getId())));
+                  order -> UI.getCurrent().navigate(Constant.PAGE_EVIDENTIAFRONT + Parm.PATH_SEPARATOR + order.getId())));
 
       grid.setSelectionMode(Grid.SelectionMode.NONE);
       grid.setDataProvider(orderDataProvider);

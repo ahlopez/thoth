@@ -9,15 +9,16 @@ public class Constant
    public static final Locale  APP_LOCALE = Locale.US;
 
    public static final String PAGE_ROOT = "";
-   public static final String PAGE_STOREFRONT = "storefront";
-   public static final String PAGE_STOREFRONT_EDIT = "storefront/edit";
+   //TODO: Cambiar "storefront", y storefrontedit por evidentiafront y evidentiafront/edit
+   public static final String PAGE_EVIDENTIAFRONT = "storefront";
+   public static final String PAGE_EVIDENTIAFRONT_EDIT = "storefront/edit";
    public static final String PAGE_DASHBOARD = "dashboard";
    public static final String PAGE_USERS = "users";
    public static final String PAGE_USER_GROUPS = "user_groups";
    public static final String PAGE_SINGLE_USERS = "single_users";
    public static final String PAGE_PRODUCTS = "products";
 
-   public static final String TITLE_STOREFRONT = "Storefront";
+   public static final String TITLE_EVIDENTIAFRONT = "Storefront";
    public static final String TITLE_DASHBOARD = "Dashboard";
 
    public static final String TITLE_ADMINISTRATION = "Administración";
@@ -499,12 +500,9 @@ public class Constant
   public static final String             TITLE_CTG_SUBSERIE_ADM_SERVICIOS               = "Cartagena, Servicios públicos";
 
 
-   public static final String[] ORDER_SORT_FIELDS = {"dueDate", "dueTime", "id"};
+   public static final String[]       ORDER_SORT_FIELDS      = {"dueDate", "dueTime", "id"};
    public static final Sort.Direction DEFAULT_SORT_DIRECTION = Sort.Direction.ASC;
 
    public static final String VIEWPORT = "width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes, viewport-fit=cover";
-
-   // Mutable for testing.
-   public static int NOTIFICATION_DURATION = 4000;
 
 }//Constant

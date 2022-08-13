@@ -3,13 +3,14 @@ package com.f.thoth.backend.data.cache;
 import java.util.Hashtable;
 import java.util.Map;
 
-/** Implementa rol Caché del patrón caché.   Grand(1998) */
-public class Cache<K,T>
+/** Implementa rol Caché del patrón caché.   Grand(1998)
+ */
+public class Cache<K,T>   // K= Key type,  T=Cached object type
 {
 
   /**
    * cache                    - El caché de objetos
-   * mru                      - most recently used object. Cabeza de lista doblemente encadenada
+   * mru                      - most recently used object.  Cabeza de lista doblemente encadenada
    * lru                      - least recently used object. Cola de lista doblemente encadenada
    * currentCacheSize         - Número de objetos actualmente en el caché
    * DEFAULT_MAX_CACHE_SIZE   - Tamaño default del caché
@@ -21,18 +22,22 @@ public class Cache<K,T>
   private int                     maxSize;
 
   private final static int DEFAULT_MAX_CACHE_SIZE = 100;
+  private final static int DEFAULT_MIN_CACHE_SIZE =  10;
 
-  /** Obtiene una instancia del caché */
+  /** Obtiene una instancia del caché 
+   */
   public Cache( ) { reset( DEFAULT_MAX_CACHE_SIZE);}
 
   /**
    * Obtiene una instancia del caché
+   * 
    * @param size Tamaño máximo en que se espera llenar el caché.
    */
-  public Cache( int size) { reset(size);}
+  public Cache( int size) { reset( size >= DEFAULT_MIN_CACHE_SIZE? size : DEFAULT_MAX_CACHE_SIZE );}
 
   /**
    * Reinicializa el caché
+   * 
    * @param size Tamaño máximo en que se espera llenar el caché.
    * @throw IllegalArgumentException cuando {@code size <= 0}
    */
@@ -53,6 +58,8 @@ public class Cache<K,T>
    * Adiciona objetos al caché, de acuerdo con su política.
    * Cuando el caché lo determine, los objetos pueden ser borrados del mismo
    * para hacer campo para nuevos objetos
+   * 
+   * @param key - Key that identifies the object to be added
    * @param obj - The candidate for addition to the caché
    */
   public synchronized void add(K key, T obj)
@@ -92,7 +99,8 @@ public class Cache<K,T>
 
   /**
    * Obtiene un objeto con base en su identificador
-   * @id Identificador único del objeto
+   * 
+   * @param key Identificador único del objeto
    * @return objeto solicitado, cuando se encuentra;
    * null si no se encuentra
    */
@@ -126,6 +134,8 @@ public class Cache<K,T>
 
   /**
    * Remplaza un objeto del caché por otro
+   * 
+   * @param key    Identificador único del objeto a remplazar
    * @param object El nuevo objeto
    * @return La versión antigua del objeto, si existe;
    * null si no existe
@@ -145,6 +155,7 @@ public class Cache<K,T>
 
   /**
    * Remueve un objeto del caché
+   * 
    * @param key Identificador del objeto a remover
    * @return El objeto removido, si existe; null si no existe
    */
@@ -179,6 +190,7 @@ public class Cache<K,T>
 
   /**
    * Aplana la estructura del caché en un String
+   * 
    * @return String que representa el caché
    */
   public synchronized String toString()
@@ -234,6 +246,7 @@ public class Cache<K,T>
   {
     /**
      * Obtiene un objeto con base en su identificador
+     * 
      * @param key Identificador del objeto
      * @return Keyable El objeto solicitado, si se encuentra;
      * null cuando no se encuentra
@@ -242,6 +255,7 @@ public class Cache<K,T>
 
     /**
      * Adiciona un nuevo objeto al sistema
+     * 
      * @param key Identificador del objeto
      * @param object El objeto a adicionar
      */
@@ -249,6 +263,7 @@ public class Cache<K,T>
 
     /**
      * Actualiza la información de un objeto en el sistema
+     * 
      * @param key Identificador del objeto
      * @param object El objeto a actualizar
      * @return el objeto anterior, si existe; null si no existe
@@ -257,6 +272,7 @@ public class Cache<K,T>
 
     /**
      * Remueve el objeto del proveedor
+     * 
      * @param id Identificador del objeto
      * @return el objeto removido, si existe; null si no existe
      */

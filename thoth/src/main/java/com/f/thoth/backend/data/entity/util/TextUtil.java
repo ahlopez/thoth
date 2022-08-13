@@ -15,16 +15,16 @@ import java.util.regex.Pattern;
  */
 public class TextUtil
 {
-  /*
-   *  sf   -   Formato simple para edicion de fechas
-   */
-  private static final Locale APP_LOCALE = Locale.US;
-  private static final SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-  private static final DateTimeFormatter FULL_DATE_FORMATTER     = DateTimeFormatter.ofPattern("yyyy.MM.dd", APP_LOCALE);
-  private static final DateTimeFormatter FULL_DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy.MM.dd:mm.ss", APP_LOCALE);
+  private static final Locale             APP_LOCALE              = Locale.US;
+  private static  final DateTimeFormatter DATE_TIME_FORMATTER     = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS", APP_LOCALE);  // Standard date-time format for a LocalDateTime
+  private static final DateTimeFormatter  DATE_FORMATTER          = DateTimeFormatter.ofPattern("yyyy.MM.dd", APP_LOCALE);   // Standard date format for a LocalDate
+  private static final SimpleDateFormat   sf                      = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");       // Standard date format for a Date
 
   /**
    * Decide si el texto presentado es nulo, o vacio
+   * (Difiere de String.isEmpty en que este método considera
+   * como empty un texto null.
+   * 
    * @param text Texto a examinar
    * @return true si el texto es nulo o vacio
    */
@@ -32,10 +32,27 @@ public class TextUtil
   {
     return text == null || text.length() == 0;
   }//isEmpty
+  
+  
+  /**
+   * Decide si un texto presentado es todo blanco.
+   * Considera un texto null como no-blanco
+   * 
+   * @param text El texto a examinar
+   * @return true si el texto es todo blanco; false si no lo es, o si es nulo
+   */
+  public static boolean isBlank( String text)
+  {
+     if (text == null)
+        return false;
+     
+     return text.trim().length() == 0;
+  }//isBlank
 
 
   /**
    * Decide si el texto presentado es no nulo ni vacio
+   * 
    * @param text Texto a examinar
    * @return true si el texto no es nulo y no es vacio
    */
@@ -44,16 +61,18 @@ public class TextUtil
     return text != null && text.length() > 0;
 
   }//isNotEmpty
+  
 
   /**
-   * Obtiene el �ndice del  argumento en el fuente para una cuenta dada
+   * Obtiene el índice del argumento en el fuente para una cuenta dada  
+   * 
    * Por ejemplo
    *    int idx = indexOf("/FCN/CLS/EXP/012479890001", "/", 3);
    *    obtiene el cuarto "/" en el string  "/FCN/CLS/EXP/012479890001" con resultado 12
    *
    * @param source El string fuente
    * @param arg    El string a buscar
-   * @param count  Cuenta del string arg en el string fuente
+   * @param count  Cuenta del string arg en el string fuente (cuenta inicial = 0)
    *
    * @return int posicion del string arg en el string fuente.
    *         -1 si no existe tal posicion
@@ -87,6 +106,7 @@ public class TextUtil
 
     return b.toString();
   }// repeat
+  
 
   /**
    * Convierte el primer caracter de una cadena a mayusuculas
@@ -95,7 +115,7 @@ public class TextUtil
    */
   public static String sentenceCase(String str)
   {
-    return(isEmpty(str) || str.length()<=1) ?
+    return(isEmpty(str) || str.length()<=1 || isBlank(str)) ?
     str :
     String.valueOf(str.charAt(0)).toUpperCase()+str.substring(1);
   }//sentenceCase
@@ -104,6 +124,7 @@ public class TextUtil
 
   /**
    * Determina si una cadena es un identificador válido
+   * 
    * @param str La cadena a examinar
    * @return true si es un identificador válido; falso si no lo es
    */
@@ -118,6 +139,7 @@ public class TextUtil
 
     return isId;
   }// isIdentifier
+  
 
   /**
    * Remplaza todas las ocurrencias de un string source por el string target,
@@ -134,6 +156,7 @@ public class TextUtil
     StringBuilder result= replace (new StringBuilder( base), source, target);
     return result.toString();
   }// replace
+  
 
   /**
    * Remplaza todas las ocurrencias de un string source por el string target,
@@ -158,6 +181,7 @@ public class TextUtil
     return base;
 
   }// replace
+  
 
   /**
    * Obtiene una fecha formateada AAA/MM/DD
@@ -172,6 +196,7 @@ public class TextUtil
     return    sf.format(theDate.getTime());
 
   }//formatDate
+  
 
   /**
    * Obtiene la fecha formateada dd.mm.yyyy
@@ -183,8 +208,9 @@ public class TextUtil
     return date == null? "---":
     date.equals(LocalDate.MAX)? "-MAX-":
     date.equals(LocalDate.MIN)? "-MIN-":
-    date.format(FULL_DATE_FORMATTER);
+    date.format(DATE_FORMATTER);
   }//formatDate
+  
 
   /**
    * Obtiene la fecha-hora formateada dd.mm.yyyy:mm.ss
@@ -196,7 +222,7 @@ public class TextUtil
     return dateTime == null? "---":
     	   dateTime.equals(LocalDateTime.MAX)? "-MAX-":
     	   dateTime.equals(LocalDateTime.MIN)? "-MIN-":
-           dateTime.format(FULL_DATETIME_FORMATTER);
+           dateTime.format(DATE_TIME_FORMATTER);
   }//formatDateTime
   
   
@@ -269,8 +295,9 @@ public class TextUtil
 
   /**
    * Determina si una cadena es un nombre válido para un nodo.
-   * Los nodos, contrario a los identificadores, pueden empezar por
-   * números, y contener el caracter '-'
+   * Los nodos, al contrario de los identificadores, pueden 
+   * empezar por números, y contener el caracter '-'
+   * 
    * @param source String a examinar
    * @return true si es válida; false si no lo es
    */
@@ -282,6 +309,7 @@ public class TextUtil
     return source.matches("[a-zA-Z0-9_-]{1,255}");
 
   }//isValidNodeName
+  
 
   /**
    * Determina si una cadena es un nombre válido.
@@ -293,9 +321,10 @@ public class TextUtil
     if ( source == null)
       return false;
 
-    return source.matches("[a-zA-ZáéíóúñÁÉÍÓÚÑ]([-a-zA-Z0-9_-áéíóúñÁÉÍÓÚÑ, ]){1,255}");
+    return source.matches("[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ]([-a-zA-Z0-9_-áéíóúüñÁÉÍÓÚÜÑ, ]){1,255}");
 
   }//isValidName
+  
 
   /**
    * Determina si una cadena es alfanumérica,
@@ -310,6 +339,7 @@ public class TextUtil
 
     return source.matches("[a-zA-Z0-9_]([a-zA-Z0-9_-]){0,255}");
   }//isAlphaNumeric
+  
 
   /**
    * Determina si una cadena presentada es una ruta válida
@@ -324,6 +354,7 @@ public class TextUtil
     return  source.matches( "([/]([a-zA-Z0-9_-]{1,255})){1,50}");
 
   }//isValidPath
+  
 
   /**
    * Verifica si un string tiene el formato de una dirección email
@@ -359,15 +390,16 @@ public class TextUtil
 
     return sentenceCase(name);
   }//nameTidy
+  
 
-  public static boolean boolValue( String value)
+  public static boolean isBoolean( String value)
   {
     if ( isEmpty(value))
       return false;
 
     String val = value.toLowerCase();
-    return val.equals("t") || val.equals("true") || val.equals("y") || val.equals("yes");
-  }//boolValue
+    return   val.equals("t") || val.equals("true") || val.equals("f") || val.equals("false");
+  }//isBoolean
 
 
 }//TextUtil

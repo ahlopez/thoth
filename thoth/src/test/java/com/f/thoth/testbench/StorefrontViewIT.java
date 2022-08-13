@@ -40,7 +40,7 @@ public class StorefrontViewIT extends AbstractIT<StorefrontViewElement> {
       order.click();
       ButtonElement editBtn = storefrontPage.getOrderDetails().getEditButton();
       editBtn.click();
-      Assert.assertThat(getDriver().getCurrentUrl(), containsString(Constant.PAGE_STOREFRONT_EDIT));
+      Assert.assertThat(getDriver().getCurrentUrl(), containsString(Constant.PAGE_EVIDENTIAFRONT_EDIT));
 
       OrderEditorElement orderEditor = storefrontPage.getOrderEditor();
       orderEditor.getOrderItemEditor(0).clickAmountFieldPlus();

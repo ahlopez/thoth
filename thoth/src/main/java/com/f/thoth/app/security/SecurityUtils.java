@@ -52,6 +52,7 @@ public final class SecurityUtils
       return null;
       
    }//getUsername
+   
 
    /**
     * Checks if access is granted for the current user for the given secured view,

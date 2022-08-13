@@ -1,7 +1,6 @@
 package com.f.thoth;
 
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 public class Parm
 {
@@ -27,9 +26,12 @@ public class Parm
    public static final Integer        DEFAULT_CATEGORY  = MIN_CATEGORY;                // Default security category if not explicitly provided (i.e. object is public)
    public static final Integer          ADMIN_CATEGORY  = MAX_CATEGORY - 1;            // Maximum security category accessible for the administrator user
 
-   public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS");  // Standard date-time format for a LocalDateTime
-   public static final LocalDateTime      END_OF_TIMES  = LocalDateTime.parse("5000-12-31T11:59:59.999");   // Maximum date handled by the system
    public static final String          VALUE_SEPARATOR  = ";";                         // Separator  of values in a text value list, (vg a metadata ENUM type)
    public static final String               NULL_VALUE  = "*";                         // Null value for any metadata text value of the system
-   
+
+   public static final LocalDateTime      END_OF_TIMES  = LocalDateTime.parse("9999-12-31T11:59:59.999");   // Maximum date handled by the system
+
+   public static final int       NOTIFICATION_DURATION  = 10000;                      // Time duration of a notification
+   //TODO:  After debugging colocar NOTIFICATION_DURATION EN 4000
+
 }//Parm

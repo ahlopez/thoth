@@ -22,9 +22,9 @@ public class AccessPermissionView extends AbstractPermissionView<Classification>
    {
       super(Classification.class, service, roleService, currentUser, Constant.TITLE_PERMISOS_ACCESO);
    }
-   
-   @Override 
+
+   @Override
    protected String getBasePage() { return Constant.PAGE_PERMISOS_ACCESO;}
 
 
-}//AccessPermitView
+}//AccessPermissionView

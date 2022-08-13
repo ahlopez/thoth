@@ -24,6 +24,7 @@ public class CacheManager<K,T>                     // K= Key type,  T=Cached obj
 
   /**
    * Reinicializa el administrador de caché
+   * 
    * @param server - Proveedor de objetos cuando no están en el caché
    * @param size   - Tamaño del caché
    * @throw NullPointerException cuando {@code server == null}
@@ -40,30 +41,28 @@ public class CacheManager<K,T>                     // K= Key type,  T=Cached obj
       this.cache  = new Cache<>( size);
 
   }//reset
+  
 
   /**
    * Adiciona un nuevo objeto al sistema
+   * 
+   * @param key    Identificador único del objeto a adicionar
    * @param object El objeto a adicionar
    */
   public synchronized void add(K key, T object)
   {
 	if (cache.fetch(key) == null)
 	{
-		cache.add(key, object);
-        server.add(key, object);
+		cache.add (key, object);
+      server.add(key, object);
 	}
-	/*
-    if ( server.fetch(key) == null)
-    {
-    	cache.add (key, object);
-        server.add(key, object);
-    }
-    */
-
   }//add
+  
 
   /**
    * Actualiza un objeto en el sistema
+   * 
+   * @param key    Identificador único del objeto a actualizar
    * @param object El nuevo objeto con la información actualizada
    */
   public synchronized T update( K key, T object)
@@ -71,45 +70,51 @@ public class CacheManager<K,T>                     // K= Key type,  T=Cached obj
     server.update(key, object);
     return cache.replace(key, object);
   }// update
+  
 
   /**
    * Obtiene un objeto dado su identificador
-   * @param id Identificador del objeto
+   * 
+   * @param key Identificador del objeto
    * @return El objeto solicitado si se encuentra; null si el objeto no se encuentra
    */
-  public synchronized T fetch( K id)
+  public synchronized T fetch( K key)
   {
-    T theObject = cache.fetch(id);
+    T theObject = cache.fetch(key);
     if ( theObject == null )
     {
-      theObject = server.fetch(id);
+      theObject = server.fetch(key);
       if ( theObject != null )
-        cache.add(id, theObject);
+        cache.add(key, theObject);
     }
     return theObject;
   } // fetch
+  
 
   /**
    * Remueve un objeto del caché y de su servidor
-   * @param id Identificador del objeto
+   * 
+   * @param key Identificador del objeto
    * @return El objeto removido, si existe; null si no existe
    */
-  public synchronized T remove( K id)
+  public synchronized T remove( K key)
   {
-    server.remove( id);
-    return cache.remove( id);
+    server.remove( key);
+    return cache.remove( key);
   }//remove
+  
 
   /**
    * Remueve un objeto del caché de forma que si se vuelve a solicitar
    * deberá ser cargado de nuevo
-   * @param id Identificador del objeto
+   * @param key Identificador del objeto
    * @return El objeto removido, si existe; null si no existe
    */
-  public synchronized T invalidate( K id)
+  public synchronized T invalidate( K key)
   {
-    return cache.remove(id);
+    return cache.remove(key);
   }//invalidate
+  
 
   /**
    * Aplana la estructura del objeto en un String

@@ -6,7 +6,6 @@ import org.openqa.selenium.remote.BrowserType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 import com.f.thoth.testbench.elements.ui.LoginViewElement;
-import com.f.thoth.ui.utils.Constant;
 import com.vaadin.testbench.IPAddress;
 import com.vaadin.testbench.ScreenshotOnFailureRule;
 import com.vaadin.testbench.TestBenchDriverProxy;
@@ -15,11 +14,6 @@ import com.vaadin.testbench.parallel.ParallelTest;
 
 public abstract class AbstractIT<E extends TestBenchElement> extends ParallelTest {
    public String APP_URL = "http://localhost:8080/";
-
-   static {
-      // Let notifications persist longer during tests
-      Constant.NOTIFICATION_DURATION = 10000;
-   }
 
    @Rule
    public ScreenshotOnFailureRule screenshotOnFailure = new ScreenshotOnFailureRule(this, true);

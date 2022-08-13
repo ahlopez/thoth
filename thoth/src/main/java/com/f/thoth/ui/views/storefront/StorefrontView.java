@@ -35,12 +35,12 @@ import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.templatemodel.TemplateModel;
 
 @Tag("storefront-view")
-@JsModule("./src/views/storefront/storefront-view.js")
-@Route(value = Constant.PAGE_STOREFRONT, layout = MainView.class)
-@RouteAlias(value = Constant.PAGE_STOREFRONT_EDIT, layout = MainView.class)
-@RouteAlias(value = Constant.PAGE_ROOT, layout = MainView.class)
-@PageTitle(Constant.TITLE_STOREFRONT)
-@Secured(Role.ADMIN)
+@JsModule  ("./src/views/storefront/storefront-view.js")
+@Route     (value = Constant.PAGE_EVIDENTIAFRONT,      layout = MainView.class)
+@RouteAlias(value = Constant.PAGE_EVIDENTIAFRONT_EDIT, layout = MainView.class)
+@RouteAlias(value = Constant.PAGE_ROOT,                layout = MainView.class)
+@PageTitle (Constant.TITLE_EVIDENTIAFRONT)
+@Secured   (Role.ADMIN)
 public class StorefrontView extends PolymerTemplate<TemplateModel>
       implements HasLogger, HasUrlParameter<Long>, EntityView<Order> {
 
@@ -76,7 +76,7 @@ public class StorefrontView extends PolymerTemplate<TemplateModel>
             .withProperty("orderCard", OrderCard::create)
             .withProperty("header", order -> presenter.getHeaderByOrderId(order.getId()))
             .withEventHandler("cardClick",
-                  order -> UI.getCurrent().navigate(Constant.PAGE_STOREFRONT + Parm.PATH_SEPARATOR + order.getId())));
+                  order -> UI.getCurrent().navigate(Constant.PAGE_EVIDENTIAFRONT + Parm.PATH_SEPARATOR + order.getId())));
 
       getSearchBar().addFilterChangeListener(
             e -> presenter.filterChanged(getSearchBar().getFilter(), getSearchBar().isCheckboxChecked()));
@@ -103,7 +103,7 @@ public class StorefrontView extends PolymerTemplate<TemplateModel>
 
    @Override
    public void setParameter(BeforeEvent event, @OptionalParameter Long orderId) {
-      boolean editView = event.getLocation().getPath().contains(Constant.PAGE_STOREFRONT_EDIT);
+      boolean editView = event.getLocation().getPath().contains(Constant.PAGE_EVIDENTIAFRONT_EDIT);
       if (orderId != null) {
          presenter.onNavigation(orderId, editView);
       } else if (dialog.isOpened()) {
@@ -112,7 +112,7 @@ public class StorefrontView extends PolymerTemplate<TemplateModel>
    }
 
    void navigateToMainView() {
-      getUI().ifPresent(ui -> ui.navigate(Constant.PAGE_STOREFRONT));
+      getUI().ifPresent(ui -> ui.navigate(Constant.PAGE_EVIDENTIAFRONT));
    }
 
    @Override

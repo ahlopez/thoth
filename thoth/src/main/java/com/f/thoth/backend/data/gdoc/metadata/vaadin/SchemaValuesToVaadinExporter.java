@@ -93,7 +93,7 @@ public class SchemaValuesToVaadinExporter implements SchemaValues.Exporter
       }
       else if( field instanceof Checkbox)
       {
-         boolean boolValue = TextUtil.boolValue(value);
+         boolean boolValue = TextUtil.isBoolean(value);
          ((Checkbox)field).setValue(boolValue);
       }
       else if( field instanceof TextArea)

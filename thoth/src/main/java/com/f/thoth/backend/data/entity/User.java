@@ -12,6 +12,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+//TODO: Este es el usuario original del ejemplo Vaadin. Remplazar por el usuario Evidentia, o eliminar completamente
 @Entity(name="UserInfo")
 public class User extends AbstractEntity 
 {
@@ -36,25 +37,26 @@ public class User extends AbstractEntity
    @NotBlank
    @Size(max = 255)
    private String role;
+   //TODO: Remplazar pues un usuario puede tener múltiples roles
 
    private boolean locked = false;
 
    @PrePersist
    @PreUpdate
-   private void prepareData(){
-      this.email = email == null ? null : email.toLowerCase();
+   private void prepareData() 
+   {  this.email = email == null ? null : email.toLowerCase();
    }
 
-   public User() {
-      // An empty constructor is needed for all beans
+   public User()  
+   {  // An empty constructor is needed for all beans
    }
 
-   public String getPasswordHash() {
-      return passwordHash;
+   public String getPasswordHash()  
+   {   return passwordHash;
    }
 
-   public void setPasswordHash(String passwordHash) {
-      this.passwordHash = passwordHash;
+   public void setPasswordHash(String passwordHash)  
+   {   this.passwordHash = passwordHash;
    }
 
    public String getFirstName() {
