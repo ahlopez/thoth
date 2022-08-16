@@ -51,7 +51,7 @@ public class DocumentOpenSearchView extends HorizontalLayout
    @Autowired
    public DocumentOpenSearchView(ClassificationService classificationService)
    {
-      this.classificationService =  classificationService;
+      this.classificationService = classificationService;
 
       addClassName("main-view");
       setSizeFull();
