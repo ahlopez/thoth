@@ -64,7 +64,7 @@ import com.vaadin.flow.server.VaadinSession;
 @Route(value = PAGE_JERARQUIA_EXPEDIENTES, layout = MainView.class)
 @PageTitle(TITLE_JERARQUIA_EXPEDIENTES)
 @Secured(Role.ADMIN)
-class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParameter<String>, AfterNavigationObserver
+public class ExpedienteHierarchyView extends HorizontalLayout implements HasUrlParameter<String>, AfterNavigationObserver
 {
 
   private ClassificationService       classificationService;

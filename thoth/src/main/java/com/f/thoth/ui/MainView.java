@@ -23,6 +23,7 @@ import com.f.thoth.ui.views.expediente.ExpedienteClassSelectorView;
 import com.f.thoth.ui.views.metadata.DocumentTypeView;
 import com.f.thoth.ui.views.metadata.MetadataSchemaView;
 import com.f.thoth.ui.views.metadata.MetadataView;
+import com.f.thoth.ui.views.search.DocumentOpenSearchView;
 import com.f.thoth.ui.views.security.permission.AccessPermissionView;
 import com.f.thoth.ui.views.security.permission.ExecutePermissionView;
 import com.f.thoth.ui.views.storefront.StorefrontView;
@@ -342,24 +343,25 @@ public class MainView extends AppLayout
     MenuItem docsMenu = consultaMenu.addItem(new Div(VaadinIcon.COPY_O.create(), new Label(Constant.TITLE_DOCUMENTOS)));
     SubMenu consultaDocsMenu = docsMenu.getSubMenu();
 
-    if (SecurityUtils.isAccessGranted(OperationView.class))
+    if (SecurityUtils.isAccessGranted(DocumentOpenSearchView.class))
       consultaDocsMenu.addItem(createRoute(VaadinIcon.BUTTON, Constant.TITLE_CONSULTA_LIBRE, OperationView.class));
 
-    if (SecurityUtils.isAccessGranted(OperationView.class))
+    /*
+    if (SecurityUtils.isAccessGranted(MetadataDocumentSearchView.class))
       consultaDocsMenu.addItem(createRoute(VaadinIcon.FORM, Constant.TITLE_CONSULTA_METADATOS, OperationView.class));
 
     MenuItem expedienteMenu = consultaMenu.addItem(new Div(VaadinIcon.FILE_O.create(), new Label(Constant.TITLE_CONSULTA_EXPEDIENTES)));
     SubMenu consultaExpedienteMenu = expedienteMenu.getSubMenu();
 
-    if (SecurityUtils.isAccessGranted(OperationView.class))
+    if (SecurityUtils.isAccessGranted(OpenExpedienteSearchView.class))
       consultaExpedienteMenu.addItem(createRoute(VaadinIcon.NATIVE_BUTTON, Constant.TITLE_CONSULTA_EXPEDIENTES_LIBRE, OperationView.class));
 
-    if (SecurityUtils.isAccessGranted(OperationView.class))
+    if (SecurityUtils.isAccessGranted(MetadataExpedienteSearchView.class))
       consultaExpedienteMenu.addItem(createRoute(VaadinIcon.BULLETS, Constant.TITLE_CONSULTA_EXPEDIENTES_METADATOS, OperationView.class));
 
-    if (SecurityUtils.isAccessGranted(OperationView.class))
+    if (SecurityUtils.isAccessGranted(ClassificationTreeExpedienteSearchView.class))
       consultaExpedienteMenu.addItem(createRoute(VaadinIcon.CONNECT, Constant.TITLE_CONSULTA_EXPEDIENTES_CLASIFICACION, OperationView.class));
-
+    */
     if ( consultaMenu.getItems().size() > 0)
       mainMenu.add(consulta);
 

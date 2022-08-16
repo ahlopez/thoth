@@ -222,7 +222,7 @@ public class TextUtil
     return dateTime == null? "---":
     	   dateTime.equals(LocalDateTime.MAX)? "-MAX-":
     	   dateTime.equals(LocalDateTime.MIN)? "-MIN-":
-           dateTime.format(DATE_TIME_FORMATTER);
+         dateTime.format(DATE_TIME_FORMATTER);
   }//formatDateTime
   
   

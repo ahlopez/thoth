@@ -1,7 +1,6 @@
 package com.f.thoth.ui.views.metadata;
 
 import static com.f.thoth.Parm.CURRENT_USER;
-
 import static com.f.thoth.ui.utils.Constant.PAGE_TIPOS_DOCUMENTALES;
 import static com.f.thoth.ui.utils.Constant.TITLE_TIPOS_DOCUMENTALES;
 

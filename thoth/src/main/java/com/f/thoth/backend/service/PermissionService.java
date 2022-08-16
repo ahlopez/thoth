@@ -3,9 +3,9 @@ package com.f.thoth.backend.service;
 import java.util.List;
 import java.util.Set;
 
-import com.f.thoth.backend.data.security.User;
 import com.f.thoth.backend.data.security.Permission;
 import com.f.thoth.backend.data.security.Role;
+import com.f.thoth.backend.data.security.User;
 
 public interface PermissionService<T> extends HierarchicalService<T>
 {

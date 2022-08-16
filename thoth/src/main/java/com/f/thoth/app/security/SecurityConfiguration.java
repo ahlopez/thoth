@@ -1,9 +1,9 @@
 package com.f.thoth.app.security;
 
-import static com.f.thoth.Parm.CURRENT_USER;
-import static com.f.thoth.Parm.TENANT;
 import static com.f.thoth.Parm.CLASS_ROOT;
+import static com.f.thoth.Parm.CURRENT_USER;
 import static com.f.thoth.Parm.EXPEDIENTE_ROOT;
+import static com.f.thoth.Parm.TENANT;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
