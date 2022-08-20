@@ -344,7 +344,7 @@ public class MainView extends AppLayout
     SubMenu consultaDocsMenu = docsMenu.getSubMenu();
 
     if (SecurityUtils.isAccessGranted(DocumentOpenSearchView.class))
-      consultaDocsMenu.addItem(createRoute(VaadinIcon.BUTTON, Constant.TITLE_CONSULTA_LIBRE, OperationView.class));
+      consultaDocsMenu.addItem(createRoute(VaadinIcon.BUTTON, Constant.TITLE_CONSULTA_LIBRE, DocumentOpenSearchView.class));
 
     /*
     if (SecurityUtils.isAccessGranted(MetadataDocumentSearchView.class))
